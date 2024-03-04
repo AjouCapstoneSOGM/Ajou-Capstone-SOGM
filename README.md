@@ -1,4 +1,4 @@
-# Ajou-Capstone-Team5
+# Ajou-Capstone-Team5 SOGM
 2024-01 Ajou. Capstone Team Project
 
 ---
