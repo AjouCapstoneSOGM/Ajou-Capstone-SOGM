@@ -14,3 +14,5 @@
 
 ### Project
 - 
+kr_news.ipynb : 네이버증권 실시간 뉴스 크롤링하는 파일입니다.
+portfolio_v1.ipynb : 티커입력하면 포트폴리오 만드는 파일입니다.
