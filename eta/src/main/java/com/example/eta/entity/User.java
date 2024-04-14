@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,33 +16,35 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
+    @Column(name = "user_id")
+    private int userId;
 
-    @OneToMany(mappedBy = "pfId")
+    @OneToMany(mappedBy = "user")
     private List<Portfolio> portfolios = new ArrayList<>();
 
-    @Column(nullable = false, length = 100)
+    @Column(name = "email", nullable = false, length = 100)
     private String email;
 
-    @Column(nullable = false)
+    @Column(name = "is_verified")
+    private Boolean isVerified;
+
+    @Column(name = "password")
     private String password;
 
-    @Column(nullable = false, length = 30)
+    @Column(name = "name", nullable = false, length = 30)
     private String name;
-/*
 
-    @Column(nullable = false)
-    private Integer role;
+    @Column(name = "role", nullable = false)
+    private int role;
 
-    @Column(nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createdDate;
+    @Column(name = "created_date", nullable = false)
+    private LocalDateTime createdDate;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date modifiedDate;
+    @Column(name = "modified_date")
+    private LocalDateTime modifiedDate;
 
-    @Column(nullable = false)
+    @Column(name = "is_suspended", nullable = false)
     private Boolean isSuspended;
-*/
+
 }
 
