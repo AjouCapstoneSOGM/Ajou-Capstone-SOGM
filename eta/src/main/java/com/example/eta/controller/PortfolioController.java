@@ -16,7 +16,7 @@ public class PortfolioController {
     private PortfolioService portfolioService;
 
     @PostMapping("/{userId}")
-    public ResponseEntity<Portfolio> addPortfolio(@PathVariable("userId") Long userId, @RequestBody PortfolioDto portfolioDto) {
+    public ResponseEntity<Portfolio> addPortfolio(@PathVariable("userId") int userId, @RequestBody PortfolioDto portfolioDto) {
         Portfolio portfolio = portfolioService.createPortfolio(userId, portfolioDto);
         return new ResponseEntity<>(portfolio, HttpStatus.CREATED);
     }

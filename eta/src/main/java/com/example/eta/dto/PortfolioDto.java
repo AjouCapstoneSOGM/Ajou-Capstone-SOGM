@@ -11,5 +11,4 @@ public class PortfolioDto {
     private Boolean isAuto;
     private Float initAsset;
     private Integer riskValue;
-    private String interestArea;
 }

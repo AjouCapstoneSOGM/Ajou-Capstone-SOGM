@@ -29,13 +29,13 @@ public class UserService {
     }
 
     @Transactional //변경
-    public Long join(User user) {
+    public int join(User user) {
         userRepository.save(user);
         return user.getUserId();
     }
 
     @Transactional // 데이터 변경
-    public void update(Long id, UserDto userDto) {
+    public void update(int id, UserDto userDto) {
         // User 엔티티 조회
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다. id=" + id));
@@ -47,7 +47,7 @@ public class UserService {
         //userRepository.save(user); 해줄필요없음 더티체킹으로 반영
     }
 
-    public User findOne(Long id) {
+    public User findOne(int id) {
         // ID로 User 엔티티 조회
         return userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다. id=" + id));

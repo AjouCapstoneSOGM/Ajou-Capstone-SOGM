@@ -18,7 +18,7 @@ public class Portfolio {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer pfId;
+    private int pfId;
 
     @JsonIgnore
     @ManyToOne(fetch = LAZY)
@@ -33,18 +33,14 @@ public class Portfolio {
     private String country;
 
     @Column(nullable = false)
-    @JsonProperty("isAuto")
     private Boolean isAuto;
 
     @Column(nullable = false)
-    @JsonProperty("initAsset")
     private Float initAsset; // 초기 자산
 
     @Column(nullable = false)
     private Integer riskValue; // 투자 성향 (리스크 감당 정도)
 
-    @Column(nullable = true, length = 100)
-    private String interestArea; // 관심 분야
 
     @Column(nullable = true)
     private Float currentAsset;

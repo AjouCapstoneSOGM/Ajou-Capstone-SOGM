@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -19,7 +20,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
+    private int userId;
 
     @JsonIgnore
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
@@ -28,24 +29,25 @@ public class User {
     @Column(nullable = false, length = 100)
     private String email;
 
+    @Column
+    private Boolean isVerified;
+
     @Column(nullable = false)
     private String password;
 
     @Column(nullable = false, length = 30)
     private String name;
-/*
-    @Column(nullable = true)
-    private Integer role;
 
-    @Column(nullable = true)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createdDate;
+    @Column(nullable = false)
+    private String role;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date modifiedDate;
+    @Column(nullable = false)
+    private LocalDateTime createdDate;
 
-    @Column(nullable = true)
-    private Boolean isSuspended;
-    */
+    @Column
+    private LocalDateTime modifiedDate;
+
+    @Column(nullable = false)
+    private Boolean enabled;
 }
 

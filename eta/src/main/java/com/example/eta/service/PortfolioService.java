@@ -14,13 +14,12 @@ public class PortfolioService {
     private PortfolioRepository portfolioRepository;
     @Autowired
     private UserRepository userRepository;
-    public Portfolio createPortfolio(Long userId, PortfolioDto portfolioDto) {
+    public Portfolio createPortfolio(int userId, PortfolioDto portfolioDto) {
         Portfolio portfolio = new Portfolio();
         portfolio.setUser(userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found")));
         portfolio.setInitAsset(portfolioDto.getInitAsset());
         portfolio.setIsAuto(portfolioDto.getIsAuto());
         portfolio.setRiskValue(portfolioDto.getRiskValue());
-        portfolio.setInterestArea(portfolioDto.getInterestArea());
         return portfolioRepository.save(portfolio);
     }
 }
