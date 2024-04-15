@@ -17,6 +17,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 
 @Component
@@ -52,7 +53,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     // 로그인, 회원가입 API는 JWT 인증 필터 무시
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return request.getServletPath().equals("/api/auth/login");
+        List<String> pathsToExclude = List.of("/api/auth/", "/docs");
+        return pathsToExclude.stream().anyMatch(path -> request.getServletPath().startsWith(path));
     }
-
 }
