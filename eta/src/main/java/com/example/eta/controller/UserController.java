@@ -9,9 +9,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController @Slf4j
 @RequestMapping("/api/user")
@@ -23,12 +26,6 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("/signupv1")
-    public CreateUserResponse saveMemberV1(@RequestBody @Valid User user) {
-        Long id = userService.join(user);
-        return new CreateUserResponse(id);
-
-    }
 //회원등록
     @PostMapping("/signup")
     public CreateUserResponse savaMemberV2(@RequestBody @Valid CreateUserRequest request) {
@@ -43,6 +40,7 @@ public class UserController {
 
     }
 
+    //유저 조회 기능
     @PatchMapping("/{id}")
     public UpdateUserResponse updateUserV2(
             @PathVariable("id") Long id,
@@ -57,12 +55,24 @@ public class UserController {
 
     }
 
+    //멤버전체 조회 (현재 사용 안됩니다.)
     @GetMapping("/users")
     public List<User> membersV1() {
         return userService.findUsers();
     }
 
 
+    //로그인 기능
+    @PostMapping("/login")
+    public ResponseEntity<LoginRequest.LoginResponse> login(@RequestBody LoginRequest request) {
+        User user = userService.authenticate(request.getEmail(), request.getPassword());
+        log.info("여기까지");
+        if (user != null) {
+            return ResponseEntity.ok(new LoginRequest.LoginResponse(user.getUserId(), user.getEmail(), user.getName()));
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
     @Data
     static class CreateUserRequest{
         @NotEmpty
@@ -96,6 +106,20 @@ public class UserController {
         private String password;
     }
 
+    @Data
+    static class LoginRequest {
+        private String email;
+        private String password;
+
+    @Data
+    @AllArgsConstructor
+    static class LoginResponse {
+        private Long userId;
+        private String email;
+        private String name;
+        }
+
+
     /*@PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody UserDto userDto) {
         log.info("register");
@@ -106,4 +130,6 @@ public class UserController {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
     }*/
+    }
 }
+

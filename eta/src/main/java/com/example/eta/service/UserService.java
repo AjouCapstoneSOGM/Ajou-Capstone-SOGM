@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -23,6 +24,9 @@ public class UserService {
     }
 
 
+    public User authenticate(String email, String password) {
+        return userRepository.findByEmailAndPassword(email, password);
+    }
 
     @Transactional //변경
     public Long join(User user) {
