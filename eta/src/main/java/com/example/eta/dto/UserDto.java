@@ -4,18 +4,20 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class UserDto {
-    private String name;
-    private String email;
-    private String password;
-
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class Login {
+    public static class InfoDto {
+        private String name;
+        private String email;
+        private String password;
+
+    }
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class LoginDto {
         private String email;
         private String password;
     }

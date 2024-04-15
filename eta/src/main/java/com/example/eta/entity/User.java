@@ -1,50 +1,53 @@
 package com.example.eta.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity
-@Getter
-@Setter
+@Data
+@ToString(exclude = "portfolios") // Portfolio 리스트를 toString에서 제외
 @Table(name = "user")
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
-    private Long userId;
+    private int userId;
 
-    @OneToMany(mappedBy = "user")
+    @JsonIgnore
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Portfolio> portfolios = new ArrayList<>();
 
-    @Column(name = "email", nullable = false, length = 100)
+    @Column(nullable = false, length = 100)
     private String email;
 
-    @Column(name = "is_verified")
+    @Column
     private Boolean isVerified;
 
-    @Column(name = "password")
+    @Column(nullable = false)
     private String password;
 
-    @Column(name = "name", nullable = false, length = 30)
+    @Column(nullable = false, length = 30)
     private String name;
 
-    @Column(name = "role", nullable = false)
+    @Column(nullable = false)
     private String role;
 
-    @Column(name = "created_date", nullable = false)
+    @Column(nullable = false)
     private LocalDateTime createdDate;
 
-    @Column(name = "modified_date")
+    @Column
     private LocalDateTime modifiedDate;
 
-    @Column(name = "enabled", nullable = false)
+    @Column(nullable = false)
     private Boolean enabled;
-
 }
 
