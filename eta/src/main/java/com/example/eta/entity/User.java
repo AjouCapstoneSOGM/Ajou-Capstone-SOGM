@@ -17,7 +17,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
-    private int userId;
+    private Long userId;
 
     @OneToMany(mappedBy = "user")
     private List<Portfolio> portfolios = new ArrayList<>();
@@ -35,7 +35,7 @@ public class User {
     private String name;
 
     @Column(name = "role", nullable = false)
-    private int role;
+    private String role;
 
     @Column(name = "created_date", nullable = false)
     private LocalDateTime createdDate;
@@ -43,8 +43,8 @@ public class User {
     @Column(name = "modified_date")
     private LocalDateTime modifiedDate;
 
-    @Column(name = "is_suspended", nullable = false)
-    private Boolean isSuspended;
+    @Column(name = "enabled", nullable = false)
+    private Boolean enabled;
 
 }
 

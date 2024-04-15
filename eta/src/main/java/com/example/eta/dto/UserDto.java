@@ -11,4 +11,12 @@ public class UserDto {
     private String name;
     private String email;
     private String password;
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Login {
+        private String email;
+        private String password;
+    }
 }
