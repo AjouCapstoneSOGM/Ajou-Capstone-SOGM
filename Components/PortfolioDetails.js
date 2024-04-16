@@ -17,6 +17,19 @@ const PortfolioDetails = ({ route }) => {
   const [selectedId, setSelectedId] = useState(null);
   const [details, setDetails] = useState([]);
 
+  const colorScale = [
+    "#FF6384",
+    "#36A2EB",
+    "#FFCE56",
+    "#4BC0C0",
+    "#F77825",
+    "#9966FF",
+    "#00BFA5",
+    "#C94D77",
+    "#4D4D4D",
+    "#7CDDDD",
+  ];
+
   // API로 받아온 데이터
 
   const data = details.map((detail) => ({
@@ -84,39 +97,16 @@ const PortfolioDetails = ({ route }) => {
   }, []);
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       <Text style={styles.title}>{portfolio.name}</Text>
       <VictoryPie
         data={data}
-        colorScale={[
-          "#FF6384",
-          "#36A2EB",
-          "#FFCE56",
-          "#4BC0C0",
-          "#F77825",
-          "#9966FF",
-          "#00BFA5",
-          "#C94D77",
-          "#4D4D4D",
-          "#7CDDDD",
-        ]}
+        colorScale={colorScale}
         width={screenWidth}
-        height={300}
-        innerRadius={({ index }) =>
-          index === details.findIndex((detail) => detail.id === selectedId)
-            ? 40
-            : 50
-        }
-        labelRadius={({ index }) =>
-          index === details.findIndex((detail) => detail.id === selectedId)
-            ? 130
-            : 110
-        }
-        radius={({ index }) =>
-          index === details.findIndex((detail) => detail.id === selectedId)
-            ? 110
-            : 100
-        } // 선택된 조각의 반경을 증가
+        height={400}
+        innerRadius={({ index }) => (index === selectedId ? 40 : 50)}
+        labelRadius={({ index }) => (index === selectedId ? 130 : 110)}
+        radius={({ index }) => (index === selectedId ? 110 : 100)} // 선택된 조각의 반경을 증가
         style={{
           labels: {
             fill: "black",
@@ -129,32 +119,40 @@ const PortfolioDetails = ({ route }) => {
         showsHorizontalScrollIndicator={false}
         style={styles.horizontalScroll}
       >
-        {details.map((item) => (
+        {details.map((item, index) => (
           <TouchableOpacity
-            key={item.id}
+            key={index}
             style={[
               styles.item,
-              selectedId === item.id ? styles.selectedItem : styles.item,
+              selectedId === index ? styles.selectedItem : styles.item,
             ]}
-            onPress={() => handleSelectItem(item.id)}
+            onPress={() => handleSelectItem(index)}
           >
             <Text style={styles.itemText}>{item.name}</Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
       <View style={styles.detailItem}>
-        <Text style={styles.itemText}>
-          {selectedId === null ? "" : details[selectedId].cur_proportion}
-        </Text>
-        <Text Style={styles.itemText}>
-          {selectedId === null
-            ? ""
-            : details[selectedId].buying_price * details[selectedId].number}
-        </Text>
+        <View>
+          <Text style={styles.itemText}>
+            {selectedId === null
+              ? ""
+              : details[selectedId].cur_proportion + "주"}
+          </Text>
+          <Text Style={styles.itemText}>
+            {selectedId === null
+              ? ""
+              : details[selectedId].buying_price * details[selectedId].number +
+                "원"}
+          </Text>
+        </View>
+        {selectedId != null && (
+          <Button title="자세히 보기" onPress={() => {}} />
+        )}
       </View>
       <Button title="뉴스 요약" onPress={() => {}} />
       <Button title="수정" onPress={() => {}} />
-    </ScrollView>
+    </View>
   );
 };
 
@@ -211,12 +209,13 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   detailItem: {
+    flexDirection: "row",
     backgroundColor: "#f9f9f9",
     borderRadius: 10,
     width: 400, // 박스의 폭을 고정
     height: 200, // 박스의 높이를 고정
-    padding: 10,
-    justifyContent: "center", // 내용을 세로 방향으로 중앙 정렬
+    padding: 20,
+    justifyContent: "space-between", // 내용을 세로 방향으로 중앙 정렬
     alignItems: "center", // 내용을 가로 방향으로 중앙 정렬
     shadowColor: "#000", // 그림자 색
     shadowOpacity: 1.25, // 그림자 투명도
