@@ -10,3 +10,14 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
         ddl-auto: update
+
+  jwt:
+    header: Authorization
+    prefix: 'Bearer '
+    secret: qwerty1234qwerty1234qwerty1234qwerty1234qwerty1234qwerty1234
+
+springdoc:
+  api-docs:
+    path: /docs/api-docs
+  swagger-ui:
+    path: /docs/swagger-ui.html

@@ -2,6 +2,7 @@ package com.example.eta.entity;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -12,34 +13,32 @@ public class Portfolio {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer pfId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Column(name = "created_date", nullable = false)
+    private LocalDateTime createdDate;
 
-    @Column(nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createdDate;
-
-    @Column(length = 30)
+    @Column(name = "country", nullable = false, length = 30)
     private String country;
 
-    @Column(nullable = false)
+    @Column(name = "is_auto", nullable = false)
     private Boolean isAuto;
 
-    @Column(nullable = false)
-    private Float initAsset;
+    @Column(name = "init_asset", nullable = false)
+    private float initAsset;
 
-    @Column(nullable = false)
-    private Float currentAsset;
+    @Column(name = "current_asset", nullable = false)
+    private float currentAsset;
 
-    @Column(nullable = false)
-    private Float initCash;
+    @Column(name = "init_cash", nullable = false)
+    private float initCash;
 
-    @Column(nullable = false)
-    private Float currentCash;
+    @Column(name = "current_cash", nullable = false)
+    private float currentCash;
 
-    @Column(nullable = false)
-    private Float rateReturn;
+    @Column(name = "rate_return", nullable = false)
+    private float rateReturn;
 
 }
