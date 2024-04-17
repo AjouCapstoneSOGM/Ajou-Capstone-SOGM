@@ -67,4 +67,8 @@ public class UserService {
         // User 저장
         return userRepository.save(user);
     }
+
+    public Boolean isExistEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
 }

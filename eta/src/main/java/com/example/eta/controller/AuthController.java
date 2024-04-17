@@ -2,12 +2,11 @@ package com.example.eta.controller;
 
 import com.example.eta.dto.UserDto;
 import com.example.eta.entity.User;
+import com.example.eta.exception.EmailAlreadyExistsException;
 import com.example.eta.service.UserService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.Password;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -58,12 +57,8 @@ public class AuthController {
                 new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword());
 
         // 인증
-        try {
-            Authentication authentication = authenticationManager.authenticate(authenticationToken);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-        } catch (AuthenticationException e) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        }
+        Authentication authentication = authenticationManager.authenticate(authenticationToken);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // JWT 토큰 발급
         SecretKey key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
@@ -83,7 +78,9 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public UserController.CreateUserResponse signup(@RequestBody @Valid UserDto.InfoDto InfoDto) {
+    public UserController.CreateUserResponse signup(@RequestBody @Valid UserDto.InfoDto InfoDto) throws RuntimeException{
+        if(userService.isExistEmail(InfoDto.getEmail())) throw new EmailAlreadyExistsException();
+
         User user = new User();
         user.setName(InfoDto.getName());
         user.setPassword(passwordEncoder.encode(InfoDto.getPassword()));
