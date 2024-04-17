@@ -72,6 +72,7 @@ public class AuthController {
         httpHeaders.add(header, prefix + jwt);
         HashMap<String, Object> response = new HashMap<>(){{
             put("token", jwt);
+            put("user_id", userService.findByEmail(loginDto.getEmail()).getUserId());
         }};
 
         return new ResponseEntity<>(response, httpHeaders, HttpStatus.OK);

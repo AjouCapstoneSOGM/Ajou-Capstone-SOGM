@@ -71,4 +71,9 @@ public class UserService {
     public Boolean isExistEmail(String email) {
         return userRepository.existsByEmail(email);
     }
+
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다. email=" + email));
+    }
 }
