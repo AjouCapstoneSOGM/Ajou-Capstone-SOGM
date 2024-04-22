@@ -26,26 +26,13 @@ public class UserController {
         this.userService = userService;
     }
 
-//회원등록
-    @PostMapping("/signup")
-    public CreateUserResponse savaMemberV2(@RequestBody @Valid CreateUserRequest request) {
-        User user = new User();
-        user.setName(request.getName());
-        user.setPassword(request.getPassword());
-        user.setEmail(request.getEmail());
-
-        int id = userService.join(user);
-        return new CreateUserResponse(id);
-
-    }
-
     //유저 조회 기능
     @PatchMapping("/{id}")
     public UpdateUserResponse updateUserV2(
             @PathVariable("id") int id,
             @RequestBody @Valid UpdateUserRequest request) {
 
-        UserDto userDto = new UserDto(
+        UserDto.InfoDto userDto = new UserDto.InfoDto(
                 request.getName(), request.getEmail(), request.getPassword()
         );
         userService.update(id, userDto);
@@ -110,12 +97,21 @@ public class UserController {
         private String email;
         private String password;
 
+<<<<<<< HEAD
     @Data
     @AllArgsConstructor
     static class LoginResponse {
         private int userId;
         private String email;
         private String name;
+=======
+        @Data
+        @AllArgsConstructor
+        static class LoginResponse {
+            private int userId;
+            private String email;
+            private String name;
+>>>>>>> dev
         }
 
 

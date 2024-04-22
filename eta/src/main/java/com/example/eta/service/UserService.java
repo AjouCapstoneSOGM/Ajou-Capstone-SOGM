@@ -35,7 +35,7 @@ public class UserService {
     }
 
     @Transactional // 데이터 변경
-    public void update(int id, UserDto userDto) {
+    public void update(int id, UserDto.InfoDto userDto) {
         // User 엔티티 조회
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다. id=" + id));
@@ -57,7 +57,7 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public User registerNewUser(UserDto userDto) {
+    public User registerNewUser(UserDto.InfoDto userDto) {
         // User 엔티티 생성
         User user = new User();
         user.setName(userDto.getName());

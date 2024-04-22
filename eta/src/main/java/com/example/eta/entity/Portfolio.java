@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import static jakarta.persistence.FetchType.LAZY;
@@ -20,37 +21,31 @@ public class Portfolio {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int pfId;
 
-    @JsonIgnore
-    @ManyToOne(fetch = LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(nullable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createdDate = new Date(); // 생성 시점의 날짜 자동 입력
+    @Column(name = "created_date", nullable = false)
+    private LocalDateTime createdDate;
 
-    @Column(length = 30)
+    @Column(name = "country", nullable = false, length = 30)
     private String country;
 
-    @Column(nullable = false)
+    @Column(name = "is_auto", nullable = false)
     private Boolean isAuto;
 
-    @Column(nullable = false)
-    private Float initAsset; // 초기 자산
+    @Column(name = "init_asset", nullable = false)
+    private float initAsset;
 
-    @Column(nullable = false)
-    private Integer riskValue; // 투자 성향 (리스크 감당 정도)
+    @Column(name = "current_asset", nullable = false)
+    private float currentAsset;
 
+    @Column(name = "init_cash", nullable = false)
+    private float initCash;
 
-    @Column(nullable = true)
-    private Float currentAsset;
+    @Column(name = "current_cash", nullable = false)
+    private float currentCash;
 
-    @Column(nullable = true)
-    private Float initCash;
-
-    @Column(nullable = true)
-    private Float currentCash;
-
-    @Column(nullable = true)
-    private Float rateReturn;
+    @Column(name = "rate_return", nullable = false)
+    private float rateReturn;
 }
