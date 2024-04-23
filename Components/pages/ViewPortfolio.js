@@ -29,17 +29,21 @@ const PortfolioList = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      {portfolios.map((portfolio) => (
-        <TouchableOpacity
-          key={portfolio.id}
-          style={styles.button}
-          onPress={() => navigation.navigate("PortfolioDetails", { portfolio })}
-        >
-          <Text style={styles.name}>{portfolio.name}</Text>
-          <Text>{portfolio.created_at}</Text>
-          <Text>수익률: {portfolio.rate_return}%</Text>
-        </TouchableOpacity>
-      ))}
+      <View style={styles.buttonContainer}>
+        {portfolios.map((portfolio) => (
+          <TouchableOpacity
+            key={portfolio.id}
+            style={styles.contentsButton}
+            onPress={() =>
+              navigation.navigate("PortfolioDetails", { portfolio })
+            }
+          >
+            <Text>{portfolio.name}</Text>
+            <Text>{portfolio.created_at}</Text>
+            <Text>수익률: {portfolio.rate_return}%</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
     </View>
   );
 };
@@ -48,19 +52,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    alignItems: "center",
-    padding: 10,
+    padding: 5,
   },
-  button: {
+  buttonContainer: {
+    alignItems: "center",
+  },
+  contentsButton: {
+    justifyContent: "center", // 가로 방향에서 중앙 정렬
     backgroundColor: "#ddd",
+    alignItems: "center",
     padding: 20,
+    borderRadius: 10,
     marginVertical: 10,
     width: "90%",
   },
-  name: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
 });
-
 export default PortfolioList;
