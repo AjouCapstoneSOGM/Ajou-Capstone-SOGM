@@ -128,7 +128,7 @@ const PortfolioDetails = ({ route }) => {
         )}
       </View>
       <View style={styles.itemContainer}>
-        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+        <ScrollView showsVerticalScrollIndicator={false}>
           {details.map((item, index) => (
             <TouchableOpacity
               key={index}
@@ -147,12 +147,34 @@ const PortfolioDetails = ({ route }) => {
                 <Text style={styles.itemText}>
                   {item.current_price.toLocaleString()}
                 </Text>
+                <Text style={styles.itemText}>
+                  {item.average_price.toLocaleString()}
+                </Text>
+                <Text style={styles.itemText}>
+                  {(item.average_price * item.number).toLocaleString()}
+                </Text>
+                <Text
+                  style={[
+                    styles.itemText,
+                    item.current_price > item.average_price
+                      ? { color: "blue" }
+                      : { color: "red" },
+                  ]}
+                >
+                  {((
+                    (item.average_price - item.current_price) /
+                    item.average_price
+                  ).toFixed(4) *
+                    10000) /
+                    100}
+                  %
+                </Text>
               </View>
             </TouchableOpacity>
           ))}
         </ScrollView>
       </View>
-      <View style={styles.detailItem}>
+      {/* <View style={styles.detailItem}>
         <View>
           <Text style={styles.itemText}>
             평단가 {}
@@ -191,7 +213,7 @@ const PortfolioDetails = ({ route }) => {
         {selectedId != null && (
           <Button title="자세히 보기" onPress={() => {}} />
         )}
-      </View>
+      </View> */}
       <View style={styles.buttonContainer}>
         <Button title="뉴스 요약" onPress={() => {}} />
         <Button title="수정" onPress={() => {}} />
@@ -224,24 +246,25 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   itemContainer: {
-    flex: 2,
+    flex: 4,
     flexDirection: "column",
     overflow: "hidden",
-    paddingVertical: 10, // 스크롤뷰에 상하 패딩 추가
   },
   nameContainer: {
-    flex: 3,
+    flex: 2,
   },
   infoContainer: {
-    flex: 5,
-    justifyContent: "space-around",
+    flex: 4,
+    justifyContent: "space-between",
+    alignContent: "stretch",
+    flexWrap: "wrap",
   },
   item: {
-    flexDirection: "column",
+    flexDirection: "row",
     backgroundColor: "#f9f9f9",
     padding: 10,
     borderRadius: 5,
-    width: 130,
+    height: 120,
     justifyContent: "center", // 내용을 세로 방향으로 중앙 정렬
     alignItems: "center", // 내용을 가로 방향으로 중앙 정렬
     marginHorizontal: 10, // 박스끼리의 수평 간격
