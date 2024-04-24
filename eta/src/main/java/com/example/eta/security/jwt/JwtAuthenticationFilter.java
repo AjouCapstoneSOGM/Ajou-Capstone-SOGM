@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -43,8 +44,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 .getBody();
 
         // 인증 성공 시 인증정보 SecurityContext에 저장
+        // TODO: email 말고 UserDetails를 저장하도록 구현하기
         String email = String.valueOf(claims.get("email"));
         var auth = new UsernamePasswordAuthenticationToken(email, null, List.of(new SimpleGrantedAuthority("USER")));
+//        var auth = new UsernamePasswordAuthenticationToken(
+//                new User(String.valueOf(claims.get("email")), "", null),
+//                null,
+//                List.of(new SimpleGrantedAuthority("USER")));
         SecurityContextHolder.getContext().setAuthentication(auth);
 
         filterChain.doFilter(request, response);
