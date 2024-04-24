@@ -144,31 +144,9 @@ const PortfolioDetails = ({ route }) => {
                 </Text>
               </View>
               <View style={styles.infoContainer}>
-                {/* <Text style={styles.itemText}>
-                  평단가 {item.average_price.toLocaleString()}
-                </Text> */}
                 <Text style={styles.itemText}>
                   {item.current_price.toLocaleString()}
                 </Text>
-                {/* <Text style={styles.itemText}>
-                {(item.average_price * item.number).toLocaleString()}
-              </Text>
-              <Text
-                style={[
-                  styles.itemText,
-                  item.current_price > item.average_price
-                    ? { color: "blue" }
-                    : { color: "red" },
-                ]}
-              >
-                {((
-                  (item.average_price - item.current_price) /
-                  item.average_price
-                ).toFixed(4) *
-                  10000) /
-                  100}
-                %
-              </Text> */}
               </View>
             </TouchableOpacity>
           ))}
