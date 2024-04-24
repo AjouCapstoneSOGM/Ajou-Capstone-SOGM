@@ -62,7 +62,7 @@ const PortfolioDetails = ({ route }) => {
         id: 2,
         name: "SK",
         number: 15,
-        current_price: 120000,
+        current_price: 70000,
         average_price: 80000,
       },
       {
@@ -127,62 +127,94 @@ const PortfolioDetails = ({ route }) => {
           }%`}</Text>
         )}
       </View>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        style={styles.itemContainer}
-      >
-        {details.map((item, index) => (
-          <TouchableOpacity
-            key={index}
-            style={[
-              styles.item,
-              selectedId === index ? styles.selectedItem : {},
-            ]}
-            onPress={() => handleSelectItem(index)}
-          >
-            <View style={styles.nameContainer}>
-              <Text style={{ textAlign: "left", fontSize: 16, padding: 10 }}>
-                {item.name}
+      <View style={styles.itemContainer}>
+        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+          {details.map((item, index) => (
+            <TouchableOpacity
+              key={index}
+              style={[
+                styles.item,
+                selectedId === index ? styles.selectedItem : {},
+              ]}
+              onPress={() => handleSelectItem(index)}
+            >
+              <View style={styles.nameContainer}>
+                <Text style={{ textAlign: "left", fontSize: 16, padding: 10 }}>
+                  {item.name}
+                </Text>
+              </View>
+              <View style={styles.infoContainer}>
+                {/* <Text style={styles.itemText}>
+                  평단가 {item.average_price.toLocaleString()}
+                </Text> */}
+                <Text style={styles.itemText}>
+                  {item.current_price.toLocaleString()}
+                </Text>
+                {/* <Text style={styles.itemText}>
+                {(item.average_price * item.number).toLocaleString()}
               </Text>
-            </View>
-            <View style={styles.infoContainer}>
-              <Text style={styles.itemText}>평단가 {item.average_price}</Text>
-              <Text style={styles.itemText}>현재가 {item.current_price}</Text>
-              <Text style={styles.itemText}>
-                {item.average_price * item.number}
-              </Text>
-              <Text style={styles.itemText}>
+              <Text
+                style={[
+                  styles.itemText,
+                  item.current_price > item.average_price
+                    ? { color: "blue" }
+                    : { color: "red" },
+                ]}
+              >
                 {((
-                  (item.current_price - item.average_price) /
+                  (item.average_price - item.current_price) /
                   item.average_price
                 ).toFixed(4) *
                   10000) /
                   100}
                 %
-              </Text>
-            </View>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-      {/* <View style={styles.detailItem}>
+              </Text> */}
+              </View>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </View>
+      <View style={styles.detailItem}>
         <View>
           <Text style={styles.itemText}>
+            평단가 {}
             {selectedId === null
               ? ""
-              : details[selectedId].cur_proportion + "주"}
+              : details[selectedId].average_price.toLocaleString()}
           </Text>
           <Text Style={styles.itemText}>
             {selectedId === null
               ? ""
-              : details[selectedId].buying_price * details[selectedId].number +
-                "원"}
+              : (
+                  details[selectedId].average_price * details[selectedId].number
+                ).toLocaleString() + " 원"}
           </Text>
+          {selectedId !== null && (
+            <Text
+              style={[
+                styles.itemText,
+                details[selectedId].current_price >
+                details[selectedId].average_price
+                  ? { color: "blue" }
+                  : { color: "red" },
+              ]}
+            >
+              {((
+                (details[selectedId].average_price -
+                  details[selectedId].current_price) /
+                details[selectedId].average_price
+              ).toFixed(4) *
+                10000) /
+                100}
+              %
+            </Text>
+          )}
         </View>
         {selectedId != null && (
           <Button title="자세히 보기" onPress={() => {}} />
         )}
-      </View> */}
-      <View style={styles.buttonView}>
+      </View>
+      <View style={styles.buttonContainer}>
         <Button title="뉴스 요약" onPress={() => {}} />
         <Button title="수정" onPress={() => {}} />
       </View>
@@ -199,19 +231,9 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: "bold",
-    marginBottom: 10,
-  },
-  contentsButton: {
-    justifyContent: "center", // 가로 방향에서 중앙 정렬
-    backgroundColor: "#ddd",
-    alignItems: "center",
-    padding: 20,
-    borderRadius: 10,
-    marginVertical: 10,
-    width: "90%",
   },
   chartContainer: {
-    flex: 1,
+    flex: 4,
     overflow: "hidden",
     position: "relative", // 컨테이너를 상대 위치로 설정
     alignItems: "center", // 자식 요소를 수평 중앙 정렬
@@ -224,25 +246,24 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   itemContainer: {
-    flex: 1,
+    flex: 2,
+    flexDirection: "column",
     overflow: "hidden",
     paddingVertical: 10, // 스크롤뷰에 상하 패딩 추가
   },
   nameContainer: {
-    flex: 2,
+    flex: 3,
   },
   infoContainer: {
     flex: 5,
-    flexWrap: "wrap",
-    alignContent: "stretch",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
   },
   item: {
-    flexDirection: "row",
+    flexDirection: "column",
     backgroundColor: "#f9f9f9",
     padding: 10,
     borderRadius: 5,
-    height: 100, // 박스의 높이를 고정
+    width: 130,
     justifyContent: "center", // 내용을 세로 방향으로 중앙 정렬
     alignItems: "center", // 내용을 가로 방향으로 중앙 정렬
     marginHorizontal: 10, // 박스끼리의 수평 간격
@@ -262,6 +283,7 @@ const styles = StyleSheet.create({
     marginBottom: 3,
   },
   detailItem: {
+    flex: 2,
     flexDirection: "row",
     backgroundColor: "#f9f9f9",
     borderRadius: 10,
@@ -275,6 +297,10 @@ const styles = StyleSheet.create({
     shadowRadius: 4, // 그림자 퍼짐
     elevation: 4, // Android에서 그림자 효과
     marginBottom: 10, // 아래쪽 여백 추가
+  },
+  buttonContainer: {
+    flex: 1,
+    justifyContent: "space-around",
   },
 });
 export default PortfolioDetails;
