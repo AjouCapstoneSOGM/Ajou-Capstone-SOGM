@@ -60,6 +60,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         List<String> pathsToExclude = List.of("/api/auth/", "/docs");
-        return pathsToExclude.stream().anyMatch(path -> request.getServletPath().startsWith(path));
+        return pathsToExclude.stream().anyMatch(path -> request.getRequestURI().startsWith(path));
     }
 }
