@@ -174,46 +174,6 @@ const PortfolioDetails = ({ route }) => {
           ))}
         </ScrollView>
       </View>
-      {/* <View style={styles.detailItem}>
-        <View>
-          <Text style={styles.itemText}>
-            평단가 {}
-            {selectedId === null
-              ? ""
-              : details[selectedId].average_price.toLocaleString()}
-          </Text>
-          <Text Style={styles.itemText}>
-            {selectedId === null
-              ? ""
-              : (
-                  details[selectedId].average_price * details[selectedId].number
-                ).toLocaleString() + " 원"}
-          </Text>
-          {selectedId !== null && (
-            <Text
-              style={[
-                styles.itemText,
-                details[selectedId].current_price >
-                details[selectedId].average_price
-                  ? { color: "blue" }
-                  : { color: "red" },
-              ]}
-            >
-              {((
-                (details[selectedId].average_price -
-                  details[selectedId].current_price) /
-                details[selectedId].average_price
-              ).toFixed(4) *
-                10000) /
-                100}
-              %
-            </Text>
-          )}
-        </View>
-        {selectedId != null && (
-          <Button title="자세히 보기" onPress={() => {}} />
-        )}
-      </View> */}
       <View style={styles.buttonContainer}>
         <Button title="뉴스 요약" onPress={() => {}} />
         <Button title="수정" onPress={() => {}} />
