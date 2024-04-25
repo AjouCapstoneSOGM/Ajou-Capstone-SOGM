@@ -14,13 +14,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 @SpringBootTest
@@ -36,6 +37,7 @@ public class AuthControllerTest {
 
     @Test
     @DisplayName("정상적인 회원가입 테스트")
+    @Transactional
     public void testSignUp() throws Exception {
         // given
         UserDto.InfoDto InfoDto = new UserDto.InfoDto("James", "james@domain.com", "password!");
@@ -43,23 +45,36 @@ public class AuthControllerTest {
 
         // when, then
         MockHttpServletResponse response = mockMvc.perform(post("/api/auth/signup")
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(InfoDto)))
-                        .andDo(print())
-                        .andExpect(status().isOk())
-                        .andReturn().getResponse();
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(InfoDto)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn().getResponse();
 
         Integer id = JsonPath.parse(response.getContentAsString()).read("$.id");
         assertNotNull(userService.findOne(id));
     }
 
     @Test
-    public void testLogin() {
+    @DisplayName("로그인, jwt 발급")
+    @Transactional
+    public void testLogin() throws Exception {
+        // given
+        ObjectMapper objectMapper = new ObjectMapper();
+        UserDto.InfoDto InfoDto = new UserDto.InfoDto("James", "james@domain.com", "password!");
+        mockMvc.perform(post("/api/auth/signup")
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(InfoDto)));
 
-    }
+        UserDto.LoginDto loginDto = new UserDto.LoginDto("james@domain.com", "password!");
 
-    @AfterEach
-    public void removeTestUser() {
-
+        // when, then
+        MockHttpServletResponse response = mockMvc.perform(post("/api/auth/login")
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(loginDto)))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(header().exists("Authorization"))
+                .andReturn().getResponse();
     }
 }
