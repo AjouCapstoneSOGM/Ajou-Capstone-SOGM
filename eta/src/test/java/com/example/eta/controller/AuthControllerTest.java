@@ -48,10 +48,10 @@ public class AuthControllerTest {
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(InfoDto)))
                 .andDo(print())
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andReturn().getResponse();
 
-        Integer id = JsonPath.parse(response.getContentAsString()).read("$.id");
+        Integer id = JsonPath.parse(response.getContentAsString()).read("$.user_id");
         assertNotNull(userService.findOne(id));
     }
 

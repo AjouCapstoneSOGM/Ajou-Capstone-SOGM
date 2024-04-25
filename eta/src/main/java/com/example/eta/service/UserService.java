@@ -13,14 +13,12 @@ import java.util.Optional;
 @Service
 @Transactional(readOnly = true)
 public class UserService {
-    @Autowired
+
     private final UserRepository userRepository;
-//    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-//        this.passwordEncoder = passwordEncoder;
     }
 
 

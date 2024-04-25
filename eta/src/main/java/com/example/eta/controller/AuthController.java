@@ -79,7 +79,7 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public UserController.CreateUserResponse signup(@RequestBody @Valid UserDto.InfoDto InfoDto) throws RuntimeException{
+    public ResponseEntity<Object> signup(@RequestBody @Valid UserDto.InfoDto InfoDto) throws RuntimeException{
         if(userService.isExistEmail(InfoDto.getEmail())) throw new EmailAlreadyExistsException();
 
         User user = new User();
@@ -91,7 +91,9 @@ public class AuthController {
         user.setCreatedDate(LocalDateTime.now());
         user.setEnabled(true);
 
-        int id = userService.join(user);
-        return new UserController.CreateUserResponse(id);
+        HashMap<String, Object> response = new HashMap<>(){{
+            put("user_id", userService.join(user));
+        }};
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 }
