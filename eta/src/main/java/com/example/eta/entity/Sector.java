@@ -13,10 +13,6 @@ public class Sector {
     @Id
     private String sectorId;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "sector", fetch = FetchType.LAZY)
-    private List<Ticker> tickers = new ArrayList<>();
-
     @Column(nullable = false)
     private String name;
 }
