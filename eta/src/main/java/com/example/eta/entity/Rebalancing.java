@@ -14,7 +14,7 @@ public class Rebalancing {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer rnId;
+    private int rnId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pf_id", nullable = false)

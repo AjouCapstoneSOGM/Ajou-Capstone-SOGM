@@ -10,6 +10,6 @@ import java.io.Serializable;
 @AllArgsConstructor
 @EqualsAndHashCode
 public class RebalancingTickerId implements Serializable {
-    private int rnId;
+    private int rebalancing;
     private String ticker;
 }

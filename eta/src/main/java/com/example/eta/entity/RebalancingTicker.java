@@ -20,7 +20,7 @@ public class RebalancingTicker {
     @Id
     @ManyToOne
     @JoinColumn(name = "rn_id")
-    private Portfolio portfolio;
+    private Rebalancing rebalancing;
 
     @Id
     @ManyToOne
