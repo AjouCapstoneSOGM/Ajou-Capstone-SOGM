@@ -11,6 +11,10 @@ const MakePortfolio = ({ navigation }) => {
     setCurrentStep(1);
   };
 
+  const handleReplacePage = () => {
+    navigation.replace("ViewPortfolio");
+  };
+
   const isPathNull = () => {
     if (path === "") {
       return true;
@@ -90,12 +94,19 @@ const MakePortfolio = ({ navigation }) => {
       }
     } else {
       return (
-        <View>
-          <Text>생성이 완료되었습니다!</Text>
-          <Button
-            title="확인"
-            onPress={() => navigation.replace("ViewPortfolio")}
-          />
+        <View style={styles.container}>
+          <View style={[styles.textContainer, { flex: 2 }]}>
+            <Text style={{ fontSize: 25 }}>생성이 완료되었어요!</Text>
+          </View>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={styles.button}
+              title="다음"
+              onPress={handleReplacePage}
+            >
+              <Text style={{ fontSize: 18, color: "white" }}>확인</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       );
     }

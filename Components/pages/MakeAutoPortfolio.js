@@ -190,20 +190,12 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
                   styles.button,
                   isInterestNull() ? styles.disabledButton : "",
                 ]}
-                title="next"
-                onPress={isInterestNull() ? null : handleNextStep}
+                title="submit"
+                onPress={isInterestNull() ? null : submitUserInfo}
               >
-                <Text style={{ fontSize: 18, color: "white" }}>다음</Text>
+                <Text style={{ fontSize: 18, color: "white" }}>생성</Text>
               </TouchableOpacity>
             </View>
-          </View>
-        );
-      case 4:
-        return (
-          <View style={styles.container}>
-            <Text>금액 {amount}</Text>
-            <Text>위험도 {riskLevel} 단계</Text>
-            <Text>관심 {interest}</Text>
           </View>
         );
       default:
