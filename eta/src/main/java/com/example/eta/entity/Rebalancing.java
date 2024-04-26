@@ -1,10 +1,14 @@
 package com.example.eta.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
+@Builder
+@NoArgsConstructor @AllArgsConstructor
 @Table(name = "rebalancing")
 public class Rebalancing {
 
@@ -20,5 +24,6 @@ public class Rebalancing {
     private LocalDateTime createdDate;
 
     @Column(nullable = false)
+    @Setter
     private Boolean ignored;
 }

@@ -1,11 +1,14 @@
 package com.example.eta.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
+@Getter
+@Builder
+@NoArgsConstructor @AllArgsConstructor
 @Table(name = "portfolio")
 public class Portfolio {
 
@@ -20,7 +23,8 @@ public class Portfolio {
     @Column
     private String name;
 
-    @Column(nullable = false)
+    @Column
+    @Setter
     private LocalDateTime createdDate;
 
     @Column(nullable = false, length = 30)
@@ -36,6 +40,7 @@ public class Portfolio {
     private float initCash;
 
     @Column(nullable = false)
+    @Setter
     private float currentCash;
 
     @Column
