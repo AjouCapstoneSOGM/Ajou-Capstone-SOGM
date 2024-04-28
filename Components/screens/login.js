@@ -30,6 +30,7 @@ const Login = () => {
         value={password}
         placeholder="Password"
         onChangeText={setPassword}
+        secureTextEntry
       ></TextInput>
 
       <TouchableOpacity

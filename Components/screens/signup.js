@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   TextInput,
   Button,
+  Alert
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
@@ -16,7 +17,14 @@ const Signup = () => {
   const [useremail, setUseremail] = useState("");
   const [password, setPassword] = useState("");
   const [pwcheck, setpwcheck] = useState("");
-  
+
+  const handleSignUp = () => {
+    if (password != pwcheck) {
+      Alert.alert('비밀번호 확인이 일치하지 않습니다.');
+      return;
+    }
+    navigation.navigate("Home", { screen: 'Home' });
+  }
   return (
     <View style={Styles.container}>      
       <Text style={Styles.HomeText}>회원가입 화면</Text>
@@ -40,6 +48,7 @@ const Signup = () => {
         value={password}
         placeholder="비밀번호"
         style={Styles.Input}
+        secureTextEntry
       >
       </TextInput>
       <TextInput
@@ -47,11 +56,12 @@ const Signup = () => {
         value={pwcheck}
         placeholder="비밀번호 확인"
         style={Styles.Input}
+        secureTextEntry
       >
       </TextInput>
       
       <TouchableOpacity
-          onPress={() => navigation.navigate("Home", { screen: 'Home' })}     
+          onPress={handleSignUp}
           style={Styles.Inputbotton}
         >
           <Text style={Styles.BottomText}>가입하기</Text>
