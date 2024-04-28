@@ -44,5 +44,5 @@ public class Portfolio {
     private float currentCash;
 
     @Column
-    private Boolean riskValue;
+    private int riskValue;
 }
