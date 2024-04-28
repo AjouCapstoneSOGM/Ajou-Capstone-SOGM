@@ -72,7 +72,7 @@ public class PortfolioServiceTest {
 
     @Test
     @DisplayName("생성된 자동 포트폴리오에 리밸런싱 알림 반영")
-    public void testApplyResultInitAutoPortfolio() throws Exception {
+    public void testRetrieveCreatedPortfolioAndSetRebalancing() throws Exception {
 
     }
 }

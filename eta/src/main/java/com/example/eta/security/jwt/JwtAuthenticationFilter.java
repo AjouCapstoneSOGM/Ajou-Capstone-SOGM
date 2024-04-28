@@ -35,6 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         // JWT 토큰 인증, 인증 실패 시 예외 발생
+        // TODO: 토큰 관련 예외 정의해서 처리하기
         String jwt = request.getHeader(header).replace(prefix, "");
         SecretKey key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         Claims claims = Jwts.parser()

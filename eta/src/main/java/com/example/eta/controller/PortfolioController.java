@@ -1,6 +1,10 @@
 package com.example.eta.controller;
 
 import com.example.eta.dto.PortfolioDto;
+import com.example.eta.entity.Portfolio;
+import com.example.eta.service.PortfolioService;
+import com.example.eta.service.UserService;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -14,18 +18,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@AllArgsConstructor
 @RequestMapping("api/portfolio")
 public class PortfolioController {
 
+    private final UserService userService;
+    private final PortfolioService portfolioService;
+
     @PostMapping("/create/auto")
     public ResponseEntity<Object> createAutoPortfolio(@RequestBody PortfolioDto.CreateRequestDto createRequestDto,
-                                                      @AuthenticationPrincipal String email) {
-        // 사용자 정보 가져오기
+                                                      @AuthenticationPrincipal String email) throws InterruptedException{
+        // DB에 포트폴리오 생성
+        Portfolio portfolio = portfolioService.createInitAutoPortfolio(email, createRequestDto);
 
-        // FastAPI 서버에 요청
+        // FastAPI 서버로부터 포트폴리오 결과 받아오기
+        portfolioService.retrieveCreatedPortfolioAndSetRebalancing(portfolio, createRequestDto);
 
-        // 생성된 포트폴리오 DB에 저장
-
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }
