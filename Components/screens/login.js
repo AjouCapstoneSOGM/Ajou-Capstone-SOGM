@@ -15,6 +15,9 @@ const Login = () => {
   const [useremail, setUseremail] = useState("");
   const [password, setPassword] = useState("");
 
+  const handleSignUp = () => {
+    navigation.navigate("Home", { screen: 'Home' })
+  }
   return (
     <View style={styles.container}>
       <Text style={styles.HomeText}>로그인 화면</Text>
@@ -34,14 +37,14 @@ const Login = () => {
       ></TextInput>
 
       <TouchableOpacity
-        onPress={() => navigation.navigate("Home", { screen: 'Home' })}
+        onPress={handleSignUp}
         style={styles.Inputbotton}
       >
         <Text style={styles.BottomText}>로그인</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
-        //onPress={() => navigation.navigate("SocialLogin", { screen: 'SocialLogin' })}
+        onPress={() => navigation.navigate("SocialLogin", { screen: 'SocialLogin' })}
         style={styles.Inputbotton}
       >
         <Text style={styles.BottomText}>소셜 로그인</Text>
