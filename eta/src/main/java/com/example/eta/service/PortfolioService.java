@@ -5,7 +5,7 @@ import com.example.eta.entity.Portfolio;
 import com.example.eta.entity.PortfolioSector;
 import com.example.eta.entity.Sector;
 import com.example.eta.repository.PortfolioRepository;
-import com.example.eta.repository.PortfolioServiceRepository;
+import com.example.eta.repository.PortfolioSectorRepository;
 import com.example.eta.repository.SectorRepository;
 import com.example.eta.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ public class PortfolioService {
 
     private final SectorRepository sectorRepository;
 
-    private final PortfolioServiceRepository portfolioServiceRepository;
+    private final PortfolioSectorRepository portfolioSectorRepository;
 
     @Transactional
     public Portfolio createInitAutoPortfolio(String email, PortfolioDto.CreateRequestDto createRequestDto) {
@@ -51,7 +51,7 @@ public class PortfolioService {
                     .portfolio(portfolio)
                     .sector(sector)
                     .build();
-            portfolioServiceRepository.save(portfolioSector);
+            portfolioSectorRepository.save(portfolioSector);
         }
 
         return portfolio;
