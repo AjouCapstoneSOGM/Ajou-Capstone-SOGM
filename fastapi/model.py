@@ -1,8 +1,7 @@
 from pydantic import BaseModel
 
 
-class UserInfo(BaseModel):
-    userId: int
-    amount: float
-    riskLevel: str
-    interest: str
+class PortfolioInfo(BaseModel):
+    tickers: int
+    safe_asset_ratio: float
+    initial_cash: int
