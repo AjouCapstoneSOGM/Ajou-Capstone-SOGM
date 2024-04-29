@@ -13,6 +13,7 @@ function Home({ navigation }) {
         title="포트폴리오 생성"
         onPress={() => navigation.navigate("MakePortfolio")}
       />
+      <Button title="로그인" onPress={() => navigation.navigate("Login")} />
     </View>
   );
 }

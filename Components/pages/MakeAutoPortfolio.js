@@ -51,7 +51,7 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
   };
 
   const fetchPortfolio = async () => {
-    fetch(`${urls.fastapiUrl}/getInfo`, {
+    fetch(`${urls.springUrl}/getInfo`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

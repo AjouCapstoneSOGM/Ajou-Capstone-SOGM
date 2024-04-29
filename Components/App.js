@@ -1,9 +1,9 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 
-import Login from './screens/login';
-import SocialLogin from './screens/sociallogin';
-import Signup from './screens/signup';
+import Login from "./pages/login/login";
+import SocialLogin from "./pages/login/sociallogin";
+import Signup from "./pages/login/signup";
 
 import Home from "./pages/Home";
 import ViewPortfolio from "./pages/ViewPortfolio";
@@ -13,7 +13,7 @@ import MakePortfolio from "./pages/MakePortfolio";
 const Stack = createStackNavigator();
 function ScreenStack() {
   return (
-    <Stack.Navigator initialRouteName="Login">
+    <Stack.Navigator initialRouteName="Home">
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="SocialLogin" component={SocialLogin} />
       <Stack.Screen name="Signup" component={Signup} />
