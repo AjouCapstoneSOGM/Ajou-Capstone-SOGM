@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
+import urls from "../utils/urls";
 
 const MakeAutoPortfolio = ({ setCurrentStep }) => {
   const [currentAutoStep, setCurrentAutoStep] = useState(1);
@@ -49,11 +50,31 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
     return false;
   };
 
-  const submitUserInfo = () => {
+  const fetchPortfolio = async () => {
+    fetch(`${urls.fastapiUrl}/getInfo`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId: 1,
+        amount: amount,
+        riskLevel: riskLevel,
+        interest: interest,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Success:", data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  };
+
+  const submitUserInfo = async () => {
     console.log(amount, riskLevel, interest);
-    /*
-    포폴 생성 api 호출
-    */
+    await fetchPortfolio();
     setCurrentStep(2);
   };
 
