@@ -4,6 +4,7 @@ import com.example.eta.dto.PortfolioDto;
 import com.example.eta.entity.Portfolio;
 import com.example.eta.entity.PortfolioSector;
 import com.example.eta.entity.Sector;
+import com.example.eta.entity.User;
 import com.example.eta.repository.PortfolioRepository;
 import com.example.eta.repository.PortfolioSectorRepository;
 import com.example.eta.repository.SectorRepository;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -29,9 +31,9 @@ public class PortfolioService {
     private final PortfolioSectorRepository portfolioSectorRepository;
 
     @Transactional
-    public Portfolio createInitAutoPortfolio(String email, PortfolioDto.CreateRequestDto createRequestDto) {
+    public Portfolio createInitAutoPortfolio(User user, PortfolioDto.CreateRequestDto createRequestDto) {
         Portfolio portfolio = new Portfolio().builder()
-                .user(userRepository.findByEmail(email).get())
+                .user(user)
                 .country(createRequestDto.getCountry())
                 .isAuto(true)
                 .initAsset(createRequestDto.getAsset())
@@ -41,11 +43,7 @@ public class PortfolioService {
                 .build();
         portfolioRepository.save(portfolio);
 
-        ArrayList<Sector> sectors = new ArrayList<>();
-        for(String sectorId : createRequestDto.getSector()) {
-            sectors.add(sectorRepository.findById(sectorId).get());
-        }
-
+        List<Sector> sectors = sectorRepository.findAllById(createRequestDto.getSector());
         for(Sector sector : sectors) {
             PortfolioSector portfolioSector = new PortfolioSector().builder()
                     .portfolio(portfolio)
