@@ -1,6 +1,15 @@
 import React, { useState } from "react";
-import {  View,  Text,  StyleSheet,  TouchableOpacity,  TextInput,  Button,  Alert} from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  TextInput,
+  Button,
+  Alert,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import urls from "../../utils/urls";
 
 const Signup = () => {
   const navigation = useNavigation();
@@ -10,78 +19,92 @@ const Signup = () => {
   const [password, setPassword] = useState("");
   const [pwcheck, setpwcheck] = useState("");
 
-  const handleSignUp = () => {
-    let IsThereEmptyInput = !([username, useremail, password, pwcheck].every(str => str.length > 0))
+  const fetchSignupInfo = async () => {
+    fetch(`${urls.springUrl}/api/auth/signup`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: useremail,
+        password: password,
+        name: username,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Success:", data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  };
 
-    if (IsThereEmptyInput){
-      Alert.alert('빈칸이 있습니다.');
+  const handleSignUp = () => {
+    let IsThereEmptyInput = ![username, useremail, password, pwcheck].every(
+      (str) => str.length > 0
+    );
+
+    if (IsThereEmptyInput) {
+      Alert.alert("빈칸이 있습니다.");
+      return;
+    } else if (!useremail.includes("@")) {
+      Alert.alert("이메일 서식이 올바르지 않습니다.");
+      return;
+    } else if (!useremail.includes("@")) {
+      Alert.alert("이메일 서식이 올바르지 않습니다.");
+      return;
+    } else if (password != pwcheck) {
+      Alert.alert("비밀번호 확인이 일치하지 않습니다.");
       return;
     }
-    else if (!useremail.includes('@')) {
-      Alert.alert('이메일 서식이 올바르지 않습니다.');
-      return;
-    }
-    else if (!useremail.includes('@')) {
-      Alert.alert('이메일 서식이 올바르지 않습니다.');
-      return;
-    }
-    else if (password != pwcheck) {
-      Alert.alert('비밀번호 확인이 일치하지 않습니다.');
-      return;
-    }
-    navigation.navigate("Home", { screen: 'Home' });
-  }
+    fetchSignupInfo();
+    navigation.navigate("Home", { screen: "Home" });
+  };
   return (
-    <View style={Styles.container}>      
+    <View style={Styles.container}>
       <Text style={Styles.HomeText}>회원가입 화면</Text>
-      
+
       <TextInput
         style={Styles.Input}
         value={username}
         placeholder="이름"
         onChangeText={setUsername}
-      >
-      </TextInput>
+      ></TextInput>
       <TextInput
         onChangeText={setUseremail}
         value={useremail}
         placeholder="이메일"
         style={Styles.Input}
-      >
-      </TextInput>
+      ></TextInput>
       <TextInput
         onChangeText={setPassword}
         value={password}
         placeholder="비밀번호"
         style={Styles.Input}
         secureTextEntry
-      >
-      </TextInput>
+      ></TextInput>
       <TextInput
         onChangeText={setpwcheck}
         value={pwcheck}
         placeholder="비밀번호 확인"
         style={Styles.Input}
         secureTextEntry
-      >
-      </TextInput>
-      
-      <TouchableOpacity
-          onPress={handleSignUp}
-          style={Styles.Inputbotton}
-        >
-          <Text style={Styles.BottomText}>가입하기</Text>
+      ></TextInput>
+
+      <TouchableOpacity onPress={handleSignUp} style={Styles.Inputbotton}>
+        <Text style={Styles.BottomText}>가입하기</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
-          onPress={() => navigation.navigate("Login", { screen: 'Login' })}
-          style={Styles.NextBottom}
-        >
-          <Text style={Styles.BottomText}>돌아가기</Text>
+        onPress={() => navigation.navigate("Login", { screen: "Login" })}
+        style={Styles.NextBottom}
+      >
+        <Text style={Styles.BottomText}>돌아가기</Text>
       </TouchableOpacity>
     </View>
-  )
-}
+  );
+};
 
 export default Signup;
 
@@ -89,7 +112,7 @@ const Styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   HomeText: {
     fontSize: 30,
@@ -106,7 +129,7 @@ const Styles = StyleSheet.create({
   },
   BottomText: {
     fontSize: 15,
-    color: 'white',
+    color: "white",
     textAlign: "center",
   },
   Inputbotton: {
@@ -114,7 +137,7 @@ const Styles = StyleSheet.create({
     width: "50%",
     padding: 10,
     borderRadius: 10,
-    marginBottom: 10
+    marginBottom: 10,
   },
   Input: {
     width: "50%",
@@ -122,6 +145,6 @@ const Styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 5,
-    marginBottom: 10
-  }
-})
+    marginBottom: 10,
+  },
+});

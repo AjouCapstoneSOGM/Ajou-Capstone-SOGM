@@ -8,6 +8,7 @@ import {
   Button,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import urls from "../../utils/urls";
 
 const Login = () => {
   const navigation = useNavigation();
@@ -15,13 +16,35 @@ const Login = () => {
   const [useremail, setUseremail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSignUp = () => {
-    navigation.navigate("Home", { screen: 'Home' })
-  }
+  const handleLogin = () => {
+    fetchLoginInfo();
+    navigation.navigate("Home", { screen: "Home" });
+  };
+
+  const fetchLoginInfo = async () => {
+    fetch(`${urls.springUrl}/api/auth/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: useremail,
+        password: password,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Success:", data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.HomeText}>로그인 화면</Text>
-      
+
       <TextInput
         style={styles.inputbox}
         value={useremail}
@@ -36,29 +59,28 @@ const Login = () => {
         secureTextEntry
       ></TextInput>
 
-      <TouchableOpacity
-        onPress={handleSignUp}
-        style={styles.Inputbotton}
-      >
+      <TouchableOpacity onPress={handleLogin} style={styles.Inputbotton}>
         <Text style={styles.BottomText}>로그인</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
-        onPress={() => navigation.navigate("SocialLogin", { screen: 'SocialLogin' })}
+        onPress={() =>
+          navigation.navigate("SocialLogin", { screen: "SocialLogin" })
+        }
         style={styles.Inputbotton}
       >
         <Text style={styles.BottomText}>소셜 로그인</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
-        onPress={() => navigation.navigate("Signup", { screen: 'Signup' })}
+        onPress={() => navigation.navigate("Signup", { screen: "Signup" })}
         style={styles.NextBottom}
       >
         <Text style={styles.BottomText}>회원가입</Text>
       </TouchableOpacity>
     </View>
-  )
-}
+  );
+};
 
 export default Login;
 
@@ -66,7 +88,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "center",
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   HomeText: {
     fontSize: 30,
@@ -83,7 +105,7 @@ const styles = StyleSheet.create({
   },
   BottomText: {
     fontSize: 15,
-    color: 'white',
+    color: "white",
     textAlign: "center",
   },
   Inputbotton: {
@@ -91,7 +113,7 @@ const styles = StyleSheet.create({
     width: "50%",
     padding: 10,
     borderRadius: 10,
-    marginBottom: 10
+    marginBottom: 10,
   },
   inputbox: {
     width: "50%",
@@ -99,6 +121,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 5,
-    marginBottom: 10
-  }
-})
+    marginBottom: 10,
+  },
+});
