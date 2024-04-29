@@ -11,7 +11,6 @@ import PortfolioDetails from "./pages/PortfolioDetails";
 import MakePortfolio from "./pages/MakePortfolio";
 
 const Stack = createStackNavigator();
-
 function ScreenStack() {
   return (
     <Stack.Navigator initialRouteName="Login">
