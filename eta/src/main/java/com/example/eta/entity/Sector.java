@@ -17,4 +17,7 @@ public class Sector {
 
     @Column(nullable = false)
     private String name;
+
+    @OneToMany(mappedBy = "sector", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PortfolioSector> portfolioSectors = new ArrayList<>();
 }

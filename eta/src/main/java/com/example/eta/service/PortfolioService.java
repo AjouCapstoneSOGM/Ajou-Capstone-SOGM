@@ -1,14 +1,9 @@
 package com.example.eta.service;
 
 import com.example.eta.dto.PortfolioDto;
-import com.example.eta.entity.Portfolio;
-import com.example.eta.entity.PortfolioSector;
-import com.example.eta.entity.Sector;
-import com.example.eta.entity.User;
-import com.example.eta.repository.PortfolioRepository;
-import com.example.eta.repository.PortfolioSectorRepository;
-import com.example.eta.repository.SectorRepository;
-import com.example.eta.repository.UserRepository;
+import com.example.eta.entity.*;
+import com.example.eta.entity.compositekey.PortfolioTickerId;
+import com.example.eta.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -16,7 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +26,8 @@ public class PortfolioService {
     private final SectorRepository sectorRepository;
 
     private final PortfolioSectorRepository portfolioSectorRepository;
+
+    private final TickerRepository tickerRepository;
 
     @Transactional
     public Portfolio createInitAutoPortfolio(User user, PortfolioDto.CreateRequestDto createRequestDto) {
@@ -65,5 +64,36 @@ public class PortfolioService {
         // created_time 현재시간으로 업데이트
         portfolio.setCreatedDate(LocalDateTime.now());
         portfolioRepository.save(portfolio);
+    }
+
+    public Map<String, Object> getPerformanceDataV1(Integer pfId) throws IllegalAccessException {
+        Portfolio portfolio = portfolioRepository.findById(pfId)
+                .orElseThrow(() -> new IllegalAccessException("Portfolio not found with id: " + pfId));
+
+        // PortfolioTicker 리스트를 가져오기
+        List<PortfolioTicker> portfolioTickers = portfolio.getPortfolioTickers();
+        List<PortfolioDto.PerformanceResponseDto> tickerPerformances = new ArrayList<>();
+
+        for (PortfolioTicker pt : portfolioTickers) {
+            Ticker ticker = pt.getTicker();
+            float averagePrice = pt.getBuyingPrice();
+
+            PortfolioDto.PerformanceResponseDto responseDto = new PortfolioDto.PerformanceResponseDto(
+                    pt.getNumber(),
+                    averagePrice,
+                    ticker.getTicker(),
+                    ticker.getName());
+
+            tickerPerformances.add(responseDto);
+        }
+
+        float currentCash = portfolio.getCurrentCash();
+
+        Map<String, Object> performance = new HashMap<>();
+
+        performance.put("portfolioPerformance", tickerPerformances);
+        performance.put("currentCash", currentCash);
+
+        return performance;
     }
 }

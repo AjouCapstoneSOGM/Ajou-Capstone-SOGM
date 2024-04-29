@@ -19,4 +19,14 @@ public class PortfolioDto {
         private float asset;
         private int riskValue;
     }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PerformanceResponseDto {
+        private Integer quantity;
+        private Float averageCost;
+        private String ticker;
+        private String companyName;
+    }
 }

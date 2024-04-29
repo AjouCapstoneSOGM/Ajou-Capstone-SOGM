@@ -12,10 +12,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @AllArgsConstructor
@@ -38,5 +38,20 @@ public class PortfolioController {
         portfolioService.retrieveCreatedPortfolioAndSetRebalancing(portfolio, createRequestDto);
 
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @GetMapping("/{port_id}/performance")
+    public ResponseEntity<?> getPortfolioPerformance(@PathVariable("port_id") Integer pfId) {
+        try {
+            Map<String, Object> performanceData = portfolioService.getPerformanceDataV1(pfId);
+            return ResponseEntity.ok(performanceData);
+        } catch (IllegalAccessException e) {
+            // This is the case where the portfolio ID does not belong to the user.
+            // The exact exception type and handling might differ based on your service logic.
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access is denied for the given portfolio ID.");
+        } catch (Exception e) {
+            // Generic exception handling, ideally you'll have more specific handlers.
+            return ResponseEntity.internalServerError().body("An error occurred while processing your request.");
+        }
     }
 }

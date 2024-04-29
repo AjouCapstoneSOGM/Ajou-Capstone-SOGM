@@ -60,7 +60,7 @@ public class PortfolioServiceTest {
                 .sector(List.of("G25"))
                 .asset(10000000)
                 .riskValue(1).build();
-        int pfId = portfolioService.createInitAutoPortfolio("james001@foo.bar", createRequestDto).getPfId();
+        int pfId = portfolioService.createInitAutoPortfolio(user, createRequestDto).getPfId();
 
         // then DB에서 가져오기, 유저id 정보가 맞는지, createdDate가 null인지
         Portfolio portfolio = portfolioRepository.findById(pfId).get();
