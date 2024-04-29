@@ -1,8 +1,6 @@
 import numpy as np
 import pandas as pd
 from pandas_datareader import data as web
-import seaborn as sns
-import time
 import yfinance as yf
 from datetime import datetime, timedelta
 import datetime
@@ -11,11 +9,13 @@ from scipy.optimize import minimize
 yf.pdr_override()
 
 
-class make_port:
+class MakePortrolio:
     def __init__(self):
-        pass
+        self.today = datetime.datetime.today()
 
-    def make_portfolio(self, tickers, start, end, safe_asset_ratio, initial_cash):
+    def make_portfolio(self, tickers, safe_asset_ratio, initial_cash):
+        start = (self.today - timedelta(weeks=52 * 1)).strftime("%Y-%m-%d")
+        end = (self.today - timedelta(days=1)).strftime("%Y-%m-%d")
         total_ratio_final, int_asset_num, cash_hold, final_returns, final_vol = (
             self.total_returns(tickers, start, end, safe_asset_ratio, initial_cash)
         )
@@ -153,8 +153,8 @@ class make_port:
         self, total_ratio, initial_cash, stock_tickers, num_bonds
     ):
 
-        start = today.strftime("%Y-%m-%d")
-        end = (today + timedelta(1)).strftime("%Y-%m-%d")
+        start = self.today.strftime("%Y-%m-%d")
+        end = (self.today + timedelta(1)).strftime("%Y-%m-%d")
         final_adjClose = pd.DataFrame()
 
         for item in stock_tickers:
@@ -226,44 +226,14 @@ class make_port:
     def evaluate(
         self, total_ratio_final, int_asset_num, cash_hold, final_returns, final_vol
     ):
-        print("최적화 후 투자 자산 개수:", int_asset_num)
-        print("남는 현금:", cash_hold)
-        print("최적화 후 현금 포함 투자 비중:\n", total_ratio_final * 100)
-        print("포트폴리오의 기대수익률:", final_returns)
-        print("포트폴리오의 위험도:", final_vol)
-
-        # api 용
         evaluation_results = {
-            "최적화 후 투자 자산 개수": int_asset_num,
-            "남는 현금": cash_hold,
-            "최적화 후 현금 포함 투자 비중": total_ratio_final * 100,
-            "포트폴리오의 기대수익률": final_returns,
-            "포트폴리오의 위험도": final_vol,
+            "int_asset_num": int_asset_num,
+            "cash_hold": cash_hold,
+            "total_ratio_final": total_ratio_final * 100,
+            "final_returns": final_returns,
+            "final_vol": final_vol,
         }
         return evaluation_results
 
 
 # IT
-tickers = [
-    "054040.KQ",
-    "264450.KQ",
-    "094970.KQ",
-    "069510.KQ",
-    "046310.KQ",
-    "079960.KQ",
-    "017250.KQ",
-    "192440.KQ",
-    "039420.KQ",
-    "029460.KS",
-]
-
-temp = make_port()
-
-
-today = datetime.datetime.today()
-start = (today - timedelta(weeks=52 * 1)).strftime("%Y-%m-%d")
-end = (today - timedelta(days=1)).strftime("%Y-%m-%d")
-
-safe_asset = 0.3
-invest_cash = 1000000
-temp.make_portfolio(tickers, start, end, safe_asset, invest_cash)
