@@ -214,8 +214,8 @@ class MakePortrolio:
                 total_invest_cash = (adj_asset * int_asset_num).sum()
                 cash_hold = initial_cash - total_invest_cash
                 break
-            # 다음 반복을 위해 cash 업데이트
-            cash = new_cash
+        # 다음 반복을 위해 cash 업데이트
+        cash = new_cash
 
         asset_ratio = (adj_asset * int_asset_num) / initial_cash
         cash_ratio = cash_hold / initial_cash
@@ -226,14 +226,17 @@ class MakePortrolio:
     def evaluate(
         self, total_ratio_final, int_asset_num, cash_hold, final_returns, final_vol
     ):
+
+        int_asset_num = int_asset_num.tolist()
+        total_ratio_final = total_ratio_final.tolist()
+        final_returns = round(final_returns * 100, 2).item()
+        final_vol = round(final_vol * 100, 2).item()
+
         evaluation_results = {
             "int_asset_num": int_asset_num,
             "cash_hold": cash_hold,
-            "total_ratio_final": total_ratio_final * 100,
+            "total_ratio_final": total_ratio_final,
             "final_returns": final_returns,
             "final_vol": final_vol,
         }
         return evaluation_results
-
-
-# IT
