@@ -14,7 +14,7 @@ CREATE TABLE `user` (
 CREATE TABLE `portfolio` (
     `pf_id` int NOT NULL AUTO_INCREMENT,
     `name` varchar(100),
-    `created_date` datetime NOT NULL,
+    `created_date` datetime,
     `country` varchar(30) NOT NULL,
     `is_auto` bool NOT NULL,
     `init_asset` float NOT NULL,
