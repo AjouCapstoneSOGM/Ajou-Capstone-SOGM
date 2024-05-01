@@ -14,6 +14,8 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -53,5 +55,21 @@ public class PortfolioController {
             // Generic exception handling, ideally you'll have more specific handlers.
             return ResponseEntity.internalServerError().body("An error occurred while processing your request.");
         }
+    }
+
+    @GetMapping
+    public ResponseEntity<Object> getPortfolioIds(@AuthenticationPrincipal String email) throws InterruptedException{
+        User user = userService.findByEmail(email);
+
+        List<Integer> pfIds = new ArrayList<>();
+        for (Portfolio portfolio : user.getPortfolios()) {
+            pfIds.add(portfolio.getPfId());
+        }
+
+        Map<String, Object> responseData = new HashMap<>();
+        responseData.put("portfolioIds", pfIds);
+        responseData.put("count", pfIds.size());
+
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 }
