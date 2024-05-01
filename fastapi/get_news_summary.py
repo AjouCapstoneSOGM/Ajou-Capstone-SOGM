@@ -6,7 +6,7 @@ from datetime import timedelta
 from tqdm import tqdm
 
 
-class get_kr_news:
+class News:
     def __init__(self):
         pass
 
@@ -133,7 +133,7 @@ class get_kr_news:
         return df
 
 
-get = get_kr_news()
+get = News()
 today = datetime.today()
 # portfolio는 현재 보유중인 티커목록
 # df = get.get_recent_news()
@@ -142,7 +142,7 @@ start_date = period.strftime("%Y-%m-%d")  # Example start date
 end_date = today.strftime("%Y-%m-%d")  # Example end date
 ticker = "207940"  # Example ticker date
 df = get.get_company_news(start_date, end_date, ticker)
-
+print(df)
 # tickers = portfolio
 # dfs = []
 # for ticker in tickers:
