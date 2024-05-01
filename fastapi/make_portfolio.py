@@ -214,8 +214,8 @@ class MakePortrolio:
                 total_invest_cash = (adj_asset * int_asset_num).sum()
                 cash_hold = initial_cash - total_invest_cash
                 break
-        # 다음 반복을 위해 cash 업데이트
-        cash = new_cash
+            # 다음 반복을 위해 cash 업데이트
+            cash = new_cash
 
         asset_ratio = (adj_asset * int_asset_num) / initial_cash
         cash_ratio = cash_hold / initial_cash
