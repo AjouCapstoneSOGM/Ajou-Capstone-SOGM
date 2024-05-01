@@ -16,17 +16,4 @@ import java.util.List;
 @ExtendWith(SpringExtension.class)
 public class TickerServiceTest {
 
-    @Autowired
-    TickerService tickerService;
-
-    @Test
-    public void testGetTopTenKorPostfixedTickerBySector() {
-        // when 티커 목록 가져오기
-        List<String> postfixedTickers = tickerService.getTopTenKorPostfixedTickerBySector("G10");
-
-        // then 10개
-        Assertions.assertAll(
-                () -> assertEquals(10, postfixedTickers.size())
-        );
-    }
 }

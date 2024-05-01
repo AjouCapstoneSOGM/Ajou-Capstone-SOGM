@@ -21,6 +21,26 @@ public class PortfolioDto {
     }
 
     @Data
+    @Builder
+    @NoArgsConstructor @AllArgsConstructor
+    public static class CreateRequestToFastApiDto {
+        private List<String> tickers;
+        private float safe_asset_ratio;
+        private int initial_cash;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor @AllArgsConstructor
+    public static class CreatedResultFromFastApiDto {
+        private List<Integer> init_asset_num;
+        private int cash_hold;
+        private List<Float> total_radio_final;
+        private float final_returns;
+        private float final_vol;
+    }
+
+    @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class PerformanceResponseDto {

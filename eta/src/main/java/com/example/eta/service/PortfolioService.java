@@ -29,6 +29,10 @@ public class PortfolioService {
 
     private final TickerRepository tickerRepository;
 
+    private final RebalancingRepository rebalancingRepository;
+
+    private final RebalancingTickerRepository rebalancingTickerRepository;
+
     @Transactional
     public Portfolio createInitAutoPortfolio(User user, PortfolioDto.CreateRequestDto createRequestDto) {
         Portfolio portfolio = new Portfolio().builder()
@@ -54,14 +58,56 @@ public class PortfolioService {
         return portfolio;
     }
 
-    @Async
     @Transactional
-    public void retrieveCreatedPortfolioAndSetRebalancing(Portfolio portfolio, PortfolioDto.CreateRequestDto createRequestDto) throws InterruptedException{
-        // TODO: FastAPI 서버로부터 포트폴리오 정보 받아오기
-        Thread.sleep(3000L);
+    public void getAutoPortfolioCreationAndSet(Portfolio portfolio, PortfolioDto.CreateRequestDto createRequestDto) throws Exception{
+        List<Ticker> tickers = tickerRepository.findTopTickerBySector(createRequestDto.getSector().get(0), 10, createRequestDto.getCountry());
 
-        // TODO: 받아온 포트폴리오 리밸런싱 알림 업데이트
-        // created_time 현재시간으로 업데이트
+        List<String> postfixedTickers = new ArrayList<>();
+        for(Ticker ticker : tickers) {
+            if (ticker.getExchange().equals("KOSPI")) {
+                postfixedTickers.add(ticker.getTicker() + ".KS");
+            }
+            else if(ticker.getExchange().equals("KOSDAQ")) {
+                postfixedTickers.add(ticker.getTicker() + ".KQ");
+            }
+        }
+
+        PortfolioDto.CreateRequestToFastApiDto createRequestToFastApiDto = PortfolioDto.CreateRequestToFastApiDto.builder()
+                .tickers(postfixedTickers)
+                .safe_asset_ratio(
+                        createRequestDto.getRiskValue() == 1 ? 0.1f :
+                        createRequestDto.getRiskValue() == 2 ? 0.2f : 0.3f
+                )
+                .initial_cash((int)createRequestDto.getAsset())
+                .build();
+
+        // TODO: FastAPI 서버로부터 포트폴리오 정보 받아오기
+        PortfolioDto.CreatedResultFromFastApiDto createdResultFromFastApiDto;
+
+        List<Integer> stockNumPerTicker = createdResultFromFastApiDto.getInit_asset_num();
+
+        Rebalancing rebalancing = Rebalancing.builder()
+                .portfolio(portfolio)
+                .createdDate(LocalDateTime.now())
+                .build();
+
+        // TODO: 예외 타입 지정
+        if (tickers.size() != stockNumPerTicker.size()) {
+            throw new Exception();
+        }
+
+        for (int i=0;i<tickers.size();i++) {
+            RebalancingTicker rebalancingTicker = RebalancingTicker.builder()
+                    .rebalancing(rebalancing)
+                    .ticker(tickers.get(i))
+                    .isBuy(true)
+                    .number(stockNumPerTicker.get(i))
+                    .build();
+            rebalancing.getRebalancingTickers().add(rebalancingTicker);
+            rebalancingTickerRepository.save(rebalancingTicker);
+        }
+
+        rebalancingRepository.save(rebalancing);
         portfolio.setCreatedDate(LocalDateTime.now());
         portfolioRepository.save(portfolio);
     }

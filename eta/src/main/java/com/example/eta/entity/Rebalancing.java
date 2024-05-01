@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -22,4 +24,8 @@ public class Rebalancing {
 
     @Column(nullable = false)
     private LocalDateTime createdDate;
+
+    @OneToMany(mappedBy = "rebalancing", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<RebalancingTicker> rebalancingTickers = new ArrayList<>();
 }

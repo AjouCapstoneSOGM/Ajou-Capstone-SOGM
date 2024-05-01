@@ -37,9 +37,9 @@ public class PortfolioController {
         Portfolio portfolio = portfolioService.createInitAutoPortfolio(user, createRequestDto);
 
         // FastAPI 서버로부터 포트폴리오 결과 받아오기
-        portfolioService.retrieveCreatedPortfolioAndSetRebalancing(portfolio, createRequestDto);
+        portfolioService.getAutoPortfolioCreationAndSet(portfolio, createRequestDto);
 
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping("/{port_id}/performance")
