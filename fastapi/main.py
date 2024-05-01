@@ -1,9 +1,11 @@
+from typing import List
 from fastapi import FastAPI
 from config import Settings
-from model import PortfolioInfo, TickerList
+from model import PortfolioInfo
 from starlette.middleware.cors import CORSMiddleware
 from make_portfolio import MakePortrolio
 from current_price import fetch_all_prices
+from get_news_summary import News
 
 
 settings = Settings()  # 설정 인스턴스 생성
@@ -30,6 +32,13 @@ async def makePortfolio(portfolio_info: PortfolioInfo):
 
 
 @app.post("/currentPrice/")
-async def get_current_prices(tickers: TickerList):
-    prices = await fetch_all_prices(tickers.tickers)
+async def get_current_prices(tickers: List[str]):
+    prices = await fetch_all_prices(tickers)
     return {"prices": prices}
+
+
+@app.post("/getNews/")
+async def get_News(ticker: str):
+    news = News()
+    summary = await news.get_company_news(ticker)
+    return {"summary": summary}

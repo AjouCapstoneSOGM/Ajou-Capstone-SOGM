@@ -8,7 +8,10 @@ from tqdm import tqdm
 
 class News:
     def __init__(self):
-        pass
+        self.today = datetime.today()
+        self.period = self.today - timedelta(days=7)
+        self.start_date = self.period.strftime("%Y-%m-%d")  # Example start date
+        self.end_date = self.today.strftime("%Y-%m-%d")  # Example end date
 
     def get_recent_news(self):
         today = datetime.today().strftime("%Y%m%d")
@@ -92,8 +95,10 @@ class News:
                 return titles, dates  # Return the collected titles and dates
         return titles, dates
 
-    def get_company_news(self, start_date, end_date, ticker):
+    def get_company_news(self, ticker):
         # Initialize lists to store unique titles and dates
+        start_date = self.start_date
+        end_date = self.end_date
         unique_titles = []
         unique_dates = set()
 
@@ -131,20 +136,3 @@ class News:
 
         # Return the DataFrame
         return df
-
-
-get = News()
-today = datetime.today()
-# portfolio는 현재 보유중인 티커목록
-# df = get.get_recent_news()
-period = today - timedelta(days=7)
-start_date = period.strftime("%Y-%m-%d")  # Example start date
-end_date = today.strftime("%Y-%m-%d")  # Example end date
-ticker = "207940"  # Example ticker date
-df = get.get_company_news(start_date, end_date, ticker)
-print(df)
-# tickers = portfolio
-# dfs = []
-# for ticker in tickers:
-#     df = get.get_company_news(start_date, end_date, ticker)
-#     dfs.append(df)
