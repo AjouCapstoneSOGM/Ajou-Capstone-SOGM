@@ -1,8 +1,10 @@
 from fastapi import FastAPI
-from model import PortfolioInfo
 from config import Settings
+from model import PortfolioInfo, TickerList
 from starlette.middleware.cors import CORSMiddleware
 from make_portfolio import MakePortrolio
+from current_price import fetch_all_prices
+
 
 settings = Settings()  # 설정 인스턴스 생성
 app = FastAPI()
@@ -16,20 +18,18 @@ app.add_middleware(
 )
 
 
-@app.get("/makePortfolio")
-async def makePortfolio(safe_asset_ratio: float, initial_cash: int):
+@app.post("/makePortfolio/")
+async def makePortfolio(portfolio_info: PortfolioInfo):
     portfolio = MakePortrolio()
-    tickers = [
-        "054040.KQ",
-        "264450.KQ",
-        "094970.KQ",
-        "069510.KQ",
-        "046310.KQ",
-        "079960.KQ",
-        "017250.KQ",
-        "192440.KQ",
-        "039420.KQ",
-        "029460.KS",
-    ]
-    result = portfolio.make_portfolio(tickers, safe_asset_ratio, initial_cash)
+    result = portfolio.make_portfolio(
+        portfolio_info.tickers,
+        portfolio_info.safe_asset_ratio,
+        portfolio_info.initial_cash,
+    )
     return result
+
+
+@app.post("/currentPrice/")
+async def get_current_prices(tickers: TickerList):
+    prices = await fetch_all_prices(tickers.tickers)
+    return {"prices": prices}

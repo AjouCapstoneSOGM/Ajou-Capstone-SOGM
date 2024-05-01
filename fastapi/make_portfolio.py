@@ -226,14 +226,17 @@ class MakePortrolio:
     def evaluate(
         self, total_ratio_final, int_asset_num, cash_hold, final_returns, final_vol
     ):
+
+        int_asset_num = int_asset_num.tolist()
+        total_ratio_final = total_ratio_final.tolist()
+        final_returns = round(final_returns * 100, 2).item()
+        final_vol = round(final_vol * 100, 2).item()
+
         evaluation_results = {
             "int_asset_num": int_asset_num,
             "cash_hold": cash_hold,
-            "total_ratio_final": total_ratio_final * 100,
+            "total_ratio_final": total_ratio_final,
             "final_returns": final_returns,
             "final_vol": final_vol,
         }
         return evaluation_results
-
-
-# IT
