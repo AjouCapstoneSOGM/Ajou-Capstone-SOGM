@@ -26,20 +26,20 @@ public class Ticker {
     private String exchange;
 
     @Column
-    private float marketCap;
+    private Float marketCap;
 
     @Column(nullable = false)
     private LocalDateTime updatedDate;
 
     @Column
-    private float eps;
+    private Float eps;
 
     @Column
-    private float forwardEps;
+    private Float forwardEps;
 
     @Column
-    private float bps;
+    private Float bps;
 
     @Column
-    private float dps;
+    private Float dps;
 }

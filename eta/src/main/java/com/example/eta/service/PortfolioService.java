@@ -76,7 +76,7 @@ public class PortfolioService {
 
         for (PortfolioTicker pt : portfolioTickers) {
             Ticker ticker = pt.getTicker();
-            float averagePrice = pt.getBuyingPrice();
+            float averagePrice = pt.getAveragePrice();
 
             PortfolioDto.PerformanceResponseDto responseDto = new PortfolioDto.PerformanceResponseDto(
                     pt.getNumber(),
