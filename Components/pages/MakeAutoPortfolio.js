@@ -50,31 +50,35 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
     return false;
   };
 
-  const fetchPortfolio = async () => {
-    fetch(`${urls.springUrl}/getInfo`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        userId: 1,
-        amount: amount,
-        riskLevel: riskLevel,
-        interest: interest,
-      }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Success:", data);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+  const fetchUserInfo = async () => {
+    try {
+      const response = await fetch(
+        `${urls.springUrl}/api/portfolio/create/auto`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            country: "KOR",
+            sector: interest,
+            asset: amount,
+            riskValue: riskLevel,
+          }),
+        }
+      );
+      const data = await response.json();
+      console.log("Success:", data);
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   const submitUserInfo = async () => {
     console.log(amount, riskLevel, interest);
-    await fetchPortfolio();
+    handleNextStep();
+    //await fetchUserInfo();
+    handleNextStep();
     setCurrentStep(2);
   };
 
@@ -219,8 +223,14 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
             </View>
           </View>
         );
+      case 4:
+        return (
+          <View style={styles.container}>
+            <Text>Loading...</Text>
+          </View>
+        );
       default:
-        return <Text>Invalid step</Text>;
+        setCurrentStep(0);
     }
   };
 

@@ -18,7 +18,7 @@ const Login = () => {
 
   const handleLogin = () => {
     fetchLoginInfo();
-    navigation.navigate("Home", { screen: "Home" });
+    navigation.replace("Home");
   };
 
   const fetchLoginInfo = async () => {

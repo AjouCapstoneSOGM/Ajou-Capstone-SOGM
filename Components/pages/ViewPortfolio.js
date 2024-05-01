@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import urls from "../utils/urls";
 
 const PortfolioList = ({ navigation }) => {
   const portfolios = [
@@ -26,6 +27,26 @@ const PortfolioList = ({ navigation }) => {
       rate_return: 4.0,
     },
   ];
+
+  const fetchPortfolio = async () => {
+    try {
+      const response = await fetch(`${urls.springUrl}/api/portfolio`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({}),
+      });
+      const data = await response.json();
+      console.log("Suceess:", data);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchPortfolio();
+  });
 
   return (
     <View style={styles.container}>
