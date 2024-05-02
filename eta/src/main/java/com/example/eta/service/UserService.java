@@ -13,14 +13,12 @@ import java.util.Optional;
 @Service
 @Transactional(readOnly = true)
 public class UserService {
-    @Autowired
+
     private final UserRepository userRepository;
-//    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-//        this.passwordEncoder = passwordEncoder;
     }
 
 
@@ -66,5 +64,14 @@ public class UserService {
 
         // User 저장
         return userRepository.save(user);
+    }
+
+    public Boolean isExistEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 존재하지 않습니다. email=" + email));
     }
 }

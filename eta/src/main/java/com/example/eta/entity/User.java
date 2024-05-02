@@ -2,10 +2,7 @@ package com.example.eta.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -13,7 +10,9 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Data
+@Getter @Setter
+@Builder
+@NoArgsConstructor @AllArgsConstructor
 @ToString(exclude = "portfolios") // Portfolio 리스트를 toString에서 제외
 @Table(name = "user")
 public class User {
