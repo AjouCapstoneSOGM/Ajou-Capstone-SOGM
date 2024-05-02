@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -61,6 +62,7 @@ public class PortfolioDto {
         private String country;
         private boolean isAuto;
         private Integer riskValue;
+        private LocalDateTime createdDate;
     }
 
     @Data

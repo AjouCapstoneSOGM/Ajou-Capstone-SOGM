@@ -72,6 +72,7 @@ public class PortfolioController {
                     .isAuto(portfolio.getIsAuto())
                     .country(portfolio.getCountry())
                     .riskValue(portfolio.getRiskValue())
+                    .createdDate(portfolio.getCreatedDate())
                     .build();
             portfolioInfos.add(portfolioInfo);
         }
