@@ -1,9 +1,11 @@
+from typing import List
 from fastapi import FastAPI
 from config import Settings
-from model import PortfolioInfo, TickerList
+from model import PortfolioInfo, TickerList, Ticker, PortfolioFinal
 from starlette.middleware.cors import CORSMiddleware
 from make_portfolio import MakePortrolio
 from current_price import fetch_all_prices
+from get_news_summary import News
 
 
 settings = Settings()  # 설정 인스턴스 생성
@@ -19,7 +21,7 @@ app.add_middleware(
 
 
 @app.post("/makePortfolio/")
-async def makePortfolio(portfolio_info: PortfolioInfo):
+async def makePortfolio(portfolio_info: PortfolioInfo, response_model=PortfolioFinal):
     portfolio = MakePortrolio()
     result = portfolio.make_portfolio(
         portfolio_info.tickers,
@@ -33,3 +35,10 @@ async def makePortfolio(portfolio_info: PortfolioInfo):
 async def get_current_prices(tickers: TickerList):
     prices = await fetch_all_prices(tickers.tickers)
     return {"prices": prices}
+
+
+@app.post("/getNews/")
+async def get_News(ticker: Ticker):
+    news = News()
+    summary = await news.get_company_news(ticker.ticker)
+    return {"summary": summary}
