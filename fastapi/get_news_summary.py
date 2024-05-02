@@ -1,8 +1,7 @@
 import requests as rq
 from bs4 import BeautifulSoup
 import pandas as pd
-from datetime import datetime
-from datetime import timedelta
+from datetime import datetime, timedelta
 from tqdm import tqdm
 
 
@@ -43,7 +42,7 @@ class News:
         news_list = pd.DataFrame({"title": title_list, "summary": summary_list})
         return news_list
 
-    def get_news_title_from_page(self, page, start_date, end_date, ticker):
+    async def get_news_title_from_page(self, page, start_date, end_date, ticker):
         url = f"https://finance.naver.com/item/news.naver?code={ticker}&page={page}"
 
         response = rq.get(url)
@@ -95,22 +94,21 @@ class News:
                 return titles, dates  # Return the collected titles and dates
         return titles, dates
 
-    def get_company_news(self, ticker):
+    async def get_company_news(self, ticker):
         # Initialize lists to store unique titles and dates
         start_date = self.start_date
         end_date = self.end_date
         unique_titles = []
         unique_dates = set()
-
         # Convert start_date and end_date to datetime objects if they are not already
         start_date = datetime.strptime(start_date, "%Y-%m-%d")
         end_date = datetime.strptime(end_date, "%Y-%m-%d")
-
         # Iterate through pages until start_date passes
         page = 1
-        while True:
+        max_articles = 50  # 최대 기사 수 설정
+        while len(unique_titles) < max_articles:
             # Call the function for the current page
-            titles, dates = self.get_news_title_from_page(
+            titles, dates = await self.get_news_title_from_page(
                 page, start_date, end_date, ticker
             )
             # If there are no more articles or start_date has passed, stop iterating

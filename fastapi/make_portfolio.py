@@ -164,6 +164,7 @@ class MakePortrolio:
         adj_asset = final_adjClose.values.flatten()
         initial_cash = initial_cash  # 투자금액
         invest = initial_cash * total_ratio  # 종목당 투자금액
+
         # 초기값 계산
         asset_num = invest / adj_asset
         int_asset_num = np.floor(asset_num).astype(int)
@@ -181,17 +182,22 @@ class MakePortrolio:
             # 각 주식 자산에 투자할 금액 계산
             invest = cash * total_ratio[:-num_bonds]
             # 각 주식 자산에 투자할 수량 계산
+
             asset_num = invest / adj_asset[:-num_bonds]
             # 수량을 정수로 변환하고 이전 정수 자산 번호에 더함
+
             int_asset_num_stock = np.floor(asset_num).astype(int)
             remaining_decimals_stock = asset_num - int_asset_num_stock
             int_asset_num_stock_all = int_asset_num_stock_all_old + int_asset_num_stock
             # 정수 자산 번호의 합이 이전 반복에서 변하지 않았는지 확인
+
             if int_asset_num_stock_all.sum() == int_asset_num_stock_all_old.sum():
                 # 합이 변하지 않으면, 남은 달러 값을 정수 자산 번호에 추가
+
                 dollar_num = np.array(int_asset_num[len(int_asset_num) - num_bonds :])
                 int_asset_num = np.append(int_asset_num_stock_all, dollar_num)
                 # 총 투자 현금과 남은 현금 계산
+
                 total_invest_cash = (adj_asset * int_asset_num).sum()
                 cash_hold = initial_cash - total_invest_cash
                 break
@@ -231,6 +237,7 @@ class MakePortrolio:
         total_ratio_final = total_ratio_final.tolist()
         final_returns = round(final_returns * 100, 2).item()
         final_vol = round(final_vol * 100, 2).item()
+        cash_hold = cash_hold.item()
 
         evaluation_results = {
             "int_asset_num": int_asset_num,
