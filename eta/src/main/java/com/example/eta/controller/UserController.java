@@ -97,21 +97,12 @@ public class UserController {
         private String email;
         private String password;
 
-<<<<<<< HEAD
-    @Data
-    @AllArgsConstructor
-    static class LoginResponse {
-        private int userId;
-        private String email;
-        private String name;
-=======
         @Data
         @AllArgsConstructor
         static class LoginResponse {
             private int userId;
             private String email;
             private String name;
->>>>>>> dev
         }
 
 

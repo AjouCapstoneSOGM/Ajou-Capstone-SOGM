@@ -3,17 +3,18 @@ package com.example.eta.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
-@Data
-@ToString(exclude = "user") // User 필드를 toString에서 제외
+@Getter
+@Builder
+@NoArgsConstructor @AllArgsConstructor
 @Table(name = "portfolio")
 public class Portfolio {
 
@@ -25,27 +26,37 @@ public class Portfolio {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "created_date", nullable = false)
+    @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<PortfolioSector> portfolioSectors = new ArrayList<>();
+
+    @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<PortfolioTicker> portfolioTickers = new ArrayList<>();
+
+    @Column
+    private String name;
+
+    @Column
+    @Setter
     private LocalDateTime createdDate;
 
-    @Column(name = "country", nullable = false, length = 30)
+    @Column(nullable = false, length = 30)
     private String country;
 
-    @Column(name = "is_auto", nullable = false)
+    @Column(nullable = false)
     private Boolean isAuto;
 
-    @Column(name = "init_asset", nullable = false)
+    @Column(nullable = false)
     private float initAsset;
 
-    @Column(name = "current_asset", nullable = false)
-    private float currentAsset;
-
-    @Column(name = "init_cash", nullable = false)
+    @Column(nullable = false)
     private float initCash;
 
-    @Column(name = "current_cash", nullable = false)
+    @Column(nullable = false)
+    @Setter
     private float currentCash;
 
-    @Column(name = "rate_return", nullable = false)
-    private float rateReturn;
+    @Column
+    private int riskValue;
 }

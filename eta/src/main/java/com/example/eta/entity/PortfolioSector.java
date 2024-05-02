@@ -1,0 +1,27 @@
+package com.example.eta.entity;
+
+import com.example.eta.entity.compositekey.PortfolioSectorId;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Entity
+@IdClass(PortfolioSectorId.class)
+@Getter
+@Builder
+@NoArgsConstructor @AllArgsConstructor
+@Table(name = "portfolio_sector")
+public class PortfolioSector {
+
+    @Id
+    @ManyToOne
+    @JoinColumn(name = "pf_id")
+    private Portfolio portfolio;
+
+    @Id
+    @ManyToOne
+    @JoinColumn(name = "sector_id")
+    private Sector sector;
+}
