@@ -59,6 +59,29 @@ public class PortfolioController {
             return ResponseEntity.internalServerError().body("An error occurred while processing your request.");
         }
     }
+  
+    @PostMapping("/{port_id}/buy")
+    public ResponseEntity<String> buyStock(@PathVariable("port_id") Integer pfId, @RequestBody PortfolioDto.BuyRequestDto buyRequestDto) {
+        try {
+            portfolioService.buyStock(pfId, buyRequestDto);
+            return ResponseEntity.ok("매수 내용이 성공적으로 기록되었습니다.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("요청이 유효하지 않습니다: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("매수 기록 중 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/{port_id}/sell")
+    public ResponseEntity<String> sellStock(@PathVariable("port_id") Integer pfId, @RequestBody PortfolioDto.sellRequestDto sellRequestDto) {
+        try {
+            portfolioService.sellStock(pfId, sellRequestDto);
+            return ResponseEntity.ok("매수 내용이 성공적으로 기록되었습니다.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("요청이 유효하지 않습니다: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("매수 기록 중 오류가 발생했습니다: " + e.getMessage());
+        }
 
     @GetMapping
     public ResponseEntity<PortfolioDto.PortfolioInfoListDto> getPortfolioInfos(@AuthenticationPrincipal String email) throws InterruptedException{

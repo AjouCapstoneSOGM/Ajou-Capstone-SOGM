@@ -34,5 +34,9 @@ public class PortfolioTicker {
 
     @Column(name = "current_proportion", nullable = false)
     private Float currentProportion;
+
+    public void updateNumber(Integer number){
+        this.number = number;
+    }
 }
 
