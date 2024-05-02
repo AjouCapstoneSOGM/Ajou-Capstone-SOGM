@@ -23,7 +23,4 @@ public class Rebalancing {
     @Column(nullable = false)
     private LocalDateTime createdDate;
 
-    @Column(nullable = false)
-    @Setter
-    private Boolean ignored;
 }

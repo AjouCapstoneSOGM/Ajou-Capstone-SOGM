@@ -23,9 +23,11 @@ public class Portfolio {
     private User user;
 
     @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<PortfolioSector> portfolioSectors = new ArrayList<>();
 
     @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<PortfolioTicker> portfolioTickers = new ArrayList<>();
 
     @Column
@@ -53,4 +55,8 @@ public class Portfolio {
 
     @Column
     private int riskValue;
+
+    public void updateCurrentCash(float currentCash){
+        this.currentCash = currentCash;
+    }
 }

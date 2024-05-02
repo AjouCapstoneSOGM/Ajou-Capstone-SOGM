@@ -5,7 +5,7 @@ CREATE TABLE `user` (
     `password` varchar(255) NULL,
     `name` varchar(30) NOT NULL,
     `role` varchar(30) NOT NULL,
-    `created_date` datetime NOT NULL,
+    `created_date` datetime,
     `modified_date` datetime NULL,
     `enabled` bool NOT NULL,
     PRIMARY KEY (`user_id`)
@@ -14,7 +14,7 @@ CREATE TABLE `user` (
 CREATE TABLE `portfolio` (
     `pf_id` int NOT NULL AUTO_INCREMENT,
     `name` varchar(100),
-    `created_date` datetime NOT NULL,
+    `created_date` datetime,
     `country` varchar(30) NOT NULL,
     `is_auto` bool NOT NULL,
     `init_asset` float NOT NULL,
@@ -74,7 +74,7 @@ CREATE TABLE `portfolio_record` (
 
 CREATE TABLE `rebalancing` (
     `rn_id` int NOT NULL AUTO_INCREMENT,
-    `created_date` datetime NOT NULL,
+    `created_date` datetime,
     `ignored` bool NOT NULL,
     `pf_id` int NOT NULL,
     PRIMARY KEY (`rn_id`),

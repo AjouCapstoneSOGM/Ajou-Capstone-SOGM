@@ -19,7 +19,15 @@ public class PortfolioDto {
         private float asset;
         private int riskValue;
     }
-
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class BuyRequestDto {
+        private String ticker;
+        private boolean isBuy;
+        private int quantity;
+        private float price;
+    }
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
@@ -28,5 +36,15 @@ public class PortfolioDto {
         private Float averageCost;
         private String ticker;
         private String companyName;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class sellRequestDto {
+        private String ticker;
+        private boolean sellBuy;
+        private int quantity;
+        private float price;
     }
 }

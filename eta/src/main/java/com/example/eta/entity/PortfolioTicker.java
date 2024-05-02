@@ -26,13 +26,17 @@ public class PortfolioTicker {
     @Column(name = "number", nullable = false)
     private Integer number;
 
-    @Column(name = "buying_price", nullable = false)
-    private Float buyingPrice;
+    @Column(name = "average_price", nullable = false)
+    private Float averagePrice;
 
     @Column(name = "init_proportion", nullable = false)
     private Float initProportion;
 
     @Column(name = "current_proportion", nullable = false)
     private Float currentProportion;
+
+    public void updateNumber(Integer number){
+        this.number = number;
+    }
 }
 
