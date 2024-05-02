@@ -28,8 +28,8 @@ public class PortfolioController {
     private final PortfolioService portfolioService;
 
     @PostMapping("/create/auto")
-    public ResponseEntity<Object> createAutoPortfolio(@RequestBody PortfolioDto.CreateRequestDto createRequestDto,
-                                                      @AuthenticationPrincipal String email) throws InterruptedException{
+    public ResponseEntity<Map<String, Integer>> createAutoPortfolio(@RequestBody PortfolioDto.CreateRequestDto createRequestDto,
+                                                      @AuthenticationPrincipal String email) throws Exception{
         // 유저 정보 가져오기
         User user = userService.findByEmail(email);
 
@@ -39,7 +39,10 @@ public class PortfolioController {
         // FastAPI 서버로부터 포트폴리오 결과 받아오기
         portfolioService.getAutoPortfolioCreationAndSet(portfolio, createRequestDto);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        Map<String, Integer> responseData = new HashMap<>();
+        responseData.put("pfId", portfolio.getPfId());
+
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
     @GetMapping("/{port_id}/performance")
@@ -58,18 +61,25 @@ public class PortfolioController {
     }
 
     @GetMapping
-    public ResponseEntity<Object> getPortfolioIds(@AuthenticationPrincipal String email) throws InterruptedException{
+    public ResponseEntity<PortfolioDto.PortfolioInfoListDto> getPortfolioInfos(@AuthenticationPrincipal String email) throws InterruptedException{
         User user = userService.findByEmail(email);
 
-        List<Integer> pfIds = new ArrayList<>();
+        List<PortfolioDto.PortfolioInfo> portfolioInfos = new ArrayList<>();
         for (Portfolio portfolio : user.getPortfolios()) {
-            pfIds.add(portfolio.getPfId());
+            PortfolioDto.PortfolioInfo portfolioInfo = PortfolioDto.PortfolioInfo.builder()
+                    .id(portfolio.getPfId())
+                    .name(portfolio.getName())
+                    .isAuto(portfolio.getIsAuto())
+                    .country(portfolio.getCountry())
+                    .riskValue(portfolio.getRiskValue())
+                    .build();
+            portfolioInfos.add(portfolioInfo);
         }
 
-        Map<String, Object> responseData = new HashMap<>();
-        responseData.put("portfolioIds", pfIds);
-        responseData.put("count", pfIds.size());
-
+        PortfolioDto.PortfolioInfoListDto responseData = PortfolioDto.PortfolioInfoListDto.builder()
+                .count(portfolioInfos.size())
+                .portfolios(portfolioInfos)
+                .build();
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 }

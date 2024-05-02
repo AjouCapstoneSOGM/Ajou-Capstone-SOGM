@@ -82,14 +82,15 @@ public class PortfolioService {
                 .build();
 
         // TODO: FastAPI 서버로부터 포트폴리오 정보 받아오기
-        PortfolioDto.CreatedResultFromFastApiDto createdResultFromFastApiDto;
-
-        List<Integer> stockNumPerTicker = createdResultFromFastApiDto.getInit_asset_num();
+        // PortfolioDto.CreatedResultFromFastApiDto createdResultFromFastApiDto = new PortfolioDto.CreatedResultFromFastApiDto();
+        // List<Integer> stockNumPerTicker = createdResultFromFastApiDto.getInit_asset_num();
+        List<Integer> stockNumPerTicker = new ArrayList<>(List.of(3, 3, 3, 3, 3, 2, 2, 2, 2, 2));
 
         Rebalancing rebalancing = Rebalancing.builder()
                 .portfolio(portfolio)
                 .createdDate(LocalDateTime.now())
                 .build();
+        rebalancingRepository.save(rebalancing);
 
         // TODO: 예외 타입 지정
         if (tickers.size() != stockNumPerTicker.size()) {
@@ -97,17 +98,15 @@ public class PortfolioService {
         }
 
         for (int i=0;i<tickers.size();i++) {
-            RebalancingTicker rebalancingTicker = RebalancingTicker.builder()
+            RebalancingTicker rebalancingTicker = rebalancingTickerRepository.save(RebalancingTicker.builder()
                     .rebalancing(rebalancing)
                     .ticker(tickers.get(i))
                     .isBuy(true)
                     .number(stockNumPerTicker.get(i))
-                    .build();
+                    .build());
             rebalancing.getRebalancingTickers().add(rebalancingTicker);
-            rebalancingTickerRepository.save(rebalancingTicker);
         }
 
-        rebalancingRepository.save(rebalancing);
         portfolio.setCreatedDate(LocalDateTime.now());
         portfolioRepository.save(portfolio);
     }

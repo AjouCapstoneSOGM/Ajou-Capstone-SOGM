@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
 
 public class PortfolioDto {
 
@@ -48,5 +49,26 @@ public class PortfolioDto {
         private Float averageCost;
         private String ticker;
         private String companyName;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PortfolioInfo {
+        private int id;
+        private String name;
+        private String country;
+        private boolean isAuto;
+        private Integer riskValue;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PortfolioInfoListDto {
+        private int count;
+        private List<PortfolioInfo> portfolios;
     }
 }
