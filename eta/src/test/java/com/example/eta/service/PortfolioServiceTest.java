@@ -4,7 +4,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.example.eta.dto.PortfolioDto;
 import com.example.eta.entity.Portfolio;
+import com.example.eta.entity.Rebalancing;
 import com.example.eta.entity.User;
+import com.example.eta.repository.RebalancingRepository;
+import com.example.eta.repository.RebalancingTickerRepository;
 import com.example.eta.service.PortfolioService;
 import com.example.eta.repository.PortfolioRepository;
 import com.example.eta.repository.UserRepository;
@@ -36,6 +39,12 @@ public class PortfolioServiceTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private RebalancingRepository rebalancingRepository;
+
+    @Autowired
+    private RebalancingTickerRepository rebalancingTickerRepository;
 
     @Autowired
     private PortfolioService portfolioService;
@@ -72,7 +81,31 @@ public class PortfolioServiceTest {
 
     @Test
     @DisplayName("생성된 자동 포트폴리오에 리밸런싱 알림 반영")
-    public void testRetrieveCreatedPortfolioAndSetRebalancing() throws Exception {
+    @Transactional
+    public void testGetAutoPortfolioCreationAndSet() throws Exception {
+        // given 유저 생성 포트폴리오 생성
+        User user = userRepository.save(new User().builder()
+                .email("james001@foo.bar")
+                .isVerified(false)
+                .password("password!")
+                .name("James")
+                .role("USER")
+                .createdDate(LocalDateTime.now())
+                .enabled(true).build());
+
+        PortfolioDto.CreateRequestDto createRequestDto = PortfolioDto.CreateRequestDto.builder()
+                .country("KOR")
+                .sector(List.of("G25"))
+                .asset(10000000)
+                .riskValue(1).build();
+        Portfolio portfolio = portfolioService.createInitAutoPortfolio(user, createRequestDto);
+
+        // when
+        portfolioService.getAutoPortfolioCreationAndSet(portfolio, createRequestDto);
+
+        // then 리밸런싱 알림 10개 생성됨
+        Rebalancing rebalancing = rebalancingRepository.findAllByPortfolio(portfolio).get(0);
+        System.out.println(rebalancing);
 
     }
 }

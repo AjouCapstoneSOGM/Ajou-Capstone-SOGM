@@ -14,6 +14,8 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,8 +28,8 @@ public class PortfolioController {
     private final PortfolioService portfolioService;
 
     @PostMapping("/create/auto")
-    public ResponseEntity<Object> createAutoPortfolio(@RequestBody PortfolioDto.CreateRequestDto createRequestDto,
-                                                      @AuthenticationPrincipal String email) throws InterruptedException{
+    public ResponseEntity<Map<String, Integer>> createAutoPortfolio(@RequestBody PortfolioDto.CreateRequestDto createRequestDto,
+                                                      @AuthenticationPrincipal String email) throws Exception{
         // 유저 정보 가져오기
         User user = userService.findByEmail(email);
 
@@ -35,9 +37,12 @@ public class PortfolioController {
         Portfolio portfolio = portfolioService.createInitAutoPortfolio(user, createRequestDto);
 
         // FastAPI 서버로부터 포트폴리오 결과 받아오기
-        portfolioService.retrieveCreatedPortfolioAndSetRebalancing(portfolio, createRequestDto);
+        portfolioService.getAutoPortfolioCreationAndSet(portfolio, createRequestDto);
 
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        Map<String, Integer> responseData = new HashMap<>();
+        responseData.put("pfId", portfolio.getPfId());
+
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
     @GetMapping("/{port_id}/performance")
@@ -54,7 +59,7 @@ public class PortfolioController {
             return ResponseEntity.internalServerError().body("An error occurred while processing your request.");
         }
     }
-
+  
     @PostMapping("/{port_id}/buy")
     public ResponseEntity<String> buyStock(@PathVariable("port_id") Integer pfId, @RequestBody PortfolioDto.BuyRequestDto buyRequestDto) {
         try {
@@ -77,5 +82,27 @@ public class PortfolioController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("매수 기록 중 오류가 발생했습니다: " + e.getMessage());
         }
+
+    @GetMapping
+    public ResponseEntity<PortfolioDto.PortfolioInfoListDto> getPortfolioInfos(@AuthenticationPrincipal String email) throws InterruptedException{
+        User user = userService.findByEmail(email);
+
+        List<PortfolioDto.PortfolioInfo> portfolioInfos = new ArrayList<>();
+        for (Portfolio portfolio : user.getPortfolios()) {
+            PortfolioDto.PortfolioInfo portfolioInfo = PortfolioDto.PortfolioInfo.builder()
+                    .id(portfolio.getPfId())
+                    .name(portfolio.getName())
+                    .isAuto(portfolio.getIsAuto())
+                    .country(portfolio.getCountry())
+                    .riskValue(portfolio.getRiskValue())
+                    .build();
+            portfolioInfos.add(portfolioInfo);
+        }
+
+        PortfolioDto.PortfolioInfoListDto responseData = PortfolioDto.PortfolioInfoListDto.builder()
+                .count(portfolioInfos.size())
+                .portfolios(portfolioInfos)
+                .build();
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 }

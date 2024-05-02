@@ -51,7 +51,7 @@ CREATE TABLE `portfolio_ticker` (
     `pf_id` int NOT NULL,
     `ticker` varchar(20) NOT NULL,
     `number` int NOT NULL,
-    `buying_price` float NOT NULL,
+    `average_price` float NOT NULL,
     `init_proportion` float NOT NULL,
     `current_proportion` float NOT NULL,
     PRIMARY KEY (`pf_id`, `ticker`),
@@ -74,8 +74,6 @@ CREATE TABLE `portfolio_record` (
 
 CREATE TABLE `rebalancing` (
     `rn_id` int NOT NULL AUTO_INCREMENT,
-    `created_date` datetime,
-    `ignored` bool NOT NULL,
     `pf_id` int NOT NULL,
     PRIMARY KEY (`rn_id`),
     FOREIGN KEY (`pf_id`) REFERENCES `portfolio` (`pf_id`)
@@ -105,6 +103,7 @@ CREATE TABLE `value` (
     `value` float,
     `momentum` float,
     `qvm` float,
+    `rank` int,
     `updated_date` datetime NOT NULL,
     PRIMARY KEY (`ticker`),
     FOREIGN KEY (`ticker`) REFERENCES `ticker` (`ticker`)
