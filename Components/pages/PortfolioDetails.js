@@ -44,18 +44,6 @@ const PortfolioDetails = ({ route }) => {
     setSelectedId(id);
   };
 
-  function processPortfolioData(data) {
-    const sortedStocks = data.sort(
-      (a, b) => b.averageCost * b.quantity - a.averageCost * a.quantity
-    );
-    const totalPrice = sortedStocks.reduce(
-      (sum, stock) => sum + stock.quantity * stock.averageCost,
-      0
-    );
-    const tickers = sortedStocks.map((stock) => stock.ticker);
-    return { sortedStocks, totalPrice, tickers };
-  }
-
   const getTotalPrice = (stocks) => {
     const totalPrice = stocks.reduce(
       (acc, cur) => acc + cur.currentPrice * cur.quantity,
