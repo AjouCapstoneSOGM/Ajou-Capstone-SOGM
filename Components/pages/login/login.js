@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,9 +6,9 @@ import {
   TouchableOpacity,
   TextInput,
   Button,
+  Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import urls from "../../utils/urls";
 
 const Login = () => {
   const navigation = useNavigation();
@@ -16,31 +16,9 @@ const Login = () => {
   const [useremail, setUseremail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
-    fetchLoginInfo();
-    navigation.replace("Home");
+  const handleSignUp = () => {
+    navigation.navigate("Home", { screen: "Home" });
   };
-
-  const fetchLoginInfo = async () => {
-    fetch(`${urls.springUrl}/api/auth/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: useremail,
-        password: password,
-      }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Success:", data);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
-  };
-
   return (
     <View style={styles.container}>
       <Text style={styles.HomeText}>로그인 화면</Text>
