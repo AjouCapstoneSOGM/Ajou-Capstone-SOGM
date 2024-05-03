@@ -9,8 +9,6 @@ import {
   StyleSheet,
 } from "react-native";
 import { VictoryPie } from "victory-native";
-import urls from "../utils/urls";
-import GetCurrentPrice from "../utils/GetCurrentPrice";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -19,48 +17,11 @@ const PortfolioDetails = ({ route }) => {
     id: null,
     name: "",
     stocks: [],
+    currentCast: 0,
     totalPrice: 0,
   });
   const [selectedId, setSelectedId] = useState(null);
-  const [loading, setLoading] = useState(true);
 
-  const ex_stocks = [
-    {
-      ticker: "005930",
-      companyName: "삼성",
-      quantity: 10,
-      averagePrice: 90000,
-      currentPrice: 0,
-    },
-    {
-      ticker: "003550",
-      companyName: "LG",
-      quantity: 5,
-      averagePrice: 70000,
-      currentPrice: 0,
-    },
-    {
-      ticker: "034730",
-      companyName: "SK",
-      quantity: 15,
-      averagePrice: 80000,
-      currentPrice: 0,
-    },
-    {
-      ticker: "035420",
-      companyName: "네이버",
-      quantity: 12,
-      averagePrice: 110000,
-      currentPrice: 0,
-    },
-    {
-      ticker: "035720",
-      companyName: "카카오",
-      quantity: 9,
-      averagePrice: 95000,
-      currentPrice: 0,
-    },
-  ];
   const colorScale = [
     "#FF6384",
     "#36A2EB",
@@ -74,92 +35,46 @@ const PortfolioDetails = ({ route }) => {
     "#7CDDDD",
   ];
 
-  // API로 받아온 데이터
-  const fetchPortfolioDetails = async () => {
-    try {
-      const response = await fetch(
-        `${urls.springUrl}/api/${portfolio.id}/performance`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({}),
-        }
-      );
-      const data = await response.json();
-      console.log("Suceess:", data);
-      return data;
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
-
   const chartData = portfolio.stocks.map((detail) => ({
     x: detail.companyName,
-    y: detail.averagePrice * detail.quantity,
+    y: detail.averageCost * detail.quantity,
   }));
 
   const handleSelectItem = (id) => {
     setSelectedId(id);
   };
 
-  // 현재 가격 업데이트
-  async function updateCurrentPrices(stocks, tickers) {
-    try {
-      const prices = await GetCurrentPrice(tickers);
-      const updatedStocks = stocks.map((stock, index) => ({
-        ...stock,
-        currentPrice: prices[index].currentPrice,
-      }));
-      return updatedStocks;
-    } catch (error) {
-      console.error("가격 정보를 가져오는데 실패했습니다:", error);
-      return stocks; // 오류 발생시 원래 주식 목록 반환
-    }
-  }
-
   function processPortfolioData(data) {
     const sortedStocks = data.sort(
-      (a, b) => b.averagePrice * b.quantity - a.averagePrice * a.quantity
+      (a, b) => b.averageCost * b.quantity - a.averageCost * a.quantity
     );
     const totalPrice = sortedStocks.reduce(
-      (sum, stock) => sum + stock.quantity * stock.averagePrice,
+      (sum, stock) => sum + stock.quantity * stock.averageCost,
       0
     );
     const tickers = sortedStocks.map((stock) => stock.ticker);
     return { sortedStocks, totalPrice, tickers };
   }
 
-  async function fetchPortfolioData() {
-    try {
-      fetchedData = ex_stocks; //임시
-      // const fetchedData = await fetchPortfolioDetails();
-      return processPortfolioData(fetchedData);
-    } catch (error) {
-      console.error("포트폴리오 데이터 로드 실패:", error);
-      return { stocks: [], totalPrice: 0 }; // 오류 발생시 기본 데이터
-    }
-  }
+  const getTotalPrice = (stocks) => {
+    const totalPrice = stocks.reduce(
+      (acc, cur) => acc + cur.currentPrice * cur.quantity,
+      0
+    );
+    return totalPrice;
+  };
 
   useEffect(() => {
-    async function loadData() {
-      const { sortedStocks, totalPrice, tickers } = await fetchPortfolioData();
-      const stocksWithPrices = await updateCurrentPrices(sortedStocks, tickers);
-      setPortfolio({
-        id: route.params.portfolio.id,
-        name: route.params.portfolio.name,
-        stocks: stocksWithPrices,
-        totalPrice: totalPrice,
-      });
-      setLoading(false);
-    }
-    loadData();
+    const currentPortfolio = route.params.portfolio;
+    setPortfolio({
+      id: currentPortfolio.id,
+      name: currentPortfolio.name,
+      stocks: currentPortfolio.detail.stocks,
+      currentCash: currentPortfolio.detail.currentCash,
+      totalPrice: getTotalPrice(currentPortfolio.detail.stocks),
+    });
   }, []);
 
-  if (loading) {
-    return <Text>Loading...</Text>;
-  }
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{portfolio.name}</Text>
@@ -184,8 +99,8 @@ const PortfolioDetails = ({ route }) => {
           <Text style={styles.centerText}>{`${
             ((
               (portfolio.stocks[selectedId].quantity *
-                portfolio.stocks[selectedId].averagePrice) /
-              totalPrice
+                portfolio.stocks[selectedId].averageCost) /
+              portfolio.totalPrice
             ).toFixed(3) *
               1000) /
             10 // 소숫점 계산 오류 방지를 위함
@@ -213,22 +128,22 @@ const PortfolioDetails = ({ route }) => {
                   {item.currentPrice.toLocaleString()}
                 </Text>
                 <Text style={styles.itemText}>
-                  {item.averagePrice.toLocaleString()}
+                  {item.averageCost.toLocaleString()}
                 </Text>
                 <Text style={styles.itemText}>
-                  {(item.averagePrice * item.quantity).toLocaleString()}
+                  {(item.averageCost * item.quantity).toLocaleString()}
                 </Text>
                 <Text
                   style={[
                     styles.itemText,
-                    item.averagePrice > item.currentPrice
+                    item.averageCost > item.currentPrice
                       ? { color: "blue" }
                       : { color: "red" },
                   ]}
                 >
                   {((
-                    (item.currentPrice - item.averagePrice) /
-                    item.averagePrice
+                    (item.currentPrice - item.averageCost) /
+                    item.averageCost
                   ).toFixed(4) *
                     10000) /
                     100}

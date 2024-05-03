@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -14,20 +14,7 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
   const [amount, setAmount] = useState("");
   const [riskLevel, setRiskLevel] = useState("");
   const [interest, setInterest] = useState("");
-
-  const sector = [
-    "it",
-    "건강관리",
-    "경기관련소비재",
-    "금융",
-    "산업재",
-    "소재",
-    "에너지",
-    "유틸리티",
-    "커뮤니케이션서비스",
-    "필수소비재",
-    "기타",
-  ];
+  const [sector, setSector] = useState({});
 
   const isRiskNull = () => {
     if (riskLevel === "") {
@@ -49,6 +36,21 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
     }
     return false;
   };
+  const fetchSector = async () => {
+    try {
+      const response = await fetch(`${urls.springUrl}/api/sector/list`, {
+        method: "GET",
+        headers: {
+          Authorization:
+            "Bearer eyJhbGciOiJIUzM4NCJ9.eyJlbWFpbCI6InRlc3RAdGVzdC5jb20ifQ.1feC60RobgkRYgmdrd4vW_x-rHTHxTSNS5KrB0_dTgWNRnlUjXjsp6a6IIwUCuW2",
+        },
+      });
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
 
   const fetchUserInfo = async () => {
     try {
@@ -58,10 +60,12 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization:
+              "Bearer eyJhbGciOiJIUzM4NCJ9.eyJlbWFpbCI6InRlc3RAdGVzdC5jb20ifQ.1feC60RobgkRYgmdrd4vW_x-rHTHxTSNS5KrB0_dTgWNRnlUjXjsp6a6IIwUCuW2",
           },
           body: JSON.stringify({
             country: "KOR",
-            sector: interest,
+            sector: [interest],
             asset: amount,
             riskValue: riskLevel,
           }),
@@ -77,7 +81,7 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
   const submitUserInfo = async () => {
     console.log(amount, riskLevel, interest);
     handleNextStep();
-    //await fetchUserInfo();
+    await fetchUserInfo();
     handleNextStep();
     setCurrentStep(2);
   };
@@ -90,6 +94,9 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
     setCurrentAutoStep(currentAutoStep - 1);
   };
 
+  useEffect(() => {
+    fetchSector().then((data) => setSector(data));
+  }, []);
   const renderAutoStep = () => {
     switch (currentAutoStep) {
       case 1:
@@ -144,7 +151,7 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
               </Text>
             </View>
             <View style={styles.inputContainer}>
-              {["1", "2", "3"].map((level) => (
+              {[0.1, 0.2, 0.3].map((level) => (
                 <TouchableOpacity
                   key={level}
                   style={[
@@ -189,16 +196,16 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
               </Text>
             </View>
             <View style={styles.sectorContainer}>
-              {sector.map((item) => (
+              {Object.entries(sector).map(([code, name]) => (
                 <TouchableOpacity
-                  key={item}
+                  key={code}
                   style={[
                     styles.input_Interest,
-                    interest === item ? styles.selectedInput : "",
+                    interest === code ? styles.selectedInput : "",
                   ]}
-                  onPress={() => setInterest(item)}
+                  onPress={() => setInterest(code)}
                 >
-                  <Text style={{ fontSize: 17 }}>{item}</Text>
+                  <Text style={{ fontSize: 17 }}>{name}</Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -233,7 +240,6 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
         setCurrentStep(0);
     }
   };
-
   return <View style={styles.container}>{renderAutoStep()}</View>;
 };
 

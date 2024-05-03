@@ -1,12 +1,7 @@
 import { Buffer } from "buffer";
 global.Buffer = Buffer;
 
-const GetCurrentPrice = async (tickers) => {
-  return Promise.all(tickers.map((ticker) => fetchCurrentPrice(ticker)));
-};
-export default GetCurrentPrice;
-
-async function fetchCurrentPrice(ticker) {
+const GetCurrentPrice = async (ticker) => {
   const iconv = require("iconv-lite");
   const url = `https://finance.naver.com/item/main.naver?code=${ticker}`;
   try {
@@ -25,4 +20,5 @@ async function fetchCurrentPrice(ticker) {
   } catch (error) {
     return { ticker, error: error.message };
   }
-}
+};
+export default GetCurrentPrice;
