@@ -13,7 +13,7 @@ import MakePortfolio from "./pages/MakePortfolio";
 const Stack = createStackNavigator();
 function ScreenStack() {
   return (
-    <Stack.Navigator initialRouteName="Home">
+    <Stack.Navigator initialRouteName="Login">
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="SocialLogin" component={SocialLogin} />
       <Stack.Screen name="Signup" component={Signup} />
