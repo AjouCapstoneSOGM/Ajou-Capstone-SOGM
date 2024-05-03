@@ -8,6 +8,7 @@ import {
   StyleSheet,
 } from "react-native";
 import urls from "../utils/urls";
+import { getUsertoken } from "../utils/localStorageUtils";
 
 const MakeAutoPortfolio = ({ setCurrentStep }) => {
   const [currentAutoStep, setCurrentAutoStep] = useState(1);
@@ -38,30 +39,33 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
   };
   const fetchSector = async () => {
     try {
+      const token = getUsertoken();
       const response = await fetch(`${urls.springUrl}/api/sector/list`, {
         method: "GET",
         headers: {
-          Authorization:
-            "Bearer eyJhbGciOiJIUzM4NCJ9.eyJlbWFpbCI6InRlc3RAdGVzdC5jb20ifQ.1feC60RobgkRYgmdrd4vW_x-rHTHxTSNS5KrB0_dTgWNRnlUjXjsp6a6IIwUCuW2",
+          Authorization: `Bearer ${token}`,
         },
       });
-      const data = await response.json();
-      return data;
+      if (response.ok) {
+        const data = await response.json();
+        return data;
+      }
     } catch (error) {
       console.error("Error:", error);
+      throw error;
     }
   };
 
   const fetchUserInfo = async () => {
     try {
+      const token = await getUsertoken();
       const response = await fetch(
         `${urls.springUrl}/api/portfolio/create/auto`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization:
-              "Bearer eyJhbGciOiJIUzM4NCJ9.eyJlbWFpbCI6InRlc3RAdGVzdC5jb20ifQ.1feC60RobgkRYgmdrd4vW_x-rHTHxTSNS5KrB0_dTgWNRnlUjXjsp6a6IIwUCuW2",
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
             country: "KOR",
@@ -71,10 +75,13 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
           }),
         }
       );
-      const data = await response.json();
-      console.log("Success:", data);
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Success:", data);
+      }
     } catch (error) {
       console.error("Error:", error);
+      throw error;
     }
   };
 

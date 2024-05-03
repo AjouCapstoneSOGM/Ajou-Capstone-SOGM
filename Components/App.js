@@ -9,19 +9,22 @@ import Home from "./pages/Home";
 import ViewPortfolio from "./pages/ViewPortfolio";
 import PortfolioDetails from "./pages/PortfolioDetails";
 import MakePortfolio from "./pages/MakePortfolio";
+import { AuthProvider } from "./utils/AuthContext";
 
 const Stack = createStackNavigator();
 function ScreenStack() {
   return (
-    <Stack.Navigator initialRouteName="Login">
-      <Stack.Screen name="Login" component={Login} />
-      <Stack.Screen name="SocialLogin" component={SocialLogin} />
-      <Stack.Screen name="Signup" component={Signup} />
-      <Stack.Screen name="Home" component={Home} />
-      <Stack.Screen name="ViewPortfolio" component={ViewPortfolio} />
-      <Stack.Screen name="PortfolioDetails" component={PortfolioDetails} />
-      <Stack.Screen name="MakePortfolio" component={MakePortfolio} />
-    </Stack.Navigator>
+    <AuthProvider>
+      <Stack.Navigator initialRouteName="Home">
+        <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="SocialLogin" component={SocialLogin} />
+        <Stack.Screen name="Signup" component={Signup} />
+        <Stack.Screen name="Home" component={Home} />
+        <Stack.Screen name="ViewPortfolio" component={ViewPortfolio} />
+        <Stack.Screen name="PortfolioDetails" component={PortfolioDetails} />
+        <Stack.Screen name="MakePortfolio" component={MakePortfolio} />
+      </Stack.Navigator>
+    </AuthProvider>
   );
 }
 

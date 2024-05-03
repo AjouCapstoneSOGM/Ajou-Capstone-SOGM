@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import urls from "../utils/urls";
 import GetCurrentPrice from "../utils/GetCurrentPrice";
+import { getUsertoken } from "../utils/localStorageUtils";
 
 const PortfolioList = ({ navigation }) => {
   const [portfolios, setPortfolios] = useState([]);
@@ -45,41 +46,46 @@ const PortfolioList = ({ navigation }) => {
   //포트폴리오 리스트를 요청
   const fetchPortfolio = async () => {
     try {
+      const token = await getUsertoken();
       const response = await fetch(`${urls.springUrl}/api/portfolio`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization:
-            "Bearer eyJhbGciOiJIUzM4NCJ9.eyJlbWFpbCI6InRlc3RAdGVzdC5jb20ifQ.1feC60RobgkRYgmdrd4vW_x-rHTHxTSNS5KrB0_dTgWNRnlUjXjsp6a6IIwUCuW2",
+          Authorization: `Bearer ${token}`,
         },
       });
-      const data = await response.json();
-      return data;
+      if (response.ok) {
+        const data = await response.json();
+        return data;
+      }
     } catch (error) {
       console.error("Error:", error);
+      throw error;
     }
   };
 
   //포트폴리오 ID를 주고 종목 리스트를 받아오는 요청
   const fetchStocksByPortfolioId = async (id) => {
     try {
+      const token = await getUsertoken();
       const response = await fetch(
         `${urls.springUrl}/api/portfolio/${id}/performance`,
         {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization:
-              "Bearer eyJhbGciOiJIUzM4NCJ9.eyJlbWFpbCI6InRlc3RAdGVzdC5jb20ifQ.1feC60RobgkRYgmdrd4vW_x-rHTHxTSNS5KrB0_dTgWNRnlUjXjsp6a6IIwUCuW2",
+            Authorization: `Bearer ${token}`,
           },
         }
       );
-      const stocks = await response.json();
-      const sortedStocks = sortStocks(stocks.portfolioPerformance);
-      return {
-        currentCash: stocks.currentCash,
-        stocks: sortedStocks,
-      };
+      if (response.ok) {
+        const stocks = await response.json();
+        const sortedStocks = sortStocks(stocks.portfolioPerformance);
+        return {
+          currentCash: stocks.currentCash,
+          stocks: sortedStocks,
+        };
+      }
     } catch (error) {
       console.error("Could not fetch stocks for portfolio:", id, error);
       return {
