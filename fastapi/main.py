@@ -6,6 +6,7 @@ from starlette.middleware.cors import CORSMiddleware
 from make_portfolio import MakePortrolio
 from current_price import fetch_all_prices
 from get_news_summary import News
+from gpt import Chatbot
 
 
 settings = Settings()  # 설정 인스턴스 생성
@@ -40,5 +41,7 @@ async def get_current_prices(tickers: TickerList):
 @app.post("/getNews/")
 async def get_News(ticker: Ticker):
     news = News()
-    summary = await news.get_company_news(ticker.ticker)
+    chatbot = Chatbot()
+    headlines = await news.get_company_news(ticker.ticker)
+    summary = await chatbot.summary(headlines, ticker)
     return {"summary": summary}
