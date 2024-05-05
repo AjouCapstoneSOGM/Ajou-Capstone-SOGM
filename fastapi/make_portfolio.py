@@ -153,14 +153,15 @@ class MakePortrolio:
         self, total_ratio, initial_cash, stock_tickers, num_bonds
     ):
 
-        start = self.today.strftime("%Y-%m-%d")
-        end = (self.today + timedelta(1)).strftime("%Y-%m-%d")
+        start = (self.today - timedelta(days=14)).strftime("%Y-%m-%d")
+        end = (self.today).strftime("%Y-%m-%d")
         final_adjClose = pd.DataFrame()
 
         for item in stock_tickers:
             data = web.get_data_yahoo(item, start=start, end=end, progress=False)
             final_adjClose[item] = data["Adj Close"].round().astype(int)
 
+        final_adjClose = final_adjClose.tail(1)
         adj_asset = final_adjClose.values.flatten()
         initial_cash = initial_cash  # 투자금액
         invest = initial_cash * total_ratio  # 종목당 투자금액
