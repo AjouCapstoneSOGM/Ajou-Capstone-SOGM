@@ -36,8 +36,8 @@ public class PortfolioController {
         // DB에 포트폴리오 생성
         Portfolio portfolio = portfolioService.createInitAutoPortfolio(user, createRequestDto);
 
-        // FastAPI 서버로부터 포트폴리오 결과 받아오기
-        portfolioService.getAutoPortfolioCreationAndSet(portfolio, createRequestDto);
+        // FastAPI 서버로부터 포트폴리오 결과 받아오고 초기화
+        portfolioService.initializeAutoPortfolio(portfolio, createRequestDto);
 
         Map<String, Integer> responseData = new HashMap<>();
         responseData.put("pfId", portfolio.getPfId());

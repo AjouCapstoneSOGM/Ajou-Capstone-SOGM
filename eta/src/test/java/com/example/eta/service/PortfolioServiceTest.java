@@ -4,13 +4,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.example.eta.dto.PortfolioDto;
 import com.example.eta.entity.Portfolio;
+import com.example.eta.entity.PortfolioTicker;
 import com.example.eta.entity.Rebalancing;
 import com.example.eta.entity.User;
-import com.example.eta.repository.RebalancingRepository;
-import com.example.eta.repository.RebalancingTickerRepository;
+import com.example.eta.repository.*;
 import com.example.eta.service.PortfolioService;
-import com.example.eta.repository.PortfolioRepository;
-import com.example.eta.repository.UserRepository;
 import org.aspectj.apache.bcel.Repository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -44,7 +42,7 @@ public class PortfolioServiceTest {
     private RebalancingRepository rebalancingRepository;
 
     @Autowired
-    private RebalancingTickerRepository rebalancingTickerRepository;
+    private PortfolioTickerRepository portfolioTickerRepository;
 
     @Autowired
     private PortfolioService portfolioService;
@@ -80,7 +78,7 @@ public class PortfolioServiceTest {
     }
 
     @Test
-    @DisplayName("생성된 자동 포트폴리오에 리밸런싱 알림 반영")
+    @DisplayName("자동 포트폴리오 초기화(생성된 결과 반영, 리밸런싱 알림 초기화)")
     @Transactional
     public void testGetAutoPortfolioCreationAndSet() throws Exception {
         // given 유저 생성 포트폴리오 생성
@@ -101,11 +99,15 @@ public class PortfolioServiceTest {
         Portfolio portfolio = portfolioService.createInitAutoPortfolio(user, createRequestDto);
 
         // when
-        portfolioService.getAutoPortfolioCreationAndSet(portfolio, createRequestDto);
+        portfolioService.initializeAutoPortfolio(portfolio, createRequestDto);
 
         // then 리밸런싱 알림 10개 생성됨
         Rebalancing rebalancing = rebalancingRepository.findAllByPortfolio(portfolio).get(0);
-        System.out.println(rebalancing);
+        List<PortfolioTicker> portfolioTickers = portfolioTickerRepository.findAllByPortfolio(portfolio);
 
+        Assertions.assertAll(
+                () -> assertEquals(10, rebalancing.getRebalancingTickers().size()),
+                () -> assertEquals(0, portfolioTickers.get(0).getNumber())
+        );
     }
 }

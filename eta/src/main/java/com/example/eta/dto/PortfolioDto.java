@@ -16,6 +16,7 @@ public class PortfolioDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CreateRequestDto {
+        private String name;
         private String country;
         private List<String> sector;
         private float asset;
