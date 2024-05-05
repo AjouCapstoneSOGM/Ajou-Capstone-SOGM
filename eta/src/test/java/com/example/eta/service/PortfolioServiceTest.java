@@ -80,7 +80,7 @@ public class PortfolioServiceTest {
     @Test
     @DisplayName("자동 포트폴리오 초기화(생성된 결과 반영, 리밸런싱 알림 초기화)")
     @Transactional
-    public void testGetAutoPortfolioCreationAndSet() throws Exception {
+    public void testInitializeAutoPortfolio() throws Exception {
         // given 유저 생성 포트폴리오 생성
         User user = userRepository.save(new User().builder()
                 .email("james001@foo.bar")
