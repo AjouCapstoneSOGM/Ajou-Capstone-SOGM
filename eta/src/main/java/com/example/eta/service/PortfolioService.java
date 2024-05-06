@@ -52,8 +52,7 @@ public class PortfolioService {
                 .build();
         portfolioRepository.save(portfolio);
 
-        List<Sector> sectors = sectorRepository.findAllById(createRequestDto.getSector());
-        for(Sector sector : sectors) {
+        for(Sector sector : sectorRepository.findAllById(createRequestDto.getSector())) {
             PortfolioSector portfolioSector = new PortfolioSector().builder()
                     .portfolio(portfolio)
                     .sector(sector)
