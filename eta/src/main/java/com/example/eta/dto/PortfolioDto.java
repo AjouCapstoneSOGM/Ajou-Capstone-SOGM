@@ -36,7 +36,7 @@ public class PortfolioDto {
     @Builder
     @NoArgsConstructor @AllArgsConstructor
     public static class CreatedResultFromFastApiDto {
-        private List<Integer> init_asset_num;
+        private List<Integer> int_asset_num;
         private int cash_hold;
         private List<Float> total_radio_final;
         private float final_returns;

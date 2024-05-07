@@ -52,8 +52,7 @@ public class PortfolioService {
                 .build();
         portfolioRepository.save(portfolio);
 
-        List<Sector> sectors = sectorRepository.findAllById(createRequestDto.getSector());
-        for(Sector sector : sectors) {
+        for(Sector sector : sectorRepository.findAllById(createRequestDto.getSector())) {
             PortfolioSector portfolioSector = new PortfolioSector().builder()
                     .portfolio(portfolio)
                     .sector(sector)
@@ -90,7 +89,7 @@ public class PortfolioService {
                 )
                 .initial_cash((int)createRequestDto.getAsset())
                 .build()).block().getBody();
-        List<Integer> stockNumPerTicker = createdResultFromFastApiDto.getInit_asset_num();
+        List<Integer> stockNumPerTicker = createdResultFromFastApiDto.getInt_asset_num();
 
         // TODO: 예외 타입 지정, 예외 처리 시 포트폴리오 삭제하도록 하기
         if (tickers.size() != stockNumPerTicker.size()) {
