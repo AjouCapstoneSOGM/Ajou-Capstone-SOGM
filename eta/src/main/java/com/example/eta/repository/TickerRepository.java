@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public interface TickerRepository extends JpaRepository<Ticker, String> {
 
-    @Query(value = "SELECT ticker.ticker, ticker.name, ticker.exchange, ticker.market_cap, ticker.updated_date, ticker.eps, ticker.forward_eps, ticker.bps, ticker.dps, ticker.sector_id " +
+    @Query(value = "SELECT ticker.ticker, ticker.name, ticker.exchange, ticker.market_cap, ticker.updated_date, ticker.dividend, ticker.equity, ticker.sector_id " +
             "FROM ticker INNER JOIN value on ticker.ticker = value.ticker " +
             "WHERE sector_id = ?1 AND (exchange = 'KOSPI' OR exchange = 'KOSDAQ') " +
             "ORDER BY value.rank ASC " +
