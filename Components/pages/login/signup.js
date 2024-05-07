@@ -8,12 +8,9 @@ import {
   Button,
   Alert,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
 import urls from "../../utils/urls";
 
-const Signup = () => {
-  const navigation = useNavigation();
-
+const Signup = ({ navigation }) => {
   const [username, setUsername] = useState("");
   const [useremail, setUseremail] = useState("");
   const [password, setPassword] = useState("");

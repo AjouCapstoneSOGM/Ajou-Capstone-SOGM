@@ -9,6 +9,8 @@ import Home from "./pages/Home";
 import ViewPortfolio from "./pages/ViewPortfolio";
 import PortfolioDetails from "./pages/PortfolioDetails";
 import MakePortfolio from "./pages/MakePortfolio";
+import NewsSummary from "./pages/NewsSummary";
+
 import { AuthProvider } from "./utils/AuthContext";
 
 const Stack = createStackNavigator();
@@ -21,6 +23,7 @@ function ScreenStack() {
         <Stack.Screen name="Signup" component={Signup} />
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="ViewPortfolio" component={ViewPortfolio} />
+        <Stack.Screen name="NewsSummary" component={NewsSummary} />
         <Stack.Screen name="PortfolioDetails" component={PortfolioDetails} />
         <Stack.Screen name="MakePortfolio" component={MakePortfolio} />
       </Stack.Navigator>

@@ -12,7 +12,7 @@ import { VictoryPie } from "victory-native";
 
 const screenWidth = Dimensions.get("window").width;
 
-const PortfolioDetails = ({ route }) => {
+const PortfolioDetails = ({ route, navigation }) => {
   const [portfolio, setPortfolio] = useState({
     id: null,
     name: "",
@@ -35,6 +35,10 @@ const PortfolioDetails = ({ route }) => {
     "#7CDDDD",
   ];
 
+  const handlePressSummary = () => {
+    selectedTicker = portfolio.stocks[selectedId].ticker;
+    navigation.navigate("NewsSummary", { ticker: selectedTicker });
+  };
   const chartData = portfolio.stocks.map((detail) => ({
     x: detail.companyName,
     y: detail.averageCost * detail.quantity,
@@ -139,7 +143,7 @@ const PortfolioDetails = ({ route }) => {
         </ScrollView>
       </View>
       <View style={styles.buttonContainer}>
-        <Button title="뉴스 요약" onPress={() => {}} />
+        <Button title="뉴스 요약" onPress={handlePressSummary} />
         <Button title="수정" onPress={() => {}} />
       </View>
     </View>

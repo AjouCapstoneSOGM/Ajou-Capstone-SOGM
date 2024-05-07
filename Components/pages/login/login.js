@@ -7,7 +7,7 @@ import {
   TextInput,
 } from "react-native";
 import urls from "../../utils/urls";
-import { setUsertoken, getUsertoken } from "../../utils/localStorageUtils.js";
+import { setUsertoken } from "../../utils/localStorageUtils.js";
 import { useAuth } from "../../utils/AuthContext.js";
 
 const Login = ({ navigation }) => {
@@ -28,8 +28,8 @@ const Login = ({ navigation }) => {
         }),
       });
       if (response.ok) {
-        const data = response.json();
-        setUsertoken(data["token"]);
+        const data = await response.json();
+        setUsertoken(data.token);
         login();
         navigation.navigate("Home", { screen: "Home" });
       }

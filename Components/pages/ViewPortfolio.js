@@ -78,13 +78,16 @@ const PortfolioList = ({ navigation }) => {
           },
         }
       );
+      const stocks = await response.json();
+
       if (response.ok) {
-        const stocks = await response.json();
         const sortedStocks = sortStocks(stocks.portfolioPerformance);
         return {
           currentCash: stocks.currentCash,
           stocks: sortedStocks,
         };
+      } else {
+        console.log(stocks);
       }
     } catch (error) {
       console.error("Could not fetch stocks for portfolio:", id, error);
