@@ -43,4 +43,11 @@ async def get_News(ticker: Ticker):
     chatbot = Chatbot()
     headlines = await news.get_company_news(ticker.ticker)
     summary = await chatbot.summary("".join(headlines), ticker.ticker)
-    return {"summary": summary}
+    sections = summary.strip().split("## ")[1:]
+
+    summary_json = []
+    for section in sections:
+        title, _, content = section.partition("\n")
+        summary_json.append({"title": title.strip(), "content": content.strip()})
+
+    return {"summary": summary_json}

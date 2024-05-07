@@ -14,7 +14,7 @@ class Chatbot:
             messages=[
                 {
                     "role": "system",
-                    "content": "You are an assistant that summarizes important stock market news in korean. Please summarize the following news headlines about given ticker. Make the parts and provide the summaries in a format of markdown, ## Title\nContent, as detail as possible. Focusing only on details relevant to give ticker.",
+                    "content": "You are an assistant that summarizes important stock market news in korean. Please summarize the following news headlines about given stock. Make the parts and provide the summaries in a format of markdown, ## Title\nContent, as detail as possible. Focusing only on details relevant to give ticker.",
                 },
                 {
                     "role": "user",
