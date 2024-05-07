@@ -2,12 +2,19 @@ package com.example.eta.scheduler;
 
 import com.example.eta.entity.Portfolio;
 import com.example.eta.entity.PortfolioTicker;
+import com.example.eta.entity.Rebalancing;
+import com.example.eta.entity.RebalancingTicker;
 import com.example.eta.repository.PortfolioRepository;
 import com.example.eta.repository.PriceRepository;
+import com.example.eta.repository.RebalancingRepository;
+import com.example.eta.repository.RebalancingTickerRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cglib.core.Local;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,6 +25,10 @@ public class PortfolioScheduler {
     private final PortfolioRepository portfolioRepository;
 
     private final PriceRepository priceRepository;
+
+    private final RebalancingRepository rebalancingRepository;
+
+    private final RebalancingTickerRepository rebalancingTickerRepository;
 
     @Scheduled(cron = "0 0 0 * * 1-5")
     public void doProportionRebalancing() {
@@ -81,6 +92,12 @@ public class PortfolioScheduler {
         }
         
         // 매도, 매수 알림 생성
+        Rebalancing rebalancing = Rebalancing.builder()
+                .portfolio(portfolio)
+                .createdDate(LocalDateTime.now())
+                .build();
+        rebalancingRepository.save(rebalancing);
+
         for (PortfolioTicker portfolioTicker : portfolio.getPortfolioTickers()) {
             float close = priceRepository.findLatestPriceByTicker(portfolioTicker.getTicker().getTicker())
                     .get().getClose().floatValue();
@@ -89,12 +106,28 @@ public class PortfolioScheduler {
             float diff = targetAmount - currentAmount;
             if (diff > 0) {
                 // 매수
-                
+                int numToBuy = (int)(diff / close);
+                if (numToBuy == 0) continue;
+                RebalancingTicker rebalancingTicker = rebalancingTickerRepository.save(RebalancingTicker.builder()
+                        .rebalancing(rebalancing)
+                        .number(numToBuy)
+                        .ticker(portfolioTicker.getTicker())
+                        .isBuy(true)
+                        .build());
+                rebalancing.getRebalancingTickers().add(rebalancingTicker);
             } else if (diff < 0) {
                 // 매도
-                
+                diff = -diff;
+                int numToSell = (int)(diff / close);
+                if (numToSell == 0) continue;
+                RebalancingTicker rebalancingTicker = rebalancingTickerRepository.save(RebalancingTicker.builder()
+                        .rebalancing(rebalancing)
+                        .number(numToSell)
+                        .ticker(portfolioTicker.getTicker())
+                        .isBuy(false)
+                        .build());
+                rebalancing.getRebalancingTickers().add(rebalancingTicker);
             }
-
         } 
     }
 }
