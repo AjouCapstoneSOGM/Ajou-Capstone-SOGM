@@ -20,10 +20,11 @@ public class ApiClient {
     public Mono<ResponseEntity<PortfolioDto.CreatedResultFromFastApiDto>> getCreatedPortfolioApi(PortfolioDto.CreateRequestToFastApiDto createRequestToFastApiDto){
         return WebClient.builder().baseUrl(baseUrl).build()
                 .post()
-                .uri("/makePortfolio")
+                .uri("/makePortfolio/")
                 .body(Mono.just(createRequestToFastApiDto), PortfolioDto.CreateRequestDto.class)
                 .retrieve()
                 .toEntity(PortfolioDto.CreatedResultFromFastApiDto.class)
+                .doOnSuccess((e) -> System.out.println(e.getStatusCode()))
                 .doOnError((e) -> System.out.println(e.getMessage()));
     }
 }
