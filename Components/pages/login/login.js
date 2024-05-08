@@ -1,20 +1,27 @@
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  TextInput,
-  Button,
-} from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Button, Alert, } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import urls from "../../utils/urls";
+import {setUsertoken, getUsertoken} from "../../utils/localStorageUtils.js"
+
 
 const Login = () => {
   const navigation = useNavigation();
 
   const [useremail, setUseremail] = useState("");
   const [password, setPassword] = useState("");
+
+  useEffect(() =>{
+    getUsertoken().then((res) => {
+      if (res == null){ // 저장된 유저 토큰이 없음
+        console.log("로그인 토큰 없음. 로그인 화면 진행")
+        return;
+      }
+      console.log("현재 로그인 " + res);
+      navigation.navigate("Home", { screen: "Home" });
+    });
+    
+  }, []);
 
   const handleLogin = () => {
     fetchLoginInfo();
@@ -35,6 +42,7 @@ const Login = () => {
       .then((response) => response.json())
       .then((data) => {
         console.log("Success:", data);
+        setUsertoken(data['token']);
       })
       .catch((error) => {
         console.error("Error:", error);

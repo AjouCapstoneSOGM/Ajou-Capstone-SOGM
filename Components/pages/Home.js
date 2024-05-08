@@ -1,7 +1,12 @@
 import React from "react";
 import { View, Text, Button, StyleSheet } from "react-native";
-
+import {removeUsertoken} from "../utils/localStorageUtils.js"
 function Home({ navigation }) {
+
+  const logout = () =>{
+    removeUsertoken().then(res => navigation.navigate("Login"));    
+  }
+
   return (
     <View style={styles.container}>
       <Text>Home Page</Text>
