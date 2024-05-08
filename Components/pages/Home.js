@@ -14,6 +14,7 @@ function Home({ navigation }) {
         onPress={() => navigation.navigate("MakePortfolio")}
       />
       <Button title="로그인" onPress={() => navigation.navigate("Login")} />
+      <Button title="설정" onPress={() => navigation.navigate("UserSetting")} />
     </View>
   );
 }

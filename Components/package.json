@@ -25,7 +25,12 @@
     "react-native-screens": "~3.22.0",
     "react-native-svg": "13.9.0",
     "react-native-web": "~0.19.6",
-    "victory-native": "^37.0.2"
+    "victory-native": "^37.0.2",
+    "expo-notifications": "~0.20.1",
+    "expo-device": "~5.4.0",
+    "expo-checkbox": "~2.4.0",
+    "@react-native-community/datetimepicker": "7.2.0",
+    "@react-native-async-storage/async-storage": "1.18.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"
