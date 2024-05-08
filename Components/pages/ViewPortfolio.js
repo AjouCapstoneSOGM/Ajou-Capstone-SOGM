@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import urls from "../utils/urls";
 import GetCurrentPrice from "../utils/GetCurrentPrice";
 import { getUsertoken } from "../utils/localStorageUtils";
+import Icon from "react-native-vector-icons/AntDesign";
 
 const PortfolioList = ({ navigation }) => {
   const [portfolios, setPortfolios] = useState([]);
@@ -169,50 +170,156 @@ const PortfolioList = ({ navigation }) => {
     return <Text>Loading...</Text>;
   }
 
+  const getRiskText = (risk) => {
+    if (risk === 1) {
+      return (
+        <Text
+          style={[
+            styles.riskText,
+            {
+              color: "#006400",
+              backgroundColor: "#90EE90",
+            },
+          ]}
+        >
+          위험도 안전
+        </Text>
+      );
+    } else if (risk === 2) {
+      return (
+        <Text
+          style={[
+            styles.riskText,
+            {
+              color: "#FF8C00",
+              backgroundColor: "#FFDAB9",
+            },
+          ]}
+        >
+          위험도 중간
+        </Text>
+      );
+    } else {
+      return (
+        <Text
+          style={[
+            styles.riskText,
+            {
+              color: "#8B0000",
+              backgroundColor: "#FFB6C1",
+            },
+          ]}
+        >
+          위험도 위험
+        </Text>
+      );
+    }
+  };
   return (
-    <View style={styles.container}>
-      <View style={styles.buttonContainer}>
-        {portfolios.map((portfolio) => (
+    <View style={styles.portfolioContainer}>
+      {portfolios.map((portfolio) => (
+        <View key={portfolio} style={styles.portfolioButton}>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              paddingHorizontal: 5,
+            }}
+          >
+            <Text
+              style={{
+                margin: 10,
+                fontSize: 17,
+                color: "white",
+              }}
+            >
+              테스트의 포트폴리오 1
+            </Text>
+            <Text
+              style={{
+                margin: 10,
+                fontSize: 15,
+                color: "white",
+              }}
+            >
+              {portfolio.auto ? "자동" : "수동"} / {portfolio.country}
+            </Text>
+          </View>
           <TouchableOpacity
-            key={portfolio}
-            style={styles.contentsButton}
+            style={styles.portfolioContent}
             onPress={() =>
               navigation.navigate("PortfolioDetails", { portfolio })
             }
           >
-            <Text>{portfolio.id}</Text>
-            <Text>{portfolio.auto ? "자동" : "수동"}</Text>
-            <Text>{portfolio.country}</Text>
-            <Text>"{portfolio.name}"</Text>
-            <Text>{portfolio.riskValue}</Text>
-            <Text>
-              {getTotalPrice(portfolio.detail.stocks).toLocaleString()} &#8361;
-            </Text>
-            <Text>{getTotalROI(portfolio.detail.stocks)}%</Text>
+            <View style={{ height: 100, justifyContent: "space-between" }}>
+              <Text style={{ fontSize: 25, fontWeight: "bold" }}>
+                {getTotalPrice(portfolio.detail.stocks).toLocaleString()}{" "}
+                &#8361;
+              </Text>
+              {getTotalROI(portfolio.detail.stocks) >= 0 ? (
+                <Text
+                  style={{ color: "#4CAF50", fontSize: 17, fontWeight: "bold" }}
+                >
+                  +{getTotalROI(portfolio.detail.stocks)}%
+                </Text>
+              ) : (
+                <Text
+                  style={{ color: "#F44336", fontSize: 17, fontWeight: "bold" }}
+                >
+                  {getTotalROI(portfolio.detail.stocks)}%
+                </Text>
+              )}
+              {getRiskText(portfolio.riskValue)}
+            </View>
+            <Icon
+              style={{ alignSelf: "center" }}
+              name="right"
+              size={30}
+              color="#000"
+            />
           </TouchableOpacity>
-        ))}
-      </View>
+        </View>
+      ))}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    padding: 5,
+  portfolioContainer: {
+    alignItems: "stretch",
+    margin: 10,
   },
-  buttonContainer: {
-    alignItems: "center",
-  },
-  contentsButton: {
-    justifyContent: "center", // 가로 방향에서 중앙 정렬
-    backgroundColor: "#ddd",
-    alignItems: "center",
-    padding: 20,
+  portfolioButton: {
+    justifyContent: "flex-start", // 가로 방향에서 중앙 정렬
+    backgroundColor: "#6495ED",
     borderRadius: 10,
     marginVertical: 10,
-    width: "90%",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5, // 상자 그림자로 입체감 주기
+  },
+  riskText: {
+    alignSelf: "flex-start",
+    fontSize: 14,
+    padding: 3,
+    borderRadius: 8,
+    marginTop: 5,
+  },
+  portfolioContent: {
+    height: 140,
+    flexDirection: "row",
+    justifyContent: "space-between", // 가로 방향에서 중앙 정렬
+    backgroundColor: "#f0f0f0",
+    alignItems: "flex-start",
+    padding: 20,
+    borderBottomLeftRadius: 10,
+    borderBottomEndRadius: 10,
   },
 });
 export default PortfolioList;

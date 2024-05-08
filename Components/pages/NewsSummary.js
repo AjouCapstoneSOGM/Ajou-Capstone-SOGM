@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, Button, StyleSheet } from "react-native";
-import { useAuth } from "../utils/AuthContext.js";
 import urls from "../utils/urls.js";
 import { ScrollView } from "react-native-gesture-handler";
 
@@ -41,6 +40,7 @@ const NewsSummary = ({ route }) => {
     }
     return false;
   };
+
   useEffect(() => {
     const loadData = async () => {
       try {

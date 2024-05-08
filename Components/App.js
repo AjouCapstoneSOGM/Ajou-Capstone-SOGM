@@ -17,7 +17,16 @@ const Stack = createStackNavigator();
 function ScreenStack() {
   return (
     <AuthProvider>
-      <Stack.Navigator initialRouteName="Home">
+      <Stack.Navigator
+        screenOptions={{
+          // headerShown: false, // 모든 스크린에서 헤더 숨기기
+          headerStyle: {
+            backgroundColor: "#6495ED", // 헤더의 배경색 설정
+          },
+          headerTintColor: "#fff", // 헤더의 텍스트 색상 설정
+        }}
+        initialRouteName="Home"
+      >
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="SocialLogin" component={SocialLogin} />
         <Stack.Screen name="Signup" component={Signup} />
