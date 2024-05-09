@@ -133,8 +133,8 @@ public class PortfolioController {
         return ResponseEntity.ok(rebalancingTickers);
     }
 
-    @DeleteMapping("/api/portfolio/rebalancing/{rnId}")
-    public ResponseEntity<?> deleteRebalancing(@PathVariable Integer rnId) {
+    @DeleteMapping("/api/portfolio/rebalancing/{rn_id}")
+    public ResponseEntity<?> deleteRebalancing(@PathVariable("rn_id") Integer rnId) {
         try {
             rebalancingService.deleteRebalancing(rnId);
             return ResponseEntity.ok().build();
