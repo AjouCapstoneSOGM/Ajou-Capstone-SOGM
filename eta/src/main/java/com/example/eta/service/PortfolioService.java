@@ -20,7 +20,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PortfolioService {
 
-    private final UserRepository userRepository;
+    private final TickerRepository tickerRepository;
 
     private final PortfolioRepository portfolioRepository;
 
@@ -28,7 +28,7 @@ public class PortfolioService {
 
     private final PortfolioSectorRepository portfolioSectorRepository;
 
-    private final TickerRepository tickerRepository;
+    private final PortfolioTickerRepository portfolioTickerRepository;
 
     private final RebalancingRepository rebalancingRepository;
 
@@ -155,4 +155,58 @@ public class PortfolioService {
 
         return performance;
     }
+
+    @Transactional
+    public void buyStock(Integer pfId, PortfolioDto.BuyRequestDto buyRequestDto) {
+        // 포트폴리오티커 조회 다대다 관계 문제로 findPortfolioTicker 정의
+        // 포트폴리오티커,포트폴리오 조회
+        PortfolioTicker portfolioTicker = findPortfolioTicker(pfId, buyRequestDto.getTicker());
+        Portfolio portfolio = portfolioTicker.getPortfolio();
+
+        // 현재 수량 계산
+        int existingQuantity = portfolioTicker.getNumber();
+        int newQuantity = existingQuantity + buyRequestDto.getQuantity();
+        portfolioTicker.updateNumber(newQuantity);
+
+        // 총 매수 비용 계산
+        float totalCost = buyRequestDto.getQuantity() * buyRequestDto.getPrice();
+
+        // 포트폴리오의 현재 현금 업데이트
+        float newCurrentCash = portfolio.getCurrentCash() - totalCost;
+        portfolio.updateCurrentCash(newCurrentCash);
+
+        // 엔티티 저장
+        portfolioTickerRepository.save(portfolioTicker);
+        portfolioRepository.save(portfolio); // 변경된 포트폴리오 저장
+    }
+
+    public void sellStock(Integer pfId, PortfolioDto.sellRequestDto sellRequestDto) {
+        PortfolioTicker portfolioTicker = findPortfolioTicker(pfId, sellRequestDto.getTicker());
+        Portfolio portfolio = portfolioTicker.getPortfolio();
+
+        int existingQuantity = portfolioTicker.getNumber();
+        int newQuantity = existingQuantity - sellRequestDto.getQuantity();
+
+        float totalCost = sellRequestDto.getQuantity() * sellRequestDto.getPrice();
+
+        float newCurrentCash = portfolio.getCurrentCash() + totalCost;
+        portfolio.updateCurrentCash(newCurrentCash);
+
+        portfolioTicker.updateNumber(newQuantity);
+        portfolio.updateCurrentCash(newCurrentCash);
+
+        portfolioTickerRepository.save(portfolioTicker);
+        portfolioRepository.save(portfolio);
+    }
+
+    public PortfolioTicker findPortfolioTicker(Integer portfolioId, String tickerId) {
+        Portfolio portfolio = portfolioRepository.findById(portfolioId)
+                .orElseThrow(() -> new IllegalArgumentException("Portfolio not found"));
+        Ticker ticker = tickerRepository.findById(tickerId)
+                .orElseThrow(() -> new IllegalArgumentException("Ticker not found"));
+
+        return portfolioTickerRepository.findByPortfolioAndTicker(portfolio, ticker)
+                .orElseThrow(() -> new IllegalArgumentException("PortfolioTicker not found"));
+    }
 }
+
