@@ -7,11 +7,12 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 
 @Entity
-@IdClass(PriceId.class)
 @Getter
-@Table(name = "price")
-public class Price {
+@IdClass(PriceId.class)
+@Table(name = "financial_statement")
+public class FinancialStatement {
     @Id
+    @Column(nullable = false)
     private LocalDateTime date;
 
     @Id
@@ -20,5 +21,11 @@ public class Price {
     private Ticker ticker;
 
     @Column
-    private Double close;
+    private String account;
+
+    @Column
+    private Float value;
+
+    @Column
+    private String period;
 }
