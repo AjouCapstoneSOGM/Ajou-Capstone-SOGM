@@ -64,6 +64,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
+    "@types/react-native-global-props": "^1.1.6",
     "rn-nodeify": "^10.3.0"
   },
   "private": true,

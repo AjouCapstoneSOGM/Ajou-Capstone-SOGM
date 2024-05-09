@@ -8,6 +8,7 @@ import Icon from "react-native-vector-icons/AntDesign";
 const PortfolioList = ({ navigation }) => {
   const [portfolios, setPortfolios] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [errorState, setErrorState] = useState(true);
 
   //포트폴리오 종목의 총 가격 반환
   const getTotalPrice = (stocks) => {
@@ -159,6 +160,7 @@ const PortfolioList = ({ navigation }) => {
       setLoading(false);
     } catch (error) {
       console.error("Failed to fetch data:", error);
+      setErrorState(true);
     }
   };
 
@@ -166,10 +168,29 @@ const PortfolioList = ({ navigation }) => {
     loadData();
   }, []);
 
-  if (loading) {
-    return <Text>Loading...</Text>;
+  if (errorState) {
+    return (
+      <View style={styles.errorContent}>
+        <Text>포트폴리오 로딩에 실패하였습니다.</Text>
+      </View>
+    );
   }
 
+  if (loading) {
+    return (
+      <View style={styles.errorContent}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
+
+  if (!portfolios) {
+    return (
+      <View style={styles.errorContent}>
+        <Text>포트폴리오가 없습니다.</Text>
+      </View>
+    );
+  }
   const getRiskText = (risk) => {
     if (risk === 1) {
       return (
@@ -290,8 +311,24 @@ const styles = StyleSheet.create({
     alignItems: "stretch",
     margin: 10,
   },
+  errorContent: {
+    height: 140,
+    backgroundColor: "#e5e5e5",
+    justifyContent: "center",
+    alignItems: "center",
+    margin: 10,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
   portfolioButton: {
-    justifyContent: "flex-start", // 가로 방향에서 중앙 정렬
+    justifyContent: "flex-start",
     backgroundColor: "#6495ED",
     borderRadius: 10,
     marginVertical: 10,
