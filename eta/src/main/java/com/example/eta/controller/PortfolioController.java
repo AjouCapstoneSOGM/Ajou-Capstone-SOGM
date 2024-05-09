@@ -36,8 +36,8 @@ public class PortfolioController {
         // DB에 포트폴리오 생성
         Portfolio portfolio = portfolioService.createInitAutoPortfolio(user, createRequestDto);
 
-        // FastAPI 서버로부터 포트폴리오 결과 받아오기
-        portfolioService.getAutoPortfolioCreationAndSet(portfolio, createRequestDto);
+        // FastAPI 서버로부터 포트폴리오 결과 받아오고 초기화
+        portfolioService.initializeAutoPortfolio(portfolio, createRequestDto);
 
         Map<String, Integer> responseData = new HashMap<>();
         responseData.put("pfId", portfolio.getPfId());
@@ -82,6 +82,7 @@ public class PortfolioController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("매수 기록 중 오류가 발생했습니다: " + e.getMessage());
         }
+    }
 
     @GetMapping
     public ResponseEntity<PortfolioDto.PortfolioInfoListDto> getPortfolioInfos(@AuthenticationPrincipal String email) throws InterruptedException{
@@ -95,6 +96,7 @@ public class PortfolioController {
                     .isAuto(portfolio.getIsAuto())
                     .country(portfolio.getCountry())
                     .riskValue(portfolio.getRiskValue())
+                    .createdDate(portfolio.getCreatedDate())
                     .build();
             portfolioInfos.add(portfolioInfo);
         }
