@@ -2,8 +2,10 @@ package com.example.eta.controller;
 
 import com.example.eta.dto.PortfolioDto;
 import com.example.eta.entity.Portfolio;
+import com.example.eta.entity.RebalancingTicker;
 import com.example.eta.entity.User;
 import com.example.eta.service.PortfolioService;
+import com.example.eta.service.RebalancingService;
 import com.example.eta.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,6 +28,7 @@ public class PortfolioController {
 
     private final UserService userService;
     private final PortfolioService portfolioService;
+    private final RebalancingService rebalancingService;
 
     @PostMapping("/create/auto")
     public ResponseEntity<Map<String, Integer>> createAutoPortfolio(@RequestBody PortfolioDto.CreateRequestDto createRequestDto,
@@ -43,6 +46,15 @@ public class PortfolioController {
         responseData.put("pfId", portfolio.getPfId());
 
         return new ResponseEntity<>(responseData, HttpStatus.OK);
+    }
+    @DeleteMapping("/{port_id}")
+    public ResponseEntity<?> deletePortfolio(@PathVariable("port_id") Integer pfId) {
+        try {
+            portfolioService.deletePortfolio(pfId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error deleting portfolio: " + e.getMessage());
+        }
     }
 
     @GetMapping("/{port_id}/performance")
@@ -85,7 +97,7 @@ public class PortfolioController {
     }
 
     @GetMapping
-    public ResponseEntity<PortfolioDto.PortfolioInfoListDto> getPortfolioInfos(@AuthenticationPrincipal String email) throws InterruptedException{
+    public ResponseEntity<PortfolioDto.PortfolioInfoListDto> getPortfolioInfos(@AuthenticationPrincipal String email) throws InterruptedException {
         User user = userService.findByEmail(email);
 
         List<PortfolioDto.PortfolioInfo> portfolioInfos = new ArrayList<>();
@@ -100,11 +112,35 @@ public class PortfolioController {
                     .build();
             portfolioInfos.add(portfolioInfo);
         }
-
         PortfolioDto.PortfolioInfoListDto responseData = PortfolioDto.PortfolioInfoListDto.builder()
                 .count(portfolioInfos.size())
                 .portfolios(portfolioInfos)
                 .build();
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
+
+    // 포트폴리오 리밸런싱 알림 존재여부 확인
+    @GetMapping("/rebalancing/{port_id}/exists")
+    public ResponseEntity<Boolean> checkRebalancingExists(@PathVariable("port_id") Integer pfId) {
+        boolean exists = rebalancingService.existsRebalancingByPortfolioId(pfId);
+        return ResponseEntity.ok(exists);
+    }
+
+    // 모든 리밸런싱 알림 받아오기
+    @GetMapping("/rebalancing/{port_id}")
+    public ResponseEntity<List<RebalancingTicker>> getAllRebalancing(@PathVariable("port_id") Integer pfId) {
+        List<RebalancingTicker> rebalancingTickers = rebalancingService.findAllRebalancingByPortfolioId(pfId);
+        return ResponseEntity.ok(rebalancingTickers);
+    }
+
+    @DeleteMapping("/api/portfolio/rebalancing/{rnId}")
+    public ResponseEntity<?> deleteRebalancing(@PathVariable Integer rnId) {
+        try {
+            rebalancingService.deleteRebalancing(rnId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error deleting rebalancing notification: " + e.getMessage());
+        }
+    }
+
 }
