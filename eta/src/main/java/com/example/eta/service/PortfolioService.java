@@ -34,8 +34,6 @@ public class PortfolioService {
 
     private final RebalancingTickerRepository rebalancingTickerRepository;
 
-    private final PortfolioTickerRepository portfolioTickerRepository;
-
     private final ApiClient apiClient;
 
     @Transactional
