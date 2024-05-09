@@ -47,7 +47,7 @@ class update_factor_score:
 
         fs_list = pd.read_sql(
             """
-            SELECT * FROM kor_fs
+            SELECT * FROM financial_statement
             WHERE 계정 IN ('당기순이익', '매출총이익', '영업활동으로인한현금흐름', '자산',
                             '자본', '부채', '매출액', '영업이익', '감가상각비','현금및현금성자산')
             AND 공시구분 = 'q';
@@ -249,28 +249,7 @@ class update_factor_score:
         data = data.replace({np.nan: None})
         query = """
         INSERT INTO value (점수기준일, 종목코드, 섹터명, ROE, ROA, GPA, GM, OP, CFROA, `EV/EBITDA`, `EV/sales`, PER, PBR, PCR, PSR, DPS, `12M_ret`, K_ratio, quality, value, momentum, score, ranking)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        ON DUPLICATE KEY UPDATE
-        ROE = VALUES(ROE),
-        ROA = VALUES(ROA),
-        GPA = VALUES(GPA),
-        GM = VALUES(GM),
-        OP = VALUES(OP),
-        CFROA = VALUES(CFROA),
-        `EV/EBITDA` = VALUES(`EV/EBITDA`),
-        `EV/sales` = VALUES(`EV/sales`),
-        PER = VALUES(PER),
-        PBR = VALUES(PBR),
-        PCR = VALUES(PCR),
-        PSR = VALUES(PSR),
-        DPS = VALUES(DPS),
-        `12M_ret` = VALUES(`12M_ret`),
-        K_ratio = VALUES(K_ratio),
-        quality = VALUES(quality),
-        value = VALUES(value),
-        momentum = VALUES(momentum),
-        score = VALUES(score),
-        ranking = VALUES(ranking);
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
         """
         with con.cursor() as cursor:
             args = data.values.tolist()
@@ -366,12 +345,20 @@ class update_factor_score:
         final_data_bind = data_bind.drop(["z_quality", "z_value", "z_momentum"], axis=1)
         return final_data_bind
 
+    def reset_db(self, con):
+        delete_query = "DELETE FROM value;"
+        with con.cursor() as cursor:
+            cursor.execute(delete_query)
+            con.commit()
+
     def cal_score(self, data_bind):
         grouped = data_bind.groupby("섹터명")
         today = datetime.today().strftime("%Y-%m-%d")
         # 모멘텀에 낮은 가중치
-        wts = [0.4, 0.4, 0.2]
+        wts = [0.5, 0.5, 0]
         port_score_dict = {}
+        engine, con = self.connect_db()
+        self.reset_db(con)
         # 각 그룹별로 데이터프레임을 불러와서 순위를 계산
         for name, group in grouped:
             df_name_sum = (
@@ -418,10 +405,9 @@ class update_factor_score:
             port_score = port_score.reset_index(drop=True)
             port_score_dict[name] = port_score
             # 재무제표 데이터를 DB에 저장
-            engine, con = self.connect_db()
             self.insert_into_value_db(port_score_dict[name], con)
-            engine.dispose()
-            con.close()
+        engine.dispose()
+        con.close()
 
     def run(self):
         ticker_list, price_list, fs_list, sector_list = self.get_from_db()
@@ -429,7 +415,3 @@ class update_factor_score:
         data_bind = self.merge_data(ticker_list, price_list, fs_list)
         final_data_bind = self.cal_zsocre(data_bind)
         self.cal_score(final_data_bind)
-
-
-# score_update = update_factor_score()
-# score_update.run()

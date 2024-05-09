@@ -44,15 +44,15 @@ class fs_update:
         # 티커 리스트 불러오기
         with engine.connect() as conn:
             ticker_list = pd.read_sql(
-                sql="""select * from kor_ticker
-                                where 기준일 = (select max(기준일) from kor_ticker)
+                sql="""select * from ticker
+                                where 기준일 = (select max(기준일) from ticker)
                                 and 종목구분 = '보통주';""",
                 con=conn.connection,
             )
 
         # DB 저장 쿼리
         query = f"""
-        insert into kor_fs (종목코드, 계정, 값, 공시구분, 기준일)
+        insert into financial_statement (종목코드, 계정, 값, 공시구분, 기준일)
         values(%s,%s,%s,%s,%s) as new
         on duplicate key update
         값 = new.값
