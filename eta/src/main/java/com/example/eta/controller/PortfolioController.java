@@ -47,8 +47,8 @@ public class PortfolioController {
 
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
-    @DeleteMapping("/{portId}")
-    public ResponseEntity<?> deletePortfolio(@PathVariable Integer pfId) {
+    @DeleteMapping("/{port_id}")
+    public ResponseEntity<?> deletePortfolio(@PathVariable("port_id") Integer pfId) {
         try {
             portfolioService.deletePortfolio(pfId);
             return ResponseEntity.ok().build();
