@@ -110,6 +110,14 @@ public class PortfolioService {
         portfolio.setCreatedDate(LocalDateTime.now());
         portfolioRepository.save(portfolio);
     }
+    public void deletePortfolio(Integer pfId) throws Exception {
+        // 포트폴리오 존재 여부 확인
+        if (!portfolioRepository.existsById(pfId)) {
+            throw new Exception("Portfolio not found with id: " + pfId);
+        }
+        // 포트폴리오 삭제
+        portfolioRepository.deleteById(pfId);
+    }
 
     public Map<String, Object> getPerformanceDataV1(Integer pfId) throws IllegalAccessException {
         Portfolio portfolio = portfolioRepository.findById(pfId)

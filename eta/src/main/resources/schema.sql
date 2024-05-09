@@ -5,7 +5,7 @@ CREATE TABLE `user` (
     `password` varchar(255) NULL,
     `name` varchar(30) NOT NULL,
     `role` varchar(30) NOT NULL,
-    `created_date` datetime,
+    `created_date` datetime NOT NULL,
     `modified_date` datetime NULL,
     `enabled` bool NOT NULL,
     PRIMARY KEY (`user_id`)
@@ -35,13 +35,11 @@ CREATE TABLE `sector` (
 CREATE TABLE `ticker` (
     `ticker` varchar(20) NOT NULL,
     `name` varchar(50),
-    `exchange` varchar(30),
     `market_cap` float,
+    `dividend` int,
+    `exchange` varchar(30),
     `updated_date` datetime NOT NULL,
-    `eps` float,
-    `forward_eps` float,
-    `bps` float,
-    `dps` float,
+    `equity` varchar(10),
     `sector_id` varchar(3),
     PRIMARY KEY (`ticker`),
     FOREIGN KEY (`sector_id`) REFERENCES `sector` (`sector_id`)
@@ -74,6 +72,10 @@ CREATE TABLE `portfolio_record` (
 
 CREATE TABLE `rebalancing` (
     `rn_id` int NOT NULL AUTO_INCREMENT,
+<<<<<<< HEAD
+=======
+    `created_date` datetime NOT NULL,
+>>>>>>> 1fe68ab (feat: 리밸런싱 관련 API구현)
     `pf_id` int NOT NULL,
     PRIMARY KEY (`rn_id`),
     FOREIGN KEY (`pf_id`) REFERENCES `portfolio` (`pf_id`)
@@ -98,7 +100,9 @@ CREATE TABLE `rebalancing_ticker` (
 );
 
 CREATE TABLE `value` (
+    `score_date` datetime NOT NULL,
     `ticker` varchar(20) NOT NULL,
+<<<<<<< HEAD
     `quality` float,
     `value` float,
     `momentum` float,
@@ -106,17 +110,46 @@ CREATE TABLE `value` (
     `rank` int,
     `updated_date` datetime NOT NULL,
     PRIMARY KEY (`ticker`),
+=======
+    `eps` float NULL,
+    `bps` float NULL,
+    `dps` float NULL,
+    `ev_ebitda` float NULL,
+    `pbr` float NULL,
+    `pcr` float NULL,
+    `per` float NULL,
+    `psr` float NULL,
+    `roe` float NULL,
+    `roa` float NULL,
+    `gpa` float NULL,
+    `op` float NULL,
+    `cfo` float NULL,
+    `12m_ret` float NULL,
+    `k_ratio` float NULL,
+    `quality` float NULL,
+    `value` float NULL,
+    `momentum` float NULL,
+    `score` float NULL,
+    `rank` int NULL,
+    PRIMARY KEY (`ticker`, `score_date`),
+>>>>>>> 1fe68ab (feat: 리밸런싱 관련 API구현)
     FOREIGN KEY (`ticker`) REFERENCES `ticker` (`ticker`)
 );
 
 CREATE TABLE `price` (
+    `date` datetime NOT NULL,
     `ticker` varchar(20) NOT NULL,
-    `open` double,
-    `high` double,
-    `low` double,
     `close` double,
-    `volume` double,
-    `updated_date` datetime NOT NULL,
-    PRIMARY KEY (`ticker`, `updated_date`),
+    PRIMARY KEY (`ticker`, `date`),
+    FOREIGN KEY (`ticker`) REFERENCES `ticker` (`ticker`)
+);
+
+CREATE TABLE `financial_statement` (
+    `date` datetime NOT NULL,
+    `ticker` varchar(20) NOT NULL,
+    `account` varchar(30) NULL,
+    `value` float NULL,
+    `period` varchar(1) NULL,
+    PRIMARY KEY (`ticker`, `date`),
     FOREIGN KEY (`ticker`) REFERENCES `ticker` (`ticker`)
 );
