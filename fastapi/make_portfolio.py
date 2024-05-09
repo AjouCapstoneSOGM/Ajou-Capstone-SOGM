@@ -26,11 +26,9 @@ class MakePortrolio:
 
     def cal_stock(self, tickers, start, end):
         stock_adjClose = pd.DataFrame()
-
         for item in tickers:
             data = web.get_data_yahoo(item, start=start, end=end, progress=False)
             stock_adjClose[item] = data["Adj Close"].round().astype(int)
-
         adjClose = stock_adjClose.bfill()
         # 로그 리턴 계산
         daily_log_returns = np.log(adjClose / adjClose.shift(1)).dropna()
@@ -45,7 +43,9 @@ class MakePortrolio:
         # # 단기채, 장기채, 달러, 금
         # bonds = ['114260.KS', '148070.KS', '261240.KS', '411060.KS']
         # 단기채, 달러, 금
-        bonds = ["114260.KS", "261240.KS", "411060.KS"]
+        # bonds = ["114260.KS", "261240.KS", "411060.KS"]
+        # 달러, 금
+        bonds = ["261240.KS", "411060.KS"]
 
         for item in bonds:
             data = web.get_data_yahoo(item, start=start, end=end, progress=False)
@@ -153,14 +153,15 @@ class MakePortrolio:
         self, total_ratio, initial_cash, stock_tickers, num_bonds
     ):
 
-        start = self.today.strftime("%Y-%m-%d")
-        end = (self.today + timedelta(1)).strftime("%Y-%m-%d")
+        start = (self.today - timedelta(days=14)).strftime("%Y-%m-%d")
+        end = (self.today).strftime("%Y-%m-%d")
         final_adjClose = pd.DataFrame()
 
         for item in stock_tickers:
             data = web.get_data_yahoo(item, start=start, end=end, progress=False)
             final_adjClose[item] = data["Adj Close"].round().astype(int)
 
+        final_adjClose = final_adjClose.tail(1)
         adj_asset = final_adjClose.values.flatten()
         initial_cash = initial_cash  # 투자금액
         invest = initial_cash * total_ratio  # 종목당 투자금액
@@ -231,6 +232,7 @@ class MakePortrolio:
         total_ratio_final = total_ratio_final.tolist()
         final_returns = round(final_returns * 100, 2).item()
         final_vol = round(final_vol * 100, 2).item()
+        cash_hold = cash_hold.item()
 
         evaluation_results = {
             "int_asset_num": int_asset_num,
