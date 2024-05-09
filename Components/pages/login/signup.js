@@ -8,12 +8,9 @@ import {
   Button,
   Alert,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
 import urls from "../../utils/urls";
 
-const Signup = () => {
-  const navigation = useNavigation();
-
+const Signup = ({ navigation }) => {
   const [username, setUsername] = useState("");
   const [useremail, setUseremail] = useState("");
   const [password, setPassword] = useState("");
@@ -41,16 +38,15 @@ const Signup = () => {
   };
 
   const handleSignUp = () => {
-
-    MinPasswordLength = 10
+    MinPasswordLength = 10;
 
     let IsThereEmptyInput = ![username, useremail, password, pwcheck].every(
       (str) => str.length > 0
     );
-    
-    const isWrongEmail = (email) => { 
-      return (email.indexOf('@') < 1 ) || (email.split('@')[1].indexOf('.') < 1);
-    }
+
+    const isWrongEmail = (email) => {
+      return email.indexOf("@") < 1 || email.split("@")[1].indexOf(".") < 1;
+    };
 
     if (IsThereEmptyInput) {
       Alert.alert("빈칸이 있습니다.");
@@ -59,7 +55,9 @@ const Signup = () => {
       Alert.alert("이메일 서식이 올바르지 않습니다.");
       return;
     } else if (password.length < MinPasswordLength) {
-      Alert.alert('비밀번호를 ' + MinPasswordLength + '자리 이상으로 설정해 주세요');
+      Alert.alert(
+        "비밀번호를 " + MinPasswordLength + "자리 이상으로 설정해 주세요"
+      );
       return;
     } else if (password != pwcheck) {
       Alert.alert("비밀번호 확인이 일치하지 않습니다.");

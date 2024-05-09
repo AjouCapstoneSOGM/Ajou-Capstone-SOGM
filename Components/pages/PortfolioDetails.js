@@ -12,11 +12,15 @@ import { VictoryPie } from "victory-native";
 
 const screenWidth = Dimensions.get("window").width;
 
-const PortfolioDetails = ({ route }) => {
-  const { portfolio } = route.params;
+const PortfolioDetails = ({ route, navigation }) => {
+  const [portfolio, setPortfolio] = useState({
+    id: null,
+    name: "",
+    stocks: [],
+    currentCast: 0,
+    totalPrice: 0,
+  });
   const [selectedId, setSelectedId] = useState(null);
-  const [details, setDetails] = useState([]);
-  const [totalPrice, setTotalPrice] = useState(null);
 
   const colorScale = [
     "#FF6384",
@@ -31,69 +35,32 @@ const PortfolioDetails = ({ route }) => {
     "#7CDDDD",
   ];
 
-  // API로 받아온 데이터
-
-  const chartData = details.map((detail) => ({
-    x: detail.name,
-    y: detail.average_price * detail.number,
+  const handlePressSummary = () => {
+    selectedTicker = portfolio.stocks[selectedId].ticker;
+    navigation.navigate("NewsSummary", { ticker: selectedTicker });
+  };
+  const chartData = portfolio.stocks.map((detail) => ({
+    x: detail.companyName,
+    y: detail.averageCost * detail.quantity,
   }));
 
-  const handleSelectItem = (id) => {
-    setSelectedId(id);
+  const getTotalPrice = (stocks) => {
+    const totalPrice = stocks.reduce(
+      (acc, cur) => acc + cur.currentPrice * cur.quantity,
+      0
+    );
+    return totalPrice;
   };
 
   useEffect(() => {
-    stocks = [
-      {
-        id: 0,
-        name: "삼성",
-        number: 10,
-        current_price: 80000,
-        average_price: 90000,
-      },
-      {
-        id: 1,
-        name: "LG",
-        number: 5,
-        current_price: 50000,
-        average_price: 70000,
-      },
-      {
-        id: 2,
-        name: "SK",
-        number: 15,
-        current_price: 70000,
-        average_price: 80000,
-      },
-      {
-        id: 3,
-        name: "기타",
-        number: 15,
-        current_price: 110000,
-        average_price: 80000,
-      },
-      {
-        id: 4,
-        name: "네이버",
-        number: 12,
-        current_price: 130000,
-        average_price: 110000,
-      },
-      {
-        id: 5,
-        name: "카카오",
-        number: 9,
-        current_price: 70000,
-        average_price: 95000,
-      },
-    ];
-    stocks.sort(
-      (a, b) => b.average_price * b.number - a.average_price * a.number
-    );
-    setTotalPrice(
-      stocks.reduce((sum, stock) => sum + stock.number * stock.average_price, 0)
-    );
-    setDetails(stocks);
+    const currentPortfolio = route.params.portfolio;
+    setPortfolio({
+      id: currentPortfolio.id,
+      name: currentPortfolio.name,
+      stocks: currentPortfolio.detail.stocks,
+      currentCash: currentPortfolio.detail.currentCash,
+      totalPrice: getTotalPrice(currentPortfolio.detail.stocks),
+    });
   }, []);
 
   return (
@@ -119,8 +86,9 @@ const PortfolioDetails = ({ route }) => {
         {selectedId !== null && (
           <Text style={styles.centerText}>{`${
             ((
-              (details[selectedId].number * details[selectedId].average_price) /
-              totalPrice
+              (portfolio.stocks[selectedId].quantity *
+                portfolio.stocks[selectedId].averageCost) /
+              portfolio.totalPrice
             ).toFixed(3) *
               1000) /
             10 // 소숫점 계산 오류 방지를 위함
@@ -129,41 +97,41 @@ const PortfolioDetails = ({ route }) => {
       </View>
       <View style={styles.itemContainer}>
         <ScrollView showsVerticalScrollIndicator={false}>
-          {details.map((item, index) => (
+          {portfolio.stocks.map((item, index) => (
             <TouchableOpacity
               key={index}
               style={[
                 styles.item,
                 selectedId === index ? styles.selectedItem : {},
               ]}
-              onPress={() => handleSelectItem(index)}
+              onPress={() => setSelectedId(index)}
             >
               <View style={styles.nameContainer}>
                 <Text style={{ textAlign: "left", fontSize: 16, padding: 10 }}>
-                  {item.name}
+                  {item.companyName}
                 </Text>
               </View>
               <View style={styles.infoContainer}>
                 <Text style={styles.itemText}>
-                  {item.current_price.toLocaleString()}
+                  {item.currentPrice.toLocaleString()}
                 </Text>
                 <Text style={styles.itemText}>
-                  {item.average_price.toLocaleString()}
+                  {item.averageCost.toLocaleString()}
                 </Text>
                 <Text style={styles.itemText}>
-                  {(item.average_price * item.number).toLocaleString()}
+                  {(item.averageCost * item.quantity).toLocaleString()}
                 </Text>
                 <Text
                   style={[
                     styles.itemText,
-                    item.current_price > item.average_price
+                    item.averageCost > item.currentPrice
                       ? { color: "blue" }
                       : { color: "red" },
                   ]}
                 >
                   {((
-                    (item.average_price - item.current_price) /
-                    item.average_price
+                    (item.currentPrice - item.averageCost) /
+                    item.averageCost
                   ).toFixed(4) *
                     10000) /
                     100}
@@ -175,7 +143,7 @@ const PortfolioDetails = ({ route }) => {
         </ScrollView>
       </View>
       <View style={styles.buttonContainer}>
-        <Button title="뉴스 요약" onPress={() => {}} />
+        <Button title="뉴스 요약" onPress={handlePressSummary} />
         <Button title="수정" onPress={() => {}} />
       </View>
     </View>

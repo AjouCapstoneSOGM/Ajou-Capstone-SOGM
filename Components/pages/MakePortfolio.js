@@ -1,9 +1,11 @@
-import React, { useState } from "react";
-import { View, Text, Button, TouchableOpacity, StyleSheet } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import MakeAutoPortfolio from "./MakeAutoPortfolio";
 import MakeManualPortfolio from "./MakeManualPortfolio.js";
+import { useAuth } from "../utils/AuthContext.js";
 
 const MakePortfolio = ({ navigation }) => {
+  const { isLoggedIn } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
   const [path, setPath] = useState("");
 
@@ -25,6 +27,11 @@ const MakePortfolio = ({ navigation }) => {
     setPath(selectedPath);
   };
 
+  useEffect(() => {
+    if (!isLoggedIn) {
+      navigation.replace("Login");
+    }
+  }, []);
   const renderInitialStep = () => {
     return (
       <View style={styles.container}>
@@ -112,7 +119,7 @@ const MakePortfolio = ({ navigation }) => {
     }
   };
 
-  return <View style={styles.container}>{renderStep()}</View>;
+  if (isLoggedIn) return <View style={styles.container}>{renderStep()}</View>;
 };
 
 const styles = StyleSheet.create({
