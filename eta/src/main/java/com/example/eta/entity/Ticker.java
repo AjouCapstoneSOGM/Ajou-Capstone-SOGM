@@ -32,14 +32,8 @@ public class Ticker {
     private LocalDateTime updatedDate;
 
     @Column
-    private Float eps;
+    private Integer dividend;
 
     @Column
-    private Float forwardEps;
-
-    @Column
-    private Float bps;
-
-    @Column
-    private Float dps;
+    private String equity;
 }

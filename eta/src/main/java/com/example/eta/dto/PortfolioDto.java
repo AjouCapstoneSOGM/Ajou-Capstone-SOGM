@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -15,12 +16,21 @@ public class PortfolioDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CreateRequestDto {
+        private String name;
         private String country;
         private List<String> sector;
         private float asset;
         private int riskValue;
     }
-
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class BuyRequestDto {
+        private String ticker;
+        private boolean isBuy;
+        private int quantity;
+        private float price;
+    }
     @Data
     @Builder
     @NoArgsConstructor @AllArgsConstructor
@@ -34,7 +44,7 @@ public class PortfolioDto {
     @Builder
     @NoArgsConstructor @AllArgsConstructor
     public static class CreatedResultFromFastApiDto {
-        private List<Integer> init_asset_num;
+        private List<Integer> int_asset_num;
         private int cash_hold;
         private List<Float> total_radio_final;
         private float final_returns;
@@ -52,6 +62,16 @@ public class PortfolioDto {
     }
 
     @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class sellRequestDto {
+        private String ticker;
+        private boolean isSell;
+        private int quantity;
+        private float price;
+    }
+
+
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
@@ -61,6 +81,7 @@ public class PortfolioDto {
         private String country;
         private boolean isAuto;
         private Integer riskValue;
+        private LocalDateTime createdDate;
     }
 
     @Data

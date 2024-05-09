@@ -1,5 +1,6 @@
 package com.example.eta.service;
 
+import com.example.eta.api.ApiClient;
 import com.example.eta.dto.PortfolioDto;
 import com.example.eta.entity.*;
 import com.example.eta.entity.compositekey.PortfolioTickerId;
@@ -19,7 +20,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PortfolioService {
 
-    private final UserRepository userRepository;
+    private final TickerRepository tickerRepository;
 
     private final PortfolioRepository portfolioRepository;
 
@@ -27,16 +28,19 @@ public class PortfolioService {
 
     private final PortfolioSectorRepository portfolioSectorRepository;
 
-    private final TickerRepository tickerRepository;
+    private final PortfolioTickerRepository portfolioTickerRepository;
 
     private final RebalancingRepository rebalancingRepository;
 
     private final RebalancingTickerRepository rebalancingTickerRepository;
 
+    private final ApiClient apiClient;
+
     @Transactional
     public Portfolio createInitAutoPortfolio(User user, PortfolioDto.CreateRequestDto createRequestDto) {
         Portfolio portfolio = new Portfolio().builder()
                 .user(user)
+                .name(createRequestDto.getName())
                 .country(createRequestDto.getCountry())
                 .isAuto(true)
                 .initAsset(createRequestDto.getAsset())
@@ -46,8 +50,7 @@ public class PortfolioService {
                 .build();
         portfolioRepository.save(portfolio);
 
-        List<Sector> sectors = sectorRepository.findAllById(createRequestDto.getSector());
-        for(Sector sector : sectors) {
+        for(Sector sector : sectorRepository.findAllById(createRequestDto.getSector())) {
             PortfolioSector portfolioSector = new PortfolioSector().builder()
                     .portfolio(portfolio)
                     .sector(sector)
@@ -59,9 +62,13 @@ public class PortfolioService {
     }
 
     @Transactional
-    public void getAutoPortfolioCreationAndSet(Portfolio portfolio, PortfolioDto.CreateRequestDto createRequestDto) throws Exception{
+    public void initializeAutoPortfolio(Portfolio portfolio, PortfolioDto.CreateRequestDto createRequestDto) throws Exception{
         List<Ticker> tickers = tickerRepository.findTopTickerBySector(createRequestDto.getSector().get(0), 10, createRequestDto.getCountry());
+        List<Integer> stockNumPerTicker = getCreatedResultFromFastAPI(createRequestDto, tickers);
+        setInitAutoPortfolio(portfolio, tickers, stockNumPerTicker);
+    }
 
+    public List<Integer> getCreatedResultFromFastAPI(PortfolioDto.CreateRequestDto createRequestDto, List<Ticker> tickers) throws Exception{
         List<String> postfixedTickers = new ArrayList<>();
         for(Ticker ticker : tickers) {
             if (ticker.getExchange().equals("KOSPI")) {
@@ -72,30 +79,25 @@ public class PortfolioService {
             }
         }
 
-        PortfolioDto.CreateRequestToFastApiDto createRequestToFastApiDto = PortfolioDto.CreateRequestToFastApiDto.builder()
+        PortfolioDto.CreatedResultFromFastApiDto createdResultFromFastApiDto = apiClient.getCreatedPortfolioApi(PortfolioDto.CreateRequestToFastApiDto.builder()
                 .tickers(postfixedTickers)
                 .safe_asset_ratio(
-                        createRequestDto.getRiskValue() == 1 ? 0.1f :
-                        createRequestDto.getRiskValue() == 2 ? 0.2f : 0.3f
+                    createRequestDto.getRiskValue() == 1 ? 0.1f :
+                    createRequestDto.getRiskValue() == 2 ? 0.2f : 0.3f
                 )
                 .initial_cash((int)createRequestDto.getAsset())
-                .build();
+                .build()).block().getBody();
+        List<Integer> stockNumPerTicker = createdResultFromFastApiDto.getInt_asset_num();
 
-        // TODO: FastAPI 서버로부터 포트폴리오 정보 받아오기
-        // PortfolioDto.CreatedResultFromFastApiDto createdResultFromFastApiDto = new PortfolioDto.CreatedResultFromFastApiDto();
-        // List<Integer> stockNumPerTicker = createdResultFromFastApiDto.getInit_asset_num();
-        List<Integer> stockNumPerTicker = new ArrayList<>(List.of(3, 3, 3, 3, 3, 2, 2, 2, 2, 2));
+        return stockNumPerTicker;
+    }
 
+    public void setInitAutoPortfolio(Portfolio portfolio, List<Ticker> tickers, List<Integer> stockNumPerTicker) {
         Rebalancing rebalancing = Rebalancing.builder()
                 .portfolio(portfolio)
                 .createdDate(LocalDateTime.now())
                 .build();
         rebalancingRepository.save(rebalancing);
-
-        // TODO: 예외 타입 지정
-        if (tickers.size() != stockNumPerTicker.size()) {
-            throw new Exception();
-        }
 
         for (int i=0;i<tickers.size();i++) {
             RebalancingTicker rebalancingTicker = rebalancingTickerRepository.save(RebalancingTicker.builder()
@@ -105,10 +107,28 @@ public class PortfolioService {
                     .number(stockNumPerTicker.get(i))
                     .build());
             rebalancing.getRebalancingTickers().add(rebalancingTicker);
+
+            PortfolioTicker portfolioTicker = portfolioTickerRepository.save(PortfolioTicker.builder()
+                    .portfolio(portfolio)
+                    .ticker(tickers.get(i))
+                    .number(0)
+                    .averagePrice(0.0f)
+                    .initProportion(0.0f)
+                    .currentProportion(0.0f)
+                    .build());
+            portfolio.getPortfolioTickers().add(portfolioTicker);
         }
 
         portfolio.setCreatedDate(LocalDateTime.now());
         portfolioRepository.save(portfolio);
+    }
+    public void deletePortfolio(Integer pfId) throws Exception {
+        // 포트폴리오 존재 여부 확인
+        if (!portfolioRepository.existsById(pfId)) {
+            throw new Exception("Portfolio not found with id: " + pfId);
+        }
+        // 포트폴리오 삭제
+        portfolioRepository.deleteById(pfId);
     }
 
     public Map<String, Object> getPerformanceDataV1(Integer pfId) throws IllegalAccessException {
@@ -141,4 +161,58 @@ public class PortfolioService {
 
         return performance;
     }
+
+    @Transactional
+    public void buyStock(Integer pfId, PortfolioDto.BuyRequestDto buyRequestDto) {
+        // 포트폴리오티커 조회 다대다 관계 문제로 findPortfolioTicker 정의
+        // 포트폴리오티커,포트폴리오 조회
+        PortfolioTicker portfolioTicker = findPortfolioTicker(pfId, buyRequestDto.getTicker());
+        Portfolio portfolio = portfolioTicker.getPortfolio();
+
+        // 현재 수량 계산
+        int existingQuantity = portfolioTicker.getNumber();
+        int newQuantity = existingQuantity + buyRequestDto.getQuantity();
+        portfolioTicker.updateNumber(newQuantity);
+
+        // 총 매수 비용 계산
+        float totalCost = buyRequestDto.getQuantity() * buyRequestDto.getPrice();
+
+        // 포트폴리오의 현재 현금 업데이트
+        float newCurrentCash = portfolio.getCurrentCash() - totalCost;
+        portfolio.updateCurrentCash(newCurrentCash);
+
+        // 엔티티 저장
+        portfolioTickerRepository.save(portfolioTicker);
+        portfolioRepository.save(portfolio); // 변경된 포트폴리오 저장
+    }
+
+    public void sellStock(Integer pfId, PortfolioDto.sellRequestDto sellRequestDto) {
+        PortfolioTicker portfolioTicker = findPortfolioTicker(pfId, sellRequestDto.getTicker());
+        Portfolio portfolio = portfolioTicker.getPortfolio();
+
+        int existingQuantity = portfolioTicker.getNumber();
+        int newQuantity = existingQuantity - sellRequestDto.getQuantity();
+
+        float totalCost = sellRequestDto.getQuantity() * sellRequestDto.getPrice();
+
+        float newCurrentCash = portfolio.getCurrentCash() + totalCost;
+        portfolio.updateCurrentCash(newCurrentCash);
+
+        portfolioTicker.updateNumber(newQuantity);
+        portfolio.updateCurrentCash(newCurrentCash);
+
+        portfolioTickerRepository.save(portfolioTicker);
+        portfolioRepository.save(portfolio);
+    }
+
+    public PortfolioTicker findPortfolioTicker(Integer portfolioId, String tickerId) {
+        Portfolio portfolio = portfolioRepository.findById(portfolioId)
+                .orElseThrow(() -> new IllegalArgumentException("Portfolio not found"));
+        Ticker ticker = tickerRepository.findById(tickerId)
+                .orElseThrow(() -> new IllegalArgumentException("Ticker not found"));
+
+        return portfolioTickerRepository.findByPortfolioAndTicker(portfolio, ticker)
+                .orElseThrow(() -> new IllegalArgumentException("PortfolioTicker not found"));
+    }
 }
+
