@@ -72,10 +72,7 @@ CREATE TABLE `portfolio_record` (
 
 CREATE TABLE `rebalancing` (
     `rn_id` int NOT NULL AUTO_INCREMENT,
-<<<<<<< HEAD
-=======
     `created_date` datetime NOT NULL,
->>>>>>> 1fe68ab (feat: 리밸런싱 관련 API구현)
     `pf_id` int NOT NULL,
     PRIMARY KEY (`rn_id`),
     FOREIGN KEY (`pf_id`) REFERENCES `portfolio` (`pf_id`)
@@ -102,15 +99,6 @@ CREATE TABLE `rebalancing_ticker` (
 CREATE TABLE `value` (
     `score_date` datetime NOT NULL,
     `ticker` varchar(20) NOT NULL,
-<<<<<<< HEAD
-    `quality` float,
-    `value` float,
-    `momentum` float,
-    `qvm` float,
-    `rank` int,
-    `updated_date` datetime NOT NULL,
-    PRIMARY KEY (`ticker`),
-=======
     `eps` float NULL,
     `bps` float NULL,
     `dps` float NULL,
@@ -132,7 +120,6 @@ CREATE TABLE `value` (
     `score` float NULL,
     `rank` int NULL,
     PRIMARY KEY (`ticker`, `score_date`),
->>>>>>> 1fe68ab (feat: 리밸런싱 관련 API구현)
     FOREIGN KEY (`ticker`) REFERENCES `ticker` (`ticker`)
 );
 
