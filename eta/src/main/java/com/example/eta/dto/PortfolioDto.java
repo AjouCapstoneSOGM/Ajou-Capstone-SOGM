@@ -66,7 +66,7 @@ public class PortfolioDto {
     @AllArgsConstructor
     public static class sellRequestDto {
         private String ticker;
-        private boolean sellBuy;
+        private boolean isSell;
         private int quantity;
         private float price;
     }
