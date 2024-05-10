@@ -71,7 +71,7 @@ public class PortfolioDto {
         private float price;
     }
 
-
+    @Data
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
