@@ -131,35 +131,25 @@ public class PortfolioService {
         portfolioRepository.deleteById(pfId);
     }
 
-    public Map<String, Object> getPerformanceDataV1(Integer pfId) throws IllegalAccessException {
-        Portfolio portfolio = portfolioRepository.findById(pfId)
-                .orElseThrow(() -> new IllegalAccessException("Portfolio not found with id: " + pfId));
+    public PortfolioDto.PerformanceResponseDto getPerformanceData(Integer pfId) {
+        Portfolio portfolio = portfolioRepository.findById(pfId).get();
 
-        // PortfolioTicker 리스트를 가져오기
-        List<PortfolioTicker> portfolioTickers = portfolio.getPortfolioTickers();
-        List<PortfolioDto.PerformanceResponseDto> tickerPerformances = new ArrayList<>();
-
-        for (PortfolioTicker pt : portfolioTickers) {
+        List<PortfolioDto.PortfolioPerformance> portfolioPerformances = new ArrayList<>();
+        for (PortfolioTicker pt : portfolio.getPortfolioTickers()) {
             Ticker ticker = pt.getTicker();
-            float averagePrice = pt.getAveragePrice();
-
-            PortfolioDto.PerformanceResponseDto responseDto = new PortfolioDto.PerformanceResponseDto(
-                    pt.getNumber(),
-                    averagePrice,
-                    ticker.getTicker(),
-                    ticker.getName());
-
-            tickerPerformances.add(responseDto);
+            portfolioPerformances.add(PortfolioDto.PortfolioPerformance.builder()
+                    .ticker(ticker.getTicker())
+                    .quantity(pt.getNumber())
+                    .companyName(ticker.getName())
+                    .averageCost(pt.getAveragePrice())
+                    .build());
         }
 
-        float currentCash = portfolio.getCurrentCash();
-
-        Map<String, Object> performance = new HashMap<>();
-
-        performance.put("portfolioPerformance", tickerPerformances);
-        performance.put("currentCash", currentCash);
-
-        return performance;
+        return PortfolioDto.PerformanceResponseDto.builder()
+                .initialAsset(portfolio.getInitAsset())
+                .currentCash(portfolio.getCurrentCash())
+                .portfolioPerformances(portfolioPerformances)
+                .build();
     }
 
     @Transactional

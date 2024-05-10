@@ -58,18 +58,8 @@ public class PortfolioController {
     }
 
     @GetMapping("/{port_id}/performance")
-    public ResponseEntity<?> getPortfolioPerformance(@PathVariable("port_id") Integer pfId) {
-        try {
-            Map<String, Object> performanceData = portfolioService.getPerformanceDataV1(pfId);
-            return ResponseEntity.ok(performanceData);
-        } catch (IllegalAccessException e) {
-            // This is the case where the portfolio ID does not belong to the user.
-            // The exact exception type and handling might differ based on your service logic.
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Access is denied for the given portfolio ID.");
-        } catch (Exception e) {
-            // Generic exception handling, ideally you'll have more specific handlers.
-            return ResponseEntity.internalServerError().body("An error occurred while processing your request.");
-        }
+    public ResponseEntity<PortfolioDto.PerformanceResponseDto> getPortfolioPerformance(@PathVariable("port_id") Integer pfId, @AuthenticationPrincipal String email) {
+        return ResponseEntity.ok(portfolioService.getPerformanceData(pfId));
     }
   
     @PostMapping("/{port_id}/buy")

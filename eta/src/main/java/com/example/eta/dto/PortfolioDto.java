@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 public class PortfolioDto {
 
@@ -52,13 +51,24 @@ public class PortfolioDto {
     }
 
     @Data
+    @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class PerformanceResponseDto {
+    public static class PortfolioPerformance {
         private Integer quantity;
         private Float averageCost;
         private String ticker;
         private String companyName;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PerformanceResponseDto {
+        private float currentCash;
+        private float initialAsset;
+        private List<PortfolioPerformance> portfolioPerformances;
     }
 
     @Data
