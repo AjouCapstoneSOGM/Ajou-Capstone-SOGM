@@ -17,6 +17,7 @@ import {
   useFonts,
   NotoSansKR_400Regular,
 } from "@expo-google-fonts/noto-sans-kr";
+import ManagementPage from "./pages/ManagePortfolio";
 
 const Stack = createStackNavigator();
 function ScreenStack() {
@@ -39,6 +40,7 @@ function ScreenStack() {
         <Stack.Screen name="ViewPortfolio" component={ViewPortfolio} />
         <Stack.Screen name="NewsSummary" component={NewsSummary} />
         <Stack.Screen name="PortfolioDetails" component={PortfolioDetails} />
+        <Stack.Screen name="ManagementPage" component={ManagementPage} />
         <Stack.Screen name="MakePortfolio" component={MakePortfolio} />
       </Stack.Navigator>
     </AuthProvider>

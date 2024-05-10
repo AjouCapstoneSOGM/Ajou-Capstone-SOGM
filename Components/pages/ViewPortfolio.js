@@ -159,25 +159,24 @@ const PortfolioList = ({ navigation }) => {
     return result;
   };
 
-  const loadData = async () => {
-    try {
-      const data = await fetchPortfolio();
-      const portfolioList = data.portfolios;
-      const portfolioIds = getPortfolioIds(portfolioList);
-      const portfolioStocks = await fetchAllStocks(portfolioIds);
-      const stocksWithCurrent = await fetchAllCurrent(portfolioStocks);
-      portfolioList.forEach((portfolio, index) => {
-        portfolio.detail = stocksWithCurrent[index];
-      });
-      setPortfolios(portfolioList);
-      setLoading(false);
-    } catch (error) {
-      console.error("Failed to fetch data:", error);
-      setErrorState(true);
-    }
-  };
-
   useEffect(() => {
+    const loadData = async () => {
+      try {
+        const data = await fetchPortfolio();
+        const portfolioList = data.portfolios;
+        const portfolioIds = getPortfolioIds(portfolioList);
+        const portfolioStocks = await fetchAllStocks(portfolioIds);
+        const stocksWithCurrent = await fetchAllCurrent(portfolioStocks);
+        portfolioList.forEach((portfolio, index) => {
+          portfolio.detail = stocksWithCurrent[index];
+        });
+        setPortfolios(portfolioList);
+        setLoading(false);
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+        setErrorState(true);
+      }
+    };
     loadData();
   }, []);
 
@@ -257,36 +256,14 @@ const PortfolioList = ({ navigation }) => {
         const currentCash = portfolio.detail.currentCash;
 
         return (
-          <View style={styles.portfolioButton}>
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-                paddingHorizontal: 5,
-              }}
-            >
-              <Text
-                style={{
-                  margin: 10,
-                  fontSize: 17,
-                  color: "white",
-                }}
-              >
-                테스트의 포트폴리오 1
-              </Text>
-              <Text
-                style={{
-                  margin: 10,
-                  fontSize: 15,
-                  color: "white",
-                }}
-              >
+          <View key={portfolio.id} style={styles.portfolioButton}>
+            <View style={styles.portfolioBody}>
+              <Text style={styles.portfolioName}>테스트의 포트폴리오 1</Text>
+              <Text style={[styles.portfolioName, { fontSize: 15 }]}>
                 {portfolio.auto ? "자동" : "수동"} / {portfolio.country}
               </Text>
             </View>
             <TouchableOpacity
-              key={portfolio.id}
               style={styles.portfolioContent}
               onPress={() =>
                 navigation.navigate("PortfolioDetails", { portfolio })
@@ -296,8 +273,8 @@ const PortfolioList = ({ navigation }) => {
                 <Text style={{ fontSize: 25, fontWeight: "bold" }}>
                   {(
                     getTotalPrice(portfolio.detail.stocks) + currentCash
-                  ).toLocaleString()}{" "}
-                  &#8361;
+                  ).toLocaleString()}
+                  원
                 </Text>
                 <Text
                   style={[
@@ -357,6 +334,17 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5, // 상자 그림자로 입체감 주기
+  },
+  portfolioBody: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 5,
+  },
+  portfolioName: {
+    margin: 10,
+    fontSize: 17,
+    color: "white",
   },
   riskText: {
     alignSelf: "flex-start",
