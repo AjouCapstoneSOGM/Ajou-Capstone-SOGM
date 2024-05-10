@@ -131,6 +131,7 @@ class News:
         mask = df["Title"].str.contains(word_to_delete, case=False)
         df = df[~mask]
         df.reset_index(drop=True, inplace=True)
+        df_value = df["Title"].to_list()
 
         # Return the DataFrame
-        return df
+        return df_value
