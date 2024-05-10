@@ -4,6 +4,9 @@ import com.example.eta.dto.PortfolioDto;
 import com.example.eta.entity.Portfolio;
 import com.example.eta.entity.RebalancingTicker;
 import com.example.eta.entity.User;
+import com.example.eta.exception.PortfolioNotFoundException;
+import com.example.eta.exception.PortfolioOwnershipException;
+import com.example.eta.repository.PortfolioRepository;
 import com.example.eta.service.PortfolioService;
 import com.example.eta.service.RebalancingService;
 import com.example.eta.service.UserService;
@@ -29,6 +32,7 @@ public class PortfolioController {
     private final UserService userService;
     private final PortfolioService portfolioService;
     private final RebalancingService rebalancingService;
+    private final PortfolioRepository portfolioRepository;
 
     @PostMapping("/create/auto")
     public ResponseEntity<Map<String, Integer>> createAutoPortfolio(@RequestBody PortfolioDto.CreateRequestDto createRequestDto,
@@ -59,6 +63,10 @@ public class PortfolioController {
 
     @GetMapping("/{port_id}/performance")
     public ResponseEntity<PortfolioDto.PerformanceResponseDto> getPortfolioPerformance(@PathVariable("port_id") Integer pfId, @AuthenticationPrincipal String email) {
+        // 포트폴리오가 없거나, 포트폴리오의 소유자가 아닐 시 403
+        if (!portfolioRepository.existsById(pfId)) throw new PortfolioNotFoundException();
+        if (!portfolioRepository.getReferenceById(pfId).getUser().getEmail().equals(email)) throw new PortfolioOwnershipException();
+
         return ResponseEntity.ok(portfolioService.getPerformanceData(pfId));
     }
   

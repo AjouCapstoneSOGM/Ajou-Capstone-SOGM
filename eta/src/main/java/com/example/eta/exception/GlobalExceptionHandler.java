@@ -21,9 +21,17 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = {AuthenticationException.class})
     protected ResponseEntity<Map<String, String>> handleAuthenticationException(AuthenticationException e) {
-        Map<String, String> responseData = new HashMap<>();
-        responseData.put("message", "계정 정보가 일치하지 않습니다.");
-        return new ResponseEntity<>(responseData, HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(value = {PortfolioNotFoundException.class})
+    protected ResponseEntity<Map<String, String>> handlePortfolioNotFoundException(PortfolioNotFoundException e) {
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(value = {PortfolioOwnershipException.class})
+    protected ResponseEntity<Map<String, String>> handlePortfolioOwnershipException(PortfolioOwnershipException e) {
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 }
 
