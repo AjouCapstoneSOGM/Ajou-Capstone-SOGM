@@ -31,8 +31,8 @@ class stock_price_update:
         # 티커 리스트 불러오기
         with engine.connect() as conn:
             ticker_list = pd.read_sql(
-                sql="""select * from kor_ticker
-                                where 기준일 = (select max(기준일) from kor_ticker)
+                sql="""select * from ticker
+                                where 기준일 = (select max(기준일) from ticker)
                                 and 종목구분 = '보통주';""",
                 con=conn.connection,
             )
@@ -105,8 +105,8 @@ class stock_price_update:
         # 티커 리스트 불러오기
         with engine.connect() as conn:
             ticker_list = pd.read_sql(
-                sql="""select * from kor_ticker
-                                where 기준일 = (select max(기준일) from kor_ticker)
+                sql="""select * from ticker
+                                where 기준일 = (select max(기준일) from ticker)
                                 and 종목구분 = '보통주';""",
                 con=conn.connection,
             )

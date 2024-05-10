@@ -26,11 +26,9 @@ class MakePortrolio:
 
     def cal_stock(self, tickers, start, end):
         stock_adjClose = pd.DataFrame()
-
         for item in tickers:
             data = web.get_data_yahoo(item, start=start, end=end, progress=False)
             stock_adjClose[item] = data["Adj Close"].round().astype(int)
-
         adjClose = stock_adjClose.bfill()
         # 로그 리턴 계산
         daily_log_returns = np.log(adjClose / adjClose.shift(1)).dropna()
@@ -45,7 +43,9 @@ class MakePortrolio:
         # # 단기채, 장기채, 달러, 금
         # bonds = ['114260.KS', '148070.KS', '261240.KS', '411060.KS']
         # 단기채, 달러, 금
-        bonds = ["114260.KS", "261240.KS", "411060.KS"]
+        # bonds = ["114260.KS", "261240.KS", "411060.KS"]
+        # 달러, 금
+        bonds = ["261240.KS", "411060.KS"]
 
         for item in bonds:
             data = web.get_data_yahoo(item, start=start, end=end, progress=False)
