@@ -18,12 +18,12 @@ import java.io.Serializable;
 public class RebalancingTicker {
 
     @Id
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rn_id")
     private Rebalancing rebalancing;
 
     @Id
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ticker")
     private Ticker ticker;
 

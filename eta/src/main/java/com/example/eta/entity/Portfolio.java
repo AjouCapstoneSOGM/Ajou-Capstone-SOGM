@@ -55,4 +55,8 @@ public class Portfolio {
 
     @Column
     private int riskValue;
+
+    public void updateCurrentCash(float currentCash){
+        this.currentCash = currentCash;
+    }
 }

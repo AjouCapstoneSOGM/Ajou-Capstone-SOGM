@@ -16,12 +16,12 @@ import lombok.NoArgsConstructor;
 public class PortfolioSector {
 
     @Id
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pf_id")
     private Portfolio portfolio;
 
     @Id
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sector_id")
     private Sector sector;
 }
