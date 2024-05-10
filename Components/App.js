@@ -11,42 +11,15 @@ import PortfolioDetails from "./pages/PortfolioDetails";
 import MakePortfolio from "./pages/MakePortfolio";
 import NewsSummary from "./pages/NewsSummary";
 
-import * as Font from "expo-font";
 import { AuthProvider } from "./utils/AuthContext";
-import { useEffect, useState } from "react";
 import { setCustomText } from "react-native-global-props";
+import {
+  useFonts,
+  NotoSansKR_400Regular,
+} from "@expo-google-fonts/noto-sans-kr";
 
 const Stack = createStackNavigator();
 function ScreenStack() {
-  const [fontsLoaded, setFontsLoaded] = useState(false);
-
-  useEffect(() => {
-    async function loadFonts() {
-      try {
-        await Font.loadAsync({
-          pretendard: require("./assets/fonts/Pretendard.ttf"),
-        });
-        setFontsLoaded(true);
-      } catch (error) {
-        console.error("폰트 로딩 에러:", error);
-        // 여기서 에러가 발생하면 폰트 파일 경로나 파일 자체에 문제가 있을 수 있습니다.
-      }
-    }
-
-    loadFonts();
-  }, []);
-
-  if (!fontsLoaded) {
-    return null; // 폰트 로딩 중에는 렌더링을 방지
-  }
-
-  const customTextProps = {
-    style: {
-      fontFamily: "pretendard",
-    },
-  };
-  setCustomText(customTextProps);
-
   return (
     <AuthProvider>
       <Stack.Navigator
@@ -73,6 +46,22 @@ function ScreenStack() {
 }
 
 export default function App() {
+  const [fontsLoaded] = useFonts({
+    NotoSansKR_400Regular,
+  });
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
+  const customTextProps = {
+    style: {
+      fontFamily: "NotoSansKR_400Regular",
+      lineHeight: 20, // 줄 간격을 20으로 설정
+    },
+  };
+
+  setCustomText(customTextProps);
   return (
     <NavigationContainer>
       <ScreenStack />

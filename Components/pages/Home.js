@@ -5,6 +5,7 @@ import { useAuth } from "../utils/AuthContext.js";
 import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 import PortfolioList from "./ViewPortfolio.js";
 import Icon from "react-native-vector-icons/AntDesign";
+import AppText from "../utils/AppText.js";
 
 const Home = ({ navigation }) => {
   const { isLoggedIn, logout } = useAuth();
@@ -39,7 +40,11 @@ const Home = ({ navigation }) => {
         )}
         <View style={styles.buttonContainer}>
           <Text
-            style={{ fontSize: 18, alignSelf: "flex-start", color: "white" }}
+            style={{
+              fontSize: 18,
+              alignSelf: "flex-start",
+              color: "white",
+            }}
           >
             나의 포트폴리오
           </Text>
@@ -129,13 +134,6 @@ const styles = StyleSheet.create({
     elevation: 4, // 상자 그림자로 입체감 주기
     padding: 13,
     marginHorizontal: 10,
-  },
-  buttonLowerContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    paddingTop: 10,
-    borderTopWidth: 1,
-    borderColor: "#777",
   },
 });
 export default Home;

@@ -6,9 +6,21 @@ import { getUsertoken } from "../utils/localStorageUtils";
 import Icon from "react-native-vector-icons/AntDesign";
 
 const PortfolioList = ({ navigation }) => {
-  const [portfolios, setPortfolios] = useState([]);
+  const [portfolios, setPortfolios] = useState([
+    {
+      auto: null,
+      country: null,
+      createDate: null,
+      detail: {
+        currentCash: 0,
+        stocks: [],
+      },
+      id: null,
+      riskValue: null,
+    },
+  ]);
   const [loading, setLoading] = useState(true);
-  const [errorState, setErrorState] = useState(true);
+  const [errorState, setErrorState] = useState(false);
 
   //포트폴리오 종목의 총 가격 반환
   const getTotalPrice = (stocks) => {
@@ -29,9 +41,10 @@ const PortfolioList = ({ navigation }) => {
   };
 
   //포트폴리오의 총 수익률 계산 후 반환
-  const getTotalROI = (stocks) => {
-    const totalPrice = getTotalPrice(stocks);
-    const totalInvestment = getTotalInvestment(stocks);
+  const getTotalROI = (detail) => {
+    const totalPrice = getTotalPrice(detail.stocks) + detail.currentCash;
+    const totalInvestment =
+      getTotalInvestment(detail.stocks) + detail.currentCash;
     const totalROI = (
       ((totalPrice - totalInvestment) / totalInvestment) *
       100
@@ -238,70 +251,74 @@ const PortfolioList = ({ navigation }) => {
   };
   return (
     <View style={styles.portfolioContainer}>
-      {portfolios.map((portfolio) => (
-        <View key={portfolio} style={styles.portfolioButton}>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              paddingHorizontal: 5,
-            }}
-          >
-            <Text
+      {portfolios.map((portfolio) => {
+        const roi = getTotalROI(portfolio.detail);
+        const roiFormatted = roi >= 0 ? `+${roi}` : `-${roi}`;
+        const currentCash = portfolio.detail.currentCash;
+
+        return (
+          <View style={styles.portfolioButton}>
+            <View
               style={{
-                margin: 10,
-                fontSize: 17,
-                color: "white",
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                paddingHorizontal: 5,
               }}
             >
-              테스트의 포트폴리오 1
-            </Text>
-            <Text
-              style={{
-                margin: 10,
-                fontSize: 15,
-                color: "white",
-              }}
-            >
-              {portfolio.auto ? "자동" : "수동"} / {portfolio.country}
-            </Text>
-          </View>
-          <TouchableOpacity
-            style={styles.portfolioContent}
-            onPress={() =>
-              navigation.navigate("PortfolioDetails", { portfolio })
-            }
-          >
-            <View style={{ height: 100, justifyContent: "space-between" }}>
-              <Text style={{ fontSize: 25, fontWeight: "bold" }}>
-                {getTotalPrice(portfolio.detail.stocks).toLocaleString()}{" "}
-                &#8361;
+              <Text
+                style={{
+                  margin: 10,
+                  fontSize: 17,
+                  color: "white",
+                }}
+              >
+                테스트의 포트폴리오 1
               </Text>
-              {getTotalROI(portfolio.detail.stocks) >= 0 ? (
-                <Text
-                  style={{ color: "#4CAF50", fontSize: 17, fontWeight: "bold" }}
-                >
-                  +{getTotalROI(portfolio.detail.stocks)}%
-                </Text>
-              ) : (
-                <Text
-                  style={{ color: "#F44336", fontSize: 17, fontWeight: "bold" }}
-                >
-                  {getTotalROI(portfolio.detail.stocks)}%
-                </Text>
-              )}
-              {getRiskText(portfolio.riskValue)}
+              <Text
+                style={{
+                  margin: 10,
+                  fontSize: 15,
+                  color: "white",
+                }}
+              >
+                {portfolio.auto ? "자동" : "수동"} / {portfolio.country}
+              </Text>
             </View>
-            <Icon
-              style={{ alignSelf: "center" }}
-              name="right"
-              size={30}
-              color="#000"
-            />
-          </TouchableOpacity>
-        </View>
-      ))}
+            <TouchableOpacity
+              key={portfolio.id}
+              style={styles.portfolioContent}
+              onPress={() =>
+                navigation.navigate("PortfolioDetails", { portfolio })
+              }
+            >
+              <View style={{ height: 100, justifyContent: "space-between" }}>
+                <Text style={{ fontSize: 25, fontWeight: "bold" }}>
+                  {(
+                    getTotalPrice(portfolio.detail.stocks) + currentCash
+                  ).toLocaleString()}{" "}
+                  &#8361;
+                </Text>
+                <Text
+                  style={[
+                    { fontSize: 17, fontWeight: "bold" },
+                    roi >= 0 ? { color: "#4CAF50" } : { color: "#F44336" },
+                  ]}
+                >
+                  {roiFormatted}%
+                </Text>
+                {getRiskText(portfolio.riskValue)}
+              </View>
+              <Icon
+                style={{ alignSelf: "center" }}
+                name="right"
+                size={30}
+                color="#000"
+              />
+            </TouchableOpacity>
+          </View>
+        );
+      })}
     </View>
   );
 };

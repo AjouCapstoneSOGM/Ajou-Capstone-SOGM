@@ -1,3 +1,4 @@
+import { center } from "@shopify/react-native-skia";
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -17,39 +18,52 @@ const PortfolioDetails = ({ route, navigation }) => {
     id: null,
     name: "",
     stocks: [],
-    currentCast: 0,
+    currentCash: 0,
     totalPrice: 0,
   });
   const [selectedId, setSelectedId] = useState(null);
+  const [chartData, setChartData] = useState([]);
 
   const colorScale = [
-    "#FF6384",
-    "#36A2EB",
-    "#FFCE56",
-    "#4BC0C0",
-    "#F77825",
-    "#9966FF",
-    "#00BFA5",
-    "#C94D77",
-    "#4D4D4D",
-    "#7CDDDD",
+    "hsl(348, 70%, 86%)", // 파스텔 핑크
+    "hsl(207, 54%, 80%)", // 파스텔 블루
+    "hsl(48, 100%, 78%)", // 파스텔 옐로우
+    "hsl(174, 36%, 76%)", // 파스텔 그린
+    "hsl(20, 85%, 72%)", // 파스텔 오렌지
+    "hsl(262, 70%, 80%)", // 파스텔 퍼플
+    "hsl(174, 60%, 70%)", // 파스텔 시안
+    "hsl(338, 50%, 72%)", // 파스텔 레드
+    "hsl(0, 10%, 60%)", // 연 회색
+    "hsl(180, 50%, 80%)", // 파스텔 시안-그린
   ];
 
   const handlePressSummary = () => {
     selectedTicker = portfolio.stocks[selectedId].ticker;
     navigation.navigate("NewsSummary", { ticker: selectedTicker });
   };
-  const chartData = portfolio.stocks.map((detail) => ({
-    x: detail.companyName,
-    y: detail.averageCost * detail.quantity,
-  }));
 
-  const getTotalPrice = (stocks) => {
-    const totalPrice = stocks.reduce(
+  const getStockROI = (id) => {
+    const current = portfolio.stocks[id].currentPrice;
+    const average = portfolio.stocks[id].averageCost;
+
+    if (current === 0 || average === 0) return 0;
+
+    return (current - average) / average;
+  };
+  const getStockRate = (id) => {
+    const stockRate =
+      (portfolio.stocks[id].quantity * portfolio.stocks[id].averageCost) /
+      getTotalPrice();
+
+    return stockRate;
+  };
+
+  const getTotalPrice = () => {
+    const totalPrice = portfolio.stocks.reduce(
       (acc, cur) => acc + cur.currentPrice * cur.quantity,
       0
     );
-    return totalPrice;
+    return totalPrice + portfolio.currentCash;
   };
 
   useEffect(() => {
@@ -59,9 +73,19 @@ const PortfolioDetails = ({ route, navigation }) => {
       name: currentPortfolio.name,
       stocks: currentPortfolio.detail.stocks,
       currentCash: currentPortfolio.detail.currentCash,
-      totalPrice: getTotalPrice(currentPortfolio.detail.stocks),
     });
   }, []);
+
+  useEffect(() => {
+    if (portfolio) {
+      const data = portfolio.stocks.map((stock) => ({
+        x: stock.companyName,
+        y: stock.averageCost * stock.quantity,
+      }));
+      data.push({ x: "현금", y: portfolio.currentCash });
+      setChartData(data);
+    }
+  }, [portfolio]); // portfolio 상태가 변경될 때마다 이 effect 실행
 
   return (
     <View style={styles.container}>
@@ -70,76 +94,74 @@ const PortfolioDetails = ({ route, navigation }) => {
         <VictoryPie
           data={chartData}
           colorScale={colorScale}
-          width={screenWidth}
-          height={400}
-          innerRadius={({ index }) => (index === selectedId ? 45 : 50)}
-          labelRadius={({ index }) => (index === selectedId ? 130 : 110)}
-          radius={({ index }) => (index === selectedId ? 110 : 100)} // 선택된 조각의 반경을 증가
-          labels={({ datum }) => `${datum.x}`}
-          style={{
-            labels: {
-              fill: "black",
-              fontSize: 15,
-            },
-          }}
+          innerRadius={({ index }) => (index === selectedId ? 80 : 85)}
+          radius={({ index }) => (index === selectedId ? 145 : 135)} // 선택된 조각의 반경을 증가
+          labels={() => ""}
+          style={styles.chart}
         />
         {selectedId !== null && (
-          <Text style={styles.centerText}>{`${
-            ((
-              (portfolio.stocks[selectedId].quantity *
-                portfolio.stocks[selectedId].averageCost) /
-              portfolio.totalPrice
-            ).toFixed(3) *
-              1000) /
-            10 // 소숫점 계산 오류 방지를 위함
-          }%`}</Text>
+          <View style={{ position: "absolute", alignItems: "center" }}>
+            <Text style={styles.centerText}>{`${
+              (getStockRate(selectedId).toFixed(3) * 1000) / 10 // 소숫점 계산 오류 방지를 위함
+            }%`}</Text>
+            <Text style={[styles.centerText, { fontSize: 17 }]}>
+              {portfolio.stocks[selectedId].companyName}
+            </Text>
+          </View>
         )}
       </View>
       <View style={styles.itemContainer}>
         <ScrollView showsVerticalScrollIndicator={false}>
-          {portfolio.stocks.map((item, index) => (
-            <TouchableOpacity
-              key={index}
-              style={[
-                styles.item,
-                selectedId === index ? styles.selectedItem : {},
-              ]}
-              onPress={() => setSelectedId(index)}
-            >
-              <View style={styles.nameContainer}>
-                <Text style={{ textAlign: "left", fontSize: 16, padding: 10 }}>
-                  {item.companyName}
-                </Text>
-              </View>
-              <View style={styles.infoContainer}>
-                <Text style={styles.itemText}>
-                  {item.currentPrice.toLocaleString()}
-                </Text>
-                <Text style={styles.itemText}>
-                  {item.averageCost.toLocaleString()}
-                </Text>
-                <Text style={styles.itemText}>
-                  {(item.averageCost * item.quantity).toLocaleString()}
-                </Text>
-                <Text
+          {portfolio.stocks.map((item, index) => {
+            const roi = getStockROI(index);
+            return (
+              <TouchableOpacity
+                key={index}
+                style={[
+                  styles.item,
+                  selectedId === index ? styles.selectedItem : {},
+                ]}
+                onPress={() => setSelectedId(index)}
+              >
+                <View
                   style={[
-                    styles.itemText,
-                    item.averageCost > item.currentPrice
-                      ? { color: "blue" }
-                      : { color: "red" },
+                    styles.nameContainer,
+                    { backgroundColor: colorScale[index] },
                   ]}
                 >
-                  {((
-                    (item.currentPrice - item.averageCost) /
-                    item.averageCost
-                  ).toFixed(4) *
-                    10000) /
-                    100}
-                  %
-                </Text>
-              </View>
-            </TouchableOpacity>
-          ))}
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      color: "#222",
+                    }}
+                  >
+                    {item.companyName}
+                  </Text>
+                </View>
+                {selectedId === index && (
+                  <View style={styles.infoContainer}>
+                    <Text style={styles.itemText}>
+                      {item.currentPrice.toLocaleString()}
+                    </Text>
+                    <Text style={styles.itemText}>
+                      {item.averageCost.toLocaleString()}
+                    </Text>
+                    <Text style={styles.itemText}>
+                      {(item.averageCost * item.quantity).toLocaleString()}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.itemText,
+                        roi >= 0 ? { color: "#4CAF50" } : { color: "#F44336" },
+                      ]}
+                    >
+                      {(roi.toFixed(4) * 1000) / 10}%
+                    </Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+            );
+          })}
         </ScrollView>
       </View>
       <View style={styles.buttonContainer}>
@@ -152,9 +174,10 @@ const PortfolioDetails = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: "column",
     justifyContent: "center",
+    alignItems: "stretch",
     padding: 5,
+    backgroundColor: "#f5f5f5",
   },
   title: {
     fontSize: 22,
@@ -162,74 +185,74 @@ const styles = StyleSheet.create({
   },
   chartContainer: {
     flex: 4,
-    overflow: "hidden",
-    position: "relative", // 컨테이너를 상대 위치로 설정
     alignItems: "center", // 자식 요소를 수평 중앙 정렬
     justifyContent: "center", // 자식 요소를 수직 중앙 정렬
   },
+  chart: {
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5, // 상자 그림자로 입체감 주기
+  },
   centerText: {
-    position: "absolute", // Text 컴포넌트를 절대 위치로 설정
     color: "black",
     fontSize: 20,
     fontWeight: "bold",
   },
   itemContainer: {
     flex: 4,
-    flexDirection: "column",
-    overflow: "hidden",
+  },
+  item: {
+    marginTop: 10,
+    borderRadius: 10,
+    height: 60,
+    justifyContent: "center", // 내용을 세로 방향으로 중앙 정렬
+    alignItems: "stretch", // 내용을 가로 방향으로 중앙 정렬
+    backgroundColor: "f0f0f0",
+    marginBottom: -15,
+    marginHorizontal: 10,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 1,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  selectedItem: {
+    height: 200,
+    justifyContent: "space-between",
+    backgroundColor: "#f0f0f0",
+    marginBottom: 5,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 2,
+      height: 2,
+    },
+    shadowOpacity: 1,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   nameContainer: {
-    flex: 2,
+    padding: 18,
+    backgroundColor: "#6495ED",
+    borderTopLeftRadius: 10,
+    borderTopRightRadius: 10,
   },
   infoContainer: {
-    flex: 4,
     justifyContent: "space-between",
     alignContent: "stretch",
     flexWrap: "wrap",
-  },
-  item: {
-    flexDirection: "row",
-    backgroundColor: "#f9f9f9",
-    padding: 10,
-    borderRadius: 5,
-    height: 120,
-    justifyContent: "center", // 내용을 세로 방향으로 중앙 정렬
-    alignItems: "center", // 내용을 가로 방향으로 중앙 정렬
-    marginHorizontal: 10, // 박스끼리의 수평 간격
-    shadowColor: "#000", // 그림자 색
-    shadowOpacity: 1.25, // 그림자 투명도
-    shadowRadius: 4, // 그림자 퍼짐
-    elevation: 4, // Android에서 그림자 효과
-    marginBottom: 5, // 아래쪽 여백 추가
-    marginTop: 5,
-  },
-  selectedItem: {
-    backgroundColor: "#E5FFDD",
   },
   itemText: {
     fontSize: 16,
     textAlign: "center", // 텍스트를 가운데 정렬
     marginBottom: 3,
-  },
-  detailItem: {
-    flex: 2,
-    flexDirection: "row",
-    backgroundColor: "#f9f9f9",
-    borderRadius: 10,
-    width: 400, // 박스의 폭을 고정
-    height: 200, // 박스의 높이를 고정
-    padding: 20,
-    justifyContent: "space-between", // 내용을 세로 방향으로 중앙 정렬
-    alignItems: "center", // 내용을 가로 방향으로 중앙 정렬
-    shadowColor: "#000", // 그림자 색
-    shadowOpacity: 1.25, // 그림자 투명도
-    shadowRadius: 4, // 그림자 퍼짐
-    elevation: 4, // Android에서 그림자 효과
-    marginBottom: 10, // 아래쪽 여백 추가
-  },
-  buttonContainer: {
-    flex: 1,
-    justifyContent: "space-around",
   },
 });
 export default PortfolioDetails;
