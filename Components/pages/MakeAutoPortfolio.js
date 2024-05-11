@@ -39,7 +39,7 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
   };
   const fetchSector = async () => {
     try {
-      const token = getUsertoken();
+      const token = await getUsertoken();
       const response = await fetch(`${urls.springUrl}/api/sector/list`, {
         method: "GET",
         headers: {
@@ -104,6 +104,7 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
   useEffect(() => {
     fetchSector().then((data) => setSector(data));
   }, []);
+
   const renderAutoStep = () => {
     switch (currentAutoStep) {
       case 1:
@@ -158,7 +159,7 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
               </Text>
             </View>
             <View style={styles.inputContainer}>
-              {[0.1, 0.2, 0.3].map((level) => (
+              {[1, 2, 3].map((level) => (
                 <TouchableOpacity
                   key={level}
                   style={[
