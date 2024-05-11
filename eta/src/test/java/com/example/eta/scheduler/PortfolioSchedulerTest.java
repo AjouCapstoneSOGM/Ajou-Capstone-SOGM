@@ -1,17 +1,13 @@
 package com.example.eta.scheduler;
 
-import com.example.eta.dto.PortfolioDto;
 import com.example.eta.entity.*;
 import com.example.eta.repository.*;
-import com.example.eta.service.PortfolioService;
-import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
