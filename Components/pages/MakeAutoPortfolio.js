@@ -177,7 +177,6 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
             <View style={styles.buttonContainer}>
               <TouchableOpacity
                 style={[styles.button]}
-                title="prev"
                 onPress={handlePrevStep}
               >
                 <Text style={{ fontSize: 18, color: "white" }}>이전</Text>
@@ -187,7 +186,6 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
                   styles.button,
                   isRiskNull() ? styles.disabledButton : "",
                 ]}
-                title="next"
                 onPress={isRiskNull() ? null : handleNextStep}
               >
                 <Text style={{ fontSize: 18, color: "white" }}>다음</Text>
@@ -220,7 +218,6 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
             <View style={styles.buttonContainer}>
               <TouchableOpacity
                 style={[styles.button]}
-                title="prev"
                 onPress={handlePrevStep}
               >
                 <Text style={{ fontSize: 18, color: "white" }}>이전</Text>
@@ -276,7 +273,6 @@ const styles = StyleSheet.create({
   input_Amount: {
     justifyContent: "center", // 가로 방향에서 중앙 정렬
     backgroundColor: "#ddd",
-    alignItems: "center",
     padding: 20,
     borderRadius: 10,
     margin: 10,

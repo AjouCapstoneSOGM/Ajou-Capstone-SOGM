@@ -24,22 +24,27 @@ const PortfolioDetails = ({ route, navigation }) => {
   const [chartData, setChartData] = useState([]);
 
   const colorScale = [
-    "hsl(348, 100%, 80%)", // 파스텔 핑크, 최대 포화도 도달
-    "hsl(207, 94%, 80%)", // 파스텔 블루, 추가 포화도 20% 증가
-    "hsl(48, 100%, 78%)", // 파스텔 옐로우, 이미 최대 포화도
-    "hsl(144, 76%, 76%)", // 파스텔 그린, 추가 포화도 20% 증가
-    "hsl(20, 100%, 72%)", // 파스텔 오렌지, 이미 최대 포화도
-    "hsl(262, 100%, 80%)", // 파스텔 퍼플, 최대 포화도 도달
-    "hsl(174, 100%, 70%)", // 파스텔 시안, 최대 포화도 도달
-    "hsl(338, 90%, 72%)", // 파스텔 레드, 추가 포화도 20% 증가
-    "hsl(20, 20%, 60%)", // 연 회색, 추가 포화도 20% 증가
-    "hsl(300, 90%, 80%)", // 파스텔 시안-그린, 추가 포화도 20% 증가
+    "hsl(348, 100%, 80%)", // 파스텔 핑크,
+    "hsl(207, 94%, 80%)", // 파스텔 블루,
+    "hsl(48, 100%, 78%)", // 파스텔 옐로우,
+    "hsl(144, 76%, 76%)", // 파스텔 그린,
+    "hsl(20, 100%, 72%)", // 파스텔 오렌지,
+    "hsl(262, 100%, 80%)", // 파스텔 퍼플,
+    "hsl(174, 100%, 70%)", // 파스텔 시안,
+    "hsl(338, 90%, 72%)", // 파스텔 레드,
+    "hsl(20, 20%, 60%)", // 연 회색,
+    "hsl(300, 90%, 80%)", // 파스텔 시안-그린,
     "#ccc",
   ];
 
   const handlePressSummary = () => {
     selectedTicker = portfolio.stocks[selectedId].ticker;
     navigation.navigate("NewsSummary", { ticker: selectedTicker });
+  };
+
+  const handleSelectedId = (index) => {
+    if (selectedId === index) setSelectedId(null);
+    else setSelectedId(index);
   };
 
   const getStockROI = (id) => {
@@ -123,7 +128,12 @@ const PortfolioDetails = ({ route, navigation }) => {
         )}
       </View>
       <View style={styles.itemContainer}>
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView
+          contentContainerStyle={{
+            paddingBottom: selectedId === null ? 180 : 20,
+          }}
+          showsVerticalScrollIndicator={false}
+        >
           {portfolio.stocks.map((item, index) => {
             const roi = getStockROI(index);
             return (
@@ -133,7 +143,7 @@ const PortfolioDetails = ({ route, navigation }) => {
                   styles.item,
                   selectedId === index ? styles.selectedItem : {},
                 ]}
-                onPress={() => setSelectedId(index)}
+                onPress={() => handleSelectedId(index)}
               >
                 <View
                   style={[
@@ -154,7 +164,7 @@ const PortfolioDetails = ({ route, navigation }) => {
                 {selectedId === index && (
                   <View style={styles.infoContainer}>
                     <Text style={styles.itemText}>
-                      {item.currentPrice.toLocaleString()}
+                      {Number(item.currentPrice).toLocaleString()}
                     </Text>
                     <Text style={styles.itemText}>
                       {item.averageCost.toLocaleString()}
@@ -178,7 +188,14 @@ const PortfolioDetails = ({ route, navigation }) => {
         </ScrollView>
       </View>
       <View style={styles.buttonContainer}>
-        <TouchableOpacity onPress={() => {}}></TouchableOpacity>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => {
+            navigation.navigate("ModifyPortfolio", { id: portfolio.id });
+          }}
+        >
+          <Text style={{ fontSize: 17, color: "white" }}>수정</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -268,6 +285,14 @@ const styles = StyleSheet.create({
   },
   manageButton: {
     paddingRight: 20,
+  },
+  button: {
+    justifyContent: "center", // 가로 방향에서 중앙 정렬
+    backgroundColor: "#6495ED",
+    alignItems: "center",
+    borderRadius: 10,
+    padding: 18,
+    margin: 5,
   },
 });
 export default PortfolioDetails;
