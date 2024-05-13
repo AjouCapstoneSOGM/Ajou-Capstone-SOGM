@@ -7,12 +7,13 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("api/portfolio/rebalancing")
+@RequestMapping("api/rebalancing")
 public class RebalancingController {
     private final RebalancingService rebalancingService;
 
@@ -26,13 +27,14 @@ public class RebalancingController {
 
     // 모든 리밸런싱 알림 받아오기
     @GetMapping("/{port_id}")
-    public ResponseEntity<?> getAllRebalancing(@PathVariable("port_id") Integer pfId) {
-        List<RebalancingDto.InfoDto> rebalancings = rebalancingService.getAllRebalancingsByPortfolioId(pfId);
-        return ResponseEntity.ok(Map.of("rebalancings",rebalancings));
+    public ResponseEntity<Map<String, List<RebalancingDto.RebalancingListDto>>> getAllRebalancing(@PathVariable("port_id") Integer pfId) {
+        Map<String, List<RebalancingDto.RebalancingListDto>> response = new HashMap<>();
+        response.put("rebalancing", rebalancingService.getAllRebalancingsByPortfolioId(pfId));
+        return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/{rn_id}")
-    public ResponseEntity<?> deleteRebalancing(@PathVariable("rn_id") Integer rnId) {
+    @DeleteMapping("/{port_id}/{rn_id}")
+    public ResponseEntity<?> deleteRebalancing(@PathVariable("port_id") Integer pfId, @PathVariable("rn_id") Integer rnId) {
         try {
             rebalancingService.deleteRebalancing(rnId);
             return ResponseEntity.ok().build();

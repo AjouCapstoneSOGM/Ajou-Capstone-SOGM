@@ -1,11 +1,9 @@
 package com.example.eta.scheduler;
 
-import com.example.eta.dto.PortfolioDto;
 import com.example.eta.entity.*;
 import com.example.eta.repository.*;
-import com.example.eta.service.PortfolioService;
-import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,118 +45,106 @@ public class PortfolioSchedulerTest {
     private RebalancingRepository rebalancingRepository;
 
     @Autowired
-    private RebalancingTickerRepository rebalancingTickerRepository;
+    private PriceRepository priceRepository;
 
-    @Test
+    private User user;
+    private Portfolio portfolio;
+
+    /**
+     * 유저의 초기 포트폴리오 상태
+     * 현금 1백만원(33%)
+     * 신라섬유 1백만원(33%) 평단가 50만원*2개
+     * 삼성전자 1백만원(33%) 평단가 1원*1백만개
+     */
+    @BeforeEach
     @Transactional
-    public void testUpdateProportion() {
-        // given 유저, 자동 포트폴리오 생성
-        User user = userRepository.save(User.builder()
-                .email("james001@foo.bar")
-                .isVerified(false)
+    public void setup() {
+        user = userRepository.save(User.builder()
+                .email("testtesttesttest@footest.bartest")
+                .isVerified(true)
                 .password("password!")
-                .name("James")
+                .name("test")
                 .role("USER")
                 .createdDate(LocalDateTime.now())
                 .enabled(true).build());
 
-        Portfolio portfolio = portfolioRepository.save(Portfolio.builder()
+        portfolio = portfolioRepository.save(Portfolio.builder()
                 .user(user)
                 .createdDate(LocalDateTime.now())
                 .country("KOR")
                 .isAuto(true)
-                .initAsset(1000000)
+                .initAsset(4000000)
+                .initCash(1000000)
                 .currentCash(1000000)
                 .riskValue(1)
                 .build());
 
-        // given 포트폴리오에 IT 섹터 관심분야로 추가, 종목 추가(삼전 주식 10개를 0원에 구매했다고 가정)
-        PortfolioSector portfolioSector = portfolioSectorRepository.save(PortfolioSector.builder()
+        portfolio.getPortfolioSectors().add(portfolioSectorRepository.save(PortfolioSector.builder()
                 .portfolio(portfolio)
                 .sector(sectorRepository
-                .findById("G45").get())
-                .build());
-        portfolio.getPortfolioSectors().add(portfolioSector);
+                        .findById("G45").get())
+                .build()));
 
-        PortfolioTicker portfolioTicker = portfolioTickerRepository.save(PortfolioTicker.builder()
+        portfolio.getPortfolioTickers().add(portfolioTickerRepository.save(PortfolioTicker.builder()
+                .portfolio(portfolio)
+                .ticker(tickerRepository.findById("001000").get())
+                .initProportion(0.33f)
+                .currentProportion(0.33f)
+                .number(2)
+                .averagePrice(500000f)
+                .build()));
+
+        portfolio.getPortfolioTickers().add(portfolioTickerRepository.save(PortfolioTicker.builder()
                 .portfolio(portfolio)
                 .ticker(tickerRepository.findById("005930").get())
-                .initProportion(0.0f)
-                .currentProportion(0.0f)
-                .number(10)
-                .averagePrice(0.0f)
-                .build());
-        portfolio.getPortfolioTickers().add(portfolioTicker);
+                .initProportion(0.33f)
+                .currentProportion(0.33f)
+                .number(1000000)
+                .averagePrice(1f)
+                .build()));
+    }
 
-        // when 삼전 종가 가격에 맞춰서 비중 업데이트
+    @Test
+    @Transactional
+    public void testUpdateProportion() {
         portfolioScheduler.updateProportion(portfolio);
 
-        // then
-        System.out.println(portfolioTicker.getCurrentProportion());
         Assertions.assertAll(
-            () -> assertNotEquals(0.0f, portfolioTicker.getCurrentProportion())
+            () -> assertNotEquals(0.33f, portfolio.getPortfolioTickers().get(0).getCurrentProportion()),
+            () -> assertNotEquals(0.33f, portfolio.getPortfolioTickers().get(1).getCurrentProportion())
         );
     }
 
     @Test
     @Transactional
     public void testDoProportionRebalancing() {
-        // given 유저, 자동 포트폴리오 생성
-        User user = userRepository.save(User.builder()
-                .email("james001@foo.bar")
-                .isVerified(false)
-                .password("password!")
-                .name("James")
-                .role("USER")
-                .createdDate(LocalDateTime.now())
-                .enabled(true).build());
-
-        Portfolio portfolio = portfolioRepository.save(Portfolio.builder()
-                .user(user)
-                .createdDate(LocalDateTime.now())
-                .country("KOR")
-                .isAuto(true)
-                .initAsset(3000000)
-                .currentCash(1000000)
-                .riskValue(1)
-                .build());
-
-        // given 포트폴리오에 IT 섹터 관심분야로 추가, 종목 추가(삼전 주식 10개를 20만원에 구매했다고 가정)
-        PortfolioSector portfolioSector = portfolioSectorRepository.save(PortfolioSector.builder()
-                .portfolio(portfolio)
-                .sector(sectorRepository
-                        .findById("G45").get())
-                .build());
-        portfolio.getPortfolioSectors().add(portfolioSector);
-
-        PortfolioTicker portfolioTicker = portfolioTickerRepository.save(PortfolioTicker.builder()
-                .portfolio(portfolio)
-                .ticker(tickerRepository.findById("005930").get())
-                .initProportion(0.66f)
-                .currentProportion(0.66f)
-                .number(10)
-                .averagePrice(200000f)
-                .build());
-        portfolio.getPortfolioTickers().add(portfolioTicker);
-
         portfolioScheduler.updateProportion(portfolio);
         portfolioScheduler.createProportionRebalancing(portfolio);
 
-        // 기존 가격 200000만원 * 10개, 원래 비중 66%
-        // 현재(2021-04-15) 가격 85400원 * 10개, 현재 비중 46%
-        // 현재 자산 1000000+85400*10의 66%는 1223640원
-        // -> 4개 매수하면 85400*14 = 1195600원
-        List<Rebalancing> rebalancings = rebalancingRepository.findAllByPortfolio(portfolio);
-        for (RebalancingTicker rebalancingTicker : rebalancings.get(0).getRebalancingTickers()) {
-            System.out.println(rebalancingTicker.getTicker().getName());
-            System.out.println(rebalancingTicker.getIsBuy());  // true
-            System.out.println(rebalancingTicker.getNumber());  // 4
+        // then 리밸런싱 반영 시, 각 종목 비중이 초기 비중에서 오차 범위 20% 내로 들어오는지 확인
+        float totalAmount = portfolio.getCurrentCash();
+        for (PortfolioTicker portfolioTicker : portfolio.getPortfolioTickers()) {
+            float number = portfolioTicker.getNumber();
+            float close = priceRepository.findLatestPriceByTicker(portfolioTicker.getTicker().getTicker())
+                    .get().getClose().floatValue();
+            totalAmount += close*number;
         }
 
-        // then
-        System.out.println(portfolioTicker.getCurrentProportion());
-        Assertions.assertAll(
-                () -> assertTrue(portfolioScheduler.isProportionRebalancingNeeded(portfolio))
-        );
+        List<Rebalancing> rebalancings = rebalancingRepository.findAllByPortfolio(portfolio);
+        for (RebalancingTicker rebalancingTicker : rebalancings.get(0).getRebalancingTickers()) {
+            float number = portfolio.getPortfolioTickers().stream()
+                            .filter(portfolioTicker -> portfolioTicker.getTicker().equals(rebalancingTicker.getTicker()))
+                            .findFirst().get().getNumber();
+            if (rebalancingTicker.getIsBuy())
+                number += rebalancingTicker.getNumber();
+            else
+                number -= rebalancingTicker.getNumber();
+
+            float close = priceRepository.findLatestPriceByTicker(rebalancingTicker.getTicker().getTicker())
+                    .get().getClose().floatValue();
+
+            float resultProportion = (close*number)/totalAmount;
+            assertTrue(0.8 < resultProportion/0.33 && resultProportion/0.33 < 1.2);
+        }
     }
 }

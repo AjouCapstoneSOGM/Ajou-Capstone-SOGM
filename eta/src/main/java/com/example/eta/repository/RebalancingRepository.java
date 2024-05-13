@@ -12,6 +12,5 @@ import java.util.List;
 public interface RebalancingRepository extends JpaRepository<Rebalancing, Integer> {
     List<Rebalancing> findAllByPortfolio(Portfolio portfolio);
     boolean existsByPortfolioPfId(Integer pfId);
-    List<RebalancingTicker> findByPortfolioPfId(Integer pfId);
-
+    List<Rebalancing> findByPortfolioPfId(Integer pfId);
 }
