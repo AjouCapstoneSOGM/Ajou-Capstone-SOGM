@@ -8,7 +8,7 @@ from tqdm import tqdm
 class News:
     def __init__(self):
         self.today = datetime.today()
-        self.period = self.today - timedelta(days=7)
+        self.period = self.today - timedelta(days=1)
         self.start_date = self.period.strftime("%Y-%m-%d")  # Example start date
         self.end_date = self.today.strftime("%Y-%m-%d")  # Example end date
 
