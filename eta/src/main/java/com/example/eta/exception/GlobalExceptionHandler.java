@@ -13,25 +13,31 @@ import java.util.Map;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = {EmailAlreadyExistsException.class})
-    protected ResponseEntity<Object> handleEmailAlreadyExistsException(EmailAlreadyExistsException e) {
+    protected ResponseEntity<Map<String, String>> handleEmailAlreadyExistsException(EmailAlreadyExistsException e) {
         Map<String, String> responseData = new HashMap<>();
         responseData.put("message", e.getMessage());
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        return ResponseEntity.badRequest().body(responseData);
     }
 
     @ExceptionHandler(value = {AuthenticationException.class})
-    protected ResponseEntity<Map<String, String>> handleAuthenticationException(AuthenticationException e) {
+    protected ResponseEntity<Void> handleAuthenticationException(AuthenticationException e) {
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(value = {PortfolioNotFoundException.class})
-    protected ResponseEntity<Map<String, String>> handlePortfolioNotFoundException(PortfolioNotFoundException e) {
+    protected ResponseEntity<Void> handlePortfolioNotFoundException(PortfolioNotFoundException e) {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(value = {PortfolioOwnershipException.class})
-    protected ResponseEntity<Map<String, String>> handlePortfolioOwnershipException(PortfolioOwnershipException e) {
+    protected ResponseEntity<Void> handlePortfolioOwnershipException(PortfolioOwnershipException e) {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(value = {Exception.class})
+    protected ResponseEntity<Void> handleException(Exception e) {
+        e.printStackTrace();
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
 

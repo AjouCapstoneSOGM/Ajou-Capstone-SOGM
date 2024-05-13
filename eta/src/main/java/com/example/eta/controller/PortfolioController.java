@@ -47,16 +47,12 @@ public class PortfolioController {
         Map<String, Integer> responseData = new HashMap<>();
         responseData.put("pfId", portfolio.getPfId());
 
-        return new ResponseEntity<>(responseData, HttpStatus.OK);
+        return ResponseEntity.ok(responseData);
     }
     @DeleteMapping("/{port_id}")
-    public ResponseEntity<?> deletePortfolio(@PathVariable("port_id") Integer pfId) {
-        try {
-            portfolioService.deletePortfolio(pfId);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error deleting portfolio: " + e.getMessage());
-        }
+    public ResponseEntity<Void> deletePortfolio(@PathVariable("port_id") Integer pfId) {
+        portfolioService.deletePortfolio(pfId);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{port_id}/performance")
@@ -65,31 +61,19 @@ public class PortfolioController {
     }
   
     @PostMapping("/{port_id}/buy")
-    public ResponseEntity<String> buyStock(@PathVariable("port_id") Integer pfId, @RequestBody PortfolioDto.BuyRequestDto buyRequestDto) {
-        try {
-            portfolioService.buyStock(pfId, buyRequestDto);
-            return ResponseEntity.ok("매수 내용이 성공적으로 기록되었습니다.");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body("요청이 유효하지 않습니다: " + e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("매수 기록 중 오류가 발생했습니다: " + e.getMessage());
-        }
+    public ResponseEntity<Void> buyStock(@PathVariable("port_id") Integer pfId, @RequestBody PortfolioDto.BuyRequestDto buyRequestDto) {
+        portfolioService.buyStock(pfId, buyRequestDto);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{port_id}/sell")
-    public ResponseEntity<String> sellStock(@PathVariable("port_id") Integer pfId, @RequestBody PortfolioDto.sellRequestDto sellRequestDto) {
-        try {
-            portfolioService.sellStock(pfId, sellRequestDto);
-            return ResponseEntity.ok("매수 내용이 성공적으로 기록되었습니다.");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body("요청이 유효하지 않습니다: " + e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("매수 기록 중 오류가 발생했습니다: " + e.getMessage());
-        }
+    public ResponseEntity<Void> sellStock(@PathVariable("port_id") Integer pfId, @RequestBody PortfolioDto.sellRequestDto sellRequestDto) {
+        portfolioService.sellStock(pfId, sellRequestDto);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping
-    public ResponseEntity<PortfolioDto.PortfolioInfoListDto> getPortfolioInfos(@AuthenticationPrincipal String email) throws InterruptedException {
+    public ResponseEntity<PortfolioDto.PortfolioInfoListDto> getPortfolioInfos(@AuthenticationPrincipal String email) {
         User user = userService.findByEmail(email);
 
         List<PortfolioDto.PortfolioInfo> portfolioInfos = new ArrayList<>();
@@ -108,6 +92,6 @@ public class PortfolioController {
                 .count(portfolioInfos.size())
                 .portfolios(portfolioInfos)
                 .build();
-        return new ResponseEntity<>(responseData, HttpStatus.OK);
+        return ResponseEntity.ok(responseData);
     }
 }

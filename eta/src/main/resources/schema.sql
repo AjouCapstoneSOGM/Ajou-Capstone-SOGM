@@ -50,8 +50,8 @@ CREATE TABLE `portfolio_ticker` (
     `ticker` varchar(20) NOT NULL,
     `number` int NOT NULL,
     `average_price` float NOT NULL,
-    `init_proportion` float NOT NULL,
-    `current_proportion` float NOT NULL,
+    `init_proportion` float,
+    `current_proportion` float,
     PRIMARY KEY (`pf_id`, `ticker`),
     FOREIGN KEY (`pf_id`) REFERENCES `portfolio` (`pf_id`) ON DELETE CASCADE,
     FOREIGN KEY (`ticker`) REFERENCES `ticker` (`ticker`)
