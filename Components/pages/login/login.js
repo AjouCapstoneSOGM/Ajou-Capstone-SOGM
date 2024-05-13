@@ -11,8 +11,8 @@ import { setUsertoken } from "../../utils/localStorageUtils.js";
 import { useAuth } from "../../utils/AuthContext.js";
 
 const Login = ({ navigation }) => {
-  const [useremail, setUseremail] = useState("test@test.com");
-  const [password, setPassword] = useState("1234");
+  const [useremail, setUseremail] = useState("Test");
+  const [password, setPassword] = useState("Test");
   const { login } = useAuth();
 
   const fetchLoginInfo = async () => {

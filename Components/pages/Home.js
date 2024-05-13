@@ -70,7 +70,7 @@ const Home = ({ navigation }) => {
         )}
       </ScrollView>
       <Button title="토큰 확인" onPress={() => getToken()} />
-      <Button title="로그아웃" onPress={() => removeUsertoken()} />
+      <Button title="로그아웃" onPress={() => navigation.navigate("UserSetting")} />
       <Button
         title="뉴스 테스트"
         onPress={() => navigation.navigate("NewsSummary", { ticker: "005930" })}

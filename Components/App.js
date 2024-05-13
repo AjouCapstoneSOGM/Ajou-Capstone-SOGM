@@ -12,6 +12,7 @@ import ViewPortfolio from "./pages/ViewPortfolio";
 import PortfolioDetails from "./pages/PortfolioDetails";
 import MakePortfolio from "./pages/MakePortfolio";
 import NewsSummary from "./pages/NewsSummary";
+import UserSetting from "./pages/UserSetting";
 
 import { AuthProvider } from "./utils/AuthContext";
 import { setCustomText } from "react-native-global-props";
@@ -47,8 +48,7 @@ function ScreenStack() {
         <Stack.Screen name="ManagementPage" component={ManagementPage} />
         <Stack.Screen name="ModifyPortfolio" component={ModifyPortfolio} />
         <Stack.Screen name="MakePortfolio" component={MakePortfolio} />
-        <Stack.Screen name="btmTabnv1" component={btmTabnv1} />
-        <Stack.Screen name="btmTabnv2" component={btmTabnv2} />
+        <Stack.Screen name="UserSetting" component={UserSetting} />
       </Stack.Navigator>
     </AuthProvider>
   );
