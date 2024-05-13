@@ -133,6 +133,5 @@ class News:
         df.reset_index(drop=True, inplace=True)
         df_value = df["Title"].to_list()
 
-        print(df_value)
         # Return the DataFrame
         return df_value
