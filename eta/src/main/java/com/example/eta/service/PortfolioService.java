@@ -10,6 +10,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.sound.sampled.Port;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -122,74 +123,75 @@ public class PortfolioService {
         portfolio.setCreatedDate(LocalDateTime.now());
         portfolioRepository.save(portfolio);
     }
-    public void deletePortfolio(Integer pfId) throws Exception {
-        // 포트폴리오 존재 여부 확인
-        if (!portfolioRepository.existsById(pfId)) {
-            throw new Exception("Portfolio not found with id: " + pfId);
-        }
-        // 포트폴리오 삭제
+    public void deletePortfolio(Integer pfId) {
         portfolioRepository.deleteById(pfId);
     }
 
-    public Map<String, Object> getPerformanceDataV1(Integer pfId) throws IllegalAccessException {
-        Portfolio portfolio = portfolioRepository.findById(pfId)
-                .orElseThrow(() -> new IllegalAccessException("Portfolio not found with id: " + pfId));
+    public PortfolioDto.PerformanceResponseDto getPerformanceData(Integer pfId) {
+        Portfolio portfolio = portfolioRepository.findById(pfId).get();
 
-        // PortfolioTicker 리스트를 가져오기
-        List<PortfolioTicker> portfolioTickers = portfolio.getPortfolioTickers();
-        List<PortfolioDto.PerformanceResponseDto> tickerPerformances = new ArrayList<>();
-
-        for (PortfolioTicker pt : portfolioTickers) {
+        List<PortfolioDto.PortfolioPerformance> portfolioPerformances = new ArrayList<>();
+        for (PortfolioTicker pt : portfolio.getPortfolioTickers()) {
             Ticker ticker = pt.getTicker();
-            float averagePrice = pt.getAveragePrice();
-
-            PortfolioDto.PerformanceResponseDto responseDto = new PortfolioDto.PerformanceResponseDto(
-                    pt.getNumber(),
-                    averagePrice,
-                    ticker.getTicker(),
-                    ticker.getName());
-
-            tickerPerformances.add(responseDto);
+            portfolioPerformances.add(PortfolioDto.PortfolioPerformance.builder()
+                    .ticker(ticker.getTicker())
+                    .quantity(pt.getNumber())
+                    .companyName(ticker.getName())
+                    .averageCost(pt.getAveragePrice())
+                    .build());
         }
 
-        float currentCash = portfolio.getCurrentCash();
-
-        Map<String, Object> performance = new HashMap<>();
-
-        performance.put("portfolioPerformance", tickerPerformances);
-        performance.put("currentCash", currentCash);
-
-        return performance;
+        return PortfolioDto.PerformanceResponseDto.builder()
+                .initialAsset(portfolio.getInitAsset())
+                .currentCash(portfolio.getCurrentCash())
+                .portfolioPerformances(portfolioPerformances)
+                .build();
     }
 
     @Transactional
     public void buyStock(Integer pfId, PortfolioDto.BuyRequestDto buyRequestDto) {
-        // 포트폴리오티커 조회 다대다 관계 문제로 findPortfolioTicker 정의
-        // 포트폴리오티커,포트폴리오 조회
-        PortfolioTicker portfolioTicker = findPortfolioTicker(pfId, buyRequestDto.getTicker());
-        Portfolio portfolio = portfolioTicker.getPortfolio();
+        // TODO: 평단가 업데이트, 현재 현금으로 매수 가능 여부
+        Portfolio portfolio = portfolioRepository.getReferenceById(pfId);
+        List<PortfolioTicker> portfolioTickers = portfolio.getPortfolioTickers();
 
-        // 현재 수량 계산
-        int existingQuantity = portfolioTicker.getNumber();
-        int newQuantity = existingQuantity + buyRequestDto.getQuantity();
-        portfolioTicker.updateNumber(newQuantity);
+        // 이미 보유한 종목일 시
+        for (PortfolioTicker portfolioTicker : portfolioTickers) {
+            if (portfolioTicker.getTicker().getTicker().equals(buyRequestDto.getTicker())) {
+                // 현재 수량 계산
+                int existingQuantity = portfolioTicker.getNumber();
+                int newQuantity = existingQuantity + buyRequestDto.getQuantity();
+                portfolioTicker.updateNumber(newQuantity);
+                portfolioTickerRepository.save(portfolioTicker);
 
-        // 총 매수 비용 계산
+                // 총 매수 비용 계산
+                float totalCost = buyRequestDto.getQuantity() * buyRequestDto.getPrice();
+                float newCurrentCash = portfolio.getCurrentCash() - totalCost;
+                portfolio.updateCurrentCash(newCurrentCash);
+                portfolioRepository.save(portfolio);
+                return;
+            }
+        }
+
+        // 새로운 종목일 시
+        PortfolioTicker portfolioTicker = portfolioTickerRepository.save(PortfolioTicker.builder()
+                .ticker(tickerRepository.findById(buyRequestDto.getTicker()).get())
+                .portfolio(portfolio)
+                .averagePrice(buyRequestDto.getPrice())
+                .number(buyRequestDto.getQuantity())
+                .build());
+        portfolio.getPortfolioTickers().add(portfolioTicker);
+
         float totalCost = buyRequestDto.getQuantity() * buyRequestDto.getPrice();
-
-        // 포트폴리오의 현재 현금 업데이트
         float newCurrentCash = portfolio.getCurrentCash() - totalCost;
         portfolio.updateCurrentCash(newCurrentCash);
-
-        // 엔티티 저장
-        portfolioTickerRepository.save(portfolioTicker);
-        portfolioRepository.save(portfolio); // 변경된 포트폴리오 저장
+        portfolioRepository.save(portfolio);
     }
 
     public void sellStock(Integer pfId, PortfolioDto.sellRequestDto sellRequestDto) {
         PortfolioTicker portfolioTicker = findPortfolioTicker(pfId, sellRequestDto.getTicker());
         Portfolio portfolio = portfolioTicker.getPortfolio();
 
+        // TODO: 매도 가능 여부(해당 티커 보유 중인지, 매도량 < 보유량인지)
         int existingQuantity = portfolioTicker.getNumber();
         int newQuantity = existingQuantity - sellRequestDto.getQuantity();
 

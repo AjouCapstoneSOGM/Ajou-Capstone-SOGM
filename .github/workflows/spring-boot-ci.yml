@@ -1,0 +1,31 @@
+name: Spring Boot CI
+
+on:
+  pull_request:
+    branches: spring
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set Up JDK-17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'oracle'
+
+      - name: Set application.yml
+        run: echo "${{ secrets.SPRING_APPLICATION }}" > ./eta/src/main/resources/application.yml
+
+      - name: Build
+        run: cd eta; ./gradlew build
+
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: ./eta/build/test-results/**/*.xml
