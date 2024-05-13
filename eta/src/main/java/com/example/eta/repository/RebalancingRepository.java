@@ -13,4 +13,5 @@ public interface RebalancingRepository extends JpaRepository<Rebalancing, Intege
     List<Rebalancing> findAllByPortfolio(Portfolio portfolio);
     boolean existsByPortfolioPfId(Integer pfId);
     List<RebalancingTicker> findByPortfolioPfId(Integer pfId);
+
 }

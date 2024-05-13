@@ -131,6 +131,15 @@ CREATE TABLE `price` (
     FOREIGN KEY (`ticker`) REFERENCES `ticker` (`ticker`)
 );
 
+CREATE TABLE `news` (
+    `date` datetime NOT NULL,
+    `ticker` varchar(20) NOT NULL,
+    `title` VARCHAR(256) NOT NULL,
+    `context` TEXT NOT NULL,
+    PRIMARY KEY (`ticker`, `date`),
+    FOREIGN KEY (`ticker`) REFERENCES `ticker` (`ticker`)
+);
+
 CREATE TABLE `financial_statement` (
     `date` datetime NOT NULL,
     `ticker` varchar(20) NOT NULL,
