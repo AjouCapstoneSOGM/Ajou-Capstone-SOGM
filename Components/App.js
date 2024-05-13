@@ -12,6 +12,14 @@ import MakePortfolio from "./pages/MakePortfolio";
 import NewsSummary from "./pages/NewsSummary";
 
 import { AuthProvider } from "./utils/AuthContext";
+import { setCustomText } from "react-native-global-props";
+import {
+  useFonts,
+  NotoSansKR_400Regular,
+} from "@expo-google-fonts/noto-sans-kr";
+import ManagementPage from "./pages/ManagePortfolio";
+import ModifyPortfolio from "./pages/ModifyPortfolio";
+import RebalanceList from "./pages/RebalanceList";
 
 const Stack = createStackNavigator();
 function ScreenStack() {
@@ -34,6 +42,9 @@ function ScreenStack() {
         <Stack.Screen name="ViewPortfolio" component={ViewPortfolio} />
         <Stack.Screen name="NewsSummary" component={NewsSummary} />
         <Stack.Screen name="PortfolioDetails" component={PortfolioDetails} />
+        <Stack.Screen name="ManagementPage" component={ManagementPage} />
+        <Stack.Screen name="RebalanceList" component={RebalanceList} />
+        <Stack.Screen name="ModifyPortfolio" component={ModifyPortfolio} />
         <Stack.Screen name="MakePortfolio" component={MakePortfolio} />
       </Stack.Navigator>
     </AuthProvider>
@@ -41,6 +52,22 @@ function ScreenStack() {
 }
 
 export default function App() {
+  const [fontsLoaded] = useFonts({
+    NotoSansKR_400Regular,
+  });
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
+  const customTextProps = {
+    style: {
+      fontFamily: "NotoSansKR_400Regular",
+      lineHeight: 20, // 줄 간격을 20으로 설정
+    },
+  };
+
+  setCustomText(customTextProps);
   return (
     <NavigationContainer>
       <ScreenStack />

@@ -1,13 +1,26 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Button } from "react-native";
 import urls from "../utils/urls";
 import GetCurrentPrice from "../utils/GetCurrentPrice";
 import { getUsertoken } from "../utils/localStorageUtils";
 import Icon from "react-native-vector-icons/AntDesign";
 
 const PortfolioList = ({ navigation }) => {
-  const [portfolios, setPortfolios] = useState([]);
+  const [portfolios, setPortfolios] = useState([
+    {
+      auto: null,
+      country: null,
+      createDate: null,
+      detail: {
+        currentCash: 0,
+        stocks: [],
+      },
+      id: null,
+      riskValue: null,
+    },
+  ]);
   const [loading, setLoading] = useState(true);
+  const [errorState, setErrorState] = useState(false);
 
   //포트폴리오 종목의 총 가격 반환
   const getTotalPrice = (stocks) => {
@@ -28,9 +41,10 @@ const PortfolioList = ({ navigation }) => {
   };
 
   //포트폴리오의 총 수익률 계산 후 반환
-  const getTotalROI = (stocks) => {
-    const totalPrice = getTotalPrice(stocks);
-    const totalInvestment = getTotalInvestment(stocks);
+  const getTotalROI = (detail) => {
+    const totalPrice = getTotalPrice(detail.stocks) + detail.currentCash;
+    const totalInvestment =
+      getTotalInvestment(detail.stocks) + detail.currentCash;
     const totalROI = (
       ((totalPrice - totalInvestment) / totalInvestment) *
       100
@@ -145,31 +159,50 @@ const PortfolioList = ({ navigation }) => {
     return result;
   };
 
-  const loadData = async () => {
-    try {
-      const data = await fetchPortfolio();
-      const portfolioList = data.portfolios;
-      const portfolioIds = getPortfolioIds(portfolioList);
-      const portfolioStocks = await fetchAllStocks(portfolioIds);
-      const stocksWithCurrent = await fetchAllCurrent(portfolioStocks);
-      portfolioList.forEach((portfolio, index) => {
-        portfolio.detail = stocksWithCurrent[index];
-      });
-      setPortfolios(portfolioList);
-      setLoading(false);
-    } catch (error) {
-      console.error("Failed to fetch data:", error);
-    }
-  };
-
   useEffect(() => {
+    const loadData = async () => {
+      try {
+        const data = await fetchPortfolio();
+        const portfolioList = data.portfolios;
+        const portfolioIds = getPortfolioIds(portfolioList);
+        const portfolioStocks = await fetchAllStocks(portfolioIds);
+        const stocksWithCurrent = await fetchAllCurrent(portfolioStocks);
+        portfolioList.forEach((portfolio, index) => {
+          portfolio.detail = stocksWithCurrent[index];
+        });
+        setPortfolios(portfolioList);
+        setLoading(false);
+      } catch (error) {
+        console.error("Failed to fetch data:", error);
+        setErrorState(true);
+      }
+    };
     loadData();
   }, []);
 
-  if (loading) {
-    return <Text>Loading...</Text>;
+  if (errorState) {
+    return (
+      <View style={styles.errorContent}>
+        <Text>포트폴리오 로딩에 실패하였습니다.</Text>
+      </View>
+    );
   }
 
+  if (loading) {
+    return (
+      <View style={styles.errorContent}>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
+
+  if (!portfolios) {
+    return (
+      <View style={styles.errorContent}>
+        <Text>포트폴리오가 없습니다.</Text>
+      </View>
+    );
+  }
   const getRiskText = (risk) => {
     if (risk === 1) {
       return (
@@ -217,70 +250,52 @@ const PortfolioList = ({ navigation }) => {
   };
   return (
     <View style={styles.portfolioContainer}>
-      {portfolios.map((portfolio) => (
-        <View key={portfolio} style={styles.portfolioButton}>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              paddingHorizontal: 5,
-            }}
-          >
-            <Text
-              style={{
-                margin: 10,
-                fontSize: 17,
-                color: "white",
-              }}
-            >
-              테스트의 포트폴리오 1
-            </Text>
-            <Text
-              style={{
-                margin: 10,
-                fontSize: 15,
-                color: "white",
-              }}
-            >
-              {portfolio.auto ? "자동" : "수동"} / {portfolio.country}
-            </Text>
-          </View>
-          <TouchableOpacity
-            style={styles.portfolioContent}
-            onPress={() =>
-              navigation.navigate("PortfolioDetails", { portfolio })
-            }
-          >
-            <View style={{ height: 100, justifyContent: "space-between" }}>
-              <Text style={{ fontSize: 25, fontWeight: "bold" }}>
-                {getTotalPrice(portfolio.detail.stocks).toLocaleString()}{" "}
-                &#8361;
+      {portfolios.map((portfolio) => {
+        const roi = getTotalROI(portfolio.detail);
+        const roiFormatted = roi >= 0 ? `+${roi}` : `${roi}`;
+        const currentCash = portfolio.detail.currentCash;
+
+        return (
+          <View key={portfolio.id} style={styles.portfolioButton}>
+            <View style={styles.portfolioBody}>
+              <Text style={styles.portfolioName}>테스트의 포트폴리오 1</Text>
+              <Text style={[styles.portfolioName, { fontSize: 15 }]}>
+                {portfolio.auto ? "자동" : "수동"} / {portfolio.country}
               </Text>
-              {getTotalROI(portfolio.detail.stocks) >= 0 ? (
-                <Text
-                  style={{ color: "#4CAF50", fontSize: 17, fontWeight: "bold" }}
-                >
-                  +{getTotalROI(portfolio.detail.stocks)}%
-                </Text>
-              ) : (
-                <Text
-                  style={{ color: "#F44336", fontSize: 17, fontWeight: "bold" }}
-                >
-                  {getTotalROI(portfolio.detail.stocks)}%
-                </Text>
-              )}
-              {getRiskText(portfolio.riskValue)}
             </View>
-            <Icon
-              style={{ alignSelf: "center" }}
-              name="right"
-              size={30}
-              color="#000"
-            />
-          </TouchableOpacity>
-        </View>
-      ))}
+            <TouchableOpacity
+              style={styles.portfolioContent}
+              onPress={() =>
+                navigation.navigate("PortfolioDetails", { portfolio })
+              }
+            >
+              <View style={{ height: 100, justifyContent: "space-between" }}>
+                <Text style={{ fontSize: 25, fontWeight: "bold" }}>
+                  {(
+                    getTotalPrice(portfolio.detail.stocks) + currentCash
+                  ).toLocaleString()}
+                  원
+                </Text>
+                <Text
+                  style={[
+                    { fontSize: 17, fontWeight: "bold" },
+                    roi >= 0 ? { color: "#4CAF50" } : { color: "#F44336" },
+                  ]}
+                >
+                  {roiFormatted}%
+                </Text>
+                {getRiskText(portfolio.riskValue)}
+              </View>
+              <Icon
+                style={{ alignSelf: "center" }}
+                name="right"
+                size={30}
+                color="#000"
+              />
+            </TouchableOpacity>
+          </View>
+        );
+      })}
     </View>
   );
 };
@@ -290,8 +305,24 @@ const styles = StyleSheet.create({
     alignItems: "stretch",
     margin: 10,
   },
+  errorContent: {
+    height: 140,
+    backgroundColor: "#e5e5e5",
+    justifyContent: "center",
+    alignItems: "center",
+    margin: 10,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
   portfolioButton: {
-    justifyContent: "flex-start", // 가로 방향에서 중앙 정렬
+    justifyContent: "flex-start",
     backgroundColor: "#6495ED",
     borderRadius: 10,
     marginVertical: 10,
@@ -303,6 +334,17 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5, // 상자 그림자로 입체감 주기
+  },
+  portfolioBody: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 5,
+  },
+  portfolioName: {
+    margin: 10,
+    fontSize: 17,
+    color: "white",
   },
   riskText: {
     alignSelf: "flex-start",
