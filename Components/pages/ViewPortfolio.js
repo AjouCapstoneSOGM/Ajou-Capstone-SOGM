@@ -252,7 +252,7 @@ const PortfolioList = ({ navigation }) => {
     <View style={styles.portfolioContainer}>
       {portfolios.map((portfolio) => {
         const roi = getTotalROI(portfolio.detail);
-        const roiFormatted = roi >= 0 ? `+${roi}` : `-${roi}`;
+        const roiFormatted = roi >= 0 ? `+${roi}` : `${roi}`;
         const currentCash = portfolio.detail.currentCash;
 
         return (

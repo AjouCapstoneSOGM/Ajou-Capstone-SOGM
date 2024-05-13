@@ -19,6 +19,7 @@ import {
 } from "@expo-google-fonts/noto-sans-kr";
 import ManagementPage from "./pages/ManagePortfolio";
 import ModifyPortfolio from "./pages/ModifyPortfolio";
+import RebalanceList from "./pages/RebalanceList";
 
 const Stack = createStackNavigator();
 function ScreenStack() {
@@ -42,6 +43,7 @@ function ScreenStack() {
         <Stack.Screen name="NewsSummary" component={NewsSummary} />
         <Stack.Screen name="PortfolioDetails" component={PortfolioDetails} />
         <Stack.Screen name="ManagementPage" component={ManagementPage} />
+        <Stack.Screen name="RebalanceList" component={RebalanceList} />
         <Stack.Screen name="ModifyPortfolio" component={ModifyPortfolio} />
         <Stack.Screen name="MakePortfolio" component={MakePortfolio} />
       </Stack.Navigator>

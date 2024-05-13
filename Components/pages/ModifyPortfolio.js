@@ -26,26 +26,6 @@ const ModifyPortfolio = ({ route, navigation }) => {
     },
   ];
 
-  const fetchRebalances = async () => {
-    try {
-      const token = await getUsertoken();
-      const response = await fetch(`${urls.springUrl}/api/rebalancing/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        console.log(data);
-        return data;
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   const fetchModify = async () => {
     try {
       const token = await getUsertoken();
@@ -98,11 +78,10 @@ const ModifyPortfolio = ({ route, navigation }) => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        // const result = await fetchRebalances();
-        const result = ex_data;
-        const tickerList = result.map((item) => item.ticker);
+        const stockList = route.params.list;
+        const tickerList = stockList.map((item) => item.ticker);
         const currentPrices = await fetchAllCurrent(tickerList);
-        const rebalancesWithCurrent = result.map((item, index) => ({
+        const rebalancesWithCurrent = stockList.map((item, index) => ({
           ...item,
           price: currentPrices[index].currentPrice,
         }));
@@ -135,7 +114,9 @@ const ModifyPortfolio = ({ route, navigation }) => {
           {rebalances.map((item, index) => (
             <View style={styles.rebalanceBlock} key={index}>
               <View>
-                <Text style={{ fontSize: 20 }}>{item.name}</Text>
+                <Text style={{ fontSize: 20, paddingHorizontal: 10 }}>
+                  {item.name}
+                </Text>
               </View>
               <View style={styles.inputContainer}>
                 <View style={styles.inputTextContainer}>
@@ -241,7 +222,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#ddd",
     paddingHorizontal: 10,
     paddingVertical: 5,
-    borderRadius: 10,
+    borderRadius: 5,
     marginVertical: 12,
     marginHorizontal: 6,
     fontSize: 18,
@@ -256,7 +237,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingVertical: 6,
     paddingHorizontal: 12,
-    backgroundColor: "#bbb",
+    backgroundColor: "#aaa",
   },
   button: {
     justifyContent: "center", // 가로 방향에서 중앙 정렬

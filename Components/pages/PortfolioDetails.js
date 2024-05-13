@@ -52,8 +52,9 @@ const PortfolioDetails = ({ route, navigation }) => {
     const average = portfolio.stocks[id].averageCost;
 
     if (current === 0 || average === 0) return 0;
+    const totalROI = (((current - average) / average) * 100).toFixed(2);
 
-    return (current - average) / average;
+    return totalROI;
   };
   const getStockRate = (id) => {
     const stockRate =
@@ -94,6 +95,7 @@ const PortfolioDetails = ({ route, navigation }) => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
+      title: "포트폴리오 이름", // 실행 시간에 제목 변경
       headerRight: () => (
         <TouchableOpacity
           style={styles.manageButton}
@@ -136,6 +138,7 @@ const PortfolioDetails = ({ route, navigation }) => {
         >
           {portfolio.stocks.map((item, index) => {
             const roi = getStockROI(index);
+            const roiFormatted = roi >= 0 ? `+${roi}` : `${roi}`;
             return (
               <TouchableOpacity
                 key={index}
@@ -178,7 +181,7 @@ const PortfolioDetails = ({ route, navigation }) => {
                         roi >= 0 ? { color: "#4CAF50" } : { color: "#F44336" },
                       ]}
                     >
-                      {(roi.toFixed(4) * 1000) / 10}%
+                      {roiFormatted}%
                     </Text>
                   </View>
                 )}
@@ -191,7 +194,7 @@ const PortfolioDetails = ({ route, navigation }) => {
         <TouchableOpacity
           style={styles.button}
           onPress={() => {
-            navigation.navigate("ModifyPortfolio", { id: portfolio.id });
+            navigation.navigate("RebalanceList", { id: portfolio.id });
           }}
         >
           <Text style={{ fontSize: 17, color: "white" }}>수정</Text>
