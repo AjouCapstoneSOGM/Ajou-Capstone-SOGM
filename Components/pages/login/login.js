@@ -1,52 +1,42 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Button, Alert, } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  TextInput,
+} from "react-native";
 import urls from "../../utils/urls";
-import {setUsertoken, getUsertoken} from "../../utils/localStorageUtils.js"
+import { setUsertoken } from "../../utils/localStorageUtils.js";
+import { useAuth } from "../../utils/AuthContext.js";
 
-
-const Login = () => {
-  const navigation = useNavigation();
-
-  const [useremail, setUseremail] = useState("");
-  const [password, setPassword] = useState("");
-
-  useEffect(() =>{
-    getUsertoken().then((res) => {
-      if (res == null){ // 저장된 유저 토큰이 없음
-        console.log("로그인 토큰 없음. 로그인 화면 진행")
-        return;
-      }
-      console.log("현재 로그인 " + res);
-      navigation.navigate("Home", { screen: "Home" });
-    });
-    
-  }, []);
-
-  const handleLogin = () => {
-    fetchLoginInfo();
-    navigation.navigate("Home", { screen: "Home" });
-  };
+const Login = ({ navigation }) => {
+  const [useremail, setUseremail] = useState("test@test.com");
+  const [password, setPassword] = useState("1234");
+  const { login } = useAuth();
 
   const fetchLoginInfo = async () => {
-    fetch(`${urls.springUrl}/api/auth/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: useremail,
-        password: password,
-      }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Success:", data);
-        setUsertoken(data['token']);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
+    try {
+      const response = await fetch(`${urls.springUrl}/api/auth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: useremail,
+          password: password,
+        }),
       });
+      if (response.ok) {
+        const data = await response.json();
+        setUsertoken(data.token);
+        login();
+        navigation.navigate("Home", { screen: "Home" });
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      throw error;
+    }
   };
 
   return (
@@ -67,7 +57,7 @@ const Login = () => {
         secureTextEntry
       ></TextInput>
 
-      <TouchableOpacity onPress={handleLogin} style={styles.Inputbotton}>
+      <TouchableOpacity onPress={fetchLoginInfo} style={styles.Inputbotton}>
         <Text style={styles.BottomText}>로그인</Text>
       </TouchableOpacity>
 

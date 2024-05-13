@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,26 +8,14 @@ import {
   StyleSheet,
 } from "react-native";
 import urls from "../utils/urls";
+import { getUsertoken } from "../utils/localStorageUtils";
 
 const MakeAutoPortfolio = ({ setCurrentStep }) => {
   const [currentAutoStep, setCurrentAutoStep] = useState(1);
   const [amount, setAmount] = useState("");
   const [riskLevel, setRiskLevel] = useState("");
   const [interest, setInterest] = useState("");
-
-  const sector = [
-    "it",
-    "건강관리",
-    "경기관련소비재",
-    "금융",
-    "산업재",
-    "소재",
-    "에너지",
-    "유틸리티",
-    "커뮤니케이션서비스",
-    "필수소비재",
-    "기타",
-  ];
+  const [sector, setSector] = useState({});
 
   const isRiskNull = () => {
     if (riskLevel === "") {
@@ -49,32 +37,59 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
     }
     return false;
   };
-
-  const fetchPortfolio = async () => {
-    fetch(`${urls.springUrl}/getInfo`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        userId: 1,
-        amount: amount,
-        riskLevel: riskLevel,
-        interest: interest,
-      }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Success:", data);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
+  const fetchSector = async () => {
+    try {
+      const token = await getUsertoken();
+      const response = await fetch(`${urls.springUrl}/api/sector/list`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
+      if (response.ok) {
+        const data = await response.json();
+        return data;
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      throw error;
+    }
+  };
+
+  const fetchUserInfo = async () => {
+    try {
+      const token = await getUsertoken();
+      const response = await fetch(
+        `${urls.springUrl}/api/portfolio/create/auto`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            country: "KOR",
+            sector: [interest],
+            asset: amount,
+            riskValue: riskLevel,
+          }),
+        }
+      );
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Success:", data);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      throw error;
+    }
   };
 
   const submitUserInfo = async () => {
     console.log(amount, riskLevel, interest);
-    await fetchPortfolio();
+    handleNextStep();
+    await fetchUserInfo();
+    handleNextStep();
     setCurrentStep(2);
   };
 
@@ -85,6 +100,10 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
   const handlePrevStep = () => {
     setCurrentAutoStep(currentAutoStep - 1);
   };
+
+  useEffect(() => {
+    fetchSector().then((data) => setSector(data));
+  }, []);
 
   const renderAutoStep = () => {
     switch (currentAutoStep) {
@@ -140,7 +159,7 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
               </Text>
             </View>
             <View style={styles.inputContainer}>
-              {["1", "2", "3"].map((level) => (
+              {[1, 2, 3].map((level) => (
                 <TouchableOpacity
                   key={level}
                   style={[
@@ -158,7 +177,6 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
             <View style={styles.buttonContainer}>
               <TouchableOpacity
                 style={[styles.button]}
-                title="prev"
                 onPress={handlePrevStep}
               >
                 <Text style={{ fontSize: 18, color: "white" }}>이전</Text>
@@ -168,7 +186,6 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
                   styles.button,
                   isRiskNull() ? styles.disabledButton : "",
                 ]}
-                title="next"
                 onPress={isRiskNull() ? null : handleNextStep}
               >
                 <Text style={{ fontSize: 18, color: "white" }}>다음</Text>
@@ -185,23 +202,22 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
               </Text>
             </View>
             <View style={styles.sectorContainer}>
-              {sector.map((item) => (
+              {Object.entries(sector).map(([code, name]) => (
                 <TouchableOpacity
-                  key={item}
+                  key={code}
                   style={[
                     styles.input_Interest,
-                    interest === item ? styles.selectedInput : "",
+                    interest === code ? styles.selectedInput : "",
                   ]}
-                  onPress={() => setInterest(item)}
+                  onPress={() => setInterest(code)}
                 >
-                  <Text style={{ fontSize: 17 }}>{item}</Text>
+                  <Text style={{ fontSize: 17 }}>{name}</Text>
                 </TouchableOpacity>
               ))}
             </View>
             <View style={styles.buttonContainer}>
               <TouchableOpacity
                 style={[styles.button]}
-                title="prev"
                 onPress={handlePrevStep}
               >
                 <Text style={{ fontSize: 18, color: "white" }}>이전</Text>
@@ -219,11 +235,16 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
             </View>
           </View>
         );
+      case 4:
+        return (
+          <View style={styles.container}>
+            <Text>Loading...</Text>
+          </View>
+        );
       default:
-        return <Text>Invalid step</Text>;
+        setCurrentStep(0);
     }
   };
-
   return <View style={styles.container}>{renderAutoStep()}</View>;
 };
 
@@ -252,7 +273,6 @@ const styles = StyleSheet.create({
   input_Amount: {
     justifyContent: "center", // 가로 방향에서 중앙 정렬
     backgroundColor: "#ddd",
-    alignItems: "center",
     padding: 20,
     borderRadius: 10,
     margin: 10,
