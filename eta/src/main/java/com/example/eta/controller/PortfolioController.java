@@ -28,7 +28,6 @@ public class PortfolioController {
 
     private final UserService userService;
     private final PortfolioService portfolioService;
-    private final RebalancingService rebalancingService;
 
     @PostMapping("/create/auto")
     public ResponseEntity<Map<String, Integer>> createAutoPortfolio(@RequestBody PortfolioDto.CreateRequestDto createRequestDto,
@@ -118,29 +117,4 @@ public class PortfolioController {
                 .build();
         return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
-
-    // 포트폴리오 리밸런싱 알림 존재여부 확인
-    @GetMapping("/rebalancing/{port_id}/exists")
-    public ResponseEntity<Boolean> checkRebalancingExists(@PathVariable("port_id") Integer pfId) {
-        boolean exists = rebalancingService.existsRebalancingByPortfolioId(pfId);
-        return ResponseEntity.ok(exists);
-    }
-
-    // 모든 리밸런싱 알림 받아오기
-    @GetMapping("/rebalancing/{port_id}")
-    public ResponseEntity<List<RebalancingTicker>> getAllRebalancing(@PathVariable("port_id") Integer pfId) {
-        List<RebalancingTicker> rebalancingTickers = rebalancingService.findAllRebalancingByPortfolioId(pfId);
-        return ResponseEntity.ok(rebalancingTickers);
-    }
-
-    @DeleteMapping("/api/portfolio/rebalancing/{rn_id}")
-    public ResponseEntity<?> deleteRebalancing(@PathVariable("rn_id") Integer rnId) {
-        try {
-            rebalancingService.deleteRebalancing(rnId);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error deleting rebalancing notification: " + e.getMessage());
-        }
-    }
-
 }
