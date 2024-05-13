@@ -63,10 +63,6 @@ public class PortfolioController {
 
     @GetMapping("/{port_id}/performance")
     public ResponseEntity<PortfolioDto.PerformanceResponseDto> getPortfolioPerformance(@PathVariable("port_id") Integer pfId, @AuthenticationPrincipal String email) {
-        // 포트폴리오가 없거나, 포트폴리오의 소유자가 아닐 시 403
-        if (!portfolioRepository.existsById(pfId)) throw new PortfolioNotFoundException();
-        if (!portfolioRepository.getReferenceById(pfId).getUser().getEmail().equals(email)) throw new PortfolioOwnershipException();
-
         return ResponseEntity.ok(portfolioService.getPerformanceData(pfId));
     }
   
