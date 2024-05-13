@@ -9,11 +9,12 @@ import com.example.eta.repository.PriceRepository;
 import com.example.eta.repository.RebalancingRepository;
 import com.example.eta.repository.RebalancingTickerRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cglib.core.Local;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +30,8 @@ public class PortfolioScheduler {
     private final RebalancingRepository rebalancingRepository;
 
     private final RebalancingTickerRepository rebalancingTickerRepository;
+
+    private Logger logger = LoggerFactory.getLogger(PortfolioScheduler.class);
 
     @Scheduled(cron = "0 0 0 * * 1-5")
     public void doProportionRebalancing() {
@@ -59,6 +62,8 @@ public class PortfolioScheduler {
             float currentProportion = currentAmountForTicker.get(portfolioTicker).floatValue() / totalAmount;
             portfolioTicker.setCurrentProportion(currentProportion);
         }
+
+        logger.info("Portfolio: " + portfolio.getPfId() + " 주가별 현재 비중 업데이트됨");
     }
 
     public boolean isProportionRebalancingNeeded(Portfolio portfolio) {
@@ -128,6 +133,8 @@ public class PortfolioScheduler {
                         .build());
                 rebalancing.getRebalancingTickers().add(rebalancingTicker);
             }
-        } 
+        }
+
+        logger.info("Portfolio: " + portfolio.getPfId() + " 비중 조정 리밸런싱 알림 생성됨");
     }
 }

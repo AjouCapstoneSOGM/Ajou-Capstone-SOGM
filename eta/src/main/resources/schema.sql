@@ -23,7 +23,7 @@ CREATE TABLE `portfolio` (
     `risk_value` int,
     `user_id` int NOT NULL,
     PRIMARY KEY (`pf_id`),
-    FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`)
+    FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE
 );
 
 CREATE TABLE `sector` (
@@ -50,10 +50,10 @@ CREATE TABLE `portfolio_ticker` (
     `ticker` varchar(20) NOT NULL,
     `number` int NOT NULL,
     `average_price` float NOT NULL,
-    `init_proportion` float NOT NULL,
-    `current_proportion` float NOT NULL,
+    `init_proportion` float,
+    `current_proportion` float,
     PRIMARY KEY (`pf_id`, `ticker`),
-    FOREIGN KEY (`pf_id`) REFERENCES `portfolio` (`pf_id`),
+    FOREIGN KEY (`pf_id`) REFERENCES `portfolio` (`pf_id`) ON DELETE CASCADE,
     FOREIGN KEY (`ticker`) REFERENCES `ticker` (`ticker`)
 );
 
@@ -67,7 +67,7 @@ CREATE TABLE `portfolio_record` (
     `pf_id` int NOT NULL,
     PRIMARY KEY (`rec_id`),
     FOREIGN KEY (`ticker`) REFERENCES `ticker` (`ticker`),
-    FOREIGN KEY (`pf_id`) REFERENCES `portfolio` (`pf_id`)
+    FOREIGN KEY (`pf_id`) REFERENCES `portfolio` (`pf_id`) ON DELETE CASCADE
 );
 
 CREATE TABLE `rebalancing` (
@@ -75,14 +75,14 @@ CREATE TABLE `rebalancing` (
     `created_date` datetime NOT NULL,
     `pf_id` int NOT NULL,
     PRIMARY KEY (`rn_id`),
-    FOREIGN KEY (`pf_id`) REFERENCES `portfolio` (`pf_id`)
+    FOREIGN KEY (`pf_id`) REFERENCES `portfolio` (`pf_id`) ON DELETE CASCADE
 );
 
 CREATE TABLE `portfolio_sector` (
     `pf_id` int NOT NULL,
     `sector_id` varchar(3) NOT NULL,
     PRIMARY KEY (`pf_id`, `sector_id`),
-    FOREIGN KEY (`pf_id`) REFERENCES `portfolio` (`pf_id`),
+    FOREIGN KEY (`pf_id`) REFERENCES `portfolio` (`pf_id`) ON DELETE CASCADE,
     FOREIGN KEY (`sector_id`) REFERENCES `sector` (`sector_id`)
 );
 
@@ -92,7 +92,7 @@ CREATE TABLE `rebalancing_ticker` (
     `number` int NOT NULL,
     `ticker` varchar(20) NOT NULL,
     PRIMARY KEY (`rn_id`, `ticker`),
-    FOREIGN KEY (`rn_id`) REFERENCES `rebalancing` (`rn_id`),
+    FOREIGN KEY (`rn_id`) REFERENCES `rebalancing` (`rn_id`) ON DELETE CASCADE,
     FOREIGN KEY (`ticker`) REFERENCES `ticker` (`ticker`)
 );
 
@@ -131,12 +131,30 @@ CREATE TABLE `price` (
     FOREIGN KEY (`ticker`) REFERENCES `ticker` (`ticker`)
 );
 
+CREATE TABLE `news` (
+    `date` datetime NOT NULL,
+    `ticker` varchar(20) NOT NULL,
+    `title` VARCHAR(256) NOT NULL,
+    `context` TEXT NOT NULL,
+    PRIMARY KEY (`ticker`, `date`),
+    FOREIGN KEY (`ticker`) REFERENCES `ticker` (`ticker`)
+);
+
 CREATE TABLE `financial_statement` (
     `date` datetime NOT NULL,
     `ticker` varchar(20) NOT NULL,
     `account` varchar(30) NULL,
     `value` float NULL,
     `period` varchar(1) NULL,
+    PRIMARY KEY (`ticker`, `date`),
+    FOREIGN KEY (`ticker`) REFERENCES `ticker` (`ticker`)
+);
+
+CREATE TABLE `news` (
+    `date` datetime NOT NULL,
+    `ticker` varchar(20) NOT NULL,
+    `title` varchar(256) NOT NULL,
+    `context` text NOT NULL,
     PRIMARY KEY (`ticker`, `date`),
     FOREIGN KEY (`ticker`) REFERENCES `ticker` (`ticker`)
 );
