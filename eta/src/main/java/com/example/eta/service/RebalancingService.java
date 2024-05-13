@@ -1,6 +1,7 @@
 package com.example.eta.service;
 
 import com.example.eta.dto.RebalancingDto;
+import com.example.eta.entity.Rebalancing;
 import com.example.eta.entity.RebalancingTicker;
 import com.example.eta.entity.Ticker;
 import com.example.eta.repository.RebalancingRepository;
@@ -32,18 +33,28 @@ public class RebalancingService {
     }
 
     // 포트폴리오 ID로 모든 리밸런싱 알림 받아오기
-    public List<RebalancingDto.InfoDto> getAllRebalancingsByPortfolioId(Integer pfId) {
-        List<RebalancingDto.InfoDto> rebalancings = new ArrayList<>();
-        List<RebalancingTicker> rebalancingTickers = rebalancingRepository.findByPortfolioPfId(pfId);
-        for (RebalancingTicker rt : rebalancingTickers) {
-            Optional<Ticker> ticker = tickerRepository.findById(rt.getTicker().getTicker());
-            ticker.ifPresent(value -> rebalancings.add(new RebalancingDto.InfoDto(
-                    value.getTicker(),
-                    value.getName(),
-                    rt.getNumber(),
-                    rt.getIsBuy()
-            )));
+    public List<RebalancingDto.RebalancingListDto> getAllRebalancingsByPortfolioId(Integer pfId) {
+
+        List<Rebalancing> rebalancings = rebalancingRepository.findByPortfolioPfId(pfId);
+        List<RebalancingDto.RebalancingListDto> rebalancingListDtos = new ArrayList<>();
+        for (Rebalancing rebalancing : rebalancings) {
+            int rnId = rebalancing.getRnId();
+            List<RebalancingDto.RebalancingInfo> rebalancingInfos = new ArrayList<>();
+            for (RebalancingTicker rebalancingTicker : rebalancing.getRebalancingTickers()) {
+                Optional<Ticker> ticker = tickerRepository.findById(rebalancingTicker.getTicker().getTicker());
+                ticker.ifPresent(value -> rebalancingInfos.add(new RebalancingDto.RebalancingInfo(
+                        value.getTicker(),
+                        value.getName(),
+                        rebalancingTicker.getNumber(),
+                        rebalancingTicker.getIsBuy()
+                )));
+            }
+            rebalancingListDtos.add(RebalancingDto.RebalancingListDto.builder()
+                    .rnId(rnId)
+                    .rebalancings(rebalancingInfos)
+                    .build());
         }
-        return rebalancings;
+
+        return rebalancingListDtos;
     }
 }
