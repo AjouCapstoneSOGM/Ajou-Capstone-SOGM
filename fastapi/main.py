@@ -1,4 +1,5 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Response, status
+from fastapi.responses import JSONResponse
 from config import Settings
 from model import PortfolioInfo, TickerList, Ticker, PortfolioFinal
 from starlette.middleware.cors import CORSMiddleware
@@ -6,7 +7,6 @@ from make_portfolio import MakePortrolio
 from current_price import fetch_all_prices
 from get_news_summary import News
 from gpt import Chatbot
-import json
 
 settings = Settings()  # 설정 인스턴스 생성
 app = FastAPI()
@@ -42,9 +42,12 @@ async def get_News(ticker: Ticker):
     news = News()
     chatbot = Chatbot()
     headlines = await news.get_company_news(ticker.ticker)
+
+    if len(headlines) == 0:
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+
     summary = await chatbot.summary("".join(headlines), ticker.ticker)
     sections = summary.strip().split("## ")[1:]
-
     summary_json = []
     for section in sections:
         title, _, content = section.partition("\n")
