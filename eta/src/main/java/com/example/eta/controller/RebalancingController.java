@@ -2,6 +2,7 @@ package com.example.eta.controller;
 
 import com.example.eta.dto.RebalancingDto;
 import com.example.eta.entity.RebalancingTicker;
+import com.example.eta.scheduler.PortfolioScheduler;
 import com.example.eta.service.RebalancingService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +41,19 @@ public class RebalancingController {
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error deleting rebalancing notification: " + e.getMessage());
+        }
+    }
+
+    @PutMapping("/{port_id}/execute")
+    public ResponseEntity<?> executeRebalancing(@PathVariable("port_id") Integer pfId) {
+        int rnId = rebalancingService.executeRebalancingAndGetNotificationId(pfId);
+        if (rnId > 0) {
+            Map<String, Integer> response = new HashMap<>();
+            response.put("rnId", rnId);
+            return ResponseEntity.ok(response);
+        }
+        else {
+            return ResponseEntity.noContent().build();
         }
     }
 }
