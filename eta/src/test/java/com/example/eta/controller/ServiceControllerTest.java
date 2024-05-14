@@ -1,5 +1,6 @@
 package com.example.eta.controller;
 
+import static com.example.eta.controller.utils.controllerTestUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -35,26 +36,11 @@ public class ServiceControllerTest {
     private MockMvc mockMvc;
 
     @Test
-    @DisplayName("섹터 목록 가져오는지 확인")
+    @DisplayName("섹터 목록 API")
     @Transactional
     public void testGetAllSectors() throws Exception {
         // given 회원가입, 로그인 후 jwt토큰 획득
-        ObjectMapper objectMapper = new ObjectMapper();
-        UserDto.InfoDto InfoDto = new UserDto.InfoDto("James", "james@domain.com", "password!");
-        mockMvc.perform(post("/api/auth/signup")
-                .contentType("application/json")
-                .content(objectMapper.writeValueAsString(InfoDto)));
-
-        UserDto.LoginDto loginDto = new UserDto.LoginDto("james@domain.com", "password!");
-        MockHttpServletResponse loginResponse = mockMvc.perform(post("/api/auth/login")
-                .contentType("application/json")
-                .content(objectMapper.writeValueAsString(loginDto)))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(header().exists("Authorization"))
-                .andReturn().getResponse();
-
-        String authorizationHeader = loginResponse.getHeader("Authorization");
+        String authorizationHeader = signUpLogin(mockMvc);
 
         // when, then
         MockHttpServletResponse getAllSectorsResponse = mockMvc.perform(get("/api/sector/list")
