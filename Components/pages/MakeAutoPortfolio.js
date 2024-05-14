@@ -9,8 +9,11 @@ import {
 } from "react-native";
 import urls from "../utils/urls";
 import { getUsertoken } from "../utils/localStorageUtils";
+import { usePortfolio } from "../utils/PortfolioContext";
+import { filteringNumber } from "../utils/utils";
 
 const MakeAutoPortfolio = ({ setCurrentStep }) => {
+  const { fetchUserInfo } = usePortfolio();
   const [currentAutoStep, setCurrentAutoStep] = useState(1);
   const [amount, setAmount] = useState("");
   const [riskLevel, setRiskLevel] = useState("");
@@ -37,6 +40,7 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
     }
     return false;
   };
+
   const fetchSector = async () => {
     try {
       const token = await getUsertoken();
@@ -56,41 +60,20 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
     }
   };
 
-  const fetchUserInfo = async () => {
-    try {
-      const token = await getUsertoken();
-      const response = await fetch(
-        `${urls.springUrl}/api/portfolio/create/auto`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            country: "KOR",
-            sector: [interest],
-            asset: amount,
-            riskValue: riskLevel,
-          }),
-        }
-      );
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Success:", data);
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      throw error;
-    }
-  };
-
   const submitUserInfo = async () => {
     console.log(amount, riskLevel, interest);
     handleNextStep();
-    await fetchUserInfo();
+    await fetchUserInfo({
+      interest: interest,
+      amount: amount,
+      riskLevel: riskLevel,
+    });
     handleNextStep();
     setCurrentStep(2);
+  };
+
+  const handleAmount = (value) => {
+    setAmount(filteringNumber(value));
   };
 
   const handleNextStep = () => {
@@ -119,8 +102,8 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
               <TextInput
                 style={styles.input_Amount}
                 keyboardType="numeric"
-                value={amount.toLocaleString()}
-                onChangeText={setAmount}
+                value={amount}
+                onChangeText={(value) => handleAmount(value)}
                 placeholder="금액을 입력하세요"
               />
               {amount && !isAmountEnough() && (

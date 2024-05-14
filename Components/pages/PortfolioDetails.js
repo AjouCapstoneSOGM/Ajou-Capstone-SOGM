@@ -3,14 +3,12 @@ import {
   View,
   Text,
   ScrollView,
-  Dimensions,
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import Icon from "react-native-vector-icons/AntDesign";
 import { VictoryPie } from "victory-native";
-
-const screenWidth = Dimensions.get("window").width;
 
 const PortfolioDetails = ({ route, navigation }) => {
   const [portfolio, setPortfolio] = useState({
@@ -80,6 +78,7 @@ const PortfolioDetails = ({ route, navigation }) => {
       stocks: currentPortfolio.detail.stocks,
       currentCash: currentPortfolio.detail.currentCash,
     });
+    console.log(currentPortfolio.id);
   }, []);
 
   useEffect(() => {
@@ -94,27 +93,33 @@ const PortfolioDetails = ({ route, navigation }) => {
   }, [portfolio]); // portfolio 상태가 변경될 때마다 이 effect 실행
 
   useLayoutEffect(() => {
-    navigation.setOptions({
-      title: "포트폴리오 이름", // 실행 시간에 제목 변경
-      headerRight: () => (
-        <TouchableOpacity
-          style={styles.manageButton}
-          onPress={() => navigation.navigate("ManagementPage", { portfolio })}
-        >
-          <Text style={{ fontSize: 16, color: "white" }}>관리</Text>
-        </TouchableOpacity>
-      ),
-    });
+    if (portfolio) {
+      navigation.setOptions({
+        title: `pfId: ${portfolio.id}`, // 실행 시간에 제목 변경
+        headerRight: () => (
+          <TouchableOpacity
+            style={styles.manageButton}
+            onPress={() => navigation.navigate("ManagementPage", { portfolio })}
+          >
+            <Text style={{ fontSize: 16, color: "white" }}>관리</Text>
+          </TouchableOpacity>
+        ),
+      });
+    }
   }, [portfolio]);
 
   return (
     <View style={styles.container}>
+      <View>
+        <Text>총 자산</Text>
+        <Text>{portfolio.currentCash.toLocaleString()}원</Text>
+      </View>
       <View style={styles.chartContainer}>
         <VictoryPie
           data={chartData}
           colorScale={colorScale}
-          innerRadius={({ index }) => (index === selectedId ? 75 : 85)}
-          radius={({ index }) => (index === selectedId ? 150 : 135)} // 선택된 조각의 반경을 증가
+          innerRadius={({ index }) => (index === selectedId ? 60 : 70)}
+          radius={({ index }) => (index === selectedId ? 135 : 120)} // 선택된 조각의 반경을 증가
           labels={() => ""}
           style={styles.chart}
         />
@@ -132,7 +137,7 @@ const PortfolioDetails = ({ route, navigation }) => {
       <View style={styles.itemContainer}>
         <ScrollView
           contentContainerStyle={{
-            paddingBottom: selectedId === null ? 180 : 20,
+            paddingBottom: selectedId === null ? 60 : 20,
           }}
           showsVerticalScrollIndicator={false}
         >
@@ -148,41 +153,65 @@ const PortfolioDetails = ({ route, navigation }) => {
                 ]}
                 onPress={() => handleSelectedId(index)}
               >
-                <View
-                  style={[
-                    styles.nameContainer,
-                    { backgroundColor: colorScale[index] },
-                  ]}
-                >
-                  <Text
+                <View style={styles.infoContainer}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 17, color: "#222" }}>
+                      {item.companyName}
+                    </Text>
+                    <Text style={{ fontSize: 13, color: "#777" }}>
+                      {Number(item.quantity).toLocaleString()} 주
+                    </Text>
+                  </View>
+                  <View
                     style={{
-                      fontSize: 16,
-                      color: "#222",
+                      flex: 1,
+                      alignItems: "flex-end",
+                      paddingHorizontal: 10,
                     }}
                   >
-                    {item.companyName}
-                  </Text>
+                    <Text style={{ fontSize: 19 }}>
+                      {(item.averageCost * item.quantity).toLocaleString()} 원
+                    </Text>
+                    <View style={{ flexDirection: "row" }}>
+                      <Text
+                        style={[
+                          styles.itemText,
+                          { paddingHorizontal: 15 },
+                          roi >= 0
+                            ? { color: "#4CAF50" }
+                            : { color: "#F44336" },
+                        ]}
+                      >
+                        {Number(item.currentPrice).toLocaleString()} 원
+                      </Text>
+                      <Text
+                        style={[
+                          styles.itemText,
+                          roi >= 0
+                            ? { color: "#4CAF50" }
+                            : { color: "#F44336" },
+                        ]}
+                      >
+                        {roiFormatted}%
+                      </Text>
+                    </View>
+                  </View>
                   <Icon name="down" size={23} color="#222" />
                 </View>
                 {selectedId === index && (
-                  <View style={styles.infoContainer}>
-                    <Text style={styles.itemText}>
-                      {Number(item.currentPrice).toLocaleString()}
-                    </Text>
-                    <Text style={styles.itemText}>
-                      {item.averageCost.toLocaleString()}
-                    </Text>
-                    <Text style={styles.itemText}>
-                      {(item.averageCost * item.quantity).toLocaleString()}
-                    </Text>
-                    <Text
-                      style={[
-                        styles.itemText,
-                        roi >= 0 ? { color: "#4CAF50" } : { color: "#F44336" },
-                      ]}
+                  <View style={styles.utilContainer}>
+                    <TouchableOpacity
+                      style={{ backgroundColor: "#ddd" }}
+                      onPress={() => {
+                        navigation.navigate("NewsSummary", {
+                          ticker: item.ticker,
+                        });
+                      }}
                     >
-                      {roiFormatted}%
-                    </Text>
+                      <Text style={{ fontSize: 20, color: "black" }}>
+                        뉴스 요약 보기
+                      </Text>
+                    </TouchableOpacity>
                   </View>
                 )}
               </TouchableOpacity>
@@ -216,7 +245,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   chartContainer: {
-    flex: 3.5,
+    flex: 2.5,
     alignItems: "center", // 자식 요소를 수평 중앙 정렬
     justifyContent: "center", // 자식 요소를 수직 중앙 정렬
   },
@@ -235,48 +264,28 @@ const styles = StyleSheet.create({
   },
   itemContainer: {
     flex: 4,
+    borderTopWidth: 5,
+    borderColor: "#ccc",
   },
   item: {
-    marginTop: 10,
-    borderRadius: 10,
-    height: 60,
-    justifyContent: "center", // 내용을 세로 방향으로 중앙 정렬
+    height: 80,
+    justifyContent: "flex-start", // 내용을 세로 방향으로 중앙 정렬
     alignItems: "stretch", // 내용을 가로 방향으로 중앙 정렬
-    backgroundColor: "f0f0f0",
-    marginBottom: -15,
-    marginHorizontal: 10,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 1,
-    shadowRadius: 3.84,
-    elevation: 5,
+    backgroundColor: "#f0f0f0",
+    borderBottomWidth: 1,
+    borderColor: "#ccc",
+    paddingHorizontal: 10,
   },
   selectedItem: {
-    height: 200,
-    justifyContent: "space-between",
-    backgroundColor: "#f0f0f0",
-    marginBottom: 5,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 2,
-      height: 2,
-    },
-    shadowOpacity: 1,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  nameContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    padding: 18,
-    backgroundColor: "#6495ED",
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
+    height: 120,
   },
   infoContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    height: 80,
+  },
+  utilContainer: {
     justifyContent: "space-between",
     alignContent: "stretch",
     flexWrap: "wrap",

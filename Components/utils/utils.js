@@ -44,3 +44,7 @@ export const arraysEqual = (arr1, arr2) => {
 
   return true; // 모든 요소가 같으면 true 반환
 };
+
+export const filteringNumber = (value) => {
+  return value.replace(/[^0-9]/g, "");
+};

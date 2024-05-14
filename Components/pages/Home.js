@@ -3,9 +3,9 @@ import { View, Button, StyleSheet, Text } from "react-native";
 import { getUsertoken, removeUsertoken } from "../utils/localStorageUtils.js";
 import { useAuth } from "../utils/AuthContext.js";
 import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
+
 import PortfolioList from "./ViewPortfolio.js";
 import Icon from "react-native-vector-icons/AntDesign";
-import AppText from "../utils/AppText.js";
 
 const Home = ({ navigation }) => {
   const { isLoggedIn, logout } = useAuth();
@@ -15,52 +15,45 @@ const Home = ({ navigation }) => {
     logout();
   };
 
-  const getToken = async () => {
-    const token = await getUsertoken();
-    console.log(token);
-  };
-
   return (
     <View style={styles.container}>
-      <ScrollView>
-        {isLoggedIn ? (
-          <View style={styles.userContainer}>
-            <Text style={{ fontSize: 18, color: "white" }}>
-              안녕하세요 테스트님
-            </Text>
-            <Button title="로그아웃" onPress={setLogout} />
-          </View>
-        ) : (
-          <View style={styles.userContainer}>
-            <Button
-              title="로그인"
-              onPress={() => navigation.navigate("Login")}
-            />
-          </View>
-        )}
-        <View style={styles.buttonContainer}>
-          <Text
-            style={{
-              fontSize: 18,
-              alignSelf: "flex-start",
-              color: "white",
-            }}
-          >
-            나의 포트폴리오
+      {isLoggedIn ? (
+        <View style={styles.userContainer}>
+          <Text style={{ fontSize: 18, color: "white" }}>
+            안녕하세요 테스트님
           </Text>
-          <TouchableOpacity
-            style={{ flexDirection: "row" }}
-            onPress={() => navigation.navigate("MakePortfolio")}
-          >
-            <Text style={{ fontSize: 16, color: "white" }}>생성하기</Text>
-            <Icon
-              style={{ alignSelf: "center", marginHorizontal: 4 }}
-              name="right"
-              size={15}
-              color="#fff"
-            />
-          </TouchableOpacity>
+          <Button title="로그아웃" onPress={setLogout} />
         </View>
+      ) : (
+        <View style={styles.userContainer}>
+          <Button title="로그인" onPress={() => navigation.navigate("Login")} />
+        </View>
+      )}
+      <View style={styles.buttonContainer}>
+        <Text
+          style={{
+            fontSize: 18,
+            alignSelf: "flex-start",
+            color: "white",
+          }}
+        >
+          나의 포트폴리오
+        </Text>
+        <TouchableOpacity
+          style={{ flexDirection: "row" }}
+          onPress={() => navigation.navigate("MakePortfolio")}
+        >
+          <Text style={{ fontSize: 16, color: "white" }}>생성하기</Text>
+          <Icon
+            style={{ alignSelf: "center", marginHorizontal: 4 }}
+            name="right"
+            size={15}
+            color="#fff"
+          />
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView>
         {isLoggedIn ? (
           <PortfolioList navigation={navigation}></PortfolioList>
         ) : (
@@ -104,8 +97,8 @@ const styles = StyleSheet.create({
   userContainer: {
     height: 180,
     backgroundColor: "#6495ED",
-    justifyContent: "center",
-    alignItems: "stretch",
+    justifyContent: "space-evenly",
+    alignItems: "center",
     borderRadius: 10,
     shadowColor: "#000",
     shadowOffset: {
@@ -116,7 +109,8 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 4, // 상자 그림자로 입체감 주기
     padding: 18,
-    margin: 10,
+    marginVertical: 40,
+    marginHorizontal: 10,
   },
   buttonContainer: {
     flexDirection: "row",

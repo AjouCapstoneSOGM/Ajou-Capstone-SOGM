@@ -14,7 +14,7 @@ const MakePortfolio = ({ navigation }) => {
   };
 
   const handleReplacePage = () => {
-    navigation.replace("ViewPortfolio");
+    navigation.replace("Home");
   };
 
   const isPathNull = () => {

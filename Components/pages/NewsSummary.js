@@ -66,8 +66,8 @@ const NewsSummary = ({ route }) => {
     <View style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {isNewsExist() ? (
-          summary.map((news) => (
-            <View style={styles.newsContainer}>
+          summary.map((news, index) => (
+            <View key={index} style={styles.newsContainer}>
               <View style={styles.header}>
                 <Text style={styles.title}>{news.title}</Text>
               </View>
