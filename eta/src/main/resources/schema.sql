@@ -11,6 +11,13 @@ CREATE TABLE `user` (
     PRIMARY KEY (`user_id`)
 );
 
+CREATE TABLE `token` (
+    `user_id` int NOT NULL,
+    `fcm_token` varchar(255) NOT NULL,
+    PRIMARY KEY (`user_id`),
+    FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`)
+);
+
 CREATE TABLE `portfolio` (
     `pf_id` int NOT NULL AUTO_INCREMENT,
     `name` varchar(100),
@@ -134,8 +141,7 @@ CREATE TABLE `price` (
 CREATE TABLE `news` (
     `date` datetime NOT NULL,
     `ticker` varchar(20) NOT NULL,
-    `title` VARCHAR(256) NOT NULL,
-    `context` TEXT NOT NULL,
+    `summary` text NOT NULL,
     PRIMARY KEY (`ticker`, `date`),
     FOREIGN KEY (`ticker`) REFERENCES `ticker` (`ticker`)
 );
