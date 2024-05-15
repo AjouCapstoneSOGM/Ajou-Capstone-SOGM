@@ -24,13 +24,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
-    @ExceptionHandler(value = {PortfolioNotFoundException.class})
-    protected ResponseEntity<Void> handlePortfolioNotFoundException(PortfolioNotFoundException e) {
+    @ExceptionHandler(value = {NotFoundException.class})
+    protected ResponseEntity<Void> handleNotFoundException(NotFoundException e) {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
-    @ExceptionHandler(value = {PortfolioOwnershipException.class})
-    protected ResponseEntity<Void> handlePortfolioOwnershipException(PortfolioOwnershipException e) {
+    @ExceptionHandler(value = {OwnershipException.class})
+    protected ResponseEntity<Void> handleOwnershipException(OwnershipException e) {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 

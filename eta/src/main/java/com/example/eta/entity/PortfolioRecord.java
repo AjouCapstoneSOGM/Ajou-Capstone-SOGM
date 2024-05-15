@@ -3,6 +3,8 @@ package com.example.eta.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Setter
@@ -16,15 +18,18 @@ public class PortfolioRecord {
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "portfolio_id", nullable = false)
+    @JoinColumn(name = "pf_id", nullable = false)
     private Portfolio portfolio;
 
     @ManyToOne
-    @JoinColumn(name = "ticker_id", nullable = false)
+    @JoinColumn(name = "ticker", nullable = false)
     private Ticker ticker;
 
     @Column(nullable = false)
-    private int quantity;
+    private LocalDateTime recordDate;
+
+    @Column(nullable = false)
+    private int number;
 
     @Column(nullable = false)
     private float price;

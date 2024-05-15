@@ -37,8 +37,11 @@ public class PortfolioScheduler {
     public void doProportionRebalancing() {
         for (Portfolio portfolio : portfolioRepository.findAllByIsAutoIsTrue()) {
             updateProportion(portfolio);
-            if(isProportionRebalancingNeeded(portfolio))
-                createProportionRebalancing(portfolio);
+            logger.info("Portfolio(id: " + portfolio.getPfId() + ") 주가별 현재 비중 업데이트됨");
+            if(isProportionRebalancingNeeded(portfolio)) {
+                int rnId = createProportionRebalancing(portfolio);
+                logger.info("Portfolio(id: " + portfolio.getPfId() + ") 비중 조정 리밸런싱 알림(id:" + rnId + ") 생성됨");
+            }
         }
     }
 
@@ -62,8 +65,6 @@ public class PortfolioScheduler {
             float currentProportion = currentAmountForTicker.get(portfolioTicker).floatValue() / totalAmount;
             portfolioTicker.setCurrentProportion(currentProportion);
         }
-
-        logger.info("Portfolio: " + portfolio.getPfId() + " 주가별 현재 비중 업데이트됨");
     }
 
     public boolean isProportionRebalancingNeeded(Portfolio portfolio) {
@@ -76,7 +77,7 @@ public class PortfolioScheduler {
     }
 
     
-    public void createProportionRebalancing(Portfolio portfolio) {
+    public int createProportionRebalancing(Portfolio portfolio) {
         Map<PortfolioTicker, Float> currentAmountForTicker = new HashMap<>();
         Map<PortfolioTicker, Float> targetAmountForTicker = new HashMap<>();
 
@@ -134,7 +135,6 @@ public class PortfolioScheduler {
                 rebalancing.getRebalancingTickers().add(rebalancingTicker);
             }
         }
-
-        logger.info("Portfolio: " + portfolio.getPfId() + " 비중 조정 리밸런싱 알림 생성됨");
+        return rebalancing.getRnId();
     }
 }
