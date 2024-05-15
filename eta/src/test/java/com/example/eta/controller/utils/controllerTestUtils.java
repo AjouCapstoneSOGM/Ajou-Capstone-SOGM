@@ -19,7 +19,7 @@ public class controllerTestUtils {
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(InfoDto)));
 
-        UserDto.LoginDto loginDto = new UserDto.LoginDto("james@domain.com", "password!");
+        UserDto.LoginDto loginDto = new UserDto.LoginDto("james@domain.com", "password!", "fcmToken");
         MockHttpServletResponse loginResponse = mockMvc.perform(post("/api/auth/login")
                         .contentType("application/json")
                         .content(objectMapper.writeValueAsString(loginDto)))

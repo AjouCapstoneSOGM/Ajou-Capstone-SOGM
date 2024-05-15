@@ -20,5 +20,6 @@ public class UserDto {
     public static class LoginDto {
         private String email;
         private String password;
+        private String fcmToken;
     }
 }

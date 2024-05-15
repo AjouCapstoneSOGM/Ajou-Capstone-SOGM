@@ -2,7 +2,6 @@ package com.example.eta.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.example.eta.repository.SectorRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

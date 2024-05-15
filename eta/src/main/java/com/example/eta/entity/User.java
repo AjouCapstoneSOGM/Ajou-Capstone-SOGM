@@ -21,6 +21,9 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int userId;
 
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+    private Token token;
+
     @JsonIgnore
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Portfolio> portfolios = new ArrayList<>();

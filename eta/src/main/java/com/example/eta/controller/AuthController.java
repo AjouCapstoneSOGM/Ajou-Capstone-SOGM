@@ -3,10 +3,12 @@ package com.example.eta.controller;
 import com.example.eta.dto.UserDto;
 import com.example.eta.entity.User;
 import com.example.eta.exception.EmailAlreadyExistsException;
+import com.example.eta.service.TokenService;
 import com.example.eta.service.UserService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -29,6 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/auth")
 public class AuthController {
 
@@ -44,12 +47,7 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
-
-    public AuthController(AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, UserService userService) {
-        this.authenticationManager = authenticationManager;
-        this.passwordEncoder = passwordEncoder;
-        this.userService = userService;
-    }
+    private final TokenService tokenService;
 
     @PostMapping("/login")
     public ResponseEntity<Object> authorize(@RequestBody UserDto.LoginDto loginDto) {
@@ -66,6 +64,9 @@ public class AuthController {
                 .setClaims(Map.of("email", loginDto.getEmail()))
                 .signWith(key)
                 .compact();
+
+        // fcmToken 저장
+        tokenService.saveFcmToken(userService.findByEmail(loginDto.getEmail()), loginDto.getFcmToken());
 
         // 응답
         HttpHeaders httpHeaders = new HttpHeaders();
