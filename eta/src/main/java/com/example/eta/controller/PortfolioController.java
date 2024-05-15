@@ -4,8 +4,6 @@ import com.example.eta.dto.PortfolioDto;
 import com.example.eta.entity.Portfolio;
 import com.example.eta.entity.RebalancingTicker;
 import com.example.eta.entity.User;
-import com.example.eta.exception.PortfolioNotFoundException;
-import com.example.eta.exception.PortfolioOwnershipException;
 import com.example.eta.repository.PortfolioRepository;
 import com.example.eta.service.PortfolioService;
 import com.example.eta.service.RebalancingService;

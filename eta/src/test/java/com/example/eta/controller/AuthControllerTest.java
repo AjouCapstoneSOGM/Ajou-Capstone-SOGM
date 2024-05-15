@@ -36,7 +36,7 @@ public class AuthControllerTest {
     private MockMvc mockMvc;
 
     @Test
-    @DisplayName("정상적인 회원가입 테스트")
+    @DisplayName("회원가입 API(정상적인 경우)")
     @Transactional
     public void testSignUp() throws Exception {
         // given
@@ -56,7 +56,7 @@ public class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("로그인, jwt 발급")
+    @DisplayName("로그인, jwt 발급 API(정상적인 경우)")
     @Transactional
     public void testLogin() throws Exception {
         // given
