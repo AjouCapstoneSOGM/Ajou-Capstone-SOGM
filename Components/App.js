@@ -12,7 +12,7 @@ import ViewPortfolio from "./pages/ViewPortfolio";
 import PortfolioDetails from "./pages/PortfolioDetails";
 import MakePortfolio from "./pages/MakePortfolio";
 import NewsSummary from "./pages/NewsSummary";
-import UserSetting from "./pages/UserSetting";
+import RebalancingAlarm_test from "./pages/RebalancingAlarm_test";
 
 import { AuthProvider } from "./utils/AuthContext";
 import { setCustomText } from "react-native-global-props";
@@ -48,7 +48,7 @@ function ScreenStack() {
         <Stack.Screen name="ManagementPage" component={ManagementPage} />
         <Stack.Screen name="ModifyPortfolio" component={ModifyPortfolio} />
         <Stack.Screen name="MakePortfolio" component={MakePortfolio} />
-        <Stack.Screen name="UserSetting" component={UserSetting} />
+        <Stack.Screen name="RebalancingAlarm_test" component={RebalancingAlarm_test} />
       </Stack.Navigator>
     </AuthProvider>
   );

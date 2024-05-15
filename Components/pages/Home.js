@@ -69,12 +69,8 @@ const Home = ({ navigation }) => {
           </View>
         )}
       </ScrollView>
-      <Button title="토큰 확인" onPress={() => getToken()} />
-      <Button title="로그아웃" onPress={() => navigation.navigate("UserSetting")} />
-      <Button
-        title="뉴스 테스트"
-        onPress={() => navigation.navigate("NewsSummary", { ticker: "005930" })}
-      />
+      {/*Home.js 가독성을 위해 RebalancingAlarm_test 페이지가 로드될 때 확인하는 것으로 임시 설정*/}
+      <Button title="알림 테스트" onPress={() => navigation.navigate("RebalancingAlarm_test")} />
     </View>
   );
 };
