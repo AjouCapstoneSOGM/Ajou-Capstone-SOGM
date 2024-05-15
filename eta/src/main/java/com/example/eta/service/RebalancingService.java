@@ -66,8 +66,6 @@ public class RebalancingService {
     @Transactional
     public boolean applyRebalancing(Integer port_id, Integer rn_id, RebalancingDto rebalancingDto) {
         Optional<Portfolio> optionalPortfolio = portfolioRepository.findById(port_id);
-        // 포트폴리오가 존재하지 않으면 false를 반환합니다.
-        if (!optionalPortfolio.isPresent()) return false;
         Portfolio portfolio = optionalPortfolio.get();
 
         for (RebalancingDto.RebalancingDetail detail : rebalancingDto.getRnList()) {

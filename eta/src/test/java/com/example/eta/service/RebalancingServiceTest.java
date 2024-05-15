@@ -43,21 +43,6 @@ class RebalancingServiceTest {
     public void setup() {
         MockitoAnnotations.openMocks(this);
     }
-//포트폴리오를 찾을 수 없는 경우: 포트폴리오가 존재하지 않을 때 false를 반환하는지 테스트
-    @Test
-    public void testApplyRebalancing_PortfolioNotFound() {
-        Integer port_id = 1;
-        Integer rn_id = 1;
-        RebalancingDto dto = new RebalancingDto(); // Assume this is properly set up
-
-        when(portfolioRepository.findById(port_id)).thenReturn(Optional.empty());
-
-        boolean result = rebalancingService.applyRebalancing(port_id, rn_id, dto);
-
-        assertFalse(result);
-        verify(portfolioRepository).findById(port_id);
-        verifyNoMoreInteractions(tickerRepository, portfolioTickerRepository, portfolioRecordRepository);
-    }
 
     //포트폴리오, 티커, 포트폴리오 티커가 모두 존재하는 경우, 매수 거래가 성공적으로 처리되는지 확인
     //이때 평균 가격과 주식 수가 올바르게 업데이트 되는지, 그리고 거래 기록이 DB에 저장되는지 테스트
