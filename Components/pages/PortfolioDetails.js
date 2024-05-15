@@ -1,4 +1,9 @@
-import React, { useState, useEffect, useLayoutEffect } from "react";
+import React, {
+  useState,
+  useEffect,
+  useLayoutEffect,
+  useCallback,
+} from "react";
 import {
   View,
   Text,
@@ -11,10 +16,12 @@ import Icon from "react-native-vector-icons/AntDesign";
 import { VictoryPie } from "victory-native";
 import { usePortfolio } from "../utils/PortfolioContext";
 import { getUsertoken } from "../utils/localStorageUtils";
+import { useFocusEffect } from "@react-navigation/native";
+
 import urls from "../utils/urls";
 
 const PortfolioDetails = ({ route, navigation }) => {
-  const { getPortfolioById } = usePortfolio();
+  const { getPortfolioById, portfolios } = usePortfolio();
   const [loading, setLoading] = useState(true);
   const [portfolio, setPortfolio] = useState({
     id: null,
@@ -93,25 +100,28 @@ const PortfolioDetails = ({ route, navigation }) => {
     return totalPrice + portfolio.currentCash;
   };
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const currentPortfolio = getPortfolioById(route.params.id);
-        await getAlertExists(currentPortfolio.id);
-        setPortfolio({
-          id: currentPortfolio.id,
-          name: currentPortfolio.name,
-          stocks: currentPortfolio.detail.stocks,
-          currentCash: currentPortfolio.detail.currentCash,
-        });
-        setLoading(false);
-      } catch (error) {
-        console.log("Detail loadData error: ", error);
-      }
-    };
+  useFocusEffect(
+    useCallback(() => {
+      const loadData = async () => {
+        try {
+          const currentPortfolio = getPortfolioById(route.params.id);
+          console.log(currentPortfolio);
+          await getAlertExists(currentPortfolio.id);
+          setPortfolio({
+            id: currentPortfolio.id,
+            name: currentPortfolio.name,
+            stocks: currentPortfolio.detail.stocks,
+            currentCash: currentPortfolio.detail.currentCash,
+          });
+          setLoading(false);
+        } catch (error) {
+          console.log("Detail loadData error: ", error);
+        }
+      };
 
-    loadData();
-  }, []);
+      loadData();
+    }, [portfolios])
+  );
 
   useEffect(() => {
     if (portfolio) {
@@ -151,7 +161,7 @@ const PortfolioDetails = ({ route, navigation }) => {
     <View style={styles.container}>
       <View style={styles.outline}>
         <Text>총 자산</Text>
-        <Text>{portfolio.currentCash.toLocaleString()}원</Text>
+        <Text>{getTotalPrice().toLocaleString()}원</Text>
       </View>
       <View style={styles.chartContainer}>
         <VictoryPie

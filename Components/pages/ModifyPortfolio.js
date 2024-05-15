@@ -1,48 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { ScrollView, TextInput } from "react-native-gesture-handler";
 import { getUsertoken } from "../utils/localStorageUtils";
 import { arraysEqual, deepCopy, filteringNumber } from "../utils/utils";
 import urls from "../utils/urls";
 import GetCurrentPrice from "../utils/GetCurrentPrice";
+import { usePortfolio } from "../utils/PortfolioContext";
 
 const ModifyPortfolio = ({ route, navigation }) => {
   const [loading, setLoading] = useState(true);
   const [rebalances, setRebalances] = useState([]);
   const [rebalancesOffer, setRebalancesOffer] = useState([]);
+  const { fetchModify } = usePortfolio();
   const rnId = route.params.rnId;
   const portId = route.params.portId;
-
-  const fetchModify = async (rebalances) => {
-    try {
-      const token = await getUsertoken();
-      const response = await fetch(
-        `${urls.springUrl}/api/rebalancing/${portId}/${rnId}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(rebalances),
-        }
-      );
-      if (response.ok) {
-        const data = await response.json();
-        console.log(data);
-        return true;
-      } else {
-        console.log(response.status);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   const updateKey = (reblances) => {
     const updated = reblances.map((stock) => {
       return {
-        isBuy: stock.buy,
+        isBuy: stock.isBuy,
         quantity: Number(stock.number),
         price: parseFloat(stock.price),
         ticker: stock.ticker,
@@ -57,8 +33,16 @@ const ModifyPortfolio = ({ route, navigation }) => {
     if (!arraysEqual(rebalances, rebalancesOffer)) {
       console.log("다릅니다.");
     }
-    console.log(rebalanceData);
-    // await fetchModify(rebalanceData);
+    await fetchModify(rebalanceData, portId, rnId);
+    Alert.alert("수정 완료", "수정이 완료되었습니다.", [
+      {
+        text: "확인",
+        onPress: () => {
+          navigation.navigate("PortfolioDetails", { id: portId });
+        },
+        style: "destructive", // iOS에서만 적용되는 스타일 옵션
+      },
+    ]);
   };
 
   const fetchAllCurrent = async (tickerList) => {
@@ -74,7 +58,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
 
   const handleChangeBuy = (index, value) => {
     const newRebalances = [...rebalances];
-    newRebalances[index].buy = value;
+    newRebalances[index].isBuy = value;
     setRebalances(newRebalances);
   };
 
@@ -154,14 +138,14 @@ const ModifyPortfolio = ({ route, navigation }) => {
                   <TouchableOpacity
                     style={[
                       styles.tradeButton,
-                      item.buy ? { backgroundColor: "#6495ED" } : "",
+                      item.isBuy ? { backgroundColor: "#6495ED" } : "",
                     ]}
                     onPress={() => handleChangeBuy(index, true)}
                   >
                     <Text
                       style={[
                         { fontSize: 18 },
-                        item.buy ? { color: "white" } : "",
+                        item.isBuy ? { color: "white" } : "",
                       ]}
                     >
                       매수
@@ -170,14 +154,14 @@ const ModifyPortfolio = ({ route, navigation }) => {
                   <TouchableOpacity
                     style={[
                       styles.tradeButton,
-                      !item.buy ? { backgroundColor: "#6495ED" } : "",
+                      !item.isBuy ? { backgroundColor: "#6495ED" } : "",
                     ]}
                     onPress={() => handleChangeBuy(index, false)}
                   >
                     <Text
                       style={[
                         { fontSize: 18 },
-                        !item.buy ? { color: "white" } : "",
+                        !item.isBuy ? { color: "white" } : "",
                       ]}
                     >
                       매도

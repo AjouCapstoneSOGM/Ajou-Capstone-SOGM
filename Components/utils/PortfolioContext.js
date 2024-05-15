@@ -8,7 +8,7 @@ const PortfolioContext = createContext();
 
 export const PortfolioProvider = ({ children }) => {
   const [portfolios, setPortfolios] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [portLoading, setPortLoading] = useState(true);
   const { isLoggedIn } = useAuth();
 
   const fetchPortfolios = async () => {
@@ -115,7 +115,7 @@ export const PortfolioProvider = ({ children }) => {
   };
 
   const fetchDelete = async (id) => {
-    setLoading(true);
+    setPortLoading(true);
     try {
       const token = await getUsertoken();
       const response = await fetch(`${urls.springUrl}/api/portfolio/${id}`, {
@@ -128,7 +128,7 @@ export const PortfolioProvider = ({ children }) => {
 
       if (response.ok) {
         setPortfolios(portfolios.filter((portfolio) => portfolio.id !== id));
-        setLoading(false);
+        setPortLoading(false);
         return true;
       } else {
         console.log(response.status);
@@ -140,7 +140,7 @@ export const PortfolioProvider = ({ children }) => {
   };
 
   const fetchUserInfo = async (userInfo) => {
-    setLoading(true);
+    setPortLoading(true);
     try {
       const token = await getUsertoken();
       const response = await fetch(
@@ -170,6 +170,32 @@ export const PortfolioProvider = ({ children }) => {
     await loadData();
   };
 
+  const fetchModify = async (rebalances, portId, rnId) => {
+    setPortLoading(true);
+    try {
+      const token = await getUsertoken();
+      const response = await fetch(
+        `${urls.springUrl}/api/rebalancing/${portId}/${rnId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ rnList: rebalances }),
+        }
+      );
+      if (response.ok) {
+      } else {
+        console.log(response.status);
+        setPortLoading(false);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+    await loadData();
+  };
+
   const getPortfolioById = (id) => {
     return portfolios.find((portfolio) => portfolio.id === id);
   };
@@ -184,11 +210,11 @@ export const PortfolioProvider = ({ children }) => {
       portfolio.detail = stocksWithCurrent[index];
     });
     setPortfolios(portfolioList);
-    setLoading(false);
+    setPortLoading(false);
   };
 
   useEffect(() => {
-    setLoading(true);
+    setPortLoading(true);
     if (isLoggedIn) loadData();
   }, [isLoggedIn]);
 
@@ -200,7 +226,8 @@ export const PortfolioProvider = ({ children }) => {
         fetchDelete,
         fetchUserInfo,
         getPortfolioById,
-        loading,
+        fetchModify,
+        portLoading,
       }}
     >
       {children}

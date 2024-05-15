@@ -224,11 +224,12 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   inputContainer: {
-    flex: 1,
+    flex: 2,
     alignItems: "stretch",
     padding: 20,
   },
   sectorContainer: {
+    flex: 2,
     flexDirection: "row",
     padding: 20,
     flexWrap: "wrap",

@@ -5,7 +5,7 @@ import { usePortfolio } from "../utils/PortfolioContext";
 import Icon from "react-native-vector-icons/AntDesign";
 
 const PortfolioList = ({ navigation }) => {
-  const { portfolios, loading } = usePortfolio();
+  const { portfolios, portLoading } = usePortfolio();
 
   //포트폴리오 종목의 총 가격 반환
   const getTotalPrice = (stocks) => {
@@ -83,7 +83,7 @@ const PortfolioList = ({ navigation }) => {
     }
   };
 
-  if (loading) {
+  if (portLoading) {
     return (
       <View style={styles.errorContent}>
         <Text>Loading...</Text>
