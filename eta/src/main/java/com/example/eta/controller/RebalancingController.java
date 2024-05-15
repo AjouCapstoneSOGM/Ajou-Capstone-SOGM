@@ -17,6 +17,14 @@ import java.util.Map;
 public class RebalancingController {
     private final RebalancingService rebalancingService;
 
+
+    @PostMapping("/{port_id}/{rn_id}")
+    public ResponseEntity<String> applyRebalancing(@PathVariable Integer port_id, @PathVariable Integer rn_id, @RequestBody RebalancingDto rebalancingDto) {
+        if (rebalancingService.applyRebalancing(port_id, rn_id, rebalancingDto)) {
+            return ResponseEntity.ok("Rebalancing applied successfully");
+        }
+        return ResponseEntity.badRequest().body("Failed to apply rebalancing");
+    }
     // 포트폴리오 리밸런싱 알림 존재여부 확인
     @GetMapping("/{port_id}/exists")
     public ResponseEntity<RebalancingDto.ExistenceDto> checkRebalancingExists(@PathVariable("port_id") Integer pfId) {
@@ -42,4 +50,5 @@ public class RebalancingController {
             return ResponseEntity.badRequest().body("Error deleting rebalancing notification: " + e.getMessage());
         }
     }
+
 }
