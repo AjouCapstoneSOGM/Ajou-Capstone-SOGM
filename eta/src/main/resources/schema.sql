@@ -159,8 +159,7 @@ CREATE TABLE `financial_statement` (
 CREATE TABLE `news` (
     `date` datetime NOT NULL,
     `ticker` varchar(20) NOT NULL,
-    `title` varchar(256) NOT NULL,
-    `context` text NOT NULL,
+    `summary` text NOT NULL,
     PRIMARY KEY (`ticker`, `date`),
     FOREIGN KEY (`ticker`) REFERENCES `ticker` (`ticker`)
 );
