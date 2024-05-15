@@ -1,13 +1,15 @@
 package com.example.eta.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.example.eta.entity.Ticker;
+import lombok.*;
 
 import java.util.List;
 
 public class RebalancingDto {
+
+    @Getter
+    @Setter
+    private List<RebalancingDetail> rnList;
     @Data
     @Builder
     @NoArgsConstructor
@@ -27,7 +29,15 @@ public class RebalancingDto {
         int rnId;
         private List<RebalancingInfo> rebalancings;
     }
-
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RebalancingDetail {
+        private String ticker;
+        private boolean isBuy;
+        private int quantity;
+        private float price;
+    }
 
     @Data
     @NoArgsConstructor

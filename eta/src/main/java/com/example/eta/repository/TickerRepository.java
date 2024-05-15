@@ -18,4 +18,6 @@ public interface TickerRepository extends JpaRepository<Ticker, String> {
             "LIMIT ?2"
             , nativeQuery = true)
     List<Ticker> findTopTickerBySector(String sectorId, int num, String country);
+
+    Ticker findByTicker(String ticker);
 }
