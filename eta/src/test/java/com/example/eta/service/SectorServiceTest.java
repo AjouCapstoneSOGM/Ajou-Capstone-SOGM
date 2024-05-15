@@ -30,8 +30,8 @@ public class SectorServiceTest {
 
         // then 목록 제대로 가져왔는지
         Assertions.assertAll(
-                () -> assertEquals(sectors.size(), 10),
-                () -> assertEquals(sectors.get("G10"), "에너지")
+                () -> assertEquals(11, sectors.size()),
+                () -> assertEquals("에너지", sectors.get("G10"))
         );
     }
 

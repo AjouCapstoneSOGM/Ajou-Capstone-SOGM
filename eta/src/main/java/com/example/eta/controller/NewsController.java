@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 @RequestMapping("/stocks")
 public class NewsController {
-    private final NewsService newsService;
-
+//    private final NewsService newsService;
+//
 //    @Autowired
 //    public NewsController(NewsService newsService) {
 //        this.newsService = newsService;
