@@ -50,9 +50,9 @@ class RebalancingServiceTest {
     public void testApplyRebalancing_SuccessfulBuyTransaction() {
         Integer port_id = 1;
         Integer rn_id = 1;
-        RebalancingDto dto = new RebalancingDto();
-        RebalancingDto.RebalancingDetail detail = new RebalancingDto.RebalancingDetail("041241", true, 5, 5450.0f);
+        RebalancingDto.RebalancingApplyListDto dto = new RebalancingDto.RebalancingApplyListDto();
         dto.setRnList(new ArrayList<>());
+        RebalancingDto.RebalancingApplyInfo detail = new RebalancingDto.RebalancingApplyInfo("041241", true, 5, 5450.0f);
         dto.getRnList().add(detail);
 
         Portfolio portfolio = new Portfolio();

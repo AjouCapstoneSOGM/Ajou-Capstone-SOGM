@@ -7,9 +7,24 @@ import java.util.List;
 
 public class RebalancingDto {
 
-    @Getter
-    @Setter
-    private List<RebalancingDetail> rnList;
+    @Builder
+    @Getter @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RebalancingApplyListDto {
+        private List<RebalancingApplyInfo> rnList;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RebalancingApplyInfo{
+        private String ticker;
+        private Boolean isBuy;
+        private int quantity;
+        private float price;
+    }
+
     @Data
     @Builder
     @NoArgsConstructor
@@ -18,7 +33,7 @@ public class RebalancingDto {
         private String ticker;
         private String name;
         private int number;
-        private boolean isBuy;
+        private Boolean isBuy;
     }
 
     @Data
@@ -28,15 +43,6 @@ public class RebalancingDto {
     public static class RebalancingListDto {
         int rnId;
         private List<RebalancingInfo> rebalancings;
-    }
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class RebalancingDetail {
-        private String ticker;
-        private boolean isBuy;
-        private int quantity;
-        private float price;
     }
 
     @Data

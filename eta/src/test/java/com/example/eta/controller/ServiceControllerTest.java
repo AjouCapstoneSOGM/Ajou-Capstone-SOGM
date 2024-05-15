@@ -53,7 +53,7 @@ public class ServiceControllerTest {
         getAllSectorsResponse.setCharacterEncoding("UTF-8");
 
         Assertions.assertAll(
-                () -> assertEquals((Integer) 10, JsonPath.parse(getAllSectorsResponse.getContentAsString()).read("$.length()")),
+                () -> assertEquals((Integer) 11, JsonPath.parse(getAllSectorsResponse.getContentAsString()).read("$.length()")),
                 () -> assertEquals("에너지", JsonPath.parse(getAllSectorsResponse.getContentAsString()).read("$.G10"))
         );
     }

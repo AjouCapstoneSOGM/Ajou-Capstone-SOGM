@@ -18,8 +18,8 @@ public class RebalancingController {
 
 
     @PostMapping("/{port_id}/{rn_id}")
-    public ResponseEntity<String> applyRebalancing(@PathVariable Integer port_id, @PathVariable Integer rn_id, @RequestBody RebalancingDto rebalancingDto) {
-        if (rebalancingService.applyRebalancing(port_id, rn_id, rebalancingDto)) {
+    public ResponseEntity<String> applyRebalancing(@PathVariable("port_id") Integer pfId, @PathVariable("rn_id") Integer rnId, @RequestBody RebalancingDto.RebalancingApplyListDto rebalancingApplyListDto) {
+        if (rebalancingService.applyRebalancing(pfId, rnId, rebalancingApplyListDto)) {
             return ResponseEntity.ok("Rebalancing applied successfully");
         }
         return ResponseEntity.badRequest().body("Failed to apply rebalancing");

@@ -36,4 +36,7 @@ public class Ticker {
 
     @Column
     private String equity;
+
+    @Column
+    private String dartCode;
 }
