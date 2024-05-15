@@ -9,8 +9,13 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import Icon from "react-native-vector-icons/AntDesign";
 import { VictoryPie } from "victory-native";
+import { usePortfolio } from "../utils/PortfolioContext";
+import { getUsertoken } from "../utils/localStorageUtils";
+import urls from "../utils/urls";
 
 const PortfolioDetails = ({ route, navigation }) => {
+  const { getPortfolioById } = usePortfolio();
+  const [loading, setLoading] = useState(true);
   const [portfolio, setPortfolio] = useState({
     id: null,
     name: "",
@@ -20,6 +25,7 @@ const PortfolioDetails = ({ route, navigation }) => {
   });
   const [selectedId, setSelectedId] = useState(null);
   const [chartData, setChartData] = useState([]);
+  const [alertExist, setAlertExist] = useState(false);
 
   const colorScale = [
     "hsl(348, 100%, 80%)", // 파스텔 핑크,
@@ -35,9 +41,26 @@ const PortfolioDetails = ({ route, navigation }) => {
     "#ccc",
   ];
 
-  const handlePressSummary = () => {
-    selectedTicker = portfolio.stocks[selectedId].ticker;
-    navigation.navigate("NewsSummary", { ticker: selectedTicker });
+  const getAlertExists = async (id) => {
+    try {
+      const token = await getUsertoken();
+      const response = await fetch(
+        `${urls.springUrl}/api/rebalancing/${id}/exists`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setAlertExist(data.exist);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      throw error;
+    }
   };
 
   const handleSelectedId = (index) => {
@@ -71,14 +94,23 @@ const PortfolioDetails = ({ route, navigation }) => {
   };
 
   useEffect(() => {
-    const currentPortfolio = route.params.portfolio;
-    setPortfolio({
-      id: currentPortfolio.id,
-      name: currentPortfolio.name,
-      stocks: currentPortfolio.detail.stocks,
-      currentCash: currentPortfolio.detail.currentCash,
-    });
-    console.log(currentPortfolio.id);
+    const loadData = async () => {
+      try {
+        const currentPortfolio = getPortfolioById(route.params.id);
+        await getAlertExists(currentPortfolio.id);
+        setPortfolio({
+          id: currentPortfolio.id,
+          name: currentPortfolio.name,
+          stocks: currentPortfolio.detail.stocks,
+          currentCash: currentPortfolio.detail.currentCash,
+        });
+        setLoading(false);
+      } catch (error) {
+        console.log("Detail loadData error: ", error);
+      }
+    };
+
+    loadData();
   }, []);
 
   useEffect(() => {
@@ -108,9 +140,16 @@ const PortfolioDetails = ({ route, navigation }) => {
     }
   }, [portfolio]);
 
+  if (loading) {
+    return (
+      <View>
+        <Text>Loading...</Text>
+      </View>
+    );
+  }
   return (
     <View style={styles.container}>
-      <View>
+      <View style={styles.outline}>
         <Text>총 자산</Text>
         <Text>{portfolio.currentCash.toLocaleString()}원</Text>
       </View>
@@ -219,16 +258,15 @@ const PortfolioDetails = ({ route, navigation }) => {
           })}
         </ScrollView>
       </View>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => {
-            navigation.navigate("RebalanceList", { id: portfolio.id });
-          }}
-        >
-          <Text style={{ fontSize: 17, color: "white" }}>수정</Text>
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity
+        style={styles.alert}
+        onPress={() => {
+          navigation.navigate("RebalanceList", { id: portfolio.id });
+        }}
+      >
+        <Icon name="bells" size={35} color="#555" />
+        {alertExist && <View style={styles.alertDot} />}
+      </TouchableOpacity>
     </View>
   );
 };
@@ -240,9 +278,21 @@ const styles = StyleSheet.create({
     padding: 5,
     backgroundColor: "#f5f5f5",
   },
-  title: {
-    fontSize: 22,
-    fontWeight: "bold",
+  outline: {},
+  alert: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    margin: 20,
+  },
+  alertDot: {
+    position: "absolute",
+    top: 0,
+    right: 0,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "red",
   },
   chartContainer: {
     flex: 2.5,

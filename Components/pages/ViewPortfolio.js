@@ -116,7 +116,7 @@ const PortfolioList = ({ navigation }) => {
               <TouchableOpacity
                 style={styles.portfolioContent}
                 onPress={() =>
-                  navigation.navigate("PortfolioDetails", { portfolio })
+                  navigation.navigate("PortfolioDetails", { id: portfolio.id })
                 }
               >
                 <View style={{ height: 100, justifyContent: "space-between" }}>

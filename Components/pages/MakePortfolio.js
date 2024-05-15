@@ -162,6 +162,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     padding: 20,
   },
+
   disabledButton: {
     backgroundColor: "#DADADA", // 비활성화 상태의 배경색 변경
   },
@@ -169,6 +170,7 @@ const styles = StyleSheet.create({
     justifyContent: "center", // 가로 방향에서 중앙 정렬
     backgroundColor: "#6495ED",
     alignItems: "center",
+    alignSelf: "stretch",
     borderRadius: 10,
     padding: 18,
   },

@@ -13,7 +13,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
   const rnId = route.params.rnId;
   const portId = route.params.portId;
 
-  const fetchModify = async () => {
+  const fetchModify = async (rebalances) => {
     try {
       const token = await getUsertoken();
       const response = await fetch(
@@ -24,22 +24,41 @@ const ModifyPortfolio = ({ route, navigation }) => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
+          body: JSON.stringify(rebalances),
         }
       );
-      const data = await response.json();
       if (response.ok) {
+        const data = await response.json();
         console.log(data);
+        return true;
+      } else {
+        console.log(response.status);
       }
     } catch (error) {
       console.error(error);
     }
   };
 
+  const updateKey = (reblances) => {
+    const updated = reblances.map((stock) => {
+      return {
+        isBuy: stock.buy,
+        quantity: Number(stock.number),
+        price: parseFloat(stock.price),
+        ticker: stock.ticker,
+      };
+    });
+
+    return updated;
+  };
+
   const handleModify = async () => {
+    const rebalanceData = updateKey([...rebalances]);
     if (!arraysEqual(rebalances, rebalancesOffer)) {
       console.log("다릅니다.");
     }
-    await fetchModify();
+    console.log(rebalanceData);
+    // await fetchModify(rebalanceData);
   };
 
   const fetchAllCurrent = async (tickerList) => {
@@ -49,7 +68,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
 
   const handleChangePrices = (index, value) => {
     const newRebalances = [...rebalances];
-    newRebalances[index].price = filteringNumber(value);
+    if (value <= 9999999) newRebalances[index].price = filteringNumber(value);
     setRebalances(newRebalances);
   };
 
@@ -113,7 +132,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
                   <TextInput
                     style={styles.input_Amount}
                     keyboardType="numeric"
-                    value={item.price}
+                    value={item.price.toString()}
                     onChangeText={(text) => handleChangePrices(index, text)}
                     placeholder={rebalancesOffer[index].price.toString()}
                     placeholderTextColor="#bbb"

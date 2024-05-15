@@ -114,13 +114,6 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
             </View>
             <View style={styles.buttonContainer}>
               <TouchableOpacity
-                style={[styles.button]}
-                title="prev"
-                onPress={handlePrevStep}
-              >
-                <Text style={{ fontSize: 18, color: "white" }}>이전</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
                 style={[
                   styles.button,
                   isAmountEnough() ? "" : styles.disabledButton,
@@ -159,12 +152,6 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
             </View>
             <View style={styles.buttonContainer}>
               <TouchableOpacity
-                style={[styles.button]}
-                onPress={handlePrevStep}
-              >
-                <Text style={{ fontSize: 18, color: "white" }}>이전</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
                 style={[
                   styles.button,
                   isRiskNull() ? styles.disabledButton : "",
@@ -199,12 +186,6 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
               ))}
             </View>
             <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                style={[styles.button]}
-                onPress={handlePrevStep}
-              >
-                <Text style={{ fontSize: 18, color: "white" }}>이전</Text>
-              </TouchableOpacity>
               <TouchableOpacity
                 style={[
                   styles.button,
@@ -282,23 +263,19 @@ const styles = StyleSheet.create({
     backgroundColor: "#cceecc",
   },
   buttonContainer: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "flex-end",
-    justifyContent: "flex-end",
+    alignItems: "stretch",
     padding: 20,
   },
   disabledButton: {
     backgroundColor: "#DADADA", // 비활성화 상태의 배경색 변경
   },
   button: {
-    flex: 1,
     justifyContent: "center", // 가로 방향에서 중앙 정렬
     backgroundColor: "#6495ED",
     alignItems: "center",
+    alignSelf: "stretch",
     borderRadius: 10,
     padding: 18,
-    margin: 5,
   },
 });
 export default MakeAutoPortfolio;

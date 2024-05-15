@@ -170,6 +170,10 @@ export const PortfolioProvider = ({ children }) => {
     await loadData();
   };
 
+  const getPortfolioById = (id) => {
+    return portfolios.find((portfolio) => portfolio.id === id);
+  };
+
   const loadData = async () => {
     const data = await fetchPortfolios();
     const portfolioList = data.portfolios;
@@ -195,6 +199,7 @@ export const PortfolioProvider = ({ children }) => {
         fetchPortfolios,
         fetchDelete,
         fetchUserInfo,
+        getPortfolioById,
         loading,
       }}
     >
