@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class NewsDto {
-    private String title;
-    private String content;
+    private String summary;
     private LocalDateTime date;
 }
