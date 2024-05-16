@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { ScrollView, TextInput } from "react-native-gesture-handler";
-import { getUsertoken } from "../utils/localStorageUtils";
 import { arraysEqual, deepCopy, filteringNumber } from "../utils/utils";
-import urls from "../utils/urls";
 import GetCurrentPrice from "../utils/GetCurrentPrice";
 import { usePortfolio } from "../utils/PortfolioContext";
 
@@ -30,10 +28,23 @@ const ModifyPortfolio = ({ route, navigation }) => {
 
   const handleModify = async () => {
     const rebalanceData = updateKey([...rebalances]);
+    Alert.alert("수정 확인", "위 항목으로 포트폴리오를 수정하실건가요?", [
+      {
+        text: "취소",
+        onPress: () => {},
+      },
+      {
+        text: "확인",
+        onPress: () => {
+          setLoading(true);
+          fetchModify(rebalanceData, portId, rnId);
+        },
+        style: "destructive", // iOS에서만 적용되는 스타일 옵션
+      },
+    ]);
     if (!arraysEqual(rebalances, rebalancesOffer)) {
       console.log("다릅니다.");
     }
-    await fetchModify(rebalanceData, portId, rnId);
     Alert.alert("수정 완료", "수정이 완료되었습니다.", [
       {
         text: "확인",

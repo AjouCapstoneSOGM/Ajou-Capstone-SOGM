@@ -132,6 +132,7 @@ export const PortfolioProvider = ({ children }) => {
         return true;
       } else {
         console.log(response.status);
+        return false;
       }
     } catch (error) {
       console.error("Error:", error);

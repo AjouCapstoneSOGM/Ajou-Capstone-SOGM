@@ -24,8 +24,16 @@ const ManagementPage = ({ route, navigation }) => {
   };
 
   const handleDelete = async () => {
-    await fetchDelete(portfolio.id);
-    navigation.popToTop();
+    const result = await fetchDelete(portfolio.id);
+    if (result) navigation.popToTop();
+    else
+      Alert.alert("삭제 실패", "삭제에 실패했습니다", [
+        {
+          text: "확인",
+          onPress: () => {},
+          style: "cancel",
+        },
+      ]);
   };
 
   if (portfolio) {
