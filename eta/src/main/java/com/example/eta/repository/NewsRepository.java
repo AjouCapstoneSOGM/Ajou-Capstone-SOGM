@@ -1,7 +1,11 @@
 package com.example.eta.repository;
 
 import com.example.eta.entity.News;
+import com.example.eta.entity.compositekey.NewsId;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface NewsRepository {
-    News findNewstByTicker(String ticker);
+import java.util.Optional;
+
+public interface NewsRepository extends JpaRepository<News, NewsId> {
+    Optional<News> findFirstByTickerTickerOrderByDateDesc(String ticker);
 }
