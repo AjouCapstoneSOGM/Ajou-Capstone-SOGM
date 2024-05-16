@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, StyleSheet, Alert, TouchableOpacity } from "react-native";
-import { usePortfolio } from "../utils/PortfolioContext";
+import { usePortfolio } from "../../utils/PortfolioContext";
 
 const ManagementPage = ({ route, navigation }) => {
   const { fetchDelete } = usePortfolio();

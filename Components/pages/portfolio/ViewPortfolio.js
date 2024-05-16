@@ -1,6 +1,6 @@
-import React, { useCallback } from "react";
+import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Button } from "react-native";
-import { usePortfolio } from "../utils/PortfolioContext";
+import { usePortfolio } from "../../utils/PortfolioContext";
 
 import Icon from "react-native-vector-icons/AntDesign";
 

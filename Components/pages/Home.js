@@ -1,10 +1,10 @@
 import React from "react";
 import { View, Button, StyleSheet, Text } from "react-native";
-import { getUsertoken, removeUsertoken } from "../utils/localStorageUtils.js";
+import { removeUsertoken } from "../utils/localStorageUtils.js";
 import { useAuth } from "../utils/AuthContext.js";
 import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 
-import PortfolioList from "./ViewPortfolio.js";
+import PortfolioList from "./portfolio/ViewPortfolio.js";
 import Icon from "react-native-vector-icons/AntDesign";
 
 const Home = ({ navigation }) => {

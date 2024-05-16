@@ -6,21 +6,25 @@ import SocialLogin from "./pages/login/sociallogin";
 import Signup from "./pages/login/signup";
 
 import Home from "./pages/Home";
-import ViewPortfolio from "./pages/ViewPortfolio";
-import PortfolioDetails from "./pages/PortfolioDetails";
-import MakePortfolio from "./pages/MakePortfolio";
 import NewsSummary from "./pages/NewsSummary";
 
+import ViewPortfolio from "./pages/portfolio/ViewPortfolio";
+import PortfolioDetails from "./pages/portfolio/PortfolioDetails";
+import ManagementPage from "./pages/portfolio/ManagePortfolio";
+
+import MakePortfolio from "./pages/make/MakePortfolio";
+
+import ModifyPortfolio from "./pages/rebalance/ModifyPortfolio";
+import RebalanceList from "./pages/rebalance/RebalanceList";
+
 import { AuthProvider } from "./utils/AuthContext";
+import { PortfolioProvider } from "./utils/PortfolioContext";
+
 import { setCustomText } from "react-native-global-props";
 import {
   useFonts,
   NotoSansKR_400Regular,
 } from "@expo-google-fonts/noto-sans-kr";
-import ManagementPage from "./pages/ManagePortfolio";
-import ModifyPortfolio from "./pages/ModifyPortfolio";
-import RebalanceList from "./pages/RebalanceList";
-import { PortfolioProvider } from "./utils/PortfolioContext";
 
 const Stack = createStackNavigator();
 function ScreenStack() {

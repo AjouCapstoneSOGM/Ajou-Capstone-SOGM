@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import MakeAutoPortfolio from "./MakeAutoPortfolio";
 import MakeManualPortfolio from "./MakeManualPortfolio.js";
-import { useAuth } from "../utils/AuthContext.js";
+import { useAuth } from "../../utils/AuthContext.js";
 
 const MakePortfolio = ({ navigation }) => {
   const { isLoggedIn } = useAuth();

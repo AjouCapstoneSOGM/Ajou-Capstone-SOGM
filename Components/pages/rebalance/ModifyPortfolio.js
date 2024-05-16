@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { ScrollView, TextInput } from "react-native-gesture-handler";
-import { arraysEqual, deepCopy, filteringNumber } from "../utils/utils";
-import GetCurrentPrice from "../utils/GetCurrentPrice";
-import { usePortfolio } from "../utils/PortfolioContext";
+import { arraysEqual, deepCopy, filteringNumber } from "../../utils/utils";
+import GetCurrentPrice from "../../utils/GetCurrentPrice";
+import { usePortfolio } from "../../utils/PortfolioContext";
 
 const ModifyPortfolio = ({ route, navigation }) => {
   const [loading, setLoading] = useState(true);

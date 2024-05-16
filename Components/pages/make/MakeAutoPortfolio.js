@@ -7,10 +7,10 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
-import urls from "../utils/urls";
-import { getUsertoken } from "../utils/localStorageUtils";
-import { usePortfolio } from "../utils/PortfolioContext";
-import { filteringNumber } from "../utils/utils";
+import urls from "../../utils/urls";
+import { getUsertoken } from "../../utils/localStorageUtils";
+import { usePortfolio } from "../../utils/PortfolioContext";
+import { filteringNumber } from "../../utils/utils";
 
 const MakeAutoPortfolio = ({ setCurrentStep }) => {
   const { fetchUserInfo } = usePortfolio();

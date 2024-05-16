@@ -14,11 +14,11 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import Icon from "react-native-vector-icons/AntDesign";
 import { VictoryPie } from "victory-native";
-import { usePortfolio } from "../utils/PortfolioContext";
-import { getUsertoken } from "../utils/localStorageUtils";
+import { usePortfolio } from "../../utils/PortfolioContext";
+import { getUsertoken } from "../../utils/localStorageUtils";
 import { useFocusEffect } from "@react-navigation/native";
 
-import urls from "../utils/urls";
+import urls from "../../utils/urls";
 
 const PortfolioDetails = ({ route, navigation }) => {
   const { getPortfolioById, portfolios } = usePortfolio();

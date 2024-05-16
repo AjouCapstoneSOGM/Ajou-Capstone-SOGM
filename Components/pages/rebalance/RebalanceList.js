@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { getUsertoken } from "../utils/localStorageUtils";
-import urls from "../utils/urls";
+import { getUsertoken } from "../../utils/localStorageUtils";
+import urls from "../../utils/urls";
 
 const RebalanceList = ({ route, navigation }) => {
   const portfolioId = route.params.id;
