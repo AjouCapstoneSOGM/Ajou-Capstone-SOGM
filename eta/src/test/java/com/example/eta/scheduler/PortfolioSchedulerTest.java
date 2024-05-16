@@ -4,6 +4,7 @@ import com.example.eta.entity.*;
 import com.example.eta.repository.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,6 +107,7 @@ public class PortfolioSchedulerTest {
 
     @Test
     @Transactional
+    @DisplayName("스케줄러: 비중 조정 테스트")
     public void testUpdateProportion() {
         portfolioScheduler.updateProportion(portfolio);
 
@@ -117,6 +119,7 @@ public class PortfolioSchedulerTest {
 
     @Test
     @Transactional
+    @DisplayName("스케줄러: 비중 조정 후 리밸런싱 알림 생성 테스트")
     public void testDoProportionRebalancing() {
         portfolioScheduler.updateProportion(portfolio);
         portfolioScheduler.createProportionRebalancing(portfolio);

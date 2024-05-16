@@ -16,7 +16,7 @@ public class Sector {
     private String sectorId;
 
     @Column(nullable = false)
-    private String name;
+    private String sectorName;
 
     @OneToMany(mappedBy = "sector", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PortfolioSector> portfolioSectors = new ArrayList<>();

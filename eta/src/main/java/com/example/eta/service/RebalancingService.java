@@ -1,6 +1,14 @@
 package com.example.eta.service;
 
 import com.example.eta.dto.RebalancingDto;
+import com.example.eta.entity.Portfolio;
+import com.example.eta.entity.Rebalancing;
+import com.example.eta.entity.RebalancingTicker;
+import com.example.eta.entity.Ticker;
+import com.example.eta.repository.PortfolioRepository;
+import com.example.eta.repository.RebalancingRepository;
+import com.example.eta.repository.TickerRepository;
+import com.example.eta.scheduler.PortfolioScheduler;
 import com.example.eta.entity.*;
 import com.example.eta.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -8,29 +16,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class RebalancingService {
+    private final TickerRepository tickerRepository;
     private final RebalancingRepository rebalancingRepository;
-    @Autowired
-    private PortfolioRepository portfolioRepository;
-    @Autowired
-    private TickerRepository tickerRepository;
-    @Autowired
-    private PortfolioTickerRepository portfolioTickerRepository;
-    @Autowired
-    private PortfolioRecordRepository portfolioRecordRepository;
+    private final PortfolioRepository portfolioRepository;
+    private final PortfolioTickerRepository portfolioTickerRepository;
+    private final PortfolioRecordRepository portfolioRecordRepository;
+    private final PortfolioScheduler portfolioScheduler;
 
-    // 포트폴리오 ID로 리밸런싱 알림 존재 여부 확인
     public boolean existsRebalancingByPortfolioId(Integer pfId) {
         return rebalancingRepository.existsByPortfolioPfId(pfId);
     }
 
-    // 알림 ID로 리밸린성 알림 삭제
     public void deleteRebalancing(Integer rnId) throws Exception {
         if (!rebalancingRepository.existsById(rnId)) {
             throw new Exception("Rebalancing notification not found with id: " + rnId);
@@ -38,9 +40,7 @@ public class RebalancingService {
         rebalancingRepository.deleteById(rnId);
     }
 
-    // 포트폴리오 ID로 모든 리밸런싱 알림 받아오기
     public List<RebalancingDto.RebalancingListDto> getAllRebalancingsByPortfolioId(Integer pfId) {
-
         List<Rebalancing> rebalancings = rebalancingRepository.findByPortfolioPfId(pfId);
         List<RebalancingDto.RebalancingListDto> rebalancingListDtos = new ArrayList<>();
         for (Rebalancing rebalancing : rebalancings) {
@@ -60,31 +60,37 @@ public class RebalancingService {
                     .rebalancings(rebalancingInfos)
                     .build());
         }
-
         return rebalancingListDtos;
     }
+
     @Transactional
-    public boolean applyRebalancing(Integer port_id, Integer rn_id, RebalancingDto rebalancingDto) {
-        Optional<Portfolio> optionalPortfolio = portfolioRepository.findById(port_id);
+    public boolean applyRebalancing(Integer pfId, Integer rnId, RebalancingDto.RebalancingApplyListDto rebalancingApplyListDto) {
+        // TODO: 리밸런싱 알림과 dto에 담겨있는 정보가 일치하는지
+
+        Optional<Portfolio> optionalPortfolio = portfolioRepository.findById(pfId);
         Portfolio portfolio = optionalPortfolio.get();
 
-        for (RebalancingDto.RebalancingDetail detail : rebalancingDto.getRnList()) {
+        for (RebalancingDto.RebalancingApplyInfo detail : rebalancingApplyListDto.getRnList()) {
             Ticker ticker = tickerRepository.findByTicker(detail.getTicker());
             if (ticker != null) {
                 // PortfolioTicker 정보를 조회하거나 새로 생성
                 Optional<PortfolioTicker> optionalPortfolioTicker = portfolioTickerRepository.findByPortfolioAndTicker(portfolio, ticker);
                 PortfolioTicker portfolioTicker;
                 if (!optionalPortfolioTicker.isPresent()) {
-                    portfolioTicker = new PortfolioTicker();
-                    portfolioTicker.setPortfolio(portfolio);
-                    portfolioTicker.setTicker(ticker);
-                    portfolioTicker.setAveragePrice(0.f);
-                    portfolioTicker.setNumber(0);
+                    portfolioTicker = portfolioTickerRepository.save(PortfolioTicker.builder()
+                            .portfolio(portfolio)
+                            .ticker(ticker)
+                            .averagePrice(0.f)
+                            .number(0)
+                            .initProportion(0.f)
+                            .currentProportion(0.f)
+                            .build());
+                    portfolio.getPortfolioTickers().add(portfolioTicker);
                 } else {
                     portfolioTicker = optionalPortfolioTicker.get();
                 }
 
-                if (detail.isBuy()) {
+                if (detail.getIsBuy()) {
                     // 매수인 경우, 새로운 평균 가격을 계산하고 주식 수를 증가
                     float newAveragePrice = ((portfolioTicker.getAveragePrice() * portfolioTicker.getNumber()) +
                             (detail.getPrice() * detail.getQuantity())) /
@@ -99,6 +105,8 @@ public class RebalancingService {
                     portfolio.setCurrentCash(portfolio.getCurrentCash() + (detail.getPrice() * detail.getQuantity()));
                 }
 
+                System.out.println(portfolioTicker.getNumber() +", "+ portfolioTicker.getAveragePrice());
+
                 // 주식 수가 0이 되면 PortfolioTicker 레코드를 삭제
                 if (portfolioTicker.getNumber() == 0) {
                     portfolioTickerRepository.delete(portfolioTicker);
@@ -110,15 +118,57 @@ public class RebalancingService {
                 PortfolioRecord record = new PortfolioRecord();
                 record.setPortfolio(portfolio);
                 record.setTicker(ticker);
-                record.setQuantity(detail.getQuantity());
+                record.setNumber(detail.getQuantity());
                 record.setPrice(detail.getPrice());
-                record.setBuy(detail.isBuy());
+                record.setBuy(detail.getIsBuy());
+                record.setRecordDate(LocalDateTime.now());
                 portfolioRecordRepository.save(record);
             }
         }
+
+        // 비중 계산
+        // 초기 포트폴리오일 경우 초기 비중도 초기화
+        boolean isInitial = true;
+        float totalAmount = portfolio.getCurrentCash();
+        Map<PortfolioTicker, Float> currentAmountForTicker = new HashMap<>();
+
+        System.out.println(portfolio.getPortfolioTickers());
+
+        for (PortfolioTicker portfolioTicker : portfolio.getPortfolioTickers()) {
+            if (portfolioTicker.getInitProportion() != 0)
+                isInitial = false;
+            totalAmount += portfolioTicker.getAveragePrice() * portfolioTicker.getNumber();
+            currentAmountForTicker.put(portfolioTicker, portfolioTicker.getAveragePrice() * portfolioTicker.getNumber());
+        }
+
+        for (PortfolioTicker portfolioTicker : currentAmountForTicker.keySet()) {
+            float currentProportion = currentAmountForTicker.get(portfolioTicker).floatValue() / totalAmount;
+            portfolioTicker.setCurrentProportion(currentProportion);
+            if (isInitial) {
+                portfolioTicker.setInitProportion(currentProportion);
+            }
+            portfolioTickerRepository.save(portfolioTicker);
+        }
+
+        if (isInitial) {
+            portfolio.setInitCash(portfolio.getCurrentCash());
+        }
+
+        // 리밸런싱 알림 삭제
+        rebalancingRepository.delete(rebalancingRepository.findById(rnId).get());
+
         // 포트폴리오 정보를 업데이트
         portfolioRepository.save(portfolio);
         return true;
     }
-}
 
+    public int executeRebalancingAndGetNotificationId(int pfId) {
+        Portfolio portfolio = portfolioRepository.findById(pfId).get();
+
+        portfolioScheduler.updateProportion(portfolio);
+        if(portfolioScheduler.isProportionRebalancingNeeded(portfolio)) {
+            return portfolioScheduler.createProportionRebalancing(portfolio);
+        }
+        else return -1;
+    }
+}

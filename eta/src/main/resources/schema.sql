@@ -11,6 +11,13 @@ CREATE TABLE `user` (
     PRIMARY KEY (`user_id`)
 );
 
+CREATE TABLE `token` (
+    `user_id` int NOT NULL,
+    `fcm_token` varchar(255) NOT NULL,
+    PRIMARY KEY (`user_id`),
+    FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`)
+);
+
 CREATE TABLE `portfolio` (
     `pf_id` int NOT NULL AUTO_INCREMENT,
     `name` varchar(100),
@@ -28,7 +35,7 @@ CREATE TABLE `portfolio` (
 
 CREATE TABLE `sector` (
     `sector_id` varchar(3) NOT NULL,
-    `name` varchar(40) NOT NULL,
+    `sector_name` varchar(40) NOT NULL,
     PRIMARY KEY (`sector_id`)
 );
 
@@ -40,6 +47,7 @@ CREATE TABLE `ticker` (
     `exchange` varchar(30),
     `updated_date` datetime NOT NULL,
     `equity` varchar(10),
+    `dart_code` varchar(8),
     `sector_id` varchar(3),
     PRIMARY KEY (`ticker`),
     FOREIGN KEY (`sector_id`) REFERENCES `sector` (`sector_id`)
@@ -97,28 +105,29 @@ CREATE TABLE `rebalancing_ticker` (
 );
 
 CREATE TABLE `value` (
-    `score_date` datetime NOT NULL,
-    `ticker` varchar(20) NOT NULL,
-    `eps` float NULL,
-    `bps` float NULL,
-    `dps` float NULL,
-    `ev_ebitda` float NULL,
-    `pbr` float NULL,
-    `pcr` float NULL,
-    `per` float NULL,
-    `psr` float NULL,
-    `roe` float NULL,
-    `roa` float NULL,
-    `gpa` float NULL,
-    `op` float NULL,
-    `cfo` float NULL,
-    `12m_ret` float NULL,
-    `k_ratio` float NULL,
+    `score_date` date NOT NULL,
+    `ticker` varchar(8) NOT NULL,
+    `sector_name` varchar(255) NULL,
+    `ROE` float NULL,
+    `ROA` float NULL,
+    `GPA` float NULL,
+    `GM` float NULL,
+    `OP` float NULL,
+    `CFROA` float NULL,
+    `EV/EBITDA` float NULL,
+    `EV/sales` float NULL,
+    `PER` float NULL,
+    `PBR` float NULL,
+    `PCR` float NULL,
+    `PSR` float NULL,
+    `DPS` float NULL,
+    `12M_ret` float NULL,
+    `K_ratio` float NULL,
     `quality` float NULL,
     `value` float NULL,
     `momentum` float NULL,
     `score` float NULL,
-    `rank` int NULL,
+    `ranking` int NULL,
     PRIMARY KEY (`ticker`, `score_date`),
     FOREIGN KEY (`ticker`) REFERENCES `ticker` (`ticker`)
 );
@@ -134,7 +143,7 @@ CREATE TABLE `price` (
 CREATE TABLE `news` (
     `date` datetime NOT NULL,
     `ticker` varchar(20) NOT NULL,
-    `summary` TEXT NOT NULL,
+    `summary` text NOT NULL,
     PRIMARY KEY (`ticker`, `date`),
     FOREIGN KEY (`ticker`) REFERENCES `ticker` (`ticker`)
 );
@@ -142,18 +151,9 @@ CREATE TABLE `news` (
 CREATE TABLE `financial_statement` (
     `date` datetime NOT NULL,
     `ticker` varchar(20) NOT NULL,
-    `account` varchar(30) NULL,
-    `value` float NULL,
+    `account` varchar(50) NULL,
+    `value` int NULL,
     `period` varchar(1) NULL,
-    PRIMARY KEY (`ticker`, `date`),
-    FOREIGN KEY (`ticker`) REFERENCES `ticker` (`ticker`)
-);
-
-CREATE TABLE `news` (
-    `date` datetime NOT NULL,
-    `ticker` varchar(20) NOT NULL,
-    `title` varchar(256) NOT NULL,
-    `context` text NOT NULL,
     PRIMARY KEY (`ticker`, `date`),
     FOREIGN KEY (`ticker`) REFERENCES `ticker` (`ticker`)
 );
