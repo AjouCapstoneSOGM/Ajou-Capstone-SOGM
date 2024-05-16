@@ -160,7 +160,7 @@ async function schedulePushNotification(data) {
       title: "리밸런싱 내역이 있습니다",
       //body: data,
     },
-    trigger: null,
+    trigger: { seconds: 10 },
   });
 }
 
