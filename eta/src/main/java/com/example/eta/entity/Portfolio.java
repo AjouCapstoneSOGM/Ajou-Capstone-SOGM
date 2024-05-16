@@ -47,6 +47,7 @@ public class Portfolio {
     private float initAsset;
 
     @Column(nullable = false)
+    @Setter
     private float initCash;
 
     @Column(nullable = false)

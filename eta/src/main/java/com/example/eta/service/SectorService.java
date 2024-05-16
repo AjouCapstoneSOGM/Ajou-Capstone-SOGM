@@ -18,7 +18,7 @@ public class SectorService {
     public Map<String, String> getAllSectors() {
         Map<String, String> sectors = new HashMap<>();
         for(Sector sector : sectorRepository.findAll()) {
-            sectors.put(sector.getSectorId(), sector.getName());
+            sectors.put(sector.getSectorId(), sector.getSectorName());
         }
         return sectors;
     }
