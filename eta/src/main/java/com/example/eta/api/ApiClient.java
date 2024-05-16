@@ -18,10 +18,6 @@ public class ApiClient {
 
     @Value("${fastApi.url}")
     private String baseUrl;
-    private final WebClient webClient;
-    public ApiClient() {
-        this.webClient = WebClient.builder().baseUrl(baseUrl).build();
-    }
 
     public Mono<ResponseEntity<PortfolioDto.CreatedResultFromFastApiDto>> getCreatedPortfolioApi(PortfolioDto.CreateRequestToFastApiDto createRequestToFastApiDto){
         return WebClient.builder().baseUrl(baseUrl).build()
@@ -34,7 +30,8 @@ public class ApiClient {
                 .doOnError((e) -> System.out.println(e.getMessage()));
     }
     public Mono<ResponseEntity<NewsDto>> getNewsFromFastApi(String ticker) {
-        return webClient.post()
+        return WebClient.builder().baseUrl(baseUrl).build()
+                .post()
                 .uri("/getNews/")
                 .body(Mono.just(Collections.singletonMap("ticker", ticker)), Map.class)
                 .retrieve()

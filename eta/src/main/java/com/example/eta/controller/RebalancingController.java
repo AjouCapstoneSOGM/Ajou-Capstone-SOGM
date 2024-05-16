@@ -16,7 +16,6 @@ import java.util.Map;
 public class RebalancingController {
     private final RebalancingService rebalancingService;
 
-
     @PostMapping("/{port_id}/{rn_id}")
     public ResponseEntity<String> applyRebalancing(@PathVariable("port_id") Integer pfId, @PathVariable("rn_id") Integer rnId, @RequestBody RebalancingDto.RebalancingApplyListDto rebalancingApplyListDto) {
         if (rebalancingService.applyRebalancing(pfId, rnId, rebalancingApplyListDto)) {
@@ -41,12 +40,8 @@ public class RebalancingController {
 
     @DeleteMapping("/{port_id}/{rn_id}")
     public ResponseEntity<?> deleteRebalancing(@PathVariable("port_id") Integer pfId, @PathVariable("rn_id") Integer rnId) {
-        try {
-            rebalancingService.deleteRebalancing(rnId);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error deleting rebalancing notification: " + e.getMessage());
-        }
+        rebalancingService.deleteRebalancing(rnId);
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{port_id}/execute")

@@ -7,6 +7,7 @@ import com.example.eta.entity.Ticker;
 import com.example.eta.repository.NewsRepository;
 import com.example.eta.repository.TickerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -31,7 +32,7 @@ public class NewsService {
 
         if (optionalNews.isPresent() && optionalNews.get().getDate().isAfter(LocalDateTime.now().minus(24, ChronoUnit.HOURS))) {
             News news = optionalNews.get();
-            return new NewsDto(news.getSummary(), news.getDate());
+            return new NewsDto(news.getSummary());
         } else {
             Mono<ResponseEntity<NewsDto>> responseEntityMono = apiClient.getNewsFromFastApi(ticker);
 
@@ -45,7 +46,7 @@ public class NewsService {
                     // FastAPI 서버에서 받은 뉴스 정보를 DB에 저장
                     Ticker tickerEntity = tickerRepository.findByTicker(ticker);
                     News news = new News();
-                    news.setDate(newsDto.getDate());
+                    news.setDate(LocalDateTime.now());
                     news.setTicker(tickerEntity);
                     news.setSummary(newsDto.getSummary());
                     newsRepository.save(news);
