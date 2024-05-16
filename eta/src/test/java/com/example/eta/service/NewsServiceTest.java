@@ -53,7 +53,6 @@ class NewsServiceTest {
 
         newsDto = new NewsDto();
         newsDto.setSummary("New news content from FastAPI");
-        newsDto.setDate(LocalDateTime.now());
     }
 
     //DB에 뉴스가 있는 경우
@@ -68,7 +67,6 @@ class NewsServiceTest {
 
         // Then
         assertThat(result.getSummary()).isEqualTo(news.getSummary());
-        assertThat(result.getDate()).isEqualTo(news.getDate());
     }
 
     //DB에 뉴스가 없는 경우
@@ -86,7 +84,6 @@ class NewsServiceTest {
 
         // Then
         assertThat(result.getSummary()).isEqualTo(newsDto.getSummary());
-        assertThat(result.getDate()).isEqualTo(newsDto.getDate());
     }
 
     //뉴스최신화가 25시간 전 인 경우
@@ -107,9 +104,8 @@ class NewsServiceTest {
 
         // Then
         assertThat(result.getSummary()).isEqualTo(newsDto.getSummary());
-        assertThat(result.getDate()).isEqualTo(newsDto.getDate());
 
         // 추가 검증: DB의 저장된 뉴스 정보와 FastAPI에서 가져온 뉴스 정보 비교
-        assertThat(result.getDate()).isAfter(news.getDate());
+        // assertThat(result.getDate()).isAfter(news.getDate());
     }
 }

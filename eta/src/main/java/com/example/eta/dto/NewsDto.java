@@ -11,5 +11,4 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class NewsDto {
     private String summary;
-    private LocalDateTime date;
 }
