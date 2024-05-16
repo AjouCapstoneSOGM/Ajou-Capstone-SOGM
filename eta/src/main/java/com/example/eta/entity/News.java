@@ -3,10 +3,14 @@ package com.example.eta.entity;
 import com.example.eta.entity.compositekey.NewsId;
 import com.example.eta.entity.compositekey.PriceId;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
+@Setter
 @IdClass(NewsId.class)
 @Table(name = "news")
 public class News {
@@ -19,10 +23,6 @@ public class News {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ticker")
     private Ticker ticker;
-
-    @Column(name = "title", nullable = false, length = 256)
-    private String title;
-
-    @Column(name = "context", nullable = false, columnDefinition = "TEXT")
-    private String context;
+    @Column(name = "summary", nullable = false, columnDefinition = "TEXT")
+    private String summary;
 }
