@@ -22,6 +22,8 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class RebalancingService {
+
+    private final PortfolioService portfolioService;
     private final TickerRepository tickerRepository;
     private final RebalancingRepository rebalancingRepository;
     private final PortfolioRepository portfolioRepository;
@@ -33,10 +35,7 @@ public class RebalancingService {
         return rebalancingRepository.existsByPortfolioPfId(pfId);
     }
 
-    public void deleteRebalancing(Integer rnId) throws Exception {
-        if (!rebalancingRepository.existsById(rnId)) {
-            throw new Exception("Rebalancing notification not found with id: " + rnId);
-        }
+    public void deleteRebalancing(Integer rnId) {
         rebalancingRepository.deleteById(rnId);
     }
 
@@ -97,6 +96,7 @@ public class RebalancingService {
                             (portfolioTicker.getNumber() + detail.getQuantity());
                     portfolioTicker.setAveragePrice(newAveragePrice);
                     portfolioTicker.setNumber(portfolioTicker.getNumber() + detail.getQuantity());
+
                     // 포트폴리오의 현재 현금 잔액을 업데이트
                     portfolio.setCurrentCash(portfolio.getCurrentCash() - (detail.getPrice() * detail.getQuantity()));
                 } else {
@@ -104,8 +104,6 @@ public class RebalancingService {
                     portfolioTicker.setNumber(portfolioTicker.getNumber() - detail.getQuantity());
                     portfolio.setCurrentCash(portfolio.getCurrentCash() + (detail.getPrice() * detail.getQuantity()));
                 }
-
-                System.out.println(portfolioTicker.getNumber() +", "+ portfolioTicker.getAveragePrice());
 
                 // 주식 수가 0이 되면 PortfolioTicker 레코드를 삭제
                 if (portfolioTicker.getNumber() == 0) {
@@ -115,31 +113,22 @@ public class RebalancingService {
                 }
 
                 // 매수/매도 기록을 PortfolioRecord에 저장
-                PortfolioRecord record = new PortfolioRecord();
-                record.setPortfolio(portfolio);
-                record.setTicker(ticker);
-                record.setNumber(detail.getQuantity());
-                record.setPrice(detail.getPrice());
-                record.setBuy(detail.getIsBuy());
-                record.setRecordDate(LocalDateTime.now());
-                portfolioRecordRepository.save(record);
+                portfolioRecordRepository.save(PortfolioRecord.builder()
+                        .portfolio(portfolio)
+                        .ticker(ticker)
+                        .number(detail.getQuantity())
+                        .price(detail.getPrice())
+                        .isBuy(detail.getIsBuy())
+                        .recordDate(LocalDateTime.now())
+                        .build());
             }
         }
 
         // 비중 계산
         // 초기 포트폴리오일 경우 초기 비중도 초기화
-        boolean isInitial = true;
-        float totalAmount = portfolio.getCurrentCash();
+        boolean isInitial = portfolio.getCreatedDate() == null ? true : false;
         Map<PortfolioTicker, Float> currentAmountForTicker = new HashMap<>();
-
-        System.out.println(portfolio.getPortfolioTickers());
-
-        for (PortfolioTicker portfolioTicker : portfolio.getPortfolioTickers()) {
-            if (portfolioTicker.getInitProportion() != 0)
-                isInitial = false;
-            totalAmount += portfolioTicker.getAveragePrice() * portfolioTicker.getNumber();
-            currentAmountForTicker.put(portfolioTicker, portfolioTicker.getAveragePrice() * portfolioTicker.getNumber());
-        }
+        float totalAmount = portfolioService.calculateProportionAndReturnTotalAmount(portfolio, true, currentAmountForTicker);
 
         for (PortfolioTicker portfolioTicker : currentAmountForTicker.keySet()) {
             float currentProportion = currentAmountForTicker.get(portfolioTicker).floatValue() / totalAmount;
@@ -158,6 +147,7 @@ public class RebalancingService {
         rebalancingRepository.delete(rebalancingRepository.findById(rnId).get());
 
         // 포트폴리오 정보를 업데이트
+        portfolio.setCreatedDate(LocalDateTime.now());
         portfolioRepository.save(portfolio);
         return true;
     }
