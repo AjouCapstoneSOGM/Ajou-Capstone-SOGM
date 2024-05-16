@@ -14,20 +14,16 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 @RequestMapping("/stocks")
 public class NewsController {
-//    private final NewsService newsService;
-//
-//    @Autowired
-//    public NewsController(NewsService newsService) {
-//        this.newsService = newsService;
-//    }
-//
-//    @GetMapping("/{ticker}/news")
-//    public ResponseEntity<NewsDto> getNews(@PathVariable{"ticker"} String ticker) {
-//        NewsDto news = newsService.getLatestNews(ticker);
-//        if (news != null) {
-//            return ResponseEntity.ok(news);
-//        } else {
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
+    @Autowired
+    private NewsService newsService;
+
+    @GetMapping("/{ticker}/news")
+    public ResponseEntity<NewsDto> getNews(@PathVariable String ticker) {
+        NewsDto newsDto = newsService.getNews(ticker);
+        if (newsDto != null) {
+            return ResponseEntity.ok(newsDto);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

@@ -8,6 +8,7 @@ import com.example.eta.repository.PortfolioRepository;
 import com.example.eta.repository.PriceRepository;
 import com.example.eta.repository.RebalancingRepository;
 import com.example.eta.repository.RebalancingTickerRepository;
+import com.example.eta.service.PortfolioService;
 import lombok.RequiredArgsConstructor;
 
 import org.slf4j.Logger;
@@ -23,12 +24,10 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PortfolioScheduler {
 
+    private final PortfolioService portfolioService;
     private final PortfolioRepository portfolioRepository;
-
     private final PriceRepository priceRepository;
-
     private final RebalancingRepository rebalancingRepository;
-
     private final RebalancingTickerRepository rebalancingTickerRepository;
 
     private Logger logger = LoggerFactory.getLogger(PortfolioScheduler.class);
@@ -46,21 +45,9 @@ public class PortfolioScheduler {
     }
 
     public void updateProportion(Portfolio portfolio) {
-        float totalAmount = portfolio.getCurrentCash();
         Map<PortfolioTicker, Float> currentAmountForTicker = new HashMap<>();
+        float totalAmount = portfolioService.calculateProportionAndReturnTotalAmount(portfolio, false, currentAmountForTicker);
 
-        // 1. 종가를 가져와서 각 종목별로 종가*개수 계산
-        // 2. 전체 종가*개수 + 현금 계산
-        for (PortfolioTicker portfolioTicker : portfolio.getPortfolioTickers()) {
-            float number = portfolioTicker.getNumber();
-            float close = priceRepository.findLatestPriceByTicker(portfolioTicker.getTicker().getTicker())
-                    .get().getClose().floatValue();
-
-            totalAmount += close*number;
-            currentAmountForTicker.put(portfolioTicker, close*number);
-        }
-
-        // 3. 1, 2에서 계산한 값 가지고 각 종목별로 비중 계산하고 업데이트
         for (PortfolioTicker portfolioTicker : currentAmountForTicker.keySet()) {
             float currentProportion = currentAmountForTicker.get(portfolioTicker).floatValue() / totalAmount;
             portfolioTicker.setCurrentProportion(currentProportion);
@@ -78,20 +65,12 @@ public class PortfolioScheduler {
 
     
     public int createProportionRebalancing(Portfolio portfolio) {
+        // 현재 총자산 계산하고, 각 종목별 비중에 따라 목표 보유량(총 가격) 계산
         Map<PortfolioTicker, Float> currentAmountForTicker = new HashMap<>();
         Map<PortfolioTicker, Float> targetAmountForTicker = new HashMap<>();
+        float totalAmount = portfolioService.calculateProportionAndReturnTotalAmount(portfolio, false, currentAmountForTicker);
 
-        // 현재 총자산 계산하고, 각 종목별 비중에 따라 목표 보유량(총 가격) 계산
-        float totalAmount = portfolio.getCurrentCash();
-        for (PortfolioTicker portfolioTicker : portfolio.getPortfolioTickers()) {
-            float number = portfolioTicker.getNumber();
-            float close = priceRepository.findLatestPriceByTicker(portfolioTicker.getTicker().getTicker())
-                    .get().getClose().floatValue();
 
-            totalAmount += close*number;
-            currentAmountForTicker.put(portfolioTicker, close*number);
-        } 
-       
         for (PortfolioTicker portfolioTicker : portfolio.getPortfolioTickers()) {
             float targetAmount = totalAmount * portfolioTicker.getInitProportion();
             targetAmountForTicker.put(portfolioTicker, targetAmount);
