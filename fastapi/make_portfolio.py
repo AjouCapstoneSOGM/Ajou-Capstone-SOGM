@@ -176,7 +176,7 @@ class MakePortrolio:
         # 이전의 정수 자산 개수를 비교하기 위해 저장
         int_asset_num_stock_all_old = int_asset_num[:-num_bonds]
 
-        max_iter = 10
+        max_iter = 100
         cash_hold = 0
         # 수렴이나 특정 조건이 충족될 때까지 반복
         for _ in range(max_iter):
@@ -201,13 +201,13 @@ class MakePortrolio:
 
                 total_invest_cash = (adj_asset * int_asset_num).sum()
                 cash_hold = initial_cash - total_invest_cash
+
                 break
 
             # 다음 반복을 위해 이전 정수 자산 번호 업데이트
             int_asset_num_stock_all_old = int_asset_num_stock_all
             # 남은 소수 자산에 투자한 후의 총 현금 계산
             new_cash = (adj_asset[:-num_bonds] * remaining_decimals_stock).sum()
-
             # 수렴을 확인하거나 new_cash가 0인지 확인
             if (
                 (abs((cash - new_cash) / new_cash) < 0.001)
@@ -238,7 +238,8 @@ class MakePortrolio:
         total_ratio_final = total_ratio_final.tolist()
         final_returns = round(final_returns * 100, 2).item()
         final_vol = round(final_vol * 100, 2).item()
-        cash_hold = cash_hold.item()
+        if cash_hold != 0:
+            cash_hold = cash_hold.item()
 
         evaluation_results = {
             "int_asset_num": int_asset_num,
