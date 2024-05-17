@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Button, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import urls from "../utils/urls.js";
 import { ScrollView } from "react-native-gesture-handler";
+import AppText from "../utils/AppText.js";
 
 const NewsSummary = ({ route }) => {
   const [loading, setLoading] = useState(true);
@@ -57,7 +58,7 @@ const NewsSummary = ({ route }) => {
   if (loading) {
     return (
       <View style={styles.container}>
-        <Text>loading...</Text>
+        <AppText>loading...</AppText>
       </View>
     );
   }
@@ -69,16 +70,16 @@ const NewsSummary = ({ route }) => {
           summary.map((news, index) => (
             <View key={index} style={styles.newsContainer}>
               <View style={styles.header}>
-                <Text style={styles.title}>{news.title}</Text>
+                <AppText style={styles.title}>{news.title}</AppText>
               </View>
               <View style={styles.newsItem}>
-                <Text style={styles.content}>&ensp;{news.content}</Text>
+                <AppText style={styles.content}>&ensp;{news.content}</AppText>
               </View>
             </View>
           ))
         ) : (
           <View style={styles.newsContainer}>
-            <Text>뉴스가 없습니다.</Text>
+            <AppText>뉴스가 없습니다.</AppText>
           </View>
         )}
       </ScrollView>

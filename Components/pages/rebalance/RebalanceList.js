@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, TouchableOpacity, StyleSheet } from "react-native";
 import { getUsertoken } from "../../utils/localStorageUtils";
 import urls from "../../utils/urls";
+import AppText from "../../utils/AppText";
 
 const RebalanceList = ({ route, navigation }) => {
   const portfolioId = route.params.id;
@@ -47,14 +48,14 @@ const RebalanceList = ({ route, navigation }) => {
   if (loading) {
     return (
       <View>
-        <Text>Loading...</Text>
+        <AppText>Loading...</AppText>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <Text style={{ fontSize: 30 }}>알림 목록</Text>
+      <AppText style={{ fontSize: 30 }}>알림 목록</AppText>
       {rebalanceList.map((rebalance, index) => (
         <View key={index}>
           <TouchableOpacity
@@ -67,7 +68,7 @@ const RebalanceList = ({ route, navigation }) => {
               });
             }}
           >
-            <Text>{rebalance.rnId}</Text>
+            <AppText>{rebalance.rnId}</AppText>
           </TouchableOpacity>
         </View>
       ))}

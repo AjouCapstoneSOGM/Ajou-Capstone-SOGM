@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   TextInput,
-  Text,
   StyleSheet,
   ActivityIndicator,
   ScrollView,
@@ -10,6 +9,7 @@ import {
 } from "react-native";
 import debounce from "lodash.debounce";
 import Icon from "react-native-vector-icons/AntDesign";
+import AppText from "../../utils/AppText";
 
 const SearchStocks = () => {
   const [query, setQuery] = useState("");
@@ -107,7 +107,7 @@ const SearchStocks = () => {
             style={styles.selectedItem}
             onPress={() => handleSelectedStocks(item)}
           >
-            <Text>{item} </Text>
+            <AppText>{item} </AppText>
             <Icon name="close" size={12} color="#222" />
           </TouchableOpacity>
         ))}
@@ -120,7 +120,7 @@ const SearchStocks = () => {
             onPress={() => handleSelectedStocks(item)}
             style={styles.suggestion}
           >
-            <Text>{item}</Text>
+            <AppText>{item}</AppText>
           </TouchableOpacity>
         ))}
       </ScrollView>

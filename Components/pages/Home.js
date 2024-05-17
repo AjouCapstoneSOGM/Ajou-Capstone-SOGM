@@ -6,6 +6,7 @@ import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 
 import PortfolioList from "./portfolio/ViewPortfolio.js";
 import Icon from "react-native-vector-icons/AntDesign";
+import AppText from "../utils/AppText.js";
 
 const Home = ({ navigation }) => {
   const { isLoggedIn, logout } = useAuth();
@@ -19,9 +20,9 @@ const Home = ({ navigation }) => {
     <View style={styles.container}>
       {isLoggedIn ? (
         <View style={styles.userContainer}>
-          <Text style={{ fontSize: 18, color: "white" }}>
+          <AppText style={{ fontSize: 18, color: "white" }}>
             안녕하세요 테스트님
-          </Text>
+          </AppText>
           <Button title="로그아웃" onPress={setLogout} />
         </View>
       ) : (
@@ -30,7 +31,7 @@ const Home = ({ navigation }) => {
         </View>
       )}
       <View style={styles.buttonContainer}>
-        <Text
+        <AppText
           style={{
             fontSize: 18,
             alignSelf: "flex-start",
@@ -38,12 +39,12 @@ const Home = ({ navigation }) => {
           }}
         >
           나의 포트폴리오
-        </Text>
+        </AppText>
         <TouchableOpacity
-          style={{ flexDirection: "row" }}
+          style={{ flexDirection: "row", alignItems: "center" }}
           onPress={() => navigation.navigate("MakePortfolio")}
         >
-          <Text style={{ fontSize: 16, color: "white" }}>생성하기</Text>
+          <AppText style={{ fontSize: 18, color: "white" }}>생성하기</AppText>
           <Icon
             style={{ alignSelf: "center", marginHorizontal: 4 }}
             name="right"
@@ -58,15 +59,12 @@ const Home = ({ navigation }) => {
           <PortfolioList navigation={navigation}></PortfolioList>
         ) : (
           <View style={styles.errorContent}>
-            <Text>로그인 필요</Text>
+            <AppText style={{ fontSize: 17 }}>
+              로그인이 필요한 서비스입니다
+            </AppText>
           </View>
         )}
       </ScrollView>
-      {/* <Button title="토큰 확인" onPress={() => getToken()} />
-      <Button
-        title="뉴스 테스트"
-        onPress={() => navigation.navigate("NewsSummary", { ticker: "005930" })}
-      /> */}
     </View>
   );
 };
@@ -85,29 +83,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     margin: 10,
     borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
   },
   userContainer: {
     height: 180,
     backgroundColor: "#6495ED",
     justifyContent: "space-evenly",
     alignItems: "center",
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 4, // 상자 그림자로 입체감 주기
+    borderRadius: 5,
     padding: 18,
     marginVertical: 40,
     marginHorizontal: 10,
@@ -115,17 +97,10 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
     backgroundColor: "#6495ED",
     alignItems: "stretch",
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 4, // 상자 그림자로 입체감 주기
+    borderRadius: 5,
     padding: 13,
     marginHorizontal: 10,
   },

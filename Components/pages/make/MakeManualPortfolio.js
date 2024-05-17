@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, Button, TouchableOpacity, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import { View, TouchableOpacity, StyleSheet } from "react-native";
 import SearchStocks from "./SearchStocks.js";
+import AppText from "../../utils/AppText.js";
 
 const MakeManualPortfolio = ({ setCurrentStep }) => {
   const [currentManualStep, setCurrentManualStep] = useState(1);
@@ -17,7 +18,7 @@ const MakeManualPortfolio = ({ setCurrentStep }) => {
             <SearchStocks />
             <View style={styles.buttonContainer}>
               <TouchableOpacity style={styles.button} onPress={handleNextStep}>
-                <Text style={{ fontSize: 18, color: "white" }}>다음</Text>
+                <AppText style={{ fontSize: 18, color: "white" }}>다음</AppText>
               </TouchableOpacity>
             </View>
           </View>

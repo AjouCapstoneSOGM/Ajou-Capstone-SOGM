@@ -4,13 +4,7 @@ import React, {
   useLayoutEffect,
   useCallback,
 } from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
-} from "react-native";
+import { View, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import Icon from "react-native-vector-icons/AntDesign";
 import { VictoryPie } from "victory-native";
@@ -19,6 +13,7 @@ import { getUsertoken } from "../../utils/localStorageUtils";
 import { useFocusEffect } from "@react-navigation/native";
 
 import urls from "../../utils/urls";
+import AppText from "../../utils/AppText";
 
 const PortfolioDetails = ({ route, navigation }) => {
   const { getPortfolioById, portfolios } = usePortfolio();
@@ -143,7 +138,7 @@ const PortfolioDetails = ({ route, navigation }) => {
             style={styles.manageButton}
             onPress={() => navigation.navigate("ManagementPage", { portfolio })}
           >
-            <Text style={{ fontSize: 16, color: "white" }}>관리</Text>
+            <AppText style={{ fontSize: 16, color: "white" }}>관리</AppText>
           </TouchableOpacity>
         ),
       });
@@ -153,15 +148,15 @@ const PortfolioDetails = ({ route, navigation }) => {
   if (loading) {
     return (
       <View>
-        <Text>Loading...</Text>
+        <AppText>Loading...</AppText>
       </View>
     );
   }
   return (
     <View style={styles.container}>
       <View style={styles.outline}>
-        <Text>총 자산</Text>
-        <Text>{getTotalPrice().toLocaleString()}원</Text>
+        <AppText>총 자산</AppText>
+        <AppText>{getTotalPrice().toLocaleString()}원</AppText>
       </View>
       <View style={styles.chartContainer}>
         <VictoryPie
@@ -174,12 +169,12 @@ const PortfolioDetails = ({ route, navigation }) => {
         />
         {selectedId !== null && (
           <View style={{ position: "absolute", alignItems: "center" }}>
-            <Text style={[styles.centerText, { fontWeight: "bold" }]}>{`${
+            <AppText style={[styles.centerText, { fontWeight: "bold" }]}>{`${
               (getStockRate(selectedId).toFixed(3) * 1000) / 10 // 소숫점 계산 오류 방지를 위함
-            }%`}</Text>
-            <Text style={[styles.centerText, { fontSize: 17 }]}>
+            }%`}</AppText>
+            <AppText style={[styles.centerText, { fontSize: 17 }]}>
               {portfolio.stocks[selectedId].companyName}
-            </Text>
+            </AppText>
           </View>
         )}
       </View>
@@ -202,69 +197,99 @@ const PortfolioDetails = ({ route, navigation }) => {
                 ]}
                 onPress={() => handleSelectedId(index)}
               >
+                <View
+                  style={{
+                    backgroundColor: colorScale[index],
+                    position: "absolute",
+                    width: 5,
+                    height: "100%",
+                  }}
+                ></View>
                 <View style={styles.infoContainer}>
-                  <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 17, color: "#222" }}>
-                      {item.companyName}
-                    </Text>
-                    <Text style={{ fontSize: 13, color: "#777" }}>
-                      {Number(item.quantity).toLocaleString()} 주
-                    </Text>
-                  </View>
                   <View
                     style={{
-                      flex: 1,
-                      alignItems: "flex-end",
-                      paddingHorizontal: 10,
+                      justifyContent: "space-between",
+                      paddingBottom: 10,
                     }}
                   >
-                    <View
-                      style={{ flexDirection: "row", alignItems: "flex-end" }}
+                    <AppText
+                      style={{
+                        fontSize: 21,
+                        color: "#222",
+                        fontWeight: "bold",
+                      }}
                     >
-                      <Text></Text>
-                      <Text style={{ fontSize: 19 }}>
-                        {(item.averageCost * item.quantity).toLocaleString()} 원
-                      </Text>
-                    </View>
+                      {item.companyName}
+                    </AppText>
                     <View style={{ flexDirection: "row" }}>
-                      <Text
+                      <AppText
                         style={[
                           styles.itemText,
-                          { paddingHorizontal: 15 },
                           roi >= 0
-                            ? { color: "#4CAF50" }
-                            : { color: "#F44336" },
+                            ? { color: "#ff3a00" }
+                            : { color: "#0c5bff" },
                         ]}
                       >
                         {Number(item.currentPrice).toLocaleString()} 원
-                      </Text>
-                      <Text
+                      </AppText>
+                      <AppText
                         style={[
                           styles.itemText,
+                          { paddingHorizontal: 10 },
                           roi >= 0
-                            ? { color: "#4CAF50" }
-                            : { color: "#F44336" },
+                            ? { color: "#ff3a00" }
+                            : { color: "#0c5bff" },
                         ]}
                       >
-                        {roiFormatted}%
-                      </Text>
+                        {roiFormatted} %
+                      </AppText>
                     </View>
                   </View>
-                  <Icon name="down" size={23} color="#222" />
+                  <View
+                    style={{
+                      justifyContent: "space-between",
+                      alignItems: "flex-end",
+                      paddingBottom: 20,
+                    }}
+                  >
+                    <AppText style={{ fontSize: 22, fontWeight: "bold" }}>
+                      {(item.averageCost * item.quantity).toLocaleString()} 원
+                    </AppText>
+                    <AppText
+                      style={{
+                        fontSize: 13,
+                        color: "#777",
+                      }}
+                    >
+                      {Number(item.quantity).toLocaleString()} 주
+                    </AppText>
+                  </View>
                 </View>
                 {selectedId === index && (
                   <View style={styles.utilContainer}>
                     <TouchableOpacity
-                      style={{ backgroundColor: "#ddd" }}
+                      style={styles.utilButton}
                       onPress={() => {
                         navigation.navigate("NewsSummary", {
                           ticker: item.ticker,
                         });
                       }}
                     >
-                      <Text style={{ fontSize: 20, color: "black" }}>
-                        뉴스 요약 보기
-                      </Text>
+                      <AppText style={{ fontSize: 18, color: "#555" }}>
+                        종목 정보
+                      </AppText>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.utilButton}
+                      onPress={() => {
+                        navigation.navigate("NewsSummary", {
+                          ticker: item.ticker,
+                        });
+                      }}
+                    >
+                      <AppText style={{ fontSize: 18, color: "#555" }}>
+                        뉴스 요약
+                      </AppText>
                     </TouchableOpacity>
                   </View>
                 )}
@@ -333,7 +358,7 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
   },
   item: {
-    height: 80,
+    height: 90,
     justifyContent: "flex-start", // 내용을 세로 방향으로 중앙 정렬
     alignItems: "stretch", // 내용을 가로 방향으로 중앙 정렬
     backgroundColor: "#f0f0f0",
@@ -342,23 +367,31 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   selectedItem: {
-    height: 120,
+    height: 140,
   },
   infoContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
-    height: 80,
+    alignItems: "stretch",
+    paddingTop: 10,
+    paddingLeft: 5,
+    height: 90,
   },
   utilContainer: {
-    justifyContent: "space-between",
-    alignContent: "stretch",
-    flexWrap: "wrap",
+    height: 50,
+    flexDirection: "row",
+    justifyContent: "space-around",
+  },
+  utilButton: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    borderTopWidth: 1,
+    borderColor: "#ccc",
   },
   itemText: {
     fontSize: 16,
     textAlign: "center", // 텍스트를 가운데 정렬
-    marginBottom: 3,
   },
   manageButton: {
     paddingRight: 20,

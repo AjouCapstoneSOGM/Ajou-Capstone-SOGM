@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import { View, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { ScrollView, TextInput } from "react-native-gesture-handler";
 import { arraysEqual, deepCopy, filteringNumber } from "../../utils/utils";
 import GetCurrentPrice from "../../utils/GetCurrentPrice";
 import { usePortfolio } from "../../utils/PortfolioContext";
+import AppText from "../../utils/AppText";
 
 const ModifyPortfolio = ({ route, navigation }) => {
   const [loading, setLoading] = useState(true);
@@ -122,7 +123,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
   if (loading) {
     return (
       <View>
-        <Text>Loading...</Text>
+        <AppText>Loading...</AppText>
       </View>
     );
   }
@@ -133,9 +134,9 @@ const ModifyPortfolio = ({ route, navigation }) => {
           {rebalances.map((item, index) => (
             <View style={styles.rebalanceBlock} key={index}>
               <View>
-                <Text style={{ fontSize: 20, paddingHorizontal: 10 }}>
+                <AppText style={{ fontSize: 20, paddingHorizontal: 10 }}>
                   {item.name}
-                </Text>
+                </AppText>
               </View>
               <View style={styles.inputContainer}>
                 <View style={styles.inputTextContainer}>
@@ -147,9 +148,9 @@ const ModifyPortfolio = ({ route, navigation }) => {
                     placeholder={rebalancesOffer[index].price.toString()}
                     placeholderTextColor="#bbb"
                   />
-                  <Text style={{ fontWeight: "bold", fontSize: 17 }}>
+                  <AppText style={{ fontWeight: "bold", fontSize: 17 }}>
                     원에&nbsp;&nbsp;
-                  </Text>
+                  </AppText>
                   <TextInput
                     style={styles.input_Amount}
                     keyboardType="numeric"
@@ -158,7 +159,9 @@ const ModifyPortfolio = ({ route, navigation }) => {
                     placeholderTextColor="#bbb"
                     onChangeText={(text) => handleChangeNumber(index, text)}
                   />
-                  <Text style={{ fontWeight: "bold", fontSize: 17 }}>주를</Text>
+                  <AppText style={{ fontWeight: "bold", fontSize: 17 }}>
+                    주를
+                  </AppText>
                 </View>
                 <View style={styles.tradeButtonContainer}>
                   <TouchableOpacity
@@ -168,14 +171,14 @@ const ModifyPortfolio = ({ route, navigation }) => {
                     ]}
                     onPress={() => handleChangeBuy(index, true)}
                   >
-                    <Text
+                    <AppText
                       style={[
                         { fontSize: 18 },
                         item.isBuy ? { color: "white" } : "",
                       ]}
                     >
                       매수
-                    </Text>
+                    </AppText>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={[
@@ -184,14 +187,14 @@ const ModifyPortfolio = ({ route, navigation }) => {
                     ]}
                     onPress={() => handleChangeBuy(index, false)}
                   >
-                    <Text
+                    <AppText
                       style={[
                         { fontSize: 18 },
                         !item.isBuy ? { color: "white" } : "",
                       ]}
                     >
                       매도
-                    </Text>
+                    </AppText>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -200,7 +203,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
         </View>
       </ScrollView>
       <TouchableOpacity style={styles.button} onPress={() => handleModify()}>
-        <Text style={{ fontSize: 18, color: "white" }}>수정</Text>
+        <AppText style={{ fontSize: 18, color: "white" }}>수정</AppText>
       </TouchableOpacity>
     </View>
   );
