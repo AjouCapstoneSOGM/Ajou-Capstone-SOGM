@@ -35,21 +35,36 @@ const ModifyPortfolio = ({ route, navigation }) => {
       },
       {
         text: "확인",
-        onPress: () => {
+        onPress: async () => {
           setLoading(true);
-          fetchModify(rebalanceData, portId, rnId);
-        },
-        style: "destructive", // iOS에서만 적용되는 스타일 옵션
-      },
-    ]);
-    if (!arraysEqual(rebalances, rebalancesOffer)) {
-      console.log("다릅니다.");
-    }
-    Alert.alert("수정 완료", "수정이 완료되었습니다.", [
-      {
-        text: "확인",
-        onPress: () => {
-          navigation.navigate("PortfolioDetails", { id: portId });
+          try {
+            await fetchModify(rebalanceData, portId, rnId);
+
+            // 변경 여부 확인
+            if (!arraysEqual(rebalances, rebalancesOffer)) {
+              console.log("다릅니다.");
+            }
+
+            // 수정 완료 알림
+            Alert.alert("수정 완료", "수정이 완료되었습니다.", [
+              {
+                text: "확인",
+                onPress: () => {
+                  navigation.navigate("PortfolioDetails", { id: portId });
+                },
+                style: "destructive", // iOS에서만 적용되는 스타일 옵션
+              },
+            ]);
+          } catch (error) {
+            console.error("수정 중 오류 발생:", error);
+            Alert.alert(
+              "수정 실패",
+              "수정 중 오류가 발생했습니다. 다시 시도해주세요.",
+              [{ text: "확인", onPress: () => {} }]
+            );
+          } finally {
+            setLoading(false);
+          }
         },
         style: "destructive", // iOS에서만 적용되는 스타일 옵션
       },

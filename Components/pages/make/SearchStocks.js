@@ -102,7 +102,11 @@ const SearchStocks = () => {
       />
       <View style={styles.selectedContainer}>
         {selectedStocks.map((item, index) => (
-          <TouchableOpacity key={index} style={styles.selectedItem}>
+          <TouchableOpacity
+            key={index}
+            style={styles.selectedItem}
+            onPress={() => handleSelectedStocks(item)}
+          >
             <Text>{item} </Text>
             <Icon name="close" size={12} color="#222" />
           </TouchableOpacity>
@@ -128,13 +132,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "stretch",
+    margin: 10,
   },
   searchBox: {
     height: 55,
     backgroundColor: "#ddd",
     borderRadius: 10,
     paddingHorizontal: 15,
-    marginBottom: 10,
     fontSize: 18,
   },
   selectedContainer: {

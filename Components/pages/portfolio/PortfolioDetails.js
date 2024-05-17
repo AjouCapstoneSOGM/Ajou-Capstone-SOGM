@@ -218,9 +218,14 @@ const PortfolioDetails = ({ route, navigation }) => {
                       paddingHorizontal: 10,
                     }}
                   >
-                    <Text style={{ fontSize: 19 }}>
-                      {(item.averageCost * item.quantity).toLocaleString()} 원
-                    </Text>
+                    <View
+                      style={{ flexDirection: "row", alignItems: "flex-end" }}
+                    >
+                      <Text></Text>
+                      <Text style={{ fontSize: 19 }}>
+                        {(item.averageCost * item.quantity).toLocaleString()} 원
+                      </Text>
+                    </View>
                     <View style={{ flexDirection: "row" }}>
                       <Text
                         style={[
