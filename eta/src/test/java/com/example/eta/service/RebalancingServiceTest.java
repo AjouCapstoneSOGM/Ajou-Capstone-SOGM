@@ -9,6 +9,7 @@ import com.example.eta.repository.PortfolioRecordRepository;
 import com.example.eta.repository.PortfolioRepository;
 import com.example.eta.repository.PortfolioTickerRepository;
 import com.example.eta.repository.TickerRepository;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -48,8 +49,8 @@ class RebalancingServiceTest {
     //이때 평균 가격과 주식 수가 올바르게 업데이트 되는지, 그리고 거래 기록이 DB에 저장되는지 테스트
     @Test
     public void testApplyRebalancing_SuccessfulBuyTransaction() {
-        Integer port_id = 1;
-        Integer rn_id = 1;
+        Integer pfId = 1;
+        Integer rnId = 1;
         RebalancingDto.RebalancingApplyListDto dto = new RebalancingDto.RebalancingApplyListDto();
         dto.setRnList(new ArrayList<>());
         RebalancingDto.RebalancingApplyInfo detail = new RebalancingDto.RebalancingApplyInfo("041241", true, 5, 5450.0f);
@@ -61,11 +62,11 @@ class RebalancingServiceTest {
         portfolioTicker.setAveragePrice(5000.0f);
         portfolioTicker.setNumber(10);
 
-        when(portfolioRepository.findById(port_id)).thenReturn(Optional.of(portfolio));
+        when(portfolioRepository.findById(pfId)).thenReturn(Optional.of(portfolio));
         when(tickerRepository.findByTicker(detail.getTicker())).thenReturn(ticker);
         when(portfolioTickerRepository.findByPortfolioAndTicker(portfolio, ticker)).thenReturn(Optional.of(portfolioTicker));
 
-        boolean result = rebalancingService.applyRebalancing(port_id, rn_id, dto);
+        boolean result = rebalancingService.applyRebalancing(pfId, rnId, dto);
 
         assertTrue(result);
         verify(portfolioRepository).save(portfolio);

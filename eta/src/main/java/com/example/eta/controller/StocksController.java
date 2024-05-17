@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/stocks")
-public class NewsController {
-    @Autowired
-    private NewsService newsService;
+@RequestMapping("api/stocks")
+public class StocksController {
+
+    private final NewsService newsService;
 
     @GetMapping("/{ticker}/news")
     public ResponseEntity<NewsDto> getNews(@PathVariable String ticker) {
