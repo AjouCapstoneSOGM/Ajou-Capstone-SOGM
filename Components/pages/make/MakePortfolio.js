@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import MakeAutoPortfolio from "./MakeAutoPortfolio";
 import MakeManualPortfolio from "./MakeManualPortfolio.js";
-import { useAuth } from "../utils/AuthContext.js";
+import { useAuth } from "../../utils/AuthContext.js";
 
 const MakePortfolio = ({ navigation }) => {
   const { isLoggedIn } = useAuth();
@@ -14,7 +14,7 @@ const MakePortfolio = ({ navigation }) => {
   };
 
   const handleReplacePage = () => {
-    navigation.replace("ViewPortfolio");
+    navigation.replace("Home");
   };
 
   const isPathNull = () => {
@@ -162,6 +162,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     padding: 20,
   },
+
   disabledButton: {
     backgroundColor: "#DADADA", // 비활성화 상태의 배경색 변경
   },
@@ -169,6 +170,7 @@ const styles = StyleSheet.create({
     justifyContent: "center", // 가로 방향에서 중앙 정렬
     backgroundColor: "#6495ED",
     alignItems: "center",
+    alignSelf: "stretch",
     borderRadius: 10,
     padding: 18,
   },

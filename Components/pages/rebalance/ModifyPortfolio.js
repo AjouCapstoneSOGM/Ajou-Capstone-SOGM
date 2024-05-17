@@ -1,55 +1,59 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import GetCurrentPrice from "../utils/GetCurrentPrice";
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { ScrollView, TextInput } from "react-native-gesture-handler";
-import urls from "../utils/urls";
-import { getUsertoken } from "../utils/localStorageUtils";
-import { arraysEqual, deepCopy } from "../utils/utils";
+import { arraysEqual, deepCopy, filteringNumber } from "../../utils/utils";
+import GetCurrentPrice from "../../utils/GetCurrentPrice";
+import { usePortfolio } from "../../utils/PortfolioContext";
 
 const ModifyPortfolio = ({ route, navigation }) => {
   const [loading, setLoading] = useState(true);
   const [rebalances, setRebalances] = useState([]);
   const [rebalancesOffer, setRebalancesOffer] = useState([]);
+  const { fetchModify } = usePortfolio();
+  const rnId = route.params.rnId;
+  const portId = route.params.portId;
 
-  const ex_data = [
-    {
-      ticker: "005930",
-      name: "삼성전자",
-      number: 3,
-      isBuy: true,
-    },
-    {
-      ticker: "003550",
-      name: "LG",
-      number: 3,
-      isBuy: true,
-    },
-  ];
+  const updateKey = (reblances) => {
+    const updated = reblances.map((stock) => {
+      return {
+        isBuy: stock.isBuy,
+        quantity: Number(stock.number),
+        price: parseFloat(stock.price),
+        ticker: stock.ticker,
+      };
+    });
 
-  const fetchModify = async () => {
-    try {
-      const token = await getUsertoken();
-      const response = await fetch(`${urls.springUrl}/api/rebalancing/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (response.ok) {
-        console.log(data);
-      }
-    } catch (error) {
-      console.error(error);
-    }
+    return updated;
   };
 
   const handleModify = async () => {
+    const rebalanceData = updateKey([...rebalances]);
+    Alert.alert("수정 확인", "위 항목으로 포트폴리오를 수정하실건가요?", [
+      {
+        text: "취소",
+        onPress: () => {},
+      },
+      {
+        text: "확인",
+        onPress: () => {
+          setLoading(true);
+          fetchModify(rebalanceData, portId, rnId);
+        },
+        style: "destructive", // iOS에서만 적용되는 스타일 옵션
+      },
+    ]);
     if (!arraysEqual(rebalances, rebalancesOffer)) {
-      console.log(rebalancesOffer);
-      console.log(rebalances);
       console.log("다릅니다.");
     }
+    Alert.alert("수정 완료", "수정이 완료되었습니다.", [
+      {
+        text: "확인",
+        onPress: () => {
+          navigation.navigate("PortfolioDetails", { id: portId });
+        },
+        style: "destructive", // iOS에서만 적용되는 스타일 옵션
+      },
+    ]);
   };
 
   const fetchAllCurrent = async (tickerList) => {
@@ -59,11 +63,11 @@ const ModifyPortfolio = ({ route, navigation }) => {
 
   const handleChangePrices = (index, value) => {
     const newRebalances = [...rebalances];
-    newRebalances[index].price = value; // 입력받은 값을 숫자로 변환하여 저장
+    if (value <= 9999999) newRebalances[index].price = filteringNumber(value);
     setRebalances(newRebalances);
   };
 
-  const handleChangeState = (index, value) => {
+  const handleChangeBuy = (index, value) => {
     const newRebalances = [...rebalances];
     newRebalances[index].isBuy = value;
     setRebalances(newRebalances);
@@ -71,7 +75,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
 
   const handleChangeNumber = (index, value) => {
     const newRebalances = [...rebalances];
-    if (value <= 99) newRebalances[index].number = value;
+    if (value <= 9999) newRebalances[index].number = filteringNumber(value);
     setRebalances(newRebalances);
   };
 
@@ -123,7 +127,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
                   <TextInput
                     style={styles.input_Amount}
                     keyboardType="numeric"
-                    value={item.price}
+                    value={item.price.toString()}
                     onChangeText={(text) => handleChangePrices(index, text)}
                     placeholder={rebalancesOffer[index].price.toString()}
                     placeholderTextColor="#bbb"
@@ -147,7 +151,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
                       styles.tradeButton,
                       item.isBuy ? { backgroundColor: "#6495ED" } : "",
                     ]}
-                    onPress={() => handleChangeState(index, true)}
+                    onPress={() => handleChangeBuy(index, true)}
                   >
                     <Text
                       style={[
@@ -163,7 +167,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
                       styles.tradeButton,
                       !item.isBuy ? { backgroundColor: "#6495ED" } : "",
                     ]}
-                    onPress={() => handleChangeState(index, false)}
+                    onPress={() => handleChangeBuy(index, false)}
                   >
                     <Text
                       style={[

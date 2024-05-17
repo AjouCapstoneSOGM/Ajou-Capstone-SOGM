@@ -7,10 +7,13 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
-import urls from "../utils/urls";
-import { getUsertoken } from "../utils/localStorageUtils";
+import urls from "../../utils/urls";
+import { getUsertoken } from "../../utils/localStorageUtils";
+import { usePortfolio } from "../../utils/PortfolioContext";
+import { filteringNumber } from "../../utils/utils";
 
 const MakeAutoPortfolio = ({ setCurrentStep }) => {
+  const { fetchUserInfo } = usePortfolio();
   const [currentAutoStep, setCurrentAutoStep] = useState(1);
   const [amount, setAmount] = useState("");
   const [riskLevel, setRiskLevel] = useState("");
@@ -37,6 +40,7 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
     }
     return false;
   };
+
   const fetchSector = async () => {
     try {
       const token = await getUsertoken();
@@ -56,41 +60,20 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
     }
   };
 
-  const fetchUserInfo = async () => {
-    try {
-      const token = await getUsertoken();
-      const response = await fetch(
-        `${urls.springUrl}/api/portfolio/create/auto`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            country: "KOR",
-            sector: [interest],
-            asset: amount,
-            riskValue: riskLevel,
-          }),
-        }
-      );
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Success:", data);
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      throw error;
-    }
-  };
-
   const submitUserInfo = async () => {
     console.log(amount, riskLevel, interest);
     handleNextStep();
-    await fetchUserInfo();
+    await fetchUserInfo({
+      interest: interest,
+      amount: amount,
+      riskLevel: riskLevel,
+    });
     handleNextStep();
     setCurrentStep(2);
+  };
+
+  const handleAmount = (value) => {
+    setAmount(filteringNumber(value));
   };
 
   const handleNextStep = () => {
@@ -119,8 +102,8 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
               <TextInput
                 style={styles.input_Amount}
                 keyboardType="numeric"
-                value={amount.toLocaleString()}
-                onChangeText={setAmount}
+                value={amount}
+                onChangeText={(value) => handleAmount(value)}
                 placeholder="금액을 입력하세요"
               />
               {amount && !isAmountEnough() && (
@@ -130,13 +113,6 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
               )}
             </View>
             <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                style={[styles.button]}
-                title="prev"
-                onPress={handlePrevStep}
-              >
-                <Text style={{ fontSize: 18, color: "white" }}>이전</Text>
-              </TouchableOpacity>
               <TouchableOpacity
                 style={[
                   styles.button,
@@ -176,12 +152,6 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
             </View>
             <View style={styles.buttonContainer}>
               <TouchableOpacity
-                style={[styles.button]}
-                onPress={handlePrevStep}
-              >
-                <Text style={{ fontSize: 18, color: "white" }}>이전</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
                 style={[
                   styles.button,
                   isRiskNull() ? styles.disabledButton : "",
@@ -216,12 +186,6 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
               ))}
             </View>
             <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                style={[styles.button]}
-                onPress={handlePrevStep}
-              >
-                <Text style={{ fontSize: 18, color: "white" }}>이전</Text>
-              </TouchableOpacity>
               <TouchableOpacity
                 style={[
                   styles.button,
@@ -260,11 +224,12 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   inputContainer: {
-    flex: 1,
+    flex: 2,
     alignItems: "stretch",
     padding: 20,
   },
   sectorContainer: {
+    flex: 2,
     flexDirection: "row",
     padding: 20,
     flexWrap: "wrap",
@@ -299,23 +264,19 @@ const styles = StyleSheet.create({
     backgroundColor: "#cceecc",
   },
   buttonContainer: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "flex-end",
-    justifyContent: "flex-end",
+    alignItems: "stretch",
     padding: 20,
   },
   disabledButton: {
     backgroundColor: "#DADADA", // 비활성화 상태의 배경색 변경
   },
   button: {
-    flex: 1,
     justifyContent: "center", // 가로 방향에서 중앙 정렬
     backgroundColor: "#6495ED",
     alignItems: "center",
+    alignSelf: "stretch",
     borderRadius: 10,
     padding: 18,
-    margin: 5,
   },
 });
 export default MakeAutoPortfolio;
