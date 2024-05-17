@@ -1,0 +1,50 @@
+name: Spring Boot CD
+
+on:
+  push:
+    branches: master
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+    - name : Checkout Code
+      uses: actions/checkout@v3
+      
+    - name: Set Up JDK-17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'oracle'
+        
+    - name: Set Up Environment
+      run: |
+        echo "${{ secrets.SPRING_APPLICATION_PROD }}" > ./eta/src/main/resources/application.yml
+        echo "${{ secrets.FB_KEY }}" > ./eta/src/main/resources/firebase-private-key.json
+        
+    - name: Build Without Testing
+      run: cd eta; ./gradlew build -x test
+      
+    - name: Build And Push Docker Image
+      run: |
+        cd eta
+        echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+        docker build -t ${{ secrets.DOCKER_REPO }}/eta-spring-boot .
+        docker push ${{ secrets.DOCKER_REPO }}/eta-spring-boot
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-20.04
+
+    steps:
+    - name: Spring Boot NCP Distribution
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.NCP_HOST }}
+        username: ${{ secrets.NCP_USERNAME }}
+        password: ${{ secrets.NCP_PASSWORD }}
+        script: |
+          echo "${{ secrets.DOCKER_PASSWORD }}" | sudo docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+          sudo docker rm -f spring-boot-server || true
+          sudo docker pull ${{ secrets.DOCKER_REPO }}/eta-spring-boot
+          sudo docker run -d -p 8080:8080 --name spring-boot-server ${{ secrets.DOCKER_REPO }}/eta-spring-boot
