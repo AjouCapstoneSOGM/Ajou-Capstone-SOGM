@@ -1,14 +1,16 @@
 import requests as rq
 from bs4 import BeautifulSoup
 import pandas as pd
-from datetime import datetime
-from datetime import timedelta
+from datetime import datetime, timedelta
 from tqdm import tqdm
 
 
-class get_kr_news:
+class News:
     def __init__(self):
-        pass
+        self.today = datetime.today()
+        self.period = self.today - timedelta(days=1)
+        self.start_date = self.period.strftime("%Y-%m-%d")  # Example start date
+        self.end_date = self.today.strftime("%Y-%m-%d")  # Example end date
 
     def get_recent_news(self):
         today = datetime.today().strftime("%Y%m%d")
@@ -40,7 +42,7 @@ class get_kr_news:
         news_list = pd.DataFrame({"title": title_list, "summary": summary_list})
         return news_list
 
-    def get_news_title_from_page(self, page, start_date, end_date, ticker):
+    async def get_news_title_from_page(self, page, start_date, end_date, ticker):
         url = f"https://finance.naver.com/item/news.naver?code={ticker}&page={page}"
 
         response = rq.get(url)
@@ -92,20 +94,21 @@ class get_kr_news:
                 return titles, dates  # Return the collected titles and dates
         return titles, dates
 
-    def get_company_news(self, start_date, end_date, ticker):
+    async def get_company_news(self, ticker):
         # Initialize lists to store unique titles and dates
+        start_date = self.start_date
+        end_date = self.end_date
         unique_titles = []
         unique_dates = set()
-
         # Convert start_date and end_date to datetime objects if they are not already
         start_date = datetime.strptime(start_date, "%Y-%m-%d")
         end_date = datetime.strptime(end_date, "%Y-%m-%d")
-
         # Iterate through pages until start_date passes
         page = 1
-        while True:
+        max_articles = 50  # 최대 기사 수 설정
+        while len(unique_titles) < max_articles:
             # Call the function for the current page
-            titles, dates = self.get_news_title_from_page(
+            titles, dates = await self.get_news_title_from_page(
                 page, start_date, end_date, ticker
             )
             # If there are no more articles or start_date has passed, stop iterating
@@ -128,23 +131,7 @@ class get_kr_news:
         mask = df["Title"].str.contains(word_to_delete, case=False)
         df = df[~mask]
         df.reset_index(drop=True, inplace=True)
+        df_value = df["Title"].to_list()
 
         # Return the DataFrame
-        return df
-
-
-get = get_kr_news()
-today = datetime.today()
-# portfolio는 현재 보유중인 티커목록
-# df = get.get_recent_news()
-period = today - timedelta(days=7)
-start_date = period.strftime("%Y-%m-%d")  # Example start date
-end_date = today.strftime("%Y-%m-%d")  # Example end date
-ticker = "207940"  # Example ticker date
-df = get.get_company_news(start_date, end_date, ticker)
-
-# tickers = portfolio
-# dfs = []
-# for ticker in tickers:
-#     df = get.get_company_news(start_date, end_date, ticker)
-#     dfs.append(df)
+        return df_value

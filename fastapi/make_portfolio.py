@@ -197,16 +197,19 @@ class MakePortrolio:
 
                 safe_num = np.array(int_asset_num[len(int_asset_num) - num_safe :])
                 int_asset_num = np.append(int_asset_num_stock_all, safe_num)
+
                 # 총 투자 현금과 남은 현금 계산
 
                 total_invest_cash = (adj_asset * int_asset_num).sum()
                 cash_hold = initial_cash - total_invest_cash
+
                 break
 
             # 다음 반복을 위해 이전 정수 자산 번호 업데이트
             int_asset_num_stock_all_old = int_asset_num_stock_all
             # 남은 소수 자산에 투자한 후의 총 현금 계산
             new_cash = (adj_asset[:-num_safe] * remaining_decimals_stock).sum()
+
             # 수렴을 확인하거나 new_cash가 0인지 확인
             if (
                 (abs((cash - new_cash) / new_cash) < 0.001)
@@ -245,6 +248,7 @@ class MakePortrolio:
         final_vol = round(final_vol * 100, 2).item()
         if cash_hold != 0:
             cash_hold = int(cash_hold.item())
+
 
         evaluation_results = {
             "int_asset_num": int_asset_num,

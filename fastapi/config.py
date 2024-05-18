@@ -5,5 +5,3 @@ class Settings:
     cors_methods = ["*"]
     cors_headers = ["*"]
     cors_credentials = True
-    host = "192.168.220.136"
-    port = 8000
