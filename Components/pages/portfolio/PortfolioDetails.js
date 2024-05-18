@@ -250,9 +250,8 @@ const PortfolioDetails = ({ route, navigation }) => {
                   >
                     <AppText
                       style={{
-                        fontSize: 21,
+                        fontSize: 18,
                         color: "#222",
-                        fontWeight: "bold",
                       }}
                     >
                       {item.companyName}
@@ -288,7 +287,7 @@ const PortfolioDetails = ({ route, navigation }) => {
                       paddingBottom: 20,
                     }}
                   >
-                    <AppText style={{ fontSize: 22, fontWeight: "bold" }}>
+                    <AppText style={{ fontSize: 21 }}>
                       {(item.currentPrice * item.quantity).toLocaleString()} 원
                     </AppText>
                     <AppText
@@ -369,6 +368,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   outlineDetailBox: {
+    width: "50%",
+    alignItems: "center",
     marginRight: 12,
     paddingRight: 12,
     borderRightWidth: 1,
