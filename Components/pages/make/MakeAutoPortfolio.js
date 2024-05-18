@@ -5,6 +5,7 @@ import { getUsertoken } from "../../utils/localStorageUtils";
 import { usePortfolio } from "../../utils/PortfolioContext";
 import { filteringNumber } from "../../utils/utils";
 import AppText from "../../utils/AppText";
+import Loading from "../../utils/Loading";
 
 const MakeAutoPortfolio = ({ setCurrentStep }) => {
   const { fetchUserInfo } = usePortfolio();
@@ -181,8 +182,8 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
                     적합해요.
                   </AppText>
                   <AppText style={styles.infoText}>
-                    • 국채, 안정적인 배당주 등 저위험 자산에 투자하여 자본
-                    보전을 최우선으로 해요.
+                    • 안전 자산에 투자하는 비율을 높여서 자본 보전을 최우선으로
+                    해요.
                   </AppText>
                 </View>
               )}
@@ -204,17 +205,22 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
                     된 투자자에게 적합해요.
                   </AppText>
                   <AppText style={styles.infoText}>
-                    • 성장주, 신흥 시장 주식, 기술주 등 고위험 자산에 투자하여
-                    자본 이익을 극대화하고자 해요.
+                    • 주식에 투자하는 비율을 높여서 자본 이익을 최대한으로
+                    하고자 해요.
                   </AppText>
                 </View>
               )}
             </View>
 
             <View style={styles.buttonContainer}>
+              <AppText>안전자산?</AppText>
+              <AppText>
+                주식과 상관관계가 반대인 달러와 금으로 구성되어있어요.
+              </AppText>
               <TouchableOpacity
                 style={[
                   styles.button,
+                  { marginTop: 10 },
                   isRiskNull() ? styles.disabledButton : "",
                 ]}
                 onPress={isRiskNull() ? null : handleNextStep}
@@ -270,11 +276,7 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
           </View>
         );
       case 4:
-        return (
-          <View style={styles.container}>
-            <AppText>Loading...</AppText>
-          </View>
-        );
+        return <Loading />;
       default:
         setCurrentStep(0);
     }

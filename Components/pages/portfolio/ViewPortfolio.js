@@ -4,6 +4,7 @@ import { usePortfolio } from "../../utils/PortfolioContext";
 
 import Icon from "react-native-vector-icons/AntDesign";
 import AppText from "../../utils/AppText";
+import Loading from "../../utils/Loading";
 
 const PortfolioList = ({ navigation }) => {
   const { portfolios, portLoading } = usePortfolio();
@@ -28,13 +29,9 @@ const PortfolioList = ({ navigation }) => {
 
   //포트폴리오의 총 수익률 계산 후 반환
   const getTotalROI = (detail) => {
-    const totalPrice = getTotalPrice(detail.stocks) + detail.currentCash;
-    const totalInvestment =
-      getTotalInvestment(detail.stocks) + detail.currentCash;
-    const totalROI = (
-      ((totalPrice - totalInvestment) / totalInvestment) *
-      100
-    ).toFixed(2);
+    const benefit =
+      getTotalPrice(detail.stocks) + detail.currentCash - detail.initialAsset;
+    const totalROI = ((benefit / detail.initialAsset) * 100).toFixed(2);
     return totalROI;
   };
 
@@ -87,7 +84,7 @@ const PortfolioList = ({ navigation }) => {
   if (portLoading) {
     return (
       <View style={styles.errorContent}>
-        <AppText>Loading...</AppText>
+        <Loading />
       </View>
     );
   }

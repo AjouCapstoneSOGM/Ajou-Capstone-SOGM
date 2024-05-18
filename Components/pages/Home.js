@@ -7,12 +7,15 @@ import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 import PortfolioList from "./portfolio/ViewPortfolio.js";
 import Icon from "react-native-vector-icons/AntDesign";
 import AppText from "../utils/AppText.js";
+import { usePortfolio } from "../utils/PortfolioContext.js";
 
 const Home = ({ navigation }) => {
   const { isLoggedIn, logout } = useAuth();
+  const { removePortfolios } = usePortfolio();
 
   const setLogout = () => {
     removeUsertoken();
+    removePortfolios();
     logout();
   };
 

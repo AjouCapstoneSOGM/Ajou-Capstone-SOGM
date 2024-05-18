@@ -3,6 +3,8 @@ import { View, TouchableOpacity, StyleSheet } from "react-native";
 import { getUsertoken } from "../../utils/localStorageUtils";
 import urls from "../../utils/urls";
 import AppText from "../../utils/AppText";
+import Loading from "../../utils/Loading";
+import NotificationBubble from "../../utils/Notification";
 
 const RebalanceList = ({ route, navigation }) => {
   const portfolioId = route.params.id;
@@ -12,7 +14,6 @@ const RebalanceList = ({ route, navigation }) => {
   const fetchRebalanceList = async () => {
     try {
       const token = await getUsertoken();
-      console.log(portfolioId);
       const response = await fetch(
         `${urls.springUrl}/api/rebalancing/${portfolioId}`,
         {
@@ -46,20 +47,18 @@ const RebalanceList = ({ route, navigation }) => {
   }, []);
 
   if (loading) {
-    return (
-      <View>
-        <AppText>Loading...</AppText>
-      </View>
-    );
+    return <Loading />;
   }
 
   return (
     <View style={styles.container}>
-      <AppText style={{ fontSize: 30 }}>알림 목록</AppText>
+      <AppText style={{ fontSize: 30, padding: 10, marginBottom: 20 }}>
+        알림 목록
+      </AppText>
       {rebalanceList.map((rebalance, index) => (
         <View key={index}>
           <TouchableOpacity
-            style={{ backgroundColor: "#ddd", height: 50, margin: 20 }}
+            style={styles.alertBox}
             onPress={() => {
               navigation.navigate("ModifyPortfolio", {
                 portId: portfolioId,
@@ -68,7 +67,7 @@ const RebalanceList = ({ route, navigation }) => {
               });
             }}
           >
-            <AppText>{rebalance.rnId}</AppText>
+            <AppText style={{ fontSize: 25 }}>알림 1</AppText>
           </TouchableOpacity>
         </View>
       ))}
@@ -78,10 +77,16 @@ const RebalanceList = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
     alignItems: "stretch",
     padding: 5,
     backgroundColor: "#f5f5f5",
+  },
+  alertBox: {
+    backgroundColor: "#ddd",
+    borderRadius: 5,
+    margin: 10,
+    marginTop: 10,
+    padding: 10,
   },
 });
 export default RebalanceList;

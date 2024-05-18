@@ -5,6 +5,7 @@ import { arraysEqual, deepCopy, filteringNumber } from "../../utils/utils";
 import GetCurrentPrice from "../../utils/GetCurrentPrice";
 import { usePortfolio } from "../../utils/PortfolioContext";
 import AppText from "../../utils/AppText";
+import Loading from "../../utils/Loading";
 
 const ModifyPortfolio = ({ route, navigation }) => {
   const [loading, setLoading] = useState(true);
@@ -121,11 +122,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
   }, []);
 
   if (loading) {
-    return (
-      <View>
-        <AppText>Loading...</AppText>
-      </View>
-    );
+    return <Loading />;
   }
   return (
     <View style={styles.container}>
@@ -141,7 +138,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
               <View style={styles.inputContainer}>
                 <View style={styles.inputTextContainer}>
                   <TextInput
-                    style={styles.input_Amount}
+                    style={styles.input_Price}
                     keyboardType="numeric"
                     value={item.price.toString()}
                     onChangeText={(text) => handleChangePrices(index, text)}
@@ -152,7 +149,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
                     원에&nbsp;&nbsp;
                   </AppText>
                   <TextInput
-                    style={styles.input_Amount}
+                    style={styles.input_Quantity}
                     keyboardType="numeric"
                     value={item.number.toString()}
                     placeholder={rebalancesOffer[index].number.toString()}
@@ -238,16 +235,17 @@ const styles = StyleSheet.create({
     justifyContent: "space-evenly",
     alignItems: "center",
   },
-  input_Amount: {
-    justifyContent: "center", // 가로 방향에서 중앙 정렬
-    alignItems: "center",
-    backgroundColor: "#ddd",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 5,
+  input_Price: {
+    width: 72,
     marginVertical: 12,
-    marginHorizontal: 6,
     fontSize: 18,
+    borderBottomWidth: 1,
+  },
+  input_Quantity: {
+    width: 42,
+    marginVertical: 12,
+    fontSize: 18,
+    borderBottomWidth: 1,
   },
   tradeButtonContainer: {
     flexDirection: "row",

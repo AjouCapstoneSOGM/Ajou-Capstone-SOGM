@@ -3,6 +3,7 @@ import { View, StyleSheet } from "react-native";
 import urls from "../utils/urls.js";
 import { ScrollView } from "react-native-gesture-handler";
 import AppText from "../utils/AppText.js";
+import Loading from "../utils/Loading.js";
 
 const NewsSummary = ({ route }) => {
   const [loading, setLoading] = useState(true);
@@ -56,11 +57,7 @@ const NewsSummary = ({ route }) => {
   }, []);
 
   if (loading) {
-    return (
-      <View style={styles.container}>
-        <AppText>loading...</AppText>
-      </View>
-    );
+    return <Loading />;
   }
 
   return (
