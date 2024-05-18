@@ -67,7 +67,7 @@ const RebalanceList = ({ route, navigation }) => {
               });
             }}
           >
-            <AppText style={{ fontSize: 25 }}>알림 1</AppText>
+            <AppText style={{ fontSize: 25 }}>알림 2024-05-19</AppText>
           </TouchableOpacity>
         </View>
       ))}

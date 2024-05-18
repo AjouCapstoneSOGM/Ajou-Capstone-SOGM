@@ -26,11 +26,15 @@ const Home = ({ navigation }) => {
           <AppText style={{ fontSize: 18, color: "white" }}>
             안녕하세요 테스트님
           </AppText>
-          <Button title="로그아웃" onPress={setLogout} />
+          <TouchableOpacity onPress={setLogout}>
+            <AppText style={{ fontSize: 18, color: "white" }}>로그아웃</AppText>
+          </TouchableOpacity>
         </View>
       ) : (
         <View style={styles.userContainer}>
-          <Button title="로그인" onPress={() => navigation.navigate("Login")} />
+          <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+            <AppText style={{ color: "white", fontSize: 25 }}>로그인</AppText>
+          </TouchableOpacity>
         </View>
       )}
       <View style={styles.buttonContainer}>

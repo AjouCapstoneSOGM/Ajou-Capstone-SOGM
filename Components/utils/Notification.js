@@ -35,7 +35,7 @@ const NotificationBubble = ({ message, visible, onClose }) => {
       <Animated.View style={[styles.container, { opacity }]}>
         <AppText style={styles.text}>{message}</AppText>
       </Animated.View>
-      <Icon name="caretright" size={30} color="rgba(0, 0, 0, 0.7)" />
+      <Icon name="caretright" size={25} color="rgba(0, 0, 0, 0.7)" />
     </TouchableOpacity>
   );
 };
