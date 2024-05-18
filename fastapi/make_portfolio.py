@@ -150,7 +150,7 @@ class MakePortrolio:
         return res["x"]
 
     def calculate_cash_allocation(
-        self, total_ratio, initial_cash, stock_tickers, num_bonds
+        self, total_ratio, initial_cash, stock_tickers, num_safe
     ):
 
         start = (self.today - timedelta(days=14)).strftime("%Y-%m-%d")
@@ -174,17 +174,17 @@ class MakePortrolio:
         # 투자 가능한 총 현금 계산
         cash = (adj_asset * remaining_decimals).sum()
         # 이전의 정수 자산 개수를 비교하기 위해 저장
-        int_asset_num_stock_all_old = int_asset_num[:-num_bonds]
+        int_asset_num_stock_all_old = int_asset_num[:-num_safe]
 
         max_iter = 100
         cash_hold = 0
         # 수렴이나 특정 조건이 충족될 때까지 반복
         for _ in range(max_iter):
             # 각 주식 자산에 투자할 금액 계산
-            invest = cash * total_ratio[:-num_bonds]
+            invest = cash * total_ratio[:-num_safe]
             # 각 주식 자산에 투자할 수량 계산
 
-            asset_num = invest / adj_asset[:-num_bonds]
+            asset_num = invest / adj_asset[:-num_safe]
             # 수량을 정수로 변환하고 이전 정수 자산 번호에 더함
 
             int_asset_num_stock = np.floor(asset_num).astype(int)
@@ -195,8 +195,9 @@ class MakePortrolio:
             if int_asset_num_stock_all.sum() == int_asset_num_stock_all_old.sum():
                 # 합이 변하지 않으면, 남은 달러 값을 정수 자산 번호에 추가
 
-                dollar_num = np.array(int_asset_num[len(int_asset_num) - num_bonds :])
-                int_asset_num = np.append(int_asset_num_stock_all, dollar_num)
+                safe_num = np.array(int_asset_num[len(int_asset_num) - num_safe :])
+                int_asset_num = np.append(int_asset_num_stock_all, safe_num)
+
                 # 총 투자 현금과 남은 현금 계산
 
                 total_invest_cash = (adj_asset * int_asset_num).sum()
@@ -207,7 +208,8 @@ class MakePortrolio:
             # 다음 반복을 위해 이전 정수 자산 번호 업데이트
             int_asset_num_stock_all_old = int_asset_num_stock_all
             # 남은 소수 자산에 투자한 후의 총 현금 계산
-            new_cash = (adj_asset[:-num_bonds] * remaining_decimals_stock).sum()
+            new_cash = (adj_asset[:-num_safe] * remaining_decimals_stock).sum()
+
             # 수렴을 확인하거나 new_cash가 0인지 확인
             if (
                 (abs((cash - new_cash) / new_cash) < 0.001)
@@ -215,8 +217,8 @@ class MakePortrolio:
                 or (new_cash == 0)
             ):
                 # 수렴이 달성되면, 남은 안전자산 값을 정수 자산 번호에 추가
-                dollar_num = np.array(int_asset_num[len(int_asset_num) - num_bonds :])
-                int_asset_num = np.append(int_asset_num_stock_all, dollar_num)
+                safe_num = np.array(int_asset_num[len(int_asset_num) - num_safe :])
+                int_asset_num = np.append(int_asset_num_stock_all, safe_num)
                 # 총 투자 현금과 남은 현금 계산
                 total_invest_cash = (adj_asset * int_asset_num).sum()
                 cash_hold = initial_cash - total_invest_cash
@@ -227,19 +229,26 @@ class MakePortrolio:
         asset_ratio = (adj_asset * int_asset_num) / initial_cash
         cash_ratio = cash_hold / initial_cash
         total_ratio_final = np.append(asset_ratio, cash_ratio)
+        total_ratio_final = np.round(total_ratio_final, 5)
+        final_total_cash = cash_hold + (total_ratio_final[:-1] * initial_cash).sum()
+
+        if final_total_cash != initial_cash:
+            e = 0
+            e = initial_cash - final_total_cash
+            cash_hold += e
 
         return total_ratio_final, int_asset_num, cash_hold
 
     def evaluate(
         self, total_ratio_final, int_asset_num, cash_hold, final_returns, final_vol
     ):
-
         int_asset_num = int_asset_num.tolist()
         total_ratio_final = total_ratio_final.tolist()
         final_returns = round(final_returns * 100, 2).item()
         final_vol = round(final_vol * 100, 2).item()
         if cash_hold != 0:
-            cash_hold = cash_hold.item()
+            cash_hold = int(cash_hold.item())
+
 
         evaluation_results = {
             "int_asset_num": int_asset_num,
