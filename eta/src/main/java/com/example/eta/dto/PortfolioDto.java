@@ -21,6 +21,7 @@ public class PortfolioDto {
         private float asset;
         private int riskValue;
     }
+
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
@@ -30,9 +31,11 @@ public class PortfolioDto {
         private int quantity;
         private float price;
     }
+
     @Data
     @Builder
-    @NoArgsConstructor @AllArgsConstructor
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class CreateRequestToFastApiDto {
         private List<String> tickers;
         private float safe_asset_ratio;
@@ -41,7 +44,8 @@ public class PortfolioDto {
 
     @Data
     @Builder
-    @NoArgsConstructor @AllArgsConstructor
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class CreatedResultFromFastApiDto {
         private List<Integer> int_asset_num;
         private int cash_hold;

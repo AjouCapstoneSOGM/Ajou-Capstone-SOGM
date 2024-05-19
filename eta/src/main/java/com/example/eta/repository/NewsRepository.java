@@ -9,5 +9,6 @@ import java.util.Optional;
 
 public interface NewsRepository extends JpaRepository<News, NewsId> {
     Optional<News> findFirstByTickerTickerOrderByDateDesc(String ticker);
+
     void deleteAllByTicker(Ticker ticker);
 }

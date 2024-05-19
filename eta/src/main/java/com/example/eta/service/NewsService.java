@@ -7,8 +7,8 @@ import com.example.eta.entity.Ticker;
 import com.example.eta.repository.NewsRepository;
 import com.example.eta.repository.TickerRepository;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -18,15 +18,12 @@ import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class NewsService {
 
-    @Autowired
-    private NewsRepository newsRepository;
-
-    @Autowired
-    private TickerRepository tickerRepository;
-    @Autowired
-    private ApiClient apiClient;
+    private final NewsRepository newsRepository;
+    private final TickerRepository tickerRepository;
+    private final ApiClient apiClient;
 
     @Transactional
     public NewsDto getNews(String ticker) {

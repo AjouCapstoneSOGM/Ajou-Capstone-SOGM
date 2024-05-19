@@ -1,7 +1,6 @@
 package com.example.eta.repository;
 
 import com.example.eta.entity.Price;
-import com.example.eta.entity.Ticker;
 import com.example.eta.entity.compositekey.PriceId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

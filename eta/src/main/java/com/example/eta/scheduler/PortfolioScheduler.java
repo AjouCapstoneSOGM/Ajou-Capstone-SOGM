@@ -10,7 +10,6 @@ import com.example.eta.repository.RebalancingRepository;
 import com.example.eta.repository.RebalancingTickerRepository;
 import com.example.eta.service.PortfolioService;
 import lombok.RequiredArgsConstructor;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -37,7 +36,7 @@ public class PortfolioScheduler {
         for (Portfolio portfolio : portfolioRepository.findAllByIsAutoIsTrue()) {
             updateProportion(portfolio);
             logger.info("Portfolio(id: " + portfolio.getPfId() + ") 주가별 현재 비중 업데이트됨");
-            if(isProportionRebalancingNeeded(portfolio)) {
+            if (isProportionRebalancingNeeded(portfolio)) {
                 int rnId = createProportionRebalancing(portfolio);
                 logger.info("Portfolio(id: " + portfolio.getPfId() + ") 비중 조정 리밸런싱 알림(id:" + rnId + ") 생성됨");
             }
@@ -63,7 +62,7 @@ public class PortfolioScheduler {
         });
     }
 
-    
+
     public int createProportionRebalancing(Portfolio portfolio) {
         // 현재 총자산 계산하고, 각 종목별 비중에 따라 목표 보유량(총 가격) 계산
         Map<PortfolioTicker, Float> currentAmountForTicker = new HashMap<>();
@@ -75,7 +74,7 @@ public class PortfolioScheduler {
             float targetAmount = totalAmount * portfolioTicker.getInitProportion();
             targetAmountForTicker.put(portfolioTicker, targetAmount);
         }
-        
+
         // 매도, 매수 알림 생성
         Rebalancing rebalancing = Rebalancing.builder()
                 .portfolio(portfolio)
@@ -91,7 +90,7 @@ public class PortfolioScheduler {
             float diff = targetAmount - currentAmount;
             if (diff > 0) {
                 // 매수
-                int numToBuy = (int)(diff / close);
+                int numToBuy = (int) (diff / close);
                 if (numToBuy == 0) continue;
                 RebalancingTicker rebalancingTicker = rebalancingTickerRepository.save(RebalancingTicker.builder()
                         .rebalancing(rebalancing)
@@ -103,7 +102,7 @@ public class PortfolioScheduler {
             } else if (diff < 0) {
                 // 매도
                 diff = -diff;
-                int numToSell = (int)(diff / close);
+                int numToSell = (int) (diff / close);
                 if (numToSell == 0) continue;
                 RebalancingTicker rebalancingTicker = rebalancingTickerRepository.save(RebalancingTicker.builder()
                         .rebalancing(rebalancing)

@@ -7,6 +7,7 @@ public class Utility {
     /**
      * 한글을 자모 단위로 분해합니다.
      * <p> 출처: https://wordbe.tistory.com/291
+     *
      * @param string 분해할 문자열
      * @return 분해된 문자열
      */
@@ -19,15 +20,15 @@ public class Utility {
                 {"", "ㄱ", "ㄲ", "ㄳ", "ㄴ", "ㄵ", "ㄶ", "ㄷ", "ㄹ", "ㄺ", "ㄻ", "ㄼ", "ㄽ", "ㄾ", "ㄿ", "ㅀ", "ㅁ", "ㅂ", "ㅄ", "ㅅ", "ㅆ", "ㅇ", "ㅈ", "ㅊ", "ㅋ", "ㅌ", "ㅍ", "ㅎ"};
 
         StringBuilder stringBuilder = new StringBuilder();
-        for (int i=0; i<string.length(); i++) {
+        for (int i = 0; i < string.length(); i++) {
             char uniVal = string.charAt(i);
 
             try {
                 if (uniVal >= 0xAC00 && uniVal <= 0xD7A3) {
-                    uniVal = (char)(uniVal - 0xAC00);
-                    char cho = (char)(uniVal / 28 / 21);
-                    char jung = (char)(uniVal / 28 % 21);
-                    char jong = (char)(uniVal % 28);
+                    uniVal = (char) (uniVal - 0xAC00);
+                    char cho = (char) (uniVal / 28 / 21);
+                    char jung = (char) (uniVal / 28 % 21);
+                    char jong = (char) (uniVal % 28);
                     stringBuilder.append(arr_cho[cho]);
                     stringBuilder.append(arr_jung[jung]);
                     stringBuilder.append(arr_jong[jong]);
