@@ -101,8 +101,8 @@ public class PortfolioService {
         PortfolioDto.CreatedResultFromFastApiDto createdResultFromFastApiDto = apiClient.getCreatedPortfolioApi(PortfolioDto.CreateRequestToFastApiDto.builder()
                 .tickers(postfixedTickers)
                 .safe_asset_ratio(
-                    createRequestDto.getRiskValue() == 1 ? 0.1f :
-                    createRequestDto.getRiskValue() == 2 ? 0.2f : 0.3f
+                    createRequestDto.getRiskValue() == 1 ? 0.3f :
+                    createRequestDto.getRiskValue() == 2 ? 0.2f : 0.1f
                 )
                 .initial_cash((int)createRequestDto.getAsset())
                 .build()).block().getBody();
