@@ -77,7 +77,13 @@ public class PortfolioService {
 
     @Transactional
     public void initializeAutoPortfolio(Portfolio portfolio, PortfolioDto.CreateRequestDto createRequestDto) throws Exception {
-        List<Ticker> tickers = tickerRepository.findTopTickerBySector(createRequestDto.getSector().get(0), 10, createRequestDto.getCountry());
+        // 섹터별 상위 10개 종목 선택
+        List<Ticker> tickers = tickerRepository.findTopTickersBySector(createRequestDto.getSector().get(0), 10, createRequestDto.getCountry());
+
+        // 안전자산 종목 추가
+        tickers.addAll(tickerRepository.findSafeAssetTickers(createRequestDto.getCountry()));
+
+        // 최초 리밸런싱 알림 생성
         List<Integer> stockNumPerTicker = getCreatedResultFromFastAPI(createRequestDto, tickers);
         setInitAutoPortfolio(portfolio, tickers, stockNumPerTicker);
     }

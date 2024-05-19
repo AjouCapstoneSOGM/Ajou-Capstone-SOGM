@@ -14,6 +14,6 @@ public class TickerService {
     private final TickerRepository tickerRepository;
 
     public List<Ticker> getSearchedTicker(String decomposedText) {
-        return tickerRepository.findTopTickerByDecomposedText(decomposedText, 20);
+        return tickerRepository.findTickersByDecomposedText(decomposedText, 20);
     }
 }

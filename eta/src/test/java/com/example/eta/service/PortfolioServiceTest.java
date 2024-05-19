@@ -3,10 +3,7 @@ package com.example.eta.service;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.example.eta.dto.PortfolioDto;
-import com.example.eta.entity.Portfolio;
-import com.example.eta.entity.PortfolioTicker;
-import com.example.eta.entity.Rebalancing;
-import com.example.eta.entity.User;
+import com.example.eta.entity.*;
 import com.example.eta.repository.*;
 import com.example.eta.service.PortfolioService;
 import org.aspectj.apache.bcel.Repository;
@@ -81,7 +78,6 @@ public class PortfolioServiceTest {
     @DisplayName("자동 포트폴리오 초기화(생성된 결과 반영, 리밸런싱 알림 초기화)")
     @Transactional
     public void testInitializeAutoPortfolio() throws Exception {
-        // given 유저 생성 포트폴리오 생성
         User user = userRepository.save(new User().builder()
                 .email("james001@foo.bar")
                 .isVerified(false)
@@ -90,24 +86,36 @@ public class PortfolioServiceTest {
                 .role("USER")
                 .createdDate(LocalDateTime.now())
                 .enabled(true).build());
-
+        String sector = "G25";
         PortfolioDto.CreateRequestDto createRequestDto = PortfolioDto.CreateRequestDto.builder()
                 .country("KOR")
-                .sector(List.of("G25"))
+                .sector(List.of(sector))
                 .asset(10000000)
                 .riskValue(1).build();
         Portfolio portfolio = portfolioService.createInitAutoPortfolio(user, createRequestDto);
 
-        // when
         portfolioService.initializeAutoPortfolio(portfolio, createRequestDto);
-
-        // then 리밸런싱 알림 10개 생성됨
         Rebalancing rebalancing = rebalancingRepository.findAllByPortfolio(portfolio).get(0);
         List<PortfolioTicker> portfolioTickers = portfolioTickerRepository.findAllByPortfolio(portfolio);
 
-        Assertions.assertAll(
-                () -> assertEquals(10, rebalancing.getRebalancingTickers().size()),
-                () -> assertEquals(0, portfolioTickers.get(0).getNumber())
-        );
+        // 상위 10개는 관심 섹터에 대한 티커, 나머지는 안전자산인지 확인
+        // 종목 보유량 0인지 확인
+        int countTicker = 0;
+        for (PortfolioTicker pt : portfolioTickers) {
+            if (countTicker < 10) {
+                assertEquals(sector, pt.getTicker().getSector().getSectorId());
+            } else {
+                assertEquals("안전자산", pt.getTicker().getEquity());
+            }
+            assertEquals(0, portfolioTickers.get(0).getNumber());
+            countTicker++;
+        }
+
+        // 리밸런싱 알림 생성 확인
+        assertEquals(countTicker, rebalancing.getRebalancingTickers().size());
+        for (RebalancingTicker rt : rebalancing.getRebalancingTickers()) {
+            assertTrue(rt.getIsBuy());
+            assertNotEquals(0, rt.getNumber());
+        }
     }
 }
