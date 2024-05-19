@@ -63,6 +63,7 @@ public class PortfolioDto {
         private Float averageCost;
         private String ticker;
         private String companyName;
+        private String equity;
     }
 
     @Data

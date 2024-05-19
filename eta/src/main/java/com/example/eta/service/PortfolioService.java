@@ -158,6 +158,7 @@ public class PortfolioService {
                     .quantity(pt.getNumber())
                     .companyName(ticker.getName())
                     .averageCost(pt.getAveragePrice())
+                    .equity(pt.getTicker().getEquity())
                     .build());
         }
 
