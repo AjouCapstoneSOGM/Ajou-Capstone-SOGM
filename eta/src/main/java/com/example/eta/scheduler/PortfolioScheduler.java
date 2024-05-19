@@ -39,6 +39,8 @@ public class PortfolioScheduler {
             if (isProportionRebalancingNeeded(portfolio)) {
                 int rnId = createProportionRebalancing(portfolio);
                 logger.info("Portfolio(id: " + portfolio.getPfId() + ") 비중 조정 리밸런싱 알림(id:" + rnId + ") 생성됨");
+
+                //TODO: 푸시 알림 보내기
             }
         }
     }
