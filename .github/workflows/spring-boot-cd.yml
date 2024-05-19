@@ -20,7 +20,6 @@ jobs:
     - name: Set Up Environment
       run: |
         echo "${{ secrets.SPRING_APPLICATION_PROD }}" > ./eta/src/main/resources/application.yml
-        echo "${{ secrets.FB_KEY }}" > ./eta/src/main/resources/firebase-private-key.json
         
     - name: Build Without Testing
       run: cd eta; ./gradlew build -x test

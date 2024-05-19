@@ -83,6 +83,6 @@ public class AuthControllerTest {
                 .andReturn().getResponse();
 
         tokenRepository.findById(userService.findByEmail("james@domain.com").getUserId())
-                .ifPresent(token -> assertNotNull(token.getFcmToken()));
+                .ifPresent(token -> assertNotNull(token.getExpoPushToken()));
     }
 }

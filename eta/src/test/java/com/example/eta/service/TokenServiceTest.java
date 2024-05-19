@@ -24,7 +24,7 @@ public class TokenServiceTest {
     private UserRepository userRepository;
 
     @Test
-    @DisplayName("FCM 토큰 저장")
+    @DisplayName("expo 토큰 저장")
     @Transactional
     public void testSaveFcmToken() {
         User user = userRepository.save(User.builder()
@@ -36,15 +36,15 @@ public class TokenServiceTest {
                 .createdDate(LocalDateTime.now())
                 .enabled(true).build());
 
-        tokenService.saveFcmToken(user, "token1");
-        assertEquals("token1", user.getToken().getFcmToken());
+        tokenService.saveToken(user, "token1");
+        assertEquals("token1", user.getToken().getExpoPushToken());
 
-        tokenService.saveFcmToken(user, "token2");
-        assertEquals("token2", user.getToken().getFcmToken());
+        tokenService.saveToken(user, "token2");
+        assertEquals("token2", user.getToken().getExpoPushToken());
     }
 
     @Test
-    @DisplayName("FCM 토큰 삭제")
+    @DisplayName("expo 토큰 삭제")
     @Transactional
     public void testDeleteFcmToken() {
         User user = userRepository.save(User.builder()
@@ -56,8 +56,8 @@ public class TokenServiceTest {
                 .createdDate(LocalDateTime.now())
                 .enabled(true).build());
 
-        tokenService.saveFcmToken(user, "token1");
-        tokenService.deleteFcmToken(user);
+        tokenService.saveToken(user, "token1");
+        tokenService.deleteToken(user);
 
         assertNull(user.getToken());
     }
