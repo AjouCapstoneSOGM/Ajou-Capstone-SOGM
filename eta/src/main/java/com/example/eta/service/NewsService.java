@@ -6,8 +6,9 @@ import com.example.eta.entity.News;
 import com.example.eta.entity.Ticker;
 import com.example.eta.repository.NewsRepository;
 import com.example.eta.repository.TickerRepository;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -17,16 +18,14 @@ import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class NewsService {
 
-    @Autowired
-    private NewsRepository newsRepository;
+    private final NewsRepository newsRepository;
+    private final TickerRepository tickerRepository;
+    private final ApiClient apiClient;
 
-    @Autowired
-    private TickerRepository tickerRepository;
-    @Autowired
-    private ApiClient apiClient;
-
+    @Transactional
     public NewsDto getNews(String ticker) {
         Optional<News> optionalNews = newsRepository.findFirstByTickerTickerOrderByDateDesc(ticker);
 
@@ -44,7 +43,10 @@ public class NewsService {
 
                 if (newsDto != null) {
                     // FastAPI 서버에서 받은 뉴스 정보를 DB에 저장
+
                     Ticker tickerEntity = tickerRepository.findByTicker(ticker);
+                    newsRepository.deleteAllByTicker(tickerEntity);
+
                     News news = new News();
                     news.setDate(LocalDateTime.now());
                     news.setTicker(tickerEntity);

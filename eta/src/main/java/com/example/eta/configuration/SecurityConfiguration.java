@@ -25,7 +25,7 @@ import javax.sql.DataSource;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class SecurityConfiguration{
+public class SecurityConfiguration {
     private final AuthenticationConfiguration authConfiguration;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
@@ -54,11 +54,11 @@ public class SecurityConfiguration{
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.httpBasic(HttpBasicConfigurer::disable)
-            .csrf(CsrfConfigurer::disable)
-            .formLogin(FormLoginConfigurer::disable)
-            .rememberMe(RememberMeConfigurer::disable)
-            .sessionManagement(configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeRequests().anyRequest().permitAll();  // TODO: 권한 및 인증 여부에 따라 수정 필요
+                .csrf(CsrfConfigurer::disable)
+                .formLogin(FormLoginConfigurer::disable)
+                .rememberMe(RememberMeConfigurer::disable)
+                .sessionManagement(configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeRequests().anyRequest().permitAll();  // TODO: 권한 및 인증 여부에 따라 수정 필요
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

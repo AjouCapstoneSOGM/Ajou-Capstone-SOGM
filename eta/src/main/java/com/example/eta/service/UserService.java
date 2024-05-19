@@ -1,14 +1,10 @@
 package com.example.eta.service;
 
-import com.example.eta.dto.UserDto;
 import com.example.eta.entity.User;
 import com.example.eta.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)

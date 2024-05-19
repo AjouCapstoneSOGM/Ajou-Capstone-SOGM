@@ -16,7 +16,7 @@ public class PortfolioControllerAspect {
 
     private PortfolioRepository portfolioRepository;
 
-    public PortfolioControllerAspect (PortfolioRepository portfolioRepository) {
+    public PortfolioControllerAspect(PortfolioRepository portfolioRepository) {
         this.portfolioRepository = portfolioRepository;
     }
 
@@ -26,7 +26,7 @@ public class PortfolioControllerAspect {
         String[] parameterNames = signature.getParameterNames();
         Object[] parameterValues = joinPoint.getArgs();
 
-        String email = (String)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Integer pfId = null;
 
         for (int i = 0; i < parameterNames.length; i++) {
@@ -37,7 +37,8 @@ public class PortfolioControllerAspect {
 
         if (pfId != null) {
             if (!portfolioRepository.existsById(pfId)) throw new NotFoundException();
-            if (!portfolioRepository.getReferenceById(pfId).getUser().getEmail().equals(email)) throw new OwnershipException();
+            if (!portfolioRepository.getReferenceById(pfId).getUser().getEmail().equals(email))
+                throw new OwnershipException();
         }
     }
 }
