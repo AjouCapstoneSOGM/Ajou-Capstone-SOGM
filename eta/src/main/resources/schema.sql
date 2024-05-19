@@ -157,3 +157,10 @@ CREATE TABLE `financial_statement` (
     PRIMARY KEY (`ticker`, `date`),
     FOREIGN KEY (`ticker`) REFERENCES `ticker` (`ticker`)
 );
+
+CREATE TABLE `ticker_search` (
+    `ticker` varchar(20) NOT NULL,
+    `decomposed_name` varchar(150),
+    PRIMARY KEY (`ticker`),
+    FOREIGN KEY (`ticker`) REFERENCES `ticker` (`ticker`)
+);
