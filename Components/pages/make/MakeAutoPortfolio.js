@@ -1,16 +1,11 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  Button,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-} from "react-native";
+import { View, TextInput, TouchableOpacity, StyleSheet } from "react-native";
 import urls from "../../utils/urls";
 import { getUsertoken } from "../../utils/localStorageUtils";
 import { usePortfolio } from "../../utils/PortfolioContext";
 import { filteringNumber } from "../../utils/utils";
+import AppText from "../../utils/AppText";
+import Loading from "../../utils/Loading";
 
 const MakeAutoPortfolio = ({ setCurrentStep }) => {
   const { fetchUserInfo } = usePortfolio();
@@ -19,6 +14,10 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
   const [riskLevel, setRiskLevel] = useState("");
   const [interest, setInterest] = useState("");
   const [sector, setSector] = useState({});
+
+  const riskText = ["안정투자형", "위험중립형", "적극투자형"];
+  const riskColor = ["#006400", "#F07C00", "#8B0000"];
+  const riskBgColor = ["#90EE90", "#FFDAB9", "#FFB6C1"];
 
   const isRiskNull = () => {
     if (riskLevel === "") {
@@ -80,8 +79,8 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
     setCurrentAutoStep(currentAutoStep + 1);
   };
 
-  const handlePrevStep = () => {
-    setCurrentAutoStep(currentAutoStep - 1);
+  const addValuetoAmount = (value) => {
+    setAmount(Number(amount) + value);
   };
 
   useEffect(() => {
@@ -94,22 +93,42 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
         return (
           <View style={styles.container}>
             <View style={styles.textContainer}>
-              <Text style={{ fontSize: 25 }}>
+              <AppText style={{ fontSize: 25 }}>
                 포트폴리오에 사용할 금액을 입력해주세요.
-              </Text>
+              </AppText>
             </View>
             <View style={styles.inputContainer}>
               <TextInput
                 style={styles.input_Amount}
                 keyboardType="numeric"
-                value={amount}
-                onChangeText={(value) => handleAmount(value)}
+                value={amount.toString()}
+                onChangeText={(value) => Number(handleAmount(value))}
                 placeholder="금액을 입력하세요"
               />
+              <View style={{ flexDirection: "row", marginBottom: 10 }}>
+                <TouchableOpacity
+                  style={styles.addButton}
+                  onPress={() => addValuetoAmount(100000)}
+                >
+                  <AppText style={{ color: "#555" }}>+ 10만</AppText>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.addButton}
+                  onPress={() => addValuetoAmount(1000000)}
+                >
+                  <AppText style={{ color: "#555" }}>+ 100만</AppText>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.addButton}
+                  onPress={() => addValuetoAmount(10000000)}
+                >
+                  <AppText style={{ color: "#555" }}>+ 1000만</AppText>
+                </TouchableOpacity>
+              </View>
               {amount && !isAmountEnough() && (
-                <Text style={{ color: "red", alignSelf: "baseline" }}>
+                <AppText style={{ color: "red", alignSelf: "baseline" }}>
                   최소 100만원 이상 가능합니다.
-                </Text>
+                </AppText>
               )}
             </View>
             <View style={styles.buttonContainer}>
@@ -121,7 +140,7 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
                 title="next"
                 onPress={isAmountEnough() ? handleNextStep : null}
               >
-                <Text style={{ fontSize: 18, color: "white" }}>다음</Text>
+                <AppText style={{ fontSize: 18, color: "white" }}>다음</AppText>
               </TouchableOpacity>
             </View>
           </View>
@@ -130,35 +149,83 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
         return (
           <View style={styles.container}>
             <View style={styles.textContainer}>
-              <Text style={{ fontSize: 25 }}>
+              <AppText style={{ fontSize: 25 }}>
                 원하는 위험도를 선택해주세요.
-              </Text>
+              </AppText>
             </View>
-            <View style={styles.inputContainer}>
-              {[1, 2, 3].map((level) => (
+            <View style={styles.riskContainer}>
+              {[1, 2, 3].map((level, index) => (
                 <TouchableOpacity
-                  key={level}
+                  key={index}
                   style={[
                     styles.input_Risk,
-                    riskLevel === level ? styles.selectedInput : "",
+                    riskLevel === level
+                      ? { backgroundColor: riskBgColor[index] }
+                      : "",
                   ]}
                   onPress={() => {
                     setRiskLevel(level);
                   }}
                 >
-                  <Text>{level} 단계</Text>
+                  <AppText style={{ color: riskColor[index] }}>
+                    {level} 단계
+                  </AppText>
+                  <AppText style={{ fontSize: 16 }}>{riskText[index]}</AppText>
                 </TouchableOpacity>
               ))}
             </View>
+            <View style={styles.riskInfo}>
+              {riskLevel === 1 && (
+                <View>
+                  <AppText style={styles.infoText}>
+                    • 변동성이 낮고 안정적인 수익을 목표로 하는 투자자에게
+                    적합해요.
+                  </AppText>
+                  <AppText style={styles.infoText}>
+                    • 안전 자산에 투자하는 비율을 높여서 자본 보전을 최우선으로
+                    해요.
+                  </AppText>
+                </View>
+              )}
+              {riskLevel === 2 && (
+                <View>
+                  <AppText style={styles.infoText}>
+                    • 위험과 수익의 균형을 맞추고자 하는 투자자에게 적합해요.
+                  </AppText>
+                  <AppText style={styles.infoText}>
+                    • 주식과 채권을 적절히 혼합하여 중간 정도의 변동성을 가지며,
+                    중간 수준의 수익을 기대할 수 있어요.
+                  </AppText>
+                </View>
+              )}
+              {riskLevel === 3 && (
+                <View>
+                  <AppText style={styles.infoText}>
+                    • 높은 수익을 기대하며 더 큰 변동성과 위험을 감수할 준비가
+                    된 투자자에게 적합해요.
+                  </AppText>
+                  <AppText style={styles.infoText}>
+                    • 주식에 투자하는 비율을 높여서 자본 이익을 최대한으로
+                    하고자 해요.
+                  </AppText>
+                </View>
+              )}
+            </View>
+
             <View style={styles.buttonContainer}>
+              <AppText>안전자산?</AppText>
+              <AppText>
+                주식과 상관관계가 반대인 달러와 금으로 구성되어있어요.
+              </AppText>
               <TouchableOpacity
                 style={[
                   styles.button,
+                  { marginTop: 10 },
                   isRiskNull() ? styles.disabledButton : "",
                 ]}
                 onPress={isRiskNull() ? null : handleNextStep}
               >
-                <Text style={{ fontSize: 18, color: "white" }}>다음</Text>
+                <AppText style={{ fontSize: 18, color: "white" }}>다음</AppText>
               </TouchableOpacity>
             </View>
           </View>
@@ -167,9 +234,9 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
         return (
           <View style={styles.container}>
             <View style={styles.textContainer}>
-              <Text style={{ fontSize: 25 }}>
+              <AppText style={{ fontSize: 25 }}>
                 관심있는 분야를 한 가지 선택해주세요.
-              </Text>
+              </AppText>
             </View>
             <View style={styles.sectorContainer}>
               {Object.entries(sector).map(([code, name]) => (
@@ -181,7 +248,16 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
                   ]}
                   onPress={() => setInterest(code)}
                 >
-                  <Text style={{ fontSize: 17 }}>{name}</Text>
+                  <AppText
+                    style={[
+                      {
+                        fontSize: 17,
+                        color: interest === code ? "white" : "black",
+                      },
+                    ]}
+                  >
+                    {name}
+                  </AppText>
                 </TouchableOpacity>
               ))}
             </View>
@@ -194,17 +270,13 @@ const MakeAutoPortfolio = ({ setCurrentStep }) => {
                 title="submit"
                 onPress={isInterestNull() ? null : submitUserInfo}
               >
-                <Text style={{ fontSize: 18, color: "white" }}>생성</Text>
+                <AppText style={{ fontSize: 18, color: "white" }}>생성</AppText>
               </TouchableOpacity>
             </View>
           </View>
         );
       case 4:
-        return (
-          <View style={styles.container}>
-            <Text>Loading...</Text>
-          </View>
-        );
+        return <Loading />;
       default:
         setCurrentStep(0);
     }
@@ -228,28 +300,47 @@ const styles = StyleSheet.create({
     alignItems: "stretch",
     padding: 20,
   },
+  riskContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    padding: 20,
+  },
+  riskInfo: {
+    flex: 1,
+    padding: 30,
+    marginTop: 30,
+  },
+  infoText: {
+    fontSize: 18,
+    marginBottom: 40,
+    textAlign: "justify",
+  },
+  input_Amount: {
+    justifyContent: "center", // 가로 방향에서 중앙 정렬
+    marginVertical: 10,
+    fontSize: 30,
+    borderBottomWidth: 1,
+  },
+  addButton: {
+    backgroundColor: "#ddd",
+    marginRight: 10,
+    padding: 8,
+    borderRadius: 5,
+  },
+  input_Risk: {
+    justifyContent: "center", // 가로 방향에서 중앙 정렬
+    height: 100,
+    backgroundColor: "#ddd",
+    alignItems: "center",
+    padding: 15,
+    borderRadius: 5,
+  },
   sectorContainer: {
     flex: 2,
     flexDirection: "row",
     padding: 20,
     flexWrap: "wrap",
     alignItems: "flex-start",
-  },
-  input_Amount: {
-    justifyContent: "center", // 가로 방향에서 중앙 정렬
-    backgroundColor: "#ddd",
-    padding: 20,
-    borderRadius: 10,
-    margin: 10,
-    fontSize: 20,
-  },
-  input_Risk: {
-    justifyContent: "center", // 가로 방향에서 중앙 정렬
-    backgroundColor: "#ddd",
-    alignItems: "center",
-    padding: 20,
-    borderRadius: 10,
-    margin: 10,
   },
   input_Interest: {
     flexGrow: 1,
@@ -261,7 +352,7 @@ const styles = StyleSheet.create({
     margin: 10,
   },
   selectedInput: {
-    backgroundColor: "#cceecc",
+    backgroundColor: "#6495ED",
   },
   buttonContainer: {
     alignItems: "stretch",

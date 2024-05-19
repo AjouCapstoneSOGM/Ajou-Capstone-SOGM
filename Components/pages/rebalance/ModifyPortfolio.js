@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import { View, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { ScrollView, TextInput } from "react-native-gesture-handler";
 import { arraysEqual, deepCopy, filteringNumber } from "../../utils/utils";
 import GetCurrentPrice from "../../utils/GetCurrentPrice";
 import { usePortfolio } from "../../utils/PortfolioContext";
+import AppText from "../../utils/AppText";
+import Loading from "../../utils/Loading";
 
 const ModifyPortfolio = ({ route, navigation }) => {
   const [loading, setLoading] = useState(true);
@@ -35,21 +37,36 @@ const ModifyPortfolio = ({ route, navigation }) => {
       },
       {
         text: "확인",
-        onPress: () => {
+        onPress: async () => {
           setLoading(true);
-          fetchModify(rebalanceData, portId, rnId);
-        },
-        style: "destructive", // iOS에서만 적용되는 스타일 옵션
-      },
-    ]);
-    if (!arraysEqual(rebalances, rebalancesOffer)) {
-      console.log("다릅니다.");
-    }
-    Alert.alert("수정 완료", "수정이 완료되었습니다.", [
-      {
-        text: "확인",
-        onPress: () => {
-          navigation.navigate("PortfolioDetails", { id: portId });
+          try {
+            await fetchModify(rebalanceData, portId, rnId);
+
+            // 변경 여부 확인
+            if (!arraysEqual(rebalances, rebalancesOffer)) {
+              console.log("다릅니다.");
+            }
+
+            // 수정 완료 알림
+            Alert.alert("수정 완료", "수정이 완료되었습니다.", [
+              {
+                text: "확인",
+                onPress: () => {
+                  navigation.navigate("PortfolioDetails", { id: portId });
+                },
+                style: "destructive", // iOS에서만 적용되는 스타일 옵션
+              },
+            ]);
+          } catch (error) {
+            console.error("수정 중 오류 발생:", error);
+            Alert.alert(
+              "수정 실패",
+              "수정 중 오류가 발생했습니다. 다시 시도해주세요.",
+              [{ text: "확인", onPress: () => {} }]
+            );
+          } finally {
+            setLoading(false);
+          }
         },
         style: "destructive", // iOS에서만 적용되는 스타일 옵션
       },
@@ -105,11 +122,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
   }, []);
 
   if (loading) {
-    return (
-      <View>
-        <Text>Loading...</Text>
-      </View>
-    );
+    return <Loading />;
   }
   return (
     <View style={styles.container}>
@@ -118,32 +131,34 @@ const ModifyPortfolio = ({ route, navigation }) => {
           {rebalances.map((item, index) => (
             <View style={styles.rebalanceBlock} key={index}>
               <View>
-                <Text style={{ fontSize: 20, paddingHorizontal: 10 }}>
+                <AppText style={{ fontSize: 20, paddingHorizontal: 10 }}>
                   {item.name}
-                </Text>
+                </AppText>
               </View>
               <View style={styles.inputContainer}>
                 <View style={styles.inputTextContainer}>
                   <TextInput
-                    style={styles.input_Amount}
+                    style={styles.input_Price}
                     keyboardType="numeric"
                     value={item.price.toString()}
                     onChangeText={(text) => handleChangePrices(index, text)}
                     placeholder={rebalancesOffer[index].price.toString()}
                     placeholderTextColor="#bbb"
                   />
-                  <Text style={{ fontWeight: "bold", fontSize: 17 }}>
+                  <AppText style={{ fontWeight: "bold", fontSize: 17 }}>
                     원에&nbsp;&nbsp;
-                  </Text>
+                  </AppText>
                   <TextInput
-                    style={styles.input_Amount}
+                    style={styles.input_Quantity}
                     keyboardType="numeric"
                     value={item.number.toString()}
                     placeholder={rebalancesOffer[index].number.toString()}
                     placeholderTextColor="#bbb"
                     onChangeText={(text) => handleChangeNumber(index, text)}
                   />
-                  <Text style={{ fontWeight: "bold", fontSize: 17 }}>주를</Text>
+                  <AppText style={{ fontWeight: "bold", fontSize: 17 }}>
+                    주를
+                  </AppText>
                 </View>
                 <View style={styles.tradeButtonContainer}>
                   <TouchableOpacity
@@ -153,14 +168,14 @@ const ModifyPortfolio = ({ route, navigation }) => {
                     ]}
                     onPress={() => handleChangeBuy(index, true)}
                   >
-                    <Text
+                    <AppText
                       style={[
                         { fontSize: 18 },
                         item.isBuy ? { color: "white" } : "",
                       ]}
                     >
                       매수
-                    </Text>
+                    </AppText>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={[
@@ -169,14 +184,14 @@ const ModifyPortfolio = ({ route, navigation }) => {
                     ]}
                     onPress={() => handleChangeBuy(index, false)}
                   >
-                    <Text
+                    <AppText
                       style={[
                         { fontSize: 18 },
                         !item.isBuy ? { color: "white" } : "",
                       ]}
                     >
                       매도
-                    </Text>
+                    </AppText>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -185,7 +200,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
         </View>
       </ScrollView>
       <TouchableOpacity style={styles.button} onPress={() => handleModify()}>
-        <Text style={{ fontSize: 18, color: "white" }}>수정</Text>
+        <AppText style={{ fontSize: 18, color: "white" }}>수정</AppText>
       </TouchableOpacity>
     </View>
   );
@@ -220,16 +235,17 @@ const styles = StyleSheet.create({
     justifyContent: "space-evenly",
     alignItems: "center",
   },
-  input_Amount: {
-    justifyContent: "center", // 가로 방향에서 중앙 정렬
-    alignItems: "center",
-    backgroundColor: "#ddd",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 5,
+  input_Price: {
+    width: 72,
     marginVertical: 12,
-    marginHorizontal: 6,
     fontSize: 18,
+    borderBottomWidth: 1,
+  },
+  input_Quantity: {
+    width: 42,
+    marginVertical: 12,
+    fontSize: 18,
+    borderBottomWidth: 1,
   },
   tradeButtonContainer: {
     flexDirection: "row",

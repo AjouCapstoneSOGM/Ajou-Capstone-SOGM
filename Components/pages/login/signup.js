@@ -1,20 +1,25 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
-  Text,
   StyleSheet,
   TouchableOpacity,
   TextInput,
-  Button,
   Alert,
 } from "react-native";
 import urls from "../../utils/urls";
+import AppText from "../../utils/AppText";
 
 const Signup = ({ navigation }) => {
   const [username, setUsername] = useState("");
   const [useremail, setUseremail] = useState("");
   const [password, setPassword] = useState("");
   const [pwcheck, setpwcheck] = useState("");
+
+  const [checkEmail, setCheckEmail] = useState("");
+  const [checkPw, setCheckPw] = useState("");
+  const [checkPwLen, setCheckPwLen] = useState("");
+
+  const MinPasswordLength = 10;
 
   const fetchSignupInfo = async () => {
     fetch(`${urls.springUrl}/api/auth/signup`, {
@@ -36,120 +41,161 @@ const Signup = ({ navigation }) => {
         console.error("Error:", error);
       });
   };
-
-  const handleSignUp = () => {
-    MinPasswordLength = 10;
-
-    let IsThereEmptyInput = ![username, useremail, password, pwcheck].every(
-      (str) => str.length > 0
-    );
-
-    const isWrongEmail = (email) => {
-      return email.indexOf("@") < 1 || email.split("@")[1].indexOf(".") < 1;
-    };
-
-    if (IsThereEmptyInput) {
-      Alert.alert("빈칸이 있습니다.");
-      return;
-    } else if (isWrongEmail(useremail)) {
-      Alert.alert("이메일 서식이 올바르지 않습니다.");
-      return;
-    } else if (password.length < MinPasswordLength) {
-      Alert.alert(
-        "비밀번호를 " + MinPasswordLength + "자리 이상으로 설정해 주세요"
-      );
-      return;
-    } else if (password != pwcheck) {
-      Alert.alert("비밀번호 확인이 일치하지 않습니다.");
-      return;
-    }
-    fetchSignupInfo();
-    navigation.navigate("Home", { screen: "Home" });
+  const isEmailValid = (email) => {
+    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return regex.test(email);
   };
+
+  const isValueValid = () => {
+    if (username && checkEmail && checkPw && checkPwLen) return true;
+    return false;
+  };
+
+  const handleSignUp = async () => {
+    if (isValueValid()) {
+      await fetchSignupInfo();
+      Alert.alert("회원가입 완료", "회원가입이 완료되었습니다.", [
+        {
+          text: "확인",
+          onPress: () => {
+            navigation.navigate("Login");
+          },
+          style: "destructive",
+        },
+      ]);
+    }
+  };
+
+  useEffect(() => {
+    if (!useremail) setCheckEmail("");
+    else {
+      if (isEmailValid(useremail)) setCheckEmail(true);
+      else setCheckEmail(false);
+    }
+  }, [useremail]);
+
+  useEffect(() => {
+    if (!password) setCheckPwLen("");
+    else {
+      if (password.length < 10) setCheckPwLen(false);
+      else setCheckPwLen(true);
+    }
+  }, [password]);
+
+  useEffect(() => {
+    if (!pwcheck) setCheckPw("");
+    else {
+      if (password !== pwcheck) setCheckPw(false);
+      else setCheckPw(true);
+    }
+  }, [pwcheck]);
   return (
-    <View style={Styles.container}>
-      <Text style={Styles.HomeText}>회원가입 화면</Text>
-
-      <TextInput
-        style={Styles.Input}
-        value={username}
-        placeholder="이름"
-        onChangeText={setUsername}
-      ></TextInput>
-      <TextInput
-        onChangeText={setUseremail}
-        value={useremail}
-        placeholder="이메일"
-        style={Styles.Input}
-      ></TextInput>
-      <TextInput
-        onChangeText={setPassword}
-        value={password}
-        placeholder="비밀번호"
-        style={Styles.Input}
-        secureTextEntry
-      ></TextInput>
-      <TextInput
-        onChangeText={setpwcheck}
-        value={pwcheck}
-        placeholder="비밀번호 확인"
-        style={Styles.Input}
-        secureTextEntry
-      ></TextInput>
-
-      <TouchableOpacity onPress={handleSignUp} style={Styles.Inputbotton}>
-        <Text style={Styles.BottomText}>가입하기</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        onPress={() => navigation.navigate("Login", { screen: "Login" })}
-        style={Styles.NextBottom}
-      >
-        <Text style={Styles.BottomText}>돌아가기</Text>
-      </TouchableOpacity>
+    <View style={styles.container}>
+      <AppText style={styles.HomeText}>회원가입</AppText>
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.inputBox}
+          value={username}
+          placeholder="이름"
+          onChangeText={setUsername}
+        ></TextInput>
+        <TextInput
+          onChangeText={setUseremail}
+          value={useremail}
+          placeholder="이메일"
+          style={styles.inputBox}
+        ></TextInput>
+        {!checkEmail && useremail && (
+          <AppText style={styles.notificationText}>
+            올바른 형식을 입력해주세요
+          </AppText>
+        )}
+        <TextInput
+          onChangeText={setPassword}
+          value={password}
+          placeholder="비밀번호"
+          style={styles.inputBox}
+          secureTextEntry
+        ></TextInput>
+        {!checkPwLen && password && (
+          <AppText style={styles.notificationText}>
+            비밀번호는 {MinPasswordLength}자리 이상이어야 합니다
+          </AppText>
+        )}
+        <TextInput
+          onChangeText={setpwcheck}
+          value={pwcheck}
+          placeholder="비밀번호 확인"
+          style={styles.inputBox}
+          secureTextEntry
+        ></TextInput>
+        {!checkPw && pwcheck && (
+          <AppText style={styles.notificationText}>
+            비밀번호를 정확히 입력해주세요
+          </AppText>
+        )}
+      </View>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          onPress={handleSignUp}
+          style={[styles.button, isValueValid() ? "" : styles.disabled]}
+        >
+          <AppText style={styles.buttonText}>가입하기</AppText>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
 
 export default Signup;
 
-const Styles = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
+    justifyContent: "center",
+    alignItems: "stretch",
     backgroundColor: "#fff",
   },
   HomeText: {
+    paddingBottom: "15%",
     fontSize: 30,
     textAlign: "center",
-    marginBottom: "10%",
   },
-  NextBottom: {
-    backgroundColor: "purple",
+  inputContainer: {
+    alignItems: "stretch",
+    padding: 30,
+    paddingBottom: 10,
+  },
+  notificationText: {
+    marginBottom: 4,
+    fontSize: 12,
+    color: "red",
+  },
+  buttonContainer: {
+    alignItems: "stretch",
+    padding: 20,
+    paddingTop: 10,
+    marginBottom: "25%",
+  },
+  inputBox: {
+    backgroundColor: "#eee",
     padding: 10,
-    marginTop: "10%",
-    width: "50%",
-    alignSelf: "center",
-    borderRadius: 10,
-  },
-  BottomText: {
-    fontSize: 15,
-    color: "white",
-    textAlign: "center",
-  },
-  Inputbotton: {
-    backgroundColor: "purple",
-    width: "50%",
-    padding: 10,
-    borderRadius: 10,
-    marginBottom: 10,
-  },
-  Input: {
-    width: "50%",
-    padding: 10,
-    borderWidth: 1,
-    borderColor: "#ccc",
+    marginVertical: 5,
     borderRadius: 5,
-    marginBottom: 10,
+  },
+  button: {
+    backgroundColor: "#6495ED",
+    padding: 15,
+    marginVertical: 5,
+    marginHorizontal: 10,
+    borderRadius: 5,
+    alignItems: "center",
+  },
+  disabled: {
+    backgroundColor: "#ddd",
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 17,
   },
 });

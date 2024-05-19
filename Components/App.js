@@ -1,30 +1,23 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+import * as Font from "expo-font";
 
 import Login from "./pages/login/login";
 import SocialLogin from "./pages/login/sociallogin";
 import Signup from "./pages/login/signup";
-
 import Home from "./pages/Home";
 import NewsSummary from "./pages/NewsSummary";
-
 import ViewPortfolio from "./pages/portfolio/ViewPortfolio";
 import PortfolioDetails from "./pages/portfolio/PortfolioDetails";
 import ManagementPage from "./pages/portfolio/ManagePortfolio";
-
 import MakePortfolio from "./pages/make/MakePortfolio";
-
 import ModifyPortfolio from "./pages/rebalance/ModifyPortfolio";
 import RebalanceList from "./pages/rebalance/RebalanceList";
-
 import { AuthProvider } from "./utils/AuthContext";
 import { PortfolioProvider } from "./utils/PortfolioContext";
 
 import { setCustomText } from "react-native-global-props";
-import {
-  useFonts,
-  NotoSansKR_400Regular,
-} from "@expo-google-fonts/noto-sans-kr";
+import { useEffect, useState } from "react";
 
 const Stack = createStackNavigator();
 function ScreenStack() {
@@ -59,9 +52,19 @@ function ScreenStack() {
 }
 
 export default function App() {
-  const [fontsLoaded] = useFonts({
-    NotoSansKR_400Regular,
-  });
+  const [fontsLoaded, setFontsLoaded] = useState(false);
+
+  useEffect(() => {
+    async function loadFonts() {
+      await Font.loadAsync({
+        pretendard: require("./assets/fonts/Pretendard.ttf"),
+        "pretendard-bold": require("./assets/fonts/Pretendard-Bold.ttf"),
+      });
+      setFontsLoaded(true);
+    }
+
+    loadFonts();
+  }, []);
 
   if (!fontsLoaded) {
     return null;
@@ -69,8 +72,7 @@ export default function App() {
 
   const customTextProps = {
     style: {
-      fontFamily: "NotoSansKR_400Regular",
-      lineHeight: 20, // 줄 간격을 20으로 설정
+      fontFamily: "pretendard",
     },
   };
 

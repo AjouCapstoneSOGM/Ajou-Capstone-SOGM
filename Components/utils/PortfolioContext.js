@@ -11,6 +11,9 @@ export const PortfolioProvider = ({ children }) => {
   const [portLoading, setPortLoading] = useState(true);
   const { isLoggedIn } = useAuth();
 
+  const removePortfolios = () => {
+    setPortfolios([]);
+  };
   const fetchPortfolios = async () => {
     try {
       const token = await getUsertoken();
@@ -65,6 +68,7 @@ export const PortfolioProvider = ({ children }) => {
       if (response.ok) {
         const sortedStocks = sortStocks(stocks.portfolioPerformances);
         return {
+          initialAsset: stocks.initialAsset,
           currentCash: stocks.currentCash,
           stocks: sortedStocks,
         };
@@ -228,6 +232,7 @@ export const PortfolioProvider = ({ children }) => {
         fetchUserInfo,
         getPortfolioById,
         fetchModify,
+        removePortfolios,
         portLoading,
       }}
     >

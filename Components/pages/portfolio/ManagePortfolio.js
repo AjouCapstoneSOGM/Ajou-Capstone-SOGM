@@ -1,6 +1,7 @@
 import React from "react";
-import { View, Text, StyleSheet, Alert, TouchableOpacity } from "react-native";
+import { View, StyleSheet, Alert, TouchableOpacity } from "react-native";
 import { usePortfolio } from "../../utils/PortfolioContext";
+import AppText from "../../utils/AppText";
 
 const ManagementPage = ({ route, navigation }) => {
   const { fetchDelete } = usePortfolio();
@@ -39,9 +40,11 @@ const ManagementPage = ({ route, navigation }) => {
   if (portfolio) {
     return (
       <View style={styles.container}>
-        <Text style={styles.header}>{portfolio.name}이름</Text>
+        <AppText style={styles.header}>{portfolio.name}이름</AppText>
         <TouchableOpacity style={styles.Button} onPress={alertDelete}>
-          <Text style={{ color: "red", fontSize: 20 }}>포트폴리오 삭제</Text>
+          <AppText style={{ color: "red", fontSize: 20 }}>
+            포트폴리오 삭제
+          </AppText>
         </TouchableOpacity>
       </View>
     );
