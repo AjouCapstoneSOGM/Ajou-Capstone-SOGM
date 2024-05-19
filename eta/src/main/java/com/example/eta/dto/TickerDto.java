@@ -7,13 +7,13 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-public class StockDto {
+public class TickerDto {
 
     @Data
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class StockInfo {
+    public static class TickerInfo {
         private String ticker;
         private String name;
         private String exchange;
@@ -23,7 +23,7 @@ public class StockDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class StockInfoListDto {
-        private List<StockInfo> searchedList;
+    public static class TickerInfoListDto {
+        private List<TickerInfo> searchedList;
     }
 }

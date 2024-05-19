@@ -1,12 +1,11 @@
 package com.example.eta.controller;
 
 import com.example.eta.dto.NewsDto;
-import com.example.eta.dto.StockDto;
+import com.example.eta.dto.TickerDto;
 import com.example.eta.entity.Ticker;
 import com.example.eta.service.NewsService;
-import com.example.eta.service.StockService;
+import com.example.eta.service.TickerService;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,11 +15,11 @@ import static com.example.eta.util.Utility.decompose;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("api/stocks")
-public class StocksController {
+@RequestMapping("api/ticker")
+public class TickerController {
 
     private final NewsService newsService;
-    private final StockService stockService;
+    private final TickerService tickerService;
 
     @GetMapping("/{ticker}/news")
     public ResponseEntity<NewsDto> getNews(@PathVariable String ticker) {
@@ -33,12 +32,12 @@ public class StocksController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<StockDto.StockInfoListDto> searchStocks(@RequestParam String text) {
-        List<Ticker> tickers = stockService.getSearchedTicker(decompose(text));
+    public ResponseEntity<TickerDto.TickerInfoListDto> searchStocks(@RequestParam String text) {
+        List<Ticker> tickers = tickerService.getSearchedTicker(decompose(text));
 
-        StockDto.StockInfoListDto stockInfoListDto = StockDto.StockInfoListDto.builder()
+        TickerDto.TickerInfoListDto tickerInfoListDto = TickerDto.TickerInfoListDto.builder()
                 .searchedList(tickers.stream()
-                        .map(ticker -> StockDto.StockInfo.builder()
+                        .map(ticker -> TickerDto.TickerInfo.builder()
                                 .ticker(ticker.getTicker())
                                 .name(ticker.getName())
                                 .exchange(ticker.getExchange())
@@ -46,6 +45,6 @@ public class StocksController {
                         .toList())
                 .build();
 
-        return ResponseEntity.ok(stockInfoListDto);
+        return ResponseEntity.ok(tickerInfoListDto);
     }
 }

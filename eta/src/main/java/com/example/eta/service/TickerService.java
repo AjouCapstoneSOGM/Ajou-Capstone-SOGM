@@ -9,7 +9,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class StockService {
+public class TickerService {
 
     private final TickerRepository tickerRepository;
 
