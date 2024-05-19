@@ -9,8 +9,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Component
@@ -19,7 +17,7 @@ public class ApiClient {
     @Value("${fastApi.url}")
     private String baseUrl;
 
-    public Mono<ResponseEntity<PortfolioDto.CreatedResultFromFastApiDto>> getCreatedPortfolioApi(PortfolioDto.CreateRequestToFastApiDto createRequestToFastApiDto){
+    public Mono<ResponseEntity<PortfolioDto.CreatedResultFromFastApiDto>> getCreatedPortfolioApi(PortfolioDto.CreateRequestToFastApiDto createRequestToFastApiDto) {
         return WebClient.builder().baseUrl(baseUrl).build()
                 .post()
                 .uri("/makePortfolio/")
@@ -29,6 +27,7 @@ public class ApiClient {
                 .doOnSuccess((e) -> System.out.println(e.getStatusCode()))
                 .doOnError((e) -> System.out.println(e.getMessage()));
     }
+
     public Mono<ResponseEntity<NewsDto>> getNewsFromFastApi(String ticker) {
         return WebClient.builder().baseUrl(baseUrl).build()
                 .post()

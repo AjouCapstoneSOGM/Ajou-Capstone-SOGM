@@ -3,17 +3,13 @@ package com.example.eta.service;
 import com.example.eta.api.ApiClient;
 import com.example.eta.dto.PortfolioDto;
 import com.example.eta.entity.*;
-import com.example.eta.entity.compositekey.PortfolioTickerId;
 import com.example.eta.repository.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.sound.sampled.Port;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,13 +42,12 @@ public class PortfolioService {
             float number = portfolioTicker.getNumber();
             float price = averagePriceUpdated ? portfolioTicker.getAveragePrice() :
                     priceRepository.findLatestPriceByTicker(portfolioTicker.getTicker().getTicker())
-                    .get().getClose().floatValue();
-            totalAmount += price*number;
-            currentAmountForTicker.put(portfolioTicker, price*number);
+                            .get().getClose().floatValue();
+            totalAmount += price * number;
+            currentAmountForTicker.put(portfolioTicker, price * number);
         }
         return totalAmount;
     }
-
 
 
     @Transactional
@@ -69,7 +64,7 @@ public class PortfolioService {
                 .build();
         portfolioRepository.save(portfolio);
 
-        for(Sector sector : sectorRepository.findAllById(createRequestDto.getSector())) {
+        for (Sector sector : sectorRepository.findAllById(createRequestDto.getSector())) {
             PortfolioSector portfolioSector = new PortfolioSector().builder()
                     .portfolio(portfolio)
                     .sector(sector)
@@ -81,19 +76,24 @@ public class PortfolioService {
     }
 
     @Transactional
-    public void initializeAutoPortfolio(Portfolio portfolio, PortfolioDto.CreateRequestDto createRequestDto) throws Exception{
-        List<Ticker> tickers = tickerRepository.findTopTickerBySector(createRequestDto.getSector().get(0), 10, createRequestDto.getCountry());
+    public void initializeAutoPortfolio(Portfolio portfolio, PortfolioDto.CreateRequestDto createRequestDto) throws Exception {
+        // 섹터별 상위 10개 종목 선택
+        List<Ticker> tickers = tickerRepository.findTopTickersBySector(createRequestDto.getSector().get(0), 10, createRequestDto.getCountry());
+
+        // 안전자산 종목 추가
+        tickers.addAll(tickerRepository.findSafeAssetTickers(createRequestDto.getCountry()));
+
+        // 최초 리밸런싱 알림 생성
         List<Integer> stockNumPerTicker = getCreatedResultFromFastAPI(createRequestDto, tickers);
         setInitAutoPortfolio(portfolio, tickers, stockNumPerTicker);
     }
 
-    public List<Integer> getCreatedResultFromFastAPI(PortfolioDto.CreateRequestDto createRequestDto, List<Ticker> tickers) throws Exception{
+    public List<Integer> getCreatedResultFromFastAPI(PortfolioDto.CreateRequestDto createRequestDto, List<Ticker> tickers) throws Exception {
         List<String> postfixedTickers = new ArrayList<>();
-        for(Ticker ticker : tickers) {
+        for (Ticker ticker : tickers) {
             if (ticker.getExchange().equals("KOSPI")) {
                 postfixedTickers.add(ticker.getTicker() + ".KS");
-            }
-            else if(ticker.getExchange().equals("KOSDAQ")) {
+            } else if (ticker.getExchange().equals("KOSDAQ")) {
                 postfixedTickers.add(ticker.getTicker() + ".KQ");
             }
         }
@@ -101,10 +101,10 @@ public class PortfolioService {
         PortfolioDto.CreatedResultFromFastApiDto createdResultFromFastApiDto = apiClient.getCreatedPortfolioApi(PortfolioDto.CreateRequestToFastApiDto.builder()
                 .tickers(postfixedTickers)
                 .safe_asset_ratio(
-                    createRequestDto.getRiskValue() == 1 ? 0.1f :
-                    createRequestDto.getRiskValue() == 2 ? 0.2f : 0.3f
+                        createRequestDto.getRiskValue() == 1 ? 0.3f :
+                                createRequestDto.getRiskValue() == 2 ? 0.2f : 0.1f
                 )
-                .initial_cash((int)createRequestDto.getAsset())
+                .initial_cash((int) createRequestDto.getAsset())
                 .build()).block().getBody();
         List<Integer> stockNumPerTicker = createdResultFromFastApiDto.getInt_asset_num();
 
@@ -118,7 +118,7 @@ public class PortfolioService {
                 .build();
         rebalancingRepository.save(rebalancing);
 
-        for (int i=0;i<tickers.size();i++) {
+        for (int i = 0; i < tickers.size(); i++) {
             RebalancingTicker rebalancingTicker = rebalancingTickerRepository.save(RebalancingTicker.builder()
                     .rebalancing(rebalancing)
                     .ticker(tickers.get(i))
@@ -138,8 +138,11 @@ public class PortfolioService {
             portfolio.getPortfolioTickers().add(portfolioTicker);
         }
 
+        // TODO: 채권 추가
+
         portfolioRepository.save(portfolio);
     }
+
     public void deletePortfolio(Integer pfId) {
         portfolioRepository.deleteById(pfId);
     }
@@ -155,6 +158,7 @@ public class PortfolioService {
                     .quantity(pt.getNumber())
                     .companyName(ticker.getName())
                     .averageCost(pt.getAveragePrice())
+                    .equity(pt.getTicker().getEquity())
                     .build());
         }
 

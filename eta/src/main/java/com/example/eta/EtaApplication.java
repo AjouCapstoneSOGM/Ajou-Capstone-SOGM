@@ -10,8 +10,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 public class EtaApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(EtaApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(EtaApplication.class, args);
+    }
 
 }

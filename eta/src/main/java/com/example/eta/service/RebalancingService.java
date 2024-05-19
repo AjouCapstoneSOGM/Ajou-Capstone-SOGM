@@ -1,18 +1,10 @@
 package com.example.eta.service;
 
 import com.example.eta.dto.RebalancingDto;
-import com.example.eta.entity.Portfolio;
-import com.example.eta.entity.Rebalancing;
-import com.example.eta.entity.RebalancingTicker;
-import com.example.eta.entity.Ticker;
-import com.example.eta.repository.PortfolioRepository;
-import com.example.eta.repository.RebalancingRepository;
-import com.example.eta.repository.TickerRepository;
-import com.example.eta.scheduler.PortfolioScheduler;
 import com.example.eta.entity.*;
 import com.example.eta.repository.*;
+import com.example.eta.scheduler.PortfolioScheduler;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -156,9 +148,8 @@ public class RebalancingService {
         Portfolio portfolio = portfolioRepository.findById(pfId).get();
 
         portfolioScheduler.updateProportion(portfolio);
-        if(portfolioScheduler.isProportionRebalancingNeeded(portfolio)) {
+        if (portfolioScheduler.isProportionRebalancingNeeded(portfolio)) {
             return portfolioScheduler.createProportionRebalancing(portfolio);
-        }
-        else return -1;
+        } else return -1;
     }
 }
