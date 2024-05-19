@@ -12,14 +12,5 @@ import java.io.IOException;
 
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
-public class FcmMessagingTest {
-
-    @Autowired
-    private FcmMessaging fcmMessaging;
-
-    @Test
-    public void testGetAccessToken() throws IOException {
-        String accessToken = fcmMessaging.getAccessToken();
-        assertNotNull(accessToken);
-    }
+public class PushNotificationServiceTest {
 }

@@ -13,22 +13,22 @@ public class TokenService {
 
     private final TokenRepository tokenRepository;
 
-    public void saveFcmToken(User user, String fcmToken) {
+    public void saveToken(User user, String expoPushToken) {
         // TODO: token DB에 jwt토큰을 저장하게 될 경우 코드 변경 필요
         tokenRepository.findById(user.getUserId())
             .ifPresentOrElse(
-                token -> token.setFcmToken(fcmToken),
+                token -> token.setExpoPushToken(expoPushToken),
                 () -> {
                     Token token = tokenRepository.save(Token.builder()
                             .user(user)
-                            .fcmToken(fcmToken)
+                            .expoPushToken(expoPushToken)
                             .build());
                     user.setToken(token);
                 }
             );
     }
 
-    public void deleteFcmToken(User user) {
+    public void deleteToken(User user) {
         tokenRepository.deleteById(user.getUserId());
         user.setToken(null);
     }

@@ -20,6 +20,6 @@ public class Token {
 
     @Column(nullable = false)
     @Setter
-    private String fcmToken;
+    private String expoPushToken;
 
 }

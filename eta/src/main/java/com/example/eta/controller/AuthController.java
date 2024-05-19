@@ -16,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -65,8 +64,8 @@ public class AuthController {
                 .signWith(key)
                 .compact();
 
-        // fcmToken 저장
-        tokenService.saveFcmToken(userService.findByEmail(loginDto.getEmail()), loginDto.getFcmToken());
+        // expo 토큰 저장
+        tokenService.saveToken(userService.findByEmail(loginDto.getEmail()), loginDto.getExpoPushToken());
 
         // 응답
         HttpHeaders httpHeaders = new HttpHeaders();

@@ -1,10 +1,9 @@
 package com.example.eta.controller;
 
-import com.example.eta.scheduler.FcmMessaging;
+import com.example.eta.dto.PushMessageDto;
+import com.example.eta.scheduler.PushNotificationService;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,22 +17,14 @@ import java.io.IOException;
  */
 @RestController
 @AllArgsConstructor
-@RequestMapping("api/fcm")
-public class FcmController {
+@RequestMapping("api/push")
+public class PushNotificationController {
 
-    @Builder
-    @AllArgsConstructor
-    static class FcmMessageDto {
-        private String token;
-        private String title;
-        private String body;
-    }
-
-    private final FcmMessaging fcmMessaging;
+    private final PushNotificationService pushNotificationService;
 
     @PostMapping("/send")
-    public ResponseEntity<Void> sendFcm(@RequestBody FcmMessageDto fcmMessageDto) throws IOException {
-        fcmMessaging.triggerFcmMessage(fcmMessageDto.token, fcmMessageDto.title, fcmMessageDto.body);
+    public ResponseEntity<Void> sendPushNotification(@RequestBody PushMessageDto pushMessageDto){
+        pushNotificationService.triggerPushNotification(pushMessageDto.getTo(), pushMessageDto.getTitle(), pushMessageDto.getBody());
         return ResponseEntity.ok().build();
     }
 }
