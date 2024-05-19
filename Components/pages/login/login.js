@@ -1,18 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
-  Text,
   StyleSheet,
   TouchableOpacity,
+  Image,
   TextInput,
 } from "react-native";
 import urls from "../../utils/urls";
 import { setUsertoken } from "../../utils/localStorageUtils.js";
 import { useAuth } from "../../utils/AuthContext.js";
+import AppText from "../../utils/AppText.js";
 
 const Login = ({ navigation }) => {
-  const [useremail, setUseremail] = useState("test@test.com");
-  const [password, setPassword] = useState("1234");
+  const [useremail, setUseremail] = useState(""); //useState("test@test.com");
+  const [password, setPassword] = useState(""); //useState("1234");
   const { login } = useAuth();
 
   const fetchLoginInfo = async () => {
@@ -41,40 +42,44 @@ const Login = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.HomeText}>로그인 화면</Text>
+      <AppText style={styles.HomeText}>로그인</AppText>
 
-      <TextInput
-        style={styles.inputbox}
-        value={useremail}
-        placeholder="Email"
-        onChangeText={setUseremail}
-      ></TextInput>
-      <TextInput
-        style={styles.inputbox}
-        value={password}
-        placeholder="Password"
-        onChangeText={setPassword}
-        secureTextEntry
-      ></TextInput>
-
-      <TouchableOpacity onPress={fetchLoginInfo} style={styles.Inputbotton}>
-        <Text style={styles.BottomText}>로그인</Text>
-      </TouchableOpacity>
-
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.inputBox}
+          value={useremail}
+          placeholder="이메일"
+          onChangeText={setUseremail}
+        ></TextInput>
+        <TextInput
+          style={styles.inputBox}
+          value={password}
+          placeholder="비밀번호"
+          onChangeText={setPassword}
+          secureTextEntry
+        ></TextInput>
+      </View>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity onPress={fetchLoginInfo} style={styles.button}>
+          <AppText style={styles.buttonText}>로그인</AppText>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("Signup")}
+          style={styles.button}
+        >
+          <AppText style={styles.buttonText}>회원가입</AppText>
+        </TouchableOpacity>
+      </View>
       <TouchableOpacity
         onPress={() =>
           navigation.navigate("SocialLogin", { screen: "SocialLogin" })
         }
-        style={styles.Inputbotton}
+        style={styles.socialButton}
       >
-        <Text style={styles.BottomText}>소셜 로그인</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        onPress={() => navigation.navigate("Signup", { screen: "Signup" })}
-        style={styles.NextBottom}
-      >
-        <Text style={styles.BottomText}>회원가입</Text>
+        <Image
+          source={require("../../assets/images/kakao_login_medium_wide.png")}
+          style={styles.image}
+        />
       </TouchableOpacity>
     </View>
   );
@@ -85,40 +90,47 @@ export default Login;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
+    justifyContent: "center",
+    alignItems: "stretch",
     backgroundColor: "#fff",
   },
   HomeText: {
+    paddingBottom: "15%",
     fontSize: 30,
     textAlign: "center",
-    marginBottom: "10%",
   },
-  NextBottom: {
-    backgroundColor: "purple",
+  inputContainer: {
+    alignItems: "stretch",
+    padding: 20,
+    paddingBottom: 10,
+  },
+  buttonContainer: {
+    alignItems: "stretch",
+    padding: 20,
+    paddingTop: 10,
+  },
+  inputBox: {
+    backgroundColor: "#eee",
     padding: 10,
-    marginTop: "10%",
-    width: "50%",
-    alignSelf: "center",
-    borderRadius: 10,
-  },
-  BottomText: {
-    fontSize: 15,
-    color: "white",
-    textAlign: "center",
-  },
-  Inputbotton: {
-    backgroundColor: "purple",
-    width: "50%",
-    padding: 10,
-    borderRadius: 10,
-    marginBottom: 10,
-  },
-  inputbox: {
-    width: "50%",
-    padding: 10,
-    borderWidth: 1,
-    borderColor: "#ccc",
+    marginVertical: 5,
+    marginHorizontal: 10,
     borderRadius: 5,
-    marginBottom: 10,
+  },
+  button: {
+    backgroundColor: "#6495ED",
+    padding: 15,
+    marginVertical: 5,
+    marginHorizontal: 10,
+    borderRadius: 5,
+    alignItems: "center",
+  },
+  socialButton: {
+    alignSelf: "center",
+    marginTop: 20,
+    marginBottom: "25%",
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 17,
   },
 });

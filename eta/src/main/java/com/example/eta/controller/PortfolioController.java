@@ -2,19 +2,12 @@ package com.example.eta.controller;
 
 import com.example.eta.dto.PortfolioDto;
 import com.example.eta.entity.Portfolio;
-import com.example.eta.entity.RebalancingTicker;
 import com.example.eta.entity.User;
-import com.example.eta.repository.PortfolioRepository;
 import com.example.eta.service.PortfolioService;
-import com.example.eta.service.RebalancingService;
 import com.example.eta.service.UserService;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -32,7 +25,7 @@ public class PortfolioController {
 
     @PostMapping("/create/auto")
     public ResponseEntity<Map<String, Integer>> createAutoPortfolio(@RequestBody PortfolioDto.CreateRequestDto createRequestDto,
-                                                      @AuthenticationPrincipal String email) throws Exception{
+                                                                    @AuthenticationPrincipal String email) throws Exception {
         // 유저 정보 가져오기
         User user = userService.findByEmail(email);
 
@@ -47,6 +40,7 @@ public class PortfolioController {
 
         return ResponseEntity.ok(responseData);
     }
+
     @DeleteMapping("/{port_id}")
     public ResponseEntity<Void> deletePortfolio(@PathVariable("port_id") Integer pfId) {
         portfolioService.deletePortfolio(pfId);
@@ -57,7 +51,7 @@ public class PortfolioController {
     public ResponseEntity<PortfolioDto.PerformanceResponseDto> getPortfolioPerformance(@PathVariable("port_id") Integer pfId, @AuthenticationPrincipal String email) {
         return ResponseEntity.ok(portfolioService.getPerformanceData(pfId));
     }
-  
+
     @PostMapping("/{port_id}/buy")
     public ResponseEntity<Void> buyStock(@PathVariable("port_id") Integer pfId, @RequestBody PortfolioDto.BuyRequestDto buyRequestDto) {
         portfolioService.buyStock(pfId, buyRequestDto);

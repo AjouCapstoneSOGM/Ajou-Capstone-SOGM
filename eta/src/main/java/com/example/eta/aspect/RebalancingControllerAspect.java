@@ -17,7 +17,7 @@ public class RebalancingControllerAspect {
     private PortfolioRepository portfolioRepository;
     private RebalancingRepository rebalancingRepository;
 
-    public RebalancingControllerAspect (PortfolioRepository portfolioRepository, RebalancingRepository rebalancingRepository) {
+    public RebalancingControllerAspect(PortfolioRepository portfolioRepository, RebalancingRepository rebalancingRepository) {
         this.portfolioRepository = portfolioRepository;
         this.rebalancingRepository = rebalancingRepository;
     }
@@ -43,11 +43,13 @@ public class RebalancingControllerAspect {
 
         if (pfId != null) {
             if (!portfolioRepository.existsById(pfId)) throw new NotFoundException();
-            if (!portfolioRepository.getReferenceById(pfId).getUser().getEmail().equals(email)) throw new OwnershipException();
+            if (!portfolioRepository.getReferenceById(pfId).getUser().getEmail().equals(email))
+                throw new OwnershipException();
         }
         if (rnId != null) {
-            if(!rebalancingRepository.existsById(rnId)) throw new NotFoundException();
-            if(!rebalancingRepository.getReferenceById(rnId).getPortfolio().getUser().getEmail().equals(email)) throw new OwnershipException();
+            if (!rebalancingRepository.existsById(rnId)) throw new NotFoundException();
+            if (!rebalancingRepository.getReferenceById(rnId).getPortfolio().getUser().getEmail().equals(email))
+                throw new OwnershipException();
         }
     }
 }

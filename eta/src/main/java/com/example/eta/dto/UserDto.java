@@ -14,6 +14,7 @@ public class UserDto {
         private String password;
 
     }
+
     @Data
     @NoArgsConstructor
     @AllArgsConstructor

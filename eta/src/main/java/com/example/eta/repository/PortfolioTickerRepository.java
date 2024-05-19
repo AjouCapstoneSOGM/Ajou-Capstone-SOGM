@@ -12,6 +12,6 @@ import java.util.Optional;
 public interface PortfolioTickerRepository extends JpaRepository<PortfolioTicker, PortfolioTickerId> {
 
     List<PortfolioTicker> findAllByPortfolio(Portfolio portfolio);
-    
+
     Optional<PortfolioTicker> findByPortfolioAndTicker(Portfolio portfolio, Ticker ticker);
 }

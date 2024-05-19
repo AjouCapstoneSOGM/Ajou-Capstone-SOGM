@@ -11,7 +11,8 @@ import lombok.NoArgsConstructor;
 @IdClass(PortfolioSectorId.class)
 @Getter
 @Builder
-@NoArgsConstructor @AllArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "portfolio_sector")
 public class PortfolioSector {
 

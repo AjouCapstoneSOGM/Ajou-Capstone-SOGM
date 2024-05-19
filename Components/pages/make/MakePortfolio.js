@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, TouchableOpacity, StyleSheet } from "react-native";
 import MakeAutoPortfolio from "./MakeAutoPortfolio";
 import MakeManualPortfolio from "./MakeManualPortfolio.js";
-import { useAuth } from "../utils/AuthContext.js";
+import { useAuth } from "../../utils/AuthContext.js";
+import AppText from "../../utils/AppText.js";
 
 const MakePortfolio = ({ navigation }) => {
   const { isLoggedIn } = useAuth();
@@ -14,7 +15,7 @@ const MakePortfolio = ({ navigation }) => {
   };
 
   const handleReplacePage = () => {
-    navigation.replace("ViewPortfolio");
+    navigation.replace("Home");
   };
 
   const isPathNull = () => {
@@ -36,7 +37,9 @@ const MakePortfolio = ({ navigation }) => {
     return (
       <View style={styles.container}>
         <View style={styles.textContainer}>
-          <Text style={{ fontSize: 25 }}>원하는 종류를 선택해주세요.</Text>
+          <AppText style={{ fontSize: 25 }}>
+            원하는 종류를 선택해주세요.
+          </AppText>
         </View>
         <View style={styles.selectContainer}>
           <TouchableOpacity
@@ -47,15 +50,13 @@ const MakePortfolio = ({ navigation }) => {
               path === "auto" ? styles.selectedButton : "",
             ]}
           >
-            <Text style={{ fontSize: 20, alignSelf: "flex-start" }}>
-              자동 포트폴리오
-            </Text>
-            {path === "auto" && (
-              <View style={styles.detailContainer}>
-                <Text>간단한 정보를 통해 직접 종목을 선별해줘요</Text>
-                <Text>종목들의 자동 리밸런싱 기능이 제공돼요</Text>
-              </View>
-            )}
+            <AppText style={styles.buttonTitle}>자동 포트폴리오</AppText>
+            <AppText style={styles.buttonInfo}>
+              • 간단한 정보를 통해 직접 종목을 선별해줘요
+            </AppText>
+            <AppText style={styles.buttonInfo}>
+              • 종목들의 자동 리밸런싱 기능이 제공돼요
+            </AppText>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -66,12 +67,13 @@ const MakePortfolio = ({ navigation }) => {
               path === "manual" ? styles.selectedButton : "",
             ]}
           >
-            <Text style={{ fontSize: 20 }}>수동 포트폴리오</Text>
-            {path === "manual" && (
-              <View style={styles.detailContainer}>
-                <Text>원하는 종목을 직접 골라담을 수 있어요</Text>
-              </View>
-            )}
+            <AppText style={styles.buttonTitle}>수동 포트폴리오</AppText>
+            <AppText style={styles.buttonInfo}>
+              • 원하는 종목을 직접 골라담을 수 있어요
+            </AppText>
+            <AppText style={styles.buttonInfo}>
+              • 종목의 가치 지표를 확인하면서 고를 수 있어요
+            </AppText>
           </TouchableOpacity>
         </View>
         <View style={styles.buttonContainer}>
@@ -80,7 +82,7 @@ const MakePortfolio = ({ navigation }) => {
             title="다음"
             onPress={isPathNull() ? null : handleNextStep}
           >
-            <Text style={{ fontSize: 18, color: "white" }}>다음</Text>
+            <AppText style={{ fontSize: 18, color: "white" }}>다음</AppText>
           </TouchableOpacity>
         </View>
       </View>
@@ -103,7 +105,7 @@ const MakePortfolio = ({ navigation }) => {
       return (
         <View style={styles.container}>
           <View style={[styles.textContainer, { flex: 2 }]}>
-            <Text style={{ fontSize: 25 }}>생성이 완료되었어요!</Text>
+            <AppText style={{ fontSize: 25 }}>생성이 완료되었어요!</AppText>
           </View>
           <View style={styles.buttonContainer}>
             <TouchableOpacity
@@ -111,7 +113,7 @@ const MakePortfolio = ({ navigation }) => {
               title="다음"
               onPress={handleReplacePage}
             >
-              <Text style={{ fontSize: 18, color: "white" }}>확인</Text>
+              <AppText style={{ fontSize: 18, color: "white" }}>확인</AppText>
             </TouchableOpacity>
           </View>
         </View>
@@ -129,38 +131,42 @@ const styles = StyleSheet.create({
     alignItems: "stretch",
   },
   textContainer: {
-    flex: 1,
+    marginTop: "25%",
     justifyContent: "center",
     padding: 20,
   },
   selectContainer: {
-    flex: 1,
     alignItems: "stretch",
     justifyContent: "center",
     padding: 20,
-  },
-  detailContainer: {
-    borderRadius: 5,
-    paddingVertical: 20,
-    justifyContent: "flex-start",
-  },
-  contentsButton: {
-    flexDirection: "column",
-    justifyContent: "space-around",
-    backgroundColor: "#ddd",
-    alignItems: "stretch",
-    borderRadius: 10,
-    marginVertical: 10,
-    padding: 15,
-  },
-  selectedButton: {
-    backgroundColor: "#cceecc",
   },
   buttonContainer: {
     flex: 1,
     alignItems: "stretch",
     justifyContent: "flex-end",
     padding: 20,
+  },
+  contentsButton: {
+    flexDirection: "column",
+    backgroundColor: "#ddd",
+    alignItems: "stretch",
+    borderRadius: 5,
+    marginVertical: 15,
+    padding: 15,
+  },
+  selectedButton: {
+    backgroundColor: "#87AFFF",
+  },
+  buttonTitle: {
+    fontSize: 23,
+    fontWeight: "bold",
+    marginTop: 5,
+    marginBottom: 20,
+  },
+  buttonInfo: {
+    fontSize: 17,
+    color: "#333",
+    marginBottom: 5,
   },
   disabledButton: {
     backgroundColor: "#DADADA", // 비활성화 상태의 배경색 변경
@@ -169,6 +175,7 @@ const styles = StyleSheet.create({
     justifyContent: "center", // 가로 방향에서 중앙 정렬
     backgroundColor: "#6495ED",
     alignItems: "center",
+    alignSelf: "stretch",
     borderRadius: 10,
     padding: 18,
   },

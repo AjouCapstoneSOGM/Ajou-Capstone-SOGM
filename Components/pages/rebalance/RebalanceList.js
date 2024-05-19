@@ -1,48 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Button, TouchableOpacity, StyleSheet } from "react-native";
+import { View, TouchableOpacity, StyleSheet } from "react-native";
+import { getUsertoken } from "../../utils/localStorageUtils";
+import urls from "../../utils/urls";
+import AppText from "../../utils/AppText";
+import Loading from "../../utils/Loading";
+import NotificationBubble from "../../utils/Notification";
 
 const RebalanceList = ({ route, navigation }) => {
   const portfolioId = route.params.id;
   const [rebalanceList, setRebalanceList] = useState([]);
   const [loading, setLoading] = useState(true);
-  const ex_data = {
-    rebalancings: [
-      {
-        id: 0,
-        list: [
-          {
-            ticker: "005930",
-            name: "삼성전자",
-            number: 2,
-            isBuy: false,
-          },
-          {
-            ticker: "003550",
-            name: "LG",
-            number: 3,
-            isBuy: true,
-          },
-        ],
-      },
-      {
-        id: 1,
-        list: [
-          {
-            ticker: "035420",
-            name: "NAVER",
-            number: 10,
-            isBuy: true,
-          },
-          {
-            ticker: "003550",
-            name: "LG",
-            number: 3,
-            isBuy: false,
-          },
-        ],
-      },
-    ],
-  };
 
   const fetchRebalanceList = async () => {
     try {
@@ -50,17 +17,15 @@ const RebalanceList = ({ route, navigation }) => {
       const response = await fetch(
         `${urls.springUrl}/api/rebalancing/${portfolioId}`,
         {
-          method: "POST",
+          method: "GET",
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
         }
       );
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
-        return data;
+        return data.rebalancing;
       }
     } catch (error) {
       console.error(error);
@@ -70,8 +35,7 @@ const RebalanceList = ({ route, navigation }) => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        // const result = await fetchRebalanceList();
-        const result = ex_data.rebalancings;
+        const result = await fetchRebalanceList();
         setRebalanceList(result);
         setLoading(false);
       } catch (error) {
@@ -83,26 +47,27 @@ const RebalanceList = ({ route, navigation }) => {
   }, []);
 
   if (loading) {
-    return (
-      <View>
-        <Text>Loading...</Text>
-      </View>
-    );
+    return <Loading />;
   }
 
   return (
     <View style={styles.container}>
+      <AppText style={{ fontSize: 30, padding: 10, marginBottom: 20 }}>
+        알림 목록
+      </AppText>
       {rebalanceList.map((rebalance, index) => (
         <View key={index}>
           <TouchableOpacity
-            style={{ backgroundColor: "blue", height: 50, margin: 20 }}
+            style={styles.alertBox}
             onPress={() => {
               navigation.navigate("ModifyPortfolio", {
-                list: [...rebalance.list],
+                portId: portfolioId,
+                rnId: rebalance.rnId,
+                list: [...rebalance.rebalancings],
               });
             }}
           >
-            <Text>{rebalance.id}</Text>
+            <AppText style={{ fontSize: 25 }}>알림 2024-05-19</AppText>
           </TouchableOpacity>
         </View>
       ))}
@@ -112,10 +77,16 @@ const RebalanceList = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
     alignItems: "stretch",
     padding: 5,
     backgroundColor: "#f5f5f5",
+  },
+  alertBox: {
+    backgroundColor: "#ddd",
+    borderRadius: 5,
+    margin: 10,
+    marginTop: 10,
+    padding: 10,
   },
 });
 export default RebalanceList;
