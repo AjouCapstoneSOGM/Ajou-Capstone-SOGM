@@ -1,10 +1,13 @@
 {
   "expo": {
-    "name": "components",
-    "slug": "components",
+    "name": "eta",
+    "slug": "etacomponent",
     "version": "1.0.0",
-    "sdkVersion": "49.0.0",
-    "platforms": ["ios", "android", "web"],
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "android": {
       "package": "com.sogm.eta"
     },
@@ -17,6 +20,12 @@
           }
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "11aead04-0453-46c8-b222-40e724fbaa76"
+      }
+    },
+    "owner": "ysw2"
   }
 }

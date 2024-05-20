@@ -4,7 +4,6 @@ import { getUsertoken } from "../../utils/localStorageUtils";
 import urls from "../../utils/urls";
 import AppText from "../../utils/AppText";
 import Loading from "../../utils/Loading";
-import NotificationBubble from "../../utils/Notification";
 
 const RebalanceList = ({ route, navigation }) => {
   const portfolioId = route.params.id;
@@ -67,7 +66,7 @@ const RebalanceList = ({ route, navigation }) => {
               });
             }}
           >
-            <AppText style={{ fontSize: 25 }}>알림 2024-05-19</AppText>
+            <AppText style={{ fontSize: 25 }}>알림 2024-05-20</AppText>
           </TouchableOpacity>
         </View>
       ))}
