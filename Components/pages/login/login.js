@@ -12,8 +12,8 @@ import { useAuth } from "../../utils/AuthContext.js";
 import AppText from "../../utils/AppText.js";
 
 const Login = ({ navigation }) => {
-  const [useremail, setUseremail] = useState(""); //useState("test@test.com");
-  const [password, setPassword] = useState(""); //useState("1234");
+  const [useremail, setUseremail] = useState("test@test.com"); //
+  const [password, setPassword] = useState("1234"); //
   const { login } = useAuth();
 
   const fetchLoginInfo = async () => {
