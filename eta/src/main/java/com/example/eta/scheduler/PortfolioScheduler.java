@@ -99,6 +99,7 @@ public class PortfolioScheduler {
                         .number(numToBuy)
                         .ticker(portfolioTicker.getTicker())
                         .isBuy(true)
+                        .price(close)
                         .build());
                 rebalancing.getRebalancingTickers().add(rebalancingTicker);
             } else if (diff < 0) {
@@ -111,6 +112,7 @@ public class PortfolioScheduler {
                         .number(numToSell)
                         .ticker(portfolioTicker.getTicker())
                         .isBuy(false)
+                        .price(close)
                         .build());
                 rebalancing.getRebalancingTickers().add(rebalancingTicker);
             }

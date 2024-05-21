@@ -34,6 +34,7 @@ public class RebalancingDto {
         private String name;
         private int number;
         private Boolean isBuy;
+        private float price;
     }
 
     @Data

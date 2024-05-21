@@ -2,6 +2,7 @@ package com.example.eta.service;
 
 import com.example.eta.api.ApiClient;
 import com.example.eta.dto.PortfolioDto;
+import com.example.eta.dto.TickerDto;
 import com.example.eta.entity.*;
 import com.example.eta.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -118,12 +119,15 @@ public class PortfolioService {
                 .build();
         rebalancingRepository.save(rebalancing);
 
+        List<TickerDto.TickerPrice> tickerPrices = apiClient.getCurrentTickerPrice(tickers.stream().map(Ticker::getTicker).toList()).block().getBody().getPrices();
+
         for (int i = 0; i < tickers.size(); i++) {
             RebalancingTicker rebalancingTicker = rebalancingTickerRepository.save(RebalancingTicker.builder()
                     .rebalancing(rebalancing)
                     .ticker(tickers.get(i))
                     .isBuy(true)
                     .number(stockNumPerTicker.get(i))
+                    .price(tickerPrices.get(i).getCurrent_price())
                     .build());
             rebalancing.getRebalancingTickers().add(rebalancingTicker);
 

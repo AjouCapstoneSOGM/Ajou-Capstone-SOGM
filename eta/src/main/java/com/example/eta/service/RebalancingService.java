@@ -43,7 +43,8 @@ public class RebalancingService {
                         value.getTicker(),
                         value.getName(),
                         rebalancingTicker.getNumber(),
-                        rebalancingTicker.getIsBuy()
+                        rebalancingTicker.getIsBuy(),
+                        rebalancingTicker.getPrice()
                 )));
             }
             rebalancingListDtos.add(RebalancingDto.RebalancingListDto.builder()
