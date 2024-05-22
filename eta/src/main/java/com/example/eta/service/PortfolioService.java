@@ -164,6 +164,26 @@ public class PortfolioService {
                 .portfolioPerformances(portfolioPerformances)
                 .build();
     }
+    @Transactional
+    public int createManualPortfolio(PortfolioDto.CreateManualRequestDto request) {
+        // 포트폴리오 생성
+        Portfolio portfolio = new Portfolio();
+        portfolio.setIsAuto(false);
+        portfolio = portfolioRepository.save(portfolio);
+
+        // 주식 추가
+        for (PortfolioDto.StockDetailDto stock : request.getStocks()) {
+            Ticker ticker = tickerRepository.findByTicker(stock.getTicker());
+            PortfolioTicker portfolioTicker = new PortfolioTicker();
+            portfolioTicker.setPortfolio(portfolio);
+            portfolioTicker.setTicker(ticker);
+            portfolioTicker.setNumber(stock.getQuantity());
+            portfolioTicker.setAveragePrice(stock.getPrice());
+            portfolioTickerRepository.save(portfolioTicker);
+        }
+
+        return portfolio.getPfId();
+    }
 
     @Transactional
     public void buyStock(Integer pfId, PortfolioDto.BuyRequestDto buyRequestDto) {

@@ -102,4 +102,26 @@ public class PortfolioDto {
         private int count;
         private List<PortfolioInfo> portfolios;
     }
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CreateManualRequestDto {
+        private List<StockDetailDto> stocks;
+    }
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class StockDetailDto {
+        private String ticker;
+        private int quantity;
+        private float price;
+        private Boolean isBuy;
+        private String country;
+    }
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CreateManualResponseDto {
+        private int id;
+    }
 }
