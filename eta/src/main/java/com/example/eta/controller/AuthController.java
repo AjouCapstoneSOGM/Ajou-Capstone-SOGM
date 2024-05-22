@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,18 +31,15 @@ import java.util.Map;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    @Value("${spring.jwt.header}")
-    private String header;
-
-    @Value("${spring.jwt.prefix}")
-    private String prefix;
-
-    @Value("${spring.jwt.secret}")
-    private String secret;
-
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
+    @Value("${spring.jwt.header}")
+    private String header;
+    @Value("${spring.jwt.prefix}")
+    private String prefix;
+    @Value("${spring.jwt.secret}")
+    private String secret;
 
     public AuthController(AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, UserService userService) {
         this.authenticationManager = authenticationManager;
@@ -70,7 +66,7 @@ public class AuthController {
         // 응답
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(header, prefix + jwt);
-        HashMap<String, Object> response = new HashMap<>(){{
+        HashMap<String, Object> response = new HashMap<>() {{
             put("token", jwt);
             put("user_id", userService.findByEmail(loginDto.getEmail()).getUserId());
         }};
@@ -79,8 +75,8 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<Object> signup(@RequestBody @Valid UserDto.InfoDto InfoDto) throws RuntimeException{
-        if(userService.isExistEmail(InfoDto.getEmail())) throw new EmailAlreadyExistsException();
+    public ResponseEntity<Object> signup(@RequestBody @Valid UserDto.InfoDto InfoDto) throws RuntimeException {
+        if (userService.isExistEmail(InfoDto.getEmail())) throw new EmailAlreadyExistsException();
 
         User user = new User();
         user.setName(InfoDto.getName());
@@ -91,7 +87,7 @@ public class AuthController {
         user.setCreatedDate(LocalDateTime.now());
         user.setEnabled(true);
 
-        HashMap<String, Object> response = new HashMap<>(){{
+        HashMap<String, Object> response = new HashMap<>() {{
             put("user_id", userService.join(user));
         }};
         return new ResponseEntity<>(response, HttpStatus.CREATED);

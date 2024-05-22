@@ -1,6 +1,5 @@
 package com.example.eta.dto;
 
-import com.example.eta.entity.Ticker;
 import lombok.*;
 
 import java.util.List;
@@ -8,7 +7,8 @@ import java.util.List;
 public class RebalancingDto {
 
     @Builder
-    @Getter @Setter
+    @Getter
+    @Setter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class RebalancingApplyListDto {
@@ -18,7 +18,7 @@ public class RebalancingDto {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class RebalancingApplyInfo{
+    public static class RebalancingApplyInfo {
         private String ticker;
         private Boolean isBuy;
         private int quantity;
@@ -29,7 +29,7 @@ public class RebalancingDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class RebalancingInfo{
+    public static class RebalancingInfo {
         private String ticker;
         private String name;
         private int number;

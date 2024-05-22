@@ -51,8 +51,7 @@ public class RebalancingController {
             Map<String, Integer> response = new HashMap<>();
             response.put("rnId", rnId);
             return ResponseEntity.ok(response);
-        }
-        else {
+        } else {
             return ResponseEntity.noContent().build();
         }
     }

@@ -11,7 +11,8 @@ import java.util.List;
 @Getter
 @Setter
 @Builder
-@NoArgsConstructor @AllArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "portfolio")
 public class Portfolio {
 
@@ -58,7 +59,7 @@ public class Portfolio {
     @Column
     private int riskValue;
 
-    public void updateCurrentCash(float currentCash){
+    public void updateCurrentCash(float currentCash) {
         this.currentCash = currentCash;
     }
 }

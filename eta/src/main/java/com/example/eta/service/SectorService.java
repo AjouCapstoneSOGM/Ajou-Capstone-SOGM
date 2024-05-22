@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -17,7 +16,7 @@ public class SectorService {
 
     public Map<String, String> getAllSectors() {
         Map<String, String> sectors = new HashMap<>();
-        for(Sector sector : sectorRepository.findAll()) {
+        for (Sector sector : sectorRepository.findAll()) {
             sectors.put(sector.getSectorId(), sector.getSectorName());
         }
         return sectors;

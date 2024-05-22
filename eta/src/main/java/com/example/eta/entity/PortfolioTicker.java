@@ -2,16 +2,17 @@ package com.example.eta.entity;
 
 import com.example.eta.entity.compositekey.PortfolioTickerId;
 import jakarta.persistence.*;
-import lombok.*;
-
-import java.util.ArrayList;
-import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @IdClass(PortfolioTickerId.class)
 @Data
 @Builder
-@NoArgsConstructor @AllArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "portfolio_ticker")
 public class PortfolioTicker {
     @Id
@@ -36,7 +37,7 @@ public class PortfolioTicker {
     @Column(name = "current_proportion", nullable = false)
     private Float currentProportion;
 
-    public void updateNumber(Integer number){
+    public void updateNumber(Integer number) {
         this.number = number;
     }
 }

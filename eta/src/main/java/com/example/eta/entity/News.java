@@ -1,7 +1,6 @@
 package com.example.eta.entity;
 
 import com.example.eta.entity.compositekey.NewsId;
-import com.example.eta.entity.compositekey.PriceId;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
