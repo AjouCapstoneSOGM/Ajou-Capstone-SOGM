@@ -20,7 +20,7 @@ public class PortfolioControllerAspect {
         this.portfolioRepository = portfolioRepository;
     }
 
-    @Before("execution(* com.example.eta.controller.PortfolioController.*(..))")
+    //@Before("execution(* com.example.eta.controller.PortfolioController.*(..))")
     public void verifyPortfolioAccessible(JoinPoint joinPoint) {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         String[] parameterNames = signature.getParameterNames();

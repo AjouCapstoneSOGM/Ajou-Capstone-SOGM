@@ -28,6 +28,7 @@ public class PortfolioService {
     private final PortfolioTickerRepository portfolioTickerRepository;
     private final RebalancingRepository rebalancingRepository;
     private final RebalancingTickerRepository rebalancingTickerRepository;
+    private final PortfolioRecordRepository portfolioRecordRepository;
     private final PriceRepository priceRepository;
     private final ApiClient apiClient;
 
@@ -165,11 +166,25 @@ public class PortfolioService {
                 .build();
     }
     @Transactional
-    public int createManualPortfolio(PortfolioDto.CreateManualRequestDto request) {
+    public int createManualPortfolio(User user,PortfolioDto.CreateManualRequestDto request) {
+
+        float totalAsset = 0;
+        for (PortfolioDto.StockDetailDto stock : request.getStocks()) {
+            totalAsset = totalAsset + (stock.getQuantity() * stock.getPrice());
+        }
         // 포트폴리오 생성
-        Portfolio portfolio = new Portfolio();
-        portfolio.setIsAuto(false);
-        portfolio = portfolioRepository.save(portfolio);
+        Portfolio portfolio = new Portfolio().builder()
+                .user(user)
+                .name(request.getName())
+                .country(request.getCountry())
+                .isAuto(false)
+                .initAsset(totalAsset)
+                .initCash(0)
+                .currentCash(0)
+                .riskValue(0)
+                .build();
+        portfolioRepository.save(portfolio);
+
 
         // 주식 추가
         for (PortfolioDto.StockDetailDto stock : request.getStocks()) {
@@ -180,7 +195,19 @@ public class PortfolioService {
             portfolioTicker.setNumber(stock.getQuantity());
             portfolioTicker.setAveragePrice(stock.getPrice());
             portfolioTickerRepository.save(portfolioTicker);
+
+            //변동 기록 저장
+            portfolioRecordRepository.save(PortfolioRecord.builder()
+                    .portfolio(portfolio)
+                    .ticker(ticker)
+                    .number(stock.getQuantity())
+                    .price(stock.getPrice())
+                    .isBuy(stock.getIsBuy())
+                    .recordDate(LocalDateTime.now())
+                    .build());
         }
+
+
 
         return portfolio.getPfId();
     }

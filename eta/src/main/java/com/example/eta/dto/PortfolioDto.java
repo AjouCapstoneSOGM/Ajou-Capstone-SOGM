@@ -106,6 +106,8 @@ public class PortfolioDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CreateManualRequestDto {
+        private String name;
+        private String country;
         private List<StockDetailDto> stocks;
     }
     @Data
@@ -116,7 +118,6 @@ public class PortfolioDto {
         private int quantity;
         private float price;
         private Boolean isBuy;
-        private String country;
     }
     @Data
     @NoArgsConstructor
