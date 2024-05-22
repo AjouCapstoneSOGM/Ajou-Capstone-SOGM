@@ -99,6 +99,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
   useEffect(() => {
     const loadData = async () => {
       try {
+        console.log(route.params.list);
         const stockList = route.params.list;
         const tickerList = stockList.map((item) => item.ticker);
         const currentPrices = await fetchAllCurrent(tickerList);

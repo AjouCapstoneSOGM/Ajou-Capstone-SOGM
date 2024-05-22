@@ -1,15 +1,12 @@
 {
   "expo": {
     "name": "eta",
-    "slug": "etacomponent",
+    "slug": "components",
     "version": "1.0.0",
-    "platforms": [
-      "ios",
-      "android",
-      "web"
-    ],
+    "platforms": ["ios", "android", "web"],
     "android": {
-      "package": "com.sogm.eta"
+      "package": "com.sogm.eta",
+      "googleServicesFile": "./google-services.json"
     },
     "plugins": [
       [
@@ -23,7 +20,7 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "11aead04-0453-46c8-b222-40e724fbaa76"
+        "projectId": "ce6ad48d-d4d9-4edb-a805-42523d361e8b"
       }
     },
     "owner": "ysw2"
