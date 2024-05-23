@@ -11,20 +11,6 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "plugins": [
-      [
-        "expo-notifications",
-        {
-          "icon": "./local/assets/notification-icon.png",
-          "color": "#ffffff",
-          "sounds": [
-            "./local/assets/notification-sound.wav",
-            "./local/assets/notification-sound-other.wav"
-          ]
-        }
-      ]
-    ],
-    
     "ios": {
       "supportsTablet": true
     },
@@ -41,9 +27,9 @@
     },
     "extra": {
       "eas": {
-        "projectId": "d94fc9f9-e8b5-4bf1-af7e-6500b3c475fe"
+        "projectId": "f3f90f52-c78a-4e7e-a7b0-ac053ff5dd0c"
       }
     },
-    "owner": "dydtn02"
+    "owner": "leeyongsoo"
   }
 }

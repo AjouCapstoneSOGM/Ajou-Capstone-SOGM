@@ -1,79 +1,110 @@
-import React from "react";
-import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
-import { createDrawerNavigator } from "@react-navigation/drawer";
+import { useState, useEffect, useRef } from 'react';
+import { Text, View, Button, Platform } from 'react-native';
+import * as Device from 'expo-device';
+import * as Notifications from 'expo-notifications';
 
-import Login from "./pages/login/login";
-import SocialLogin from "./pages/login/sociallogin";
-import Signup from "./pages/login/signup";
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
 
-import Home from "./pages/Home";
-import ViewPortfolio from "./pages/ViewPortfolio";
-import PortfolioDetails from "./pages/PortfolioDetails";
-import MakePortfolio from "./pages/MakePortfolio";
-import NewsSummary from "./pages/NewsSummary";
-import RebalancingAlarm_test from "./pages/RebalancingAlarm_test";
+export default function App() {
+  const [expoPushToken, setExpoPushToken] = useState('');
+  const [notification, setNotification] = useState(false);
+  const notificationListener = useRef();
+  const responseListener = useRef();
 
-import { AuthProvider } from "./utils/AuthContext";
-import { setCustomText } from "react-native-global-props";
-import {
-  useFonts,
-  NotoSansKR_400Regular,
-} from "@expo-google-fonts/noto-sans-kr";
-import ManagementPage from "./pages/ManagePortfolio";
-import ModifyPortfolio from "./pages/ModifyPortfolio";
+  useEffect(() => {
+    registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
 
-const Stack = createStackNavigator();
+    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+      setNotification(notification);
+    });
 
-function ScreenStack() {
+    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+      console.log(response);
+    });
+
+    return () => {
+      Notifications.removeNotificationSubscription(notificationListener.current);
+      Notifications.removeNotificationSubscription(responseListener.current);
+    };
+  }, []);
+
   return (
-    <AuthProvider>
-      <Stack.Navigator
-        screenOptions={{
-          // headerShown: false, // 모든 스크린에서 헤더 숨기기
-          headerStyle: {
-            backgroundColor: "#6495ED", // 헤더의 배경색 설정
-          },
-          headerTintColor: "#fff", // 헤더의 텍스트 색상 설정
+    <View
+      style={{
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'space-around',
+      }}>
+      <Text>Your expo push token: {expoPushToken}</Text>
+      <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+        <Text>Title: {notification && notification.request.content.title} </Text>
+        <Text>Body: {notification && notification.request.content.body}</Text>
+        <Text>Data: {notification && JSON.stringify(notification.request.content.data)}</Text>
+      </View>
+      <Button
+        title="Press to schedule a notification"
+        onPress={async () => {
+          await schedulePushNotification();
         }}
-        initialRouteName="Home"
-      >
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="SocialLogin" component={SocialLogin} />
-        <Stack.Screen name="Signup" component={Signup} />
-        <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="ViewPortfolio" component={ViewPortfolio} />
-        <Stack.Screen name="NewsSummary" component={NewsSummary} />
-        <Stack.Screen name="PortfolioDetails" component={PortfolioDetails} />
-        <Stack.Screen name="ManagementPage" component={ManagementPage} />
-        <Stack.Screen name="ModifyPortfolio" component={ModifyPortfolio} />
-        <Stack.Screen name="MakePortfolio" component={MakePortfolio} />
-        <Stack.Screen name="RebalancingAlarm_test" component={RebalancingAlarm_test} />
-      </Stack.Navigator>
-    </AuthProvider>
+      />
+      <Button
+        title="getexpoToken"
+        onPress={async () => {
+          await registerForPushNotificationsAsync();
+        }}
+      />
+    </View>
   );
 }
 
-export default function App() {
-  const [fontsLoaded] = useFonts({
-    NotoSansKR_400Regular,
+async function schedulePushNotification() {
+  await Notifications.scheduleNotificationAsync({
+    content: {
+      title: "You've got mail! 📬",
+      body: 'Here is the notification body',
+      data: { data: 'goes here' },
+    },
+    trigger: { seconds: 2 },
   });
+}
 
-  if (!fontsLoaded) {
-    return null;
+async function registerForPushNotificationsAsync() {
+  let token;
+
+  if (Platform.OS === 'android') {
+    await Notifications.setNotificationChannelAsync('default', {
+      name: 'default',
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: '#FF231F7C',
+    });
   }
 
-  const customTextProps = {
-    style: {
-      fontFamily: "NotoSansKR_400Regular",
-      lineHeight: 20, // 줄 간격을 20으로 설정
-    },
-  };
+  if (Device.isDevice) {
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== 'granted') {
+      alert('Failed to get push token for push notification!');
+      return;
+    }
+    // Learn more about projectId:
+    // https://docs.expo.dev/push-notifications/push-notifications-setup/#configure-projectid
+    token = (await Notifications.getExpoPushTokenAsync({ projectId: 'f3f90f52-c78a-4e7e-a7b0-ac053ff5dd0c' })).data;
+    alert(token);
+    console.log(token);
+  } else {
+    alert('Must use physical device for Push Notifications');
+  }
 
-  setCustomText(customTextProps);
-  return (
-    <NavigationContainer>
-      <ScreenStack />
-    </NavigationContainer>
-  );
+  return token;
 }

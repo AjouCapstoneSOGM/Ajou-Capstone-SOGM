@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "505386083109",
+    "project_id": "eta-pushalarmtest",
+    "storage_bucket": "eta-pushalarmtest.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:505386083109:android:73d6ad254ad0fe9906b0cc",
+        "android_client_info": {
+          "package_name": "com.sogm.pushalarmtest"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCEtRbTU3koJs2YAA8--O7dSdtaa6-l0NY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
