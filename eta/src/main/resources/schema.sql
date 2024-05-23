@@ -13,7 +13,7 @@ CREATE TABLE `user` (
 
 CREATE TABLE `token` (
     `user_id` int NOT NULL,
-    `fcm_token` varchar(255) NOT NULL,
+    `expo_push_token` varchar(255) NOT NULL,
     PRIMARY KEY (`user_id`),
     FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`)
 );

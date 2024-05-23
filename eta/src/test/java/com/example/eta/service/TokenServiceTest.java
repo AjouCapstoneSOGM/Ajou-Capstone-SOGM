@@ -3,6 +3,7 @@ package com.example.eta.service;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.example.eta.entity.User;
+import com.example.eta.enums.Role;
 import com.example.eta.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,7 +33,7 @@ public class TokenServiceTest {
                 .isVerified(false)
                 .password("password!")
                 .name("James")
-                .role("USER")
+                .role(Role.ROLE_USER)
                 .createdDate(LocalDateTime.now())
                 .enabled(true).build());
 
@@ -52,7 +53,7 @@ public class TokenServiceTest {
                 .isVerified(false)
                 .password("password!")
                 .name("James")
-                .role("USER")
+                .role(Role.ROLE_USER)
                 .createdDate(LocalDateTime.now())
                 .enabled(true).build());
 

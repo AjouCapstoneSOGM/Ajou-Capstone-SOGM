@@ -4,6 +4,7 @@ import com.example.eta.dto.PortfolioDto;
 import com.example.eta.dto.UserDto;
 import com.example.eta.entity.Portfolio;
 import com.example.eta.entity.User;
+import com.example.eta.enums.Role;
 import com.example.eta.repository.PortfolioRepository;
 import com.example.eta.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -58,7 +59,7 @@ public class PortfolioControllerTest {
                 .isVerified(false)
                 .password("password!")
                 .name("James")
-                .role("USER")
+                .role(Role.ROLE_USER)
                 .createdDate(LocalDateTime.now())
                 .enabled(true).build());
         int pfId = portfolioRepository.save(Portfolio.builder()

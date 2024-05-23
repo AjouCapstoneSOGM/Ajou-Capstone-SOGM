@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.example.eta.dto.PortfolioDto;
 import com.example.eta.entity.*;
+import com.example.eta.enums.Role;
 import com.example.eta.repository.*;
 import com.example.eta.service.PortfolioService;
 import org.aspectj.apache.bcel.Repository;
@@ -54,7 +55,7 @@ public class PortfolioServiceTest {
                 .isVerified(false)
                 .password("password!")
                 .name("James")
-                .role("USER")
+                .role(Role.ROLE_USER)
                 .createdDate(LocalDateTime.now())
                 .enabled(true).build());
 
@@ -83,7 +84,7 @@ public class PortfolioServiceTest {
                 .isVerified(false)
                 .password("password!")
                 .name("James")
-                .role("USER")
+                .role(Role.ROLE_USER)
                 .createdDate(LocalDateTime.now())
                 .enabled(true).build());
         String sector = "G25";

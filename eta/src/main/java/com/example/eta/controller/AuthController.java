@@ -2,6 +2,7 @@ package com.example.eta.controller;
 
 import com.example.eta.dto.UserDto;
 import com.example.eta.entity.User;
+import com.example.eta.enums.Role;
 import com.example.eta.exception.EmailAlreadyExistsException;
 import com.example.eta.service.TokenService;
 import com.example.eta.service.UserService;
@@ -85,7 +86,7 @@ public class AuthController {
         user.setPassword(passwordEncoder.encode(InfoDto.getPassword()));
         user.setEmail(InfoDto.getEmail());
         user.setIsVerified(false);
-        user.setRole("USER");
+        user.setRole(Role.ROLE_USER);
         user.setCreatedDate(LocalDateTime.now());
         user.setEnabled(true);
 

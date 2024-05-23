@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import static com.example.eta.enums.Role.ROLE_USER;
+
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Value("${spring.jwt.header}")
@@ -43,13 +45,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 .getBody();
 
         // 인증 성공 시 인증정보 SecurityContext에 저장
-        // TODO: email 말고 UserDetails를 저장하도록 구현하기
         String email = String.valueOf(claims.get("email"));
-        var auth = new UsernamePasswordAuthenticationToken(email, null, List.of(new SimpleGrantedAuthority("USER")));
 //        var auth = new UsernamePasswordAuthenticationToken(
-//                new User(String.valueOf(claims.get("email")), "", null),
-//                null,
-//                List.of(new SimpleGrantedAuthority("USER")));
+//                    new User(String.valueOf(claims.get("email")), "", null), null,
+//                        List.of(new SimpleGrantedAuthority("USER")));
+        var auth = new UsernamePasswordAuthenticationToken(email, null, List.of(new SimpleGrantedAuthority(ROLE_USER.name())));
         SecurityContextHolder.getContext().setAuthentication(auth);
 
         filterChain.doFilter(request, response);

@@ -1,5 +1,6 @@
 package com.example.eta.entity;
 
+import com.example.eta.enums.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -42,7 +43,8 @@ public class User {
     private String name;
 
     @Column(nullable = false)
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     @Column(nullable = false)
     private LocalDateTime createdDate;
