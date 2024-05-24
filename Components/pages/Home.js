@@ -1,13 +1,14 @@
 import React from "react";
-import { View, Button, StyleSheet, Text } from "react-native";
+import { SafeAreaView, View, StyleSheet } from "react-native";
 import { removeUsertoken } from "../utils/localStorageUtils.js";
 import { useAuth } from "../utils/AuthContext.js";
 import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 
 import PortfolioList from "./portfolio/ViewPortfolio.js";
-import Icon from "react-native-vector-icons/AntDesign";
 import AppText from "../utils/AppText.js";
 import { usePortfolio } from "../utils/PortfolioContext.js";
+import { Header, Icon } from "@rneui/base";
+import Footer from "../utils/Footer.js";
 
 const Home = ({ navigation }) => {
   const { isLoggedIn, logout } = useAuth();
@@ -19,6 +20,11 @@ const Home = ({ navigation }) => {
     logout();
   };
 
+  return (
+    <SafeAreaView style={styles.container}>
+      <Footer></Footer>
+    </SafeAreaView>
+  );
   return (
     <View style={styles.container}>
       {isLoggedIn ? (
@@ -80,8 +86,16 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "stretch",
-    padding: 5,
     backgroundColor: "#f5f5f5",
+  },
+  headerContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#397af8",
+    marginBottom: 20,
+    height: 200,
+    width: "100%",
+    paddingVertical: 15,
   },
   errorContent: {
     height: 140,
