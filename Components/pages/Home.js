@@ -1,129 +1,177 @@
-import React from "react";
+import React, { useState } from "react";
 import { SafeAreaView, View, StyleSheet } from "react-native";
 import { removeUsertoken } from "../utils/localStorageUtils.js";
 import { useAuth } from "../utils/AuthContext.js";
 import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 
-import PortfolioList from "./portfolio/ViewPortfolio.js";
 import AppText from "../utils/AppText.js";
 import { usePortfolio } from "../utils/PortfolioContext.js";
-import { Header, Icon } from "@rneui/base";
-import Footer from "../utils/Footer.js";
+import { Button, Divider, Icon } from "@rneui/base";
+import HeaderComponent from "../utils/Header.js";
+import FooterComponent from "../utils/Footer.js";
+import { SearchBar } from "@rneui/themed";
+import { LinearGradient } from "expo-linear-gradient";
 
 const Home = ({ navigation }) => {
   const { isLoggedIn, logout } = useAuth();
   const { removePortfolios } = usePortfolio();
-
+  const { FGI, setFGI } = useState(55);
+  const [search, setSearch] = useState("");
+  const news = [
+    {
+      title: "아스트라제네카, 2030년까지 800억달러 매출 목표",
+      source: "이데일리",
+      date: "2024-05-24",
+    },
+    {
+      title: "아스트라제네카, 2030년까지 800억달러 매출 목표",
+      source: "이데일리",
+      date: "2024-05-24",
+    },
+    {
+      title: "아스트라제네카, 2030년까지 800억달러 매출 목표",
+      source: "이데일리",
+      date: "2024-05-24",
+    },
+    {
+      title: "아스트라제네카, 2030년까지 800억달러 매출 목표",
+      source: "이데일리",
+      date: "2024-05-24",
+    },
+    {
+      title: "아스트라제네카, 2030년까지 800억달러 매출 목표",
+      source: "이데일리",
+      date: "2024-05-24",
+    },
+    {
+      title: "아스트라제네카, 2030년까지 800억달러 매출 목표",
+      source: "이데일리",
+      date: "2024-05-24",
+    },
+  ];
   const setLogout = () => {
     removeUsertoken();
     removePortfolios();
     logout();
   };
-
+  const updateSearch = (search) => {
+    setSearch(search);
+  };
   return (
     <SafeAreaView style={styles.container}>
-      <Footer></Footer>
-    </SafeAreaView>
-  );
-  return (
-    <View style={styles.container}>
-      {isLoggedIn ? (
-        <View style={styles.userContainer}>
-          <AppText style={{ fontSize: 18, color: "white" }}>
-            안녕하세요 테스트님
-          </AppText>
-          <TouchableOpacity onPress={setLogout}>
-            <AppText style={{ fontSize: 18, color: "white" }}>로그아웃</AppText>
-          </TouchableOpacity>
-        </View>
-      ) : (
-        <View style={styles.userContainer}>
-          <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-            <AppText style={{ color: "white", fontSize: 25 }}>로그인</AppText>
-          </TouchableOpacity>
-        </View>
-      )}
-      <View style={styles.buttonContainer}>
-        <AppText
-          style={{
-            fontSize: 18,
-            alignSelf: "flex-start",
-            color: "white",
-          }}
-        >
-          나의 포트폴리오
-        </AppText>
-        <TouchableOpacity
-          style={{ flexDirection: "row", alignItems: "center" }}
-          onPress={() => navigation.navigate("MakePortfolio")}
-        >
-          <AppText style={{ fontSize: 18, color: "white" }}>생성하기</AppText>
-          <Icon
-            style={{ alignSelf: "center", marginHorizontal: 4 }}
-            name="right"
-            size={15}
-            color="#fff"
-          />
-        </TouchableOpacity>
-      </View>
-
+      <HeaderComponent />
       <ScrollView>
-        {isLoggedIn ? (
-          <PortfolioList navigation={navigation}></PortfolioList>
-        ) : (
-          <View style={styles.errorContent}>
-            <AppText style={{ fontSize: 17 }}>
-              로그인이 필요한 서비스입니다
+        <SearchBar
+          placeholder="주식종목 검색"
+          onChangeText={updateSearch}
+          value={search}
+          containerStyle={styles.searchContainer}
+          inputContainerStyle={styles.searchInputContainer}
+        ></SearchBar>
+        <View style={styles.FGIContainer}>
+          <View style={styles.FGIHeader}>
+            <AppText
+              style={{ fontWeight: "bold", fontSize: 20, color: "#f0f0f0" }}
+            >
+              공포탐욕지수
             </AppText>
+            <Button
+              buttonStyle={{ marginHorizontal: -10 }}
+              type="clear"
+              onPress={() => {}}
+              icon={{
+                name: "questioncircleo",
+                type: "antdesign",
+                color: "white",
+              }}
+            />
           </View>
-        )}
+          <View style={styles.FGIContent}>
+            <AppText style={{ fontSize: 20 }}>
+              <AppText style={{ fontSize: 25, fontWeight: "bold" }}>
+                55{" "}
+              </AppText>
+              <AppText>/ 100</AppText>
+            </AppText>
+            <LinearGradient
+              colors={["#ff5c5c", "#93ff93"]} // 빨간색에서 초록색으로 변하는 그라데이션
+              start={{ x: 0, y: 0 }} // 그라데이션 시작 위치
+              end={{ x: 1, y: 0 }} // 그라데이션 종료 위치
+              style={styles.FGIBar}
+            />
+          </View>
+        </View>
+        <View style={styles.newsContainer}>
+          <AppText style={styles.newsHeader}>실시간 뉴스</AppText>
+          {news.map((newsItem, index) => (
+            <TouchableOpacity key={index}>
+              <AppText style={styles.newsTitle}>{newsItem.title}</AppText>
+              <AppText style={{ color: "#7d7d7d", fontSize: 13 }}>
+                <AppText>{newsItem.source} </AppText>
+                <AppText>{newsItem.date}</AppText>
+              </AppText>
+              <Divider style={{ marginVertical: 15 }} />
+            </TouchableOpacity>
+          ))}
+        </View>
       </ScrollView>
-    </View>
+      <FooterComponent />
+    </SafeAreaView>
   );
 };
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
     alignItems: "stretch",
     backgroundColor: "#f5f5f5",
   },
-  headerContainer: {
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#397af8",
-    marginBottom: 20,
-    height: 200,
-    width: "100%",
-    paddingVertical: 15,
+  searchContainer: {
+    backgroundColor: "#333",
+    borderTopColor: "#333",
+    borderBottomColor: "#333",
   },
-  errorContent: {
-    height: 140,
-    backgroundColor: "#e5e5e5",
-    justifyContent: "center",
+  searchInputContainer: {
+    backgroundColor: "#f0f0f0",
+    borderRadius: 23,
+  },
+  FGIContainer: {
+    backgroundColor: "#333",
+    paddingHorizontal: 10,
+    paddingVertical: 30,
+  },
+  FGIHeader: {
+    flexDirection: "row",
     alignItems: "center",
-    margin: 10,
+    justifyContent: "space-between",
+  },
+  FGIContent: {
+    alignItems: "center",
+    backgroundColor: "#f0f0f0",
+    marginVertical: 10,
+    paddingVertical: 20,
     borderRadius: 10,
   },
-  userContainer: {
-    height: 180,
-    backgroundColor: "#6495ED",
-    justifyContent: "space-evenly",
-    alignItems: "center",
-    borderRadius: 5,
-    padding: 18,
-    marginVertical: 40,
-    marginHorizontal: 10,
+  FGIBar: {
+    height: 15,
+    width: "80%",
+    borderRadius: 10,
+    marginTop: 20,
   },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: "#6495ED",
-    alignItems: "stretch",
-    borderRadius: 5,
-    padding: 13,
-    marginHorizontal: 10,
+  newsContainer: {
+    backgroundColor: "#333",
+    paddingHorizontal: 10,
+    paddingVertical: 30,
+  },
+  newsHeader: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#f0f0f0",
+    marginBottom: 30,
+  },
+  newsTitle: {
+    fontSize: 18,
+    color: "#f0f0f0",
+    marginBottom: 15,
   },
 });
 export default Home;

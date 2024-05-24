@@ -1,27 +1,40 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
+import { Button } from "@rneui/themed";
 
-const Footer = () => {
+const FooterComponent = () => {
   return (
     <View style={styles.footer}>
-      <TouchableOpacity
-        onPress={() => alert("홈으로 이동!")}
-        style={styles.button}
-      >
-        <Text>홈</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        onPress={() => alert("설정으로 이동!")}
-        style={styles.button}
-      >
-        <Text>설정</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        onPress={() => alert("프로필로 이동!")}
-        style={styles.button}
-      >
-        <Text>프로필</Text>
-      </TouchableOpacity>
+      <View style={styles.buttonContainer}>
+        <Button
+          buttonStyle={styles.footerButton}
+          titleStyle={styles.buttonTitle}
+          title="내 정보"
+          type="clear"
+          onPress={() => {}}
+          icon={{ name: "user", type: "font-awesome", color: "white" }}
+        />
+      </View>
+      <View style={styles.buttonContainer}>
+        <Button
+          buttonStyle={styles.footerButton}
+          titleStyle={styles.buttonTitle}
+          title="홈"
+          type="clear"
+          onPress={() => {}}
+          icon={{ name: "home", type: "font-awesome", color: "white" }}
+        />
+      </View>
+      <View style={styles.buttonContainer}>
+        <Button
+          buttonStyle={styles.footerButton}
+          titleStyle={styles.buttonTitle}
+          title="포트폴리오"
+          type="clear"
+          onPress={() => {}}
+          icon={{ name: "piechart", type: "antdesign", color: "white" }}
+        />
+      </View>
     </View>
   );
 };
@@ -31,18 +44,22 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
-    height: 50,
-    backgroundColor: "#f8f8f8",
-    borderTopWidth: 1,
+    height: 70,
+    backgroundColor: "#333",
     borderTopColor: "#e1e1e1",
-    position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
   },
-  button: {
-    padding: 10,
+  buttonContainer: {
+    flex: 1,
+  },
+  footerButton: {
+    flexDirection: "column",
+  },
+  buttonTitle: {
+    color: "#fff",
   },
 });
 
-export default Footer;
+export default FooterComponent;
