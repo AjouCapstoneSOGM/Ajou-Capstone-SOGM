@@ -182,37 +182,6 @@ export const PortfolioProvider = ({ children }) => {
     }
   };
 
-  const fetchUserInfo = async (userInfo) => {
-    setPortLoading(true);
-    try {
-      const token = await getUsertoken();
-      const response = await fetch(
-        `${urls.springUrl}/api/portfolio/create/auto`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            country: "KOR",
-            sector: [userInfo.interest],
-            asset: userInfo.amount,
-            riskValue: userInfo.riskLevel,
-          }),
-        }
-      );
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Success:", data);
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      throw error;
-    }
-    await loadData();
-  };
-
   const fetchModify = async (rebalances, portId, rnId) => {
     setPortLoading(true);
     try {
@@ -259,11 +228,6 @@ export const PortfolioProvider = ({ children }) => {
     setPortLoading(false);
   };
 
-  useEffect(() => {
-    setPortLoading(true);
-    if (isLoggedIn) loadData();
-  }, [isLoggedIn]);
-
   return (
     <PortfolioContext.Provider
       value={{
@@ -271,10 +235,10 @@ export const PortfolioProvider = ({ children }) => {
         rebalances,
         fetchPortfolios,
         fetchDelete,
-        fetchUserInfo,
         getPortfolioById,
         fetchModify,
         removePortfolios,
+        loadData,
         portLoading,
       }}
     >

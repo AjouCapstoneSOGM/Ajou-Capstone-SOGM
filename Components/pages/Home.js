@@ -1,17 +1,12 @@
 import React, { useState } from "react";
-import {
-  SafeAreaView,
-  View,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-} from "react-native";
+import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import AppText from "../utils/AppText.js";
 import { Button, Divider } from "@rneui/base";
 import HeaderComponent from "../utils/Header.js";
 import FooterComponent from "../utils/Footer.js";
 import { SearchBar } from "@rneui/themed";
 import { LinearGradient } from "expo-linear-gradient";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const Home = ({ navigation }) => {
   const [FGI, setFGI] = useState(55);
@@ -52,17 +47,20 @@ const Home = ({ navigation }) => {
   const updateSearch = (search) => {
     setSearch(search);
   };
+
   return (
     <SafeAreaView style={styles.container}>
       <HeaderComponent />
       <ScrollView>
-        <SearchBar
-          placeholder="주식종목 검색"
-          onChangeText={updateSearch}
-          value={search}
-          containerStyle={styles.searchContainer}
-          inputContainerStyle={styles.searchInputContainer}
-        ></SearchBar>
+        <View style={styles.searchBarContainer}>
+          <SearchBar
+            placeholder="주식종목 검색"
+            onChangeText={updateSearch}
+            value={search}
+            containerStyle={styles.searchContainer}
+            inputContainerStyle={styles.searchInputContainer}
+          ></SearchBar>
+        </View>
         <View style={styles.FGIContainer}>
           <View style={styles.FGIHeader}>
             <AppText
@@ -110,6 +108,8 @@ const Home = ({ navigation }) => {
           ))}
         </View>
       </ScrollView>
+      <View style={{ height: 70 }} />
+      {/* footer 높이 만큼 증가 */}
       <FooterComponent />
     </SafeAreaView>
   );
@@ -118,16 +118,25 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: "stretch",
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#f0f0f0",
+  },
+  searchBarContainer: {
+    backgroundColor: "#f0f0f0",
+    paddingVertical: 20,
+    paddingHorizontal: 20,
   },
   searchContainer: {
-    backgroundColor: "#333",
-    borderTopColor: "#333",
-    borderBottomColor: "#333",
+    borderRadius: 30,
+    borderBottomColor: "transparent",
+    borderTopColor: "transparent",
+    padding: 4,
+    paddingRight: 50,
+    height: 50,
   },
   searchInputContainer: {
     backgroundColor: "#f0f0f0",
-    borderRadius: 23,
+    borderRadius: 30,
+    height: 40,
   },
   FGIContainer: {
     backgroundColor: "#333",

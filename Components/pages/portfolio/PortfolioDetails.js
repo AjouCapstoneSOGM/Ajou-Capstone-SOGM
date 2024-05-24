@@ -33,22 +33,6 @@ const PortfolioDetails = ({ route, navigation }) => {
   const [alertExist, setAlertExist] = useState(false);
   const [notificationVisible, setNotificationVisible] = useState(false);
 
-  const colorScale = [
-    "hsl(348, 100%, 80%)", // 파스텔 핑크,
-    "hsl(207, 94%, 80%)", // 파스텔 블루,
-    "hsl(48, 100%, 78%)", // 파스텔 옐로우,
-    "hsl(144, 76%, 76%)", // 파스텔 그린,
-    "hsl(20, 100%, 72%)", // 파스텔 오렌지,
-    "hsl(262, 100%, 80%)", // 파스텔 퍼플,
-    "hsl(174, 100%, 70%)", // 파스텔 시안,
-    "hsl(338, 90%, 72%)", // 파스텔 레드,
-    "hsl(20, 20%, 60%)", // 연 회색,
-    "hsl(300, 90%, 80%)", // 파스텔 시안-그린,
-    "#333",
-    "#777",
-    "#ccc",
-  ];
-
   const getAlertExists = async (id) => {
     try {
       const token = await getUsertoken();
@@ -198,14 +182,6 @@ const PortfolioDetails = ({ route, navigation }) => {
         </View>
       </View>
       <View style={styles.chartContainer}>
-        <VictoryPie
-          data={chartData}
-          colorScale={colorScale}
-          innerRadius={({ index }) => (index === selectedId ? 65 : 75)}
-          radius={({ index }) => (index === selectedId ? 125 : 110)}
-          labels={() => ""}
-          style={styles.chart}
-        />
         {selectedId !== null && (
           <View style={{ position: "absolute", alignItems: "center" }}>
             <AppText style={[styles.centerText, { fontWeight: "bold" }]}>{`${

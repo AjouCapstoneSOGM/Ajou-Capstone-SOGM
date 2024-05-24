@@ -10,14 +10,19 @@ import urls from "../../utils/urls";
 import { setUsertoken } from "../../utils/localStorageUtils.js";
 import { useAuth } from "../../utils/AuthContext.js";
 import AppText from "../../utils/AppText.js";
+import { usePortfolio } from "../../utils/PortfolioContext.js";
+import Loading from "../../utils/Loading.js";
 
 const Login = ({ navigation }) => {
   const [useremail, setUseremail] = useState("test@test.com"); //
   const [password, setPassword] = useState("1234"); //
+  const [loading, setLoading] = useState(false);
   const { login } = useAuth();
+  const { loadData } = usePortfolio();
 
   const fetchLoginInfo = async () => {
     try {
+      setLoading(true);
       const response = await fetch(`${urls.springUrl}/api/auth/login`, {
         method: "POST",
         headers: {
@@ -32,6 +37,8 @@ const Login = ({ navigation }) => {
         const data = await response.json();
         setUsertoken(data.token);
         login();
+        await loadData();
+        setLoading(false);
         navigation.navigate("Home", { screen: "Home" });
       }
     } catch (error) {
@@ -40,6 +47,7 @@ const Login = ({ navigation }) => {
     }
   };
 
+  if (loading) return <Loading />;
   return (
     <View style={styles.container}>
       <AppText style={styles.HomeText}>로그인</AppText>

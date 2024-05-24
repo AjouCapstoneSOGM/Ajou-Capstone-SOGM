@@ -2,9 +2,12 @@ import React from "react";
 import { View, StyleSheet } from "react-native";
 import { Button } from "@rneui/themed";
 import { useNavigation } from "@react-navigation/native";
+import { useAuth } from "./AuthContext";
 
 const FooterComponent = () => {
   const navigation = useNavigation();
+  const { isLoggedIn } = useAuth();
+
   return (
     <View style={styles.footer}>
       <View style={styles.buttonContainer}>
@@ -13,8 +16,10 @@ const FooterComponent = () => {
           titleStyle={styles.buttonTitle}
           title="내 정보"
           type="clear"
-          onPress={() => {}}
-          icon={{ name: "user", type: "font-awesome", color: "white" }}
+          onPress={() => {
+            isLoggedIn ? {} : navigation.navigate("Login");
+          }}
+          icon={{ name: "user", type: "font-awesome", color: "#f0f0f0" }}
         />
       </View>
       <View style={styles.buttonContainer}>
@@ -26,7 +31,7 @@ const FooterComponent = () => {
           onPress={() => {
             navigation.navigate("Home");
           }}
-          icon={{ name: "home", type: "font-awesome", color: "white" }}
+          icon={{ name: "home", type: "font-awesome", color: "#f0f0f0" }}
         />
       </View>
       <View style={styles.buttonContainer}>
@@ -36,9 +41,11 @@ const FooterComponent = () => {
           title="포트폴리오"
           type="clear"
           onPress={() => {
-            navigation.navigate("ViewPortfolio");
+            isLoggedIn
+              ? navigation.navigate("ViewPortfolio")
+              : navigation.navigate("Login");
           }}
-          icon={{ name: "piechart", type: "antdesign", color: "white" }}
+          icon={{ name: "piechart", type: "antdesign", color: "#f0f0f0" }}
         />
       </View>
     </View>
@@ -53,9 +60,10 @@ const styles = StyleSheet.create({
     height: 70,
     backgroundColor: "#333",
     borderTopColor: "#e1e1e1",
+    position: "absolute",
     bottom: 0,
-    left: 0,
     right: 0,
+    left: 0,
   },
   buttonContainer: {
     flex: 1,
@@ -64,7 +72,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
   },
   buttonTitle: {
-    color: "#fff",
+    color: "#f0f0f0",
   },
 });
 
