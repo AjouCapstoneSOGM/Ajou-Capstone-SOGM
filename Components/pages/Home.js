@@ -1,21 +1,20 @@
 import React, { useState } from "react";
-import { SafeAreaView, View, StyleSheet } from "react-native";
-import { removeUsertoken } from "../utils/localStorageUtils.js";
-import { useAuth } from "../utils/AuthContext.js";
-import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
-
+import {
+  SafeAreaView,
+  View,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
 import AppText from "../utils/AppText.js";
-import { usePortfolio } from "../utils/PortfolioContext.js";
-import { Button, Divider, Icon } from "@rneui/base";
+import { Button, Divider } from "@rneui/base";
 import HeaderComponent from "../utils/Header.js";
 import FooterComponent from "../utils/Footer.js";
 import { SearchBar } from "@rneui/themed";
 import { LinearGradient } from "expo-linear-gradient";
 
 const Home = ({ navigation }) => {
-  const { isLoggedIn, logout } = useAuth();
-  const { removePortfolios } = usePortfolio();
-  const { FGI, setFGI } = useState(55);
+  const [FGI, setFGI] = useState(55);
   const [search, setSearch] = useState("");
   const news = [
     {
@@ -49,11 +48,7 @@ const Home = ({ navigation }) => {
       date: "2024-05-24",
     },
   ];
-  const setLogout = () => {
-    removeUsertoken();
-    removePortfolios();
-    logout();
-  };
+
   const updateSearch = (search) => {
     setSearch(search);
   };
@@ -89,7 +84,7 @@ const Home = ({ navigation }) => {
           <View style={styles.FGIContent}>
             <AppText style={{ fontSize: 20 }}>
               <AppText style={{ fontSize: 25, fontWeight: "bold" }}>
-                55{" "}
+                {FGI}{" "}
               </AppText>
               <AppText>/ 100</AppText>
             </AppText>

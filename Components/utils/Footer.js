@@ -1,8 +1,10 @@
 import React from "react";
 import { View, StyleSheet } from "react-native";
 import { Button } from "@rneui/themed";
+import { useNavigation } from "@react-navigation/native";
 
 const FooterComponent = () => {
+  const navigation = useNavigation();
   return (
     <View style={styles.footer}>
       <View style={styles.buttonContainer}>
@@ -21,7 +23,9 @@ const FooterComponent = () => {
           titleStyle={styles.buttonTitle}
           title="홈"
           type="clear"
-          onPress={() => {}}
+          onPress={() => {
+            navigation.navigate("Home");
+          }}
           icon={{ name: "home", type: "font-awesome", color: "white" }}
         />
       </View>
@@ -31,7 +35,9 @@ const FooterComponent = () => {
           titleStyle={styles.buttonTitle}
           title="포트폴리오"
           type="clear"
-          onPress={() => {}}
+          onPress={() => {
+            navigation.navigate("ViewPortfolio");
+          }}
           icon={{ name: "piechart", type: "antdesign", color: "white" }}
         />
       </View>
