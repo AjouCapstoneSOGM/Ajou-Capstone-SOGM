@@ -2,6 +2,7 @@ package com.example.eta.controller;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -82,6 +83,7 @@ public class AuthControllerTest {
                 .andExpect(header().exists("Authorization"))
                 .andReturn().getResponse();
 
+        assertTrue(JsonPath.parse(response.getContentAsString()).read("$.name").equals("James"));
         tokenRepository.findById(userService.findByEmail("james@domain.com").getUserId())
                 .ifPresent(token -> assertNotNull(token.getExpoPushToken()));
     }

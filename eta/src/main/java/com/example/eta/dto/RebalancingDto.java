@@ -2,6 +2,7 @@ package com.example.eta.dto;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class RebalancingDto {
@@ -42,7 +43,8 @@ public class RebalancingDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class RebalancingListDto {
-        int rnId;
+        private int rnId;
+        private LocalDateTime createdDate;
         private List<RebalancingInfo> rebalancings;
     }
 
