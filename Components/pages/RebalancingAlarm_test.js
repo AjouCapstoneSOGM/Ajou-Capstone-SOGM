@@ -11,7 +11,7 @@ Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
     shouldPlaySound: false,
-    shouldSetBadge: true,
+    shouldSetBadge: false,
   }),
 });
 
@@ -141,7 +141,7 @@ const UserSetting = ({navigation}) => {
       <Text>Your expo push token: {expoPushToken}</Text>
       <View style={{ alignItems: 'center', justifyContent: 'center' }}>
         <Text>Title: {notification && notification.request.content.title} </Text>
-        {/*<Text>Body: {notification && notification.request.content.body}</Text>*/}
+        <Text>Body: {notification && notification.request.content.body}</Text>
       </View>
       <Button
         title="알림 다시 보내기"
@@ -158,9 +158,9 @@ async function schedulePushNotification(data) {
   await Notifications.scheduleNotificationAsync({
     content: {
       title: "리밸런싱 내역이 있습니다",
-      //body: data,
+      body: "data를 입력하세요",
     },
-    trigger: { seconds: 10 },
+    trigger: { seconds: 1 },
   });
 }
 
@@ -189,8 +189,8 @@ async function registerForPushNotificationsAsync() {
     }
     // Learn more about projectId:
     // https://docs.expo.dev/push-notifications/push-notifications-setup/#configure-projectid
-    token = (await Notifications.getExpoPushTokenAsync()).data;
-    //token = (await Notifications.getDevicePushTokenAsync()).data;
+    //token = (await Notifications.getExpoPushTokenAsync()).data;
+    token = (await Notifications.getDevicePushTokenAsync()).data;
     console.log(finalStatus, token);
     
   } else {
