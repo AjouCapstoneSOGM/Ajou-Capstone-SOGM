@@ -39,9 +39,10 @@ public class RebalancingAuthorizationInterceptor implements HandlerInterceptor {
 
         if (pathVariables.get("rn_id") == null)
             return true;
-        Integer rnId = Integer.parseInt(pathVariables.get("port_id"));
+        Integer rnId = Integer.parseInt(pathVariables.get("rn_id"));
 
         if (!rebalancingRepository.existsById(rnId)) throw new NotFoundException();
+        if (!rebalancingRepository.getReferenceById(rnId).getPortfolio().getPfId().equals(pfId)) throw new NotFoundException();
         if (!rebalancingRepository.getReferenceById(rnId).getPortfolio().getUser().getEmail().equals(email))
             throw new OwnershipException();
 
