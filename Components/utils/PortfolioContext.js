@@ -9,11 +9,45 @@ const PortfolioContext = createContext();
 export const PortfolioProvider = ({ children }) => {
   const [portfolios, setPortfolios] = useState([]);
   const [portLoading, setPortLoading] = useState(true);
+  const [rebalances, setRebalances] = useState([]);
   const { isLoggedIn } = useAuth();
 
   const removePortfolios = () => {
     setPortfolios([]);
   };
+
+  const fetchRebalanceList = async (portfolioId) => {
+    try {
+      const token = await getUsertoken();
+      const response = await fetch(
+        `${urls.springUrl}/api/rebalancing/${portfolioId}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (response.ok) {
+        const data = await response.json();
+        data.rebalancing.forEach((item) => {
+          item.pfId = portfolioId;
+        });
+        return data.rebalancing;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchAllRebalances = async (portfolioIds) => {
+    const promises = portfolioIds.map((id) => {
+      return fetchRebalanceList(id);
+    });
+    const rebalancesList = await Promise.all(promises);
+    return rebalancesList.flat();
+  };
+
   const fetchPortfolios = async () => {
     try {
       const token = await getUsertoken();
@@ -148,37 +182,6 @@ export const PortfolioProvider = ({ children }) => {
     }
   };
 
-  const fetchUserInfo = async (userInfo) => {
-    setPortLoading(true);
-    try {
-      const token = await getUsertoken();
-      const response = await fetch(
-        `${urls.springUrl}/api/portfolio/create/auto`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            country: "KOR",
-            sector: [userInfo.interest],
-            asset: userInfo.amount,
-            riskValue: userInfo.riskLevel,
-          }),
-        }
-      );
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Success:", data);
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      throw error;
-    }
-    await loadData();
-  };
-
   const fetchModify = async (rebalances, portId, rnId) => {
     setPortLoading(true);
     try {
@@ -210,33 +213,32 @@ export const PortfolioProvider = ({ children }) => {
   };
 
   const loadData = async () => {
-    const data = await fetchPortfolios();
-    const portfolioList = data.portfolios;
+    const portData = await fetchPortfolios();
+    const portfolioList = portData.portfolios;
     const portfolioIds = getPortfolioIds(portfolioList);
     const portfolioStocks = await fetchAllStocks(portfolioIds);
     const stocksWithCurrent = await fetchAllCurrent(portfolioStocks);
     portfolioList.forEach((portfolio, index) => {
       portfolio.detail = stocksWithCurrent[index];
     });
+
+    const rebalancesList = await fetchAllRebalances(portfolioIds);
+    setRebalances(rebalancesList);
     setPortfolios(portfolioList);
     setPortLoading(false);
   };
-
-  useEffect(() => {
-    setPortLoading(true);
-    if (isLoggedIn) loadData();
-  }, [isLoggedIn]);
 
   return (
     <PortfolioContext.Provider
       value={{
         portfolios,
+        rebalances,
         fetchPortfolios,
         fetchDelete,
-        fetchUserInfo,
         getPortfolioById,
         fetchModify,
         removePortfolios,
+        loadData,
         portLoading,
       }}
     >
