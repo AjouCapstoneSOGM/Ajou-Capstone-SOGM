@@ -70,6 +70,7 @@ public class PortfolioServiceTest {
         Portfolio portfolio = portfolioRepository.findById(pfId).get();
         Assertions.assertAll(
                 () -> assertEquals(portfolio.getUser().getUserId(), user.getUserId()),
+                () -> assertTrue(portfolio.getName().equals(user.getName() + "의 자동 포트폴리오 " + user.getPortfolios().size())),
                 () -> assertNull(portfolio.getCreatedDate())
         );
     }

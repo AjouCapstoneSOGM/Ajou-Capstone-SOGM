@@ -54,9 +54,14 @@ public class PortfolioService {
 
     @Transactional
     public Portfolio createInitAutoPortfolio(User user, PortfolioDto.CreateRequestDto createRequestDto) {
+        String name = createRequestDto.getName();
+        if (name == null) {
+            name = user.getName() + "의 자동 포트폴리오 " + (user.getPortfolios().size() + 1);
+        }
+
         Portfolio portfolio = new Portfolio().builder()
                 .user(user)
-                .name(createRequestDto.getName())
+                .name(name)
                 .country(createRequestDto.getCountry())
                 .isAuto(true)
                 .initAsset(createRequestDto.getAsset())
@@ -65,6 +70,7 @@ public class PortfolioService {
                 .riskValue(createRequestDto.getRiskValue())
                 .build();
         portfolioRepository.save(portfolio);
+        user.getPortfolios().add(portfolio);
 
         for (Sector sector : sectorRepository.findAllById(createRequestDto.getSector())) {
             PortfolioSector portfolioSector = new PortfolioSector().builder()
@@ -142,8 +148,6 @@ public class PortfolioService {
                     .build());
             portfolio.getPortfolioTickers().add(portfolioTicker);
         }
-
-        // TODO: 채권 추가
 
         portfolioRepository.save(portfolio);
     }
