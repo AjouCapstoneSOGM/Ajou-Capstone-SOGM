@@ -17,6 +17,7 @@ import Loading from "../../utils/Loading";
 import NotificationBubble from "../../utils/Notification";
 
 const PortfolioDetails = ({ route, navigation }) => {
+  const stocksLength = 10;
   const { getPortfolioById, portfolios } = usePortfolio();
   const [loading, setLoading] = useState(true);
   const [portfolio, setPortfolio] = useState({
@@ -43,6 +44,8 @@ const PortfolioDetails = ({ route, navigation }) => {
     "hsl(338, 90%, 72%)", // 파스텔 레드,
     "hsl(20, 20%, 60%)", // 연 회색,
     "hsl(300, 90%, 80%)", // 파스텔 시안-그린,
+    "#333",
+    "#777",
     "#ccc",
   ];
 
@@ -111,8 +114,8 @@ const PortfolioDetails = ({ route, navigation }) => {
   const getPortfolioROI = () => {
     const benefit = getTotalPrice() - portfolio.initialAsset;
     const roi = ((benefit / portfolio.initialAsset) * 100).toFixed(2);
-    const roiFormatted = roi >= 0 ? `+${roi}` : `${roi}`;
-    const color = roi >= 0 ? "#ff3a00" : "#0c5bff";
+    const roiFormatted = roi > 0 ? `+${roi}` : `${roi}`;
+    const color = roi > 0 ? "#ff3a00" : roi < 0 ? "#0c5bff" : "#666";
     return (
       <View style={{ flexDirection: "row" }}>
         <AppText>{benefit.toLocaleString()} 원 </AppText>
@@ -198,8 +201,8 @@ const PortfolioDetails = ({ route, navigation }) => {
         <VictoryPie
           data={chartData}
           colorScale={colorScale}
-          innerRadius={({ index }) => (index === selectedId ? 55 : 65)}
-          radius={({ index }) => (index === selectedId ? 115 : 100)}
+          innerRadius={({ index }) => (index === selectedId ? 65 : 75)}
+          radius={({ index }) => (index === selectedId ? 125 : 110)}
           labels={() => ""}
           style={styles.chart}
         />
@@ -208,7 +211,7 @@ const PortfolioDetails = ({ route, navigation }) => {
             <AppText style={[styles.centerText, { fontWeight: "bold" }]}>{`${
               (getStockRate(selectedId).toFixed(3) * 1000) / 10 // 소숫점 계산 오류 방지를 위함
             }%`}</AppText>
-            <AppText style={[styles.centerText, { fontSize: 15 }]}>
+            <AppText style={[styles.centerText, { fontSize: 13 }]}>
               {portfolio.stocks[selectedId].companyName}
             </AppText>
           </View>
@@ -221,114 +224,135 @@ const PortfolioDetails = ({ route, navigation }) => {
           }}
           showsVerticalScrollIndicator={false}
         >
+          <AppText style={{ fontSize: 20, padding: 10, color: "#666" }}>
+            주식
+          </AppText>
           {portfolio.stocks.map((item, index) => {
             const roi = getStockROI(index);
-            const roiFormatted = roi >= 0 ? `+${roi}` : `${roi}`;
+            const roiFormatted = roi > 0 ? `+${roi}` : `${roi}`;
+            {
+              index === stocksLength - 1 && (
+                <AppText style={{ fontSize: 20, padding: 10, color: "#666" }}>
+                  안전자산
+                </AppText>
+              );
+            }
             return (
-              <TouchableOpacity
-                key={index}
-                style={[
-                  styles.item,
-                  selectedId === index ? styles.selectedItem : {},
-                ]}
-                onPress={() => handleSelectedId(index)}
-              >
-                <View
-                  style={{
-                    backgroundColor: colorScale[index],
-                    position: "absolute",
-                    width: 5,
-                    height: "100%",
-                  }}
-                ></View>
-                <View style={styles.infoContainer}>
+              <React.Fragment key={index}>
+                {stocksLength === index && (
+                  <AppText style={{ fontSize: 20, padding: 10, color: "#666" }}>
+                    안전자산
+                  </AppText>
+                )}
+                <TouchableOpacity
+                  style={[
+                    styles.item,
+                    selectedId === index ? styles.selectedItem : {},
+                  ]}
+                  onPress={() => handleSelectedId(index)}
+                >
                   <View
                     style={{
-                      justifyContent: "space-between",
-                      paddingBottom: 10,
+                      backgroundColor: colorScale[index],
+                      position: "absolute",
+                      width: 5,
+                      height: "100%",
                     }}
-                  >
-                    <AppText
+                  ></View>
+                  <View style={styles.infoContainer}>
+                    <View
                       style={{
-                        fontSize: 18,
-                        color: "#222",
+                        justifyContent: "space-between",
+                        paddingBottom: 10,
                       }}
                     >
-                      {item.companyName}
-                    </AppText>
-                    <View style={{ flexDirection: "row" }}>
                       <AppText
-                        style={[
-                          styles.itemText,
-                          roi >= 0
-                            ? { color: "#ff3a00" }
-                            : { color: "#0c5bff" },
-                        ]}
+                        style={{
+                          fontSize: 18,
+                          color: "#222",
+                        }}
                       >
-                        {Number(item.currentPrice).toLocaleString()} 원
+                        {item.companyName}
+                      </AppText>
+                      <View style={{ flexDirection: "row" }}>
+                        <AppText
+                          style={[
+                            styles.itemText,
+                            roi > 0
+                              ? { color: "#ff3a00" }
+                              : roi < 0
+                              ? { color: "#0c5bff" }
+                              : { color: "#666" },
+                          ]}
+                        >
+                          {Number(item.currentPrice).toLocaleString()} 원
+                        </AppText>
+                        <AppText
+                          style={[
+                            styles.itemText,
+                            { paddingHorizontal: 10 },
+                            roi > 0
+                              ? { color: "#ff3a00" }
+                              : roi < 0
+                              ? { color: "#0c5bff" }
+                              : { color: "#666" },
+                          ]}
+                        >
+                          {roiFormatted} %
+                        </AppText>
+                      </View>
+                    </View>
+                    <View
+                      style={{
+                        justifyContent: "space-between",
+                        alignItems: "flex-end",
+                        paddingBottom: 20,
+                      }}
+                    >
+                      <AppText style={{ fontSize: 21 }}>
+                        {(item.currentPrice * item.quantity).toLocaleString()}{" "}
+                        원
                       </AppText>
                       <AppText
-                        style={[
-                          styles.itemText,
-                          { paddingHorizontal: 10 },
-                          roi >= 0
-                            ? { color: "#ff3a00" }
-                            : { color: "#0c5bff" },
-                        ]}
+                        style={{
+                          fontSize: 13,
+                          color: "#777",
+                        }}
                       >
-                        {roiFormatted} %
+                        {Number(item.quantity).toLocaleString()} 주
                       </AppText>
                     </View>
                   </View>
-                  <View
-                    style={{
-                      justifyContent: "space-between",
-                      alignItems: "flex-end",
-                      paddingBottom: 20,
-                    }}
-                  >
-                    <AppText style={{ fontSize: 21 }}>
-                      {(item.currentPrice * item.quantity).toLocaleString()} 원
-                    </AppText>
-                    <AppText
-                      style={{
-                        fontSize: 13,
-                        color: "#777",
-                      }}
-                    >
-                      {Number(item.quantity).toLocaleString()} 주
-                    </AppText>
-                  </View>
-                </View>
-                {selectedId === index && (
-                  <View style={styles.utilContainer}>
-                    <TouchableOpacity
-                      style={styles.utilButton}
-                      onPress={() => {
-                        navigation.navigate("NewsSummary", {
-                          ticker: item.ticker,
-                        });
-                      }}
-                    >
-                      <AppText style={{ fontSize: 18, color: "#555" }}>
-                        종목 정보
-                      </AppText>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={styles.utilButton}
-                      onPress={() => {
-                        navigation.navigate("NewsSummary", {
-                          ticker: item.ticker,
-                        });
-                      }}
-                    >
-                      <AppText style={{ fontSize: 18, color: "#555" }}>
-                        뉴스 요약
-                      </AppText>
-                    </TouchableOpacity>
-                  </View>
-                )}
-              </TouchableOpacity>
+                  {selectedId === index && (
+                    <View style={styles.utilContainer}>
+                      <TouchableOpacity
+                        style={styles.utilButton}
+                        onPress={() => {
+                          navigation.navigate("NewsSummary", {
+                            ticker: item.ticker,
+                          });
+                        }}
+                      >
+                        <AppText style={{ fontSize: 18, color: "#555" }}>
+                          종목 정보
+                        </AppText>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.utilButton}
+                        onPress={() => {
+                          navigation.navigate("NewsSummary", {
+                            ticker: item.ticker,
+                          });
+                        }}
+                      >
+                        <AppText style={{ fontSize: 18, color: "#555" }}>
+                          뉴스 요약
+                        </AppText>
+                      </TouchableOpacity>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              </React.Fragment>
             );
           })}
         </ScrollView>

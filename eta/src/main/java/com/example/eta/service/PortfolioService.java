@@ -2,6 +2,7 @@ package com.example.eta.service;
 
 import com.example.eta.api.ApiClient;
 import com.example.eta.dto.PortfolioDto;
+import com.example.eta.dto.TickerDto;
 import com.example.eta.entity.*;
 import com.example.eta.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class PortfolioService {
     private final PortfolioTickerRepository portfolioTickerRepository;
     private final RebalancingRepository rebalancingRepository;
     private final RebalancingTickerRepository rebalancingTickerRepository;
+    private final PortfolioRecordRepository portfolioRecordRepository;
     private final PriceRepository priceRepository;
     private final ApiClient apiClient;
 
@@ -118,12 +120,15 @@ public class PortfolioService {
                 .build();
         rebalancingRepository.save(rebalancing);
 
+        List<TickerDto.TickerPrice> tickerPrices = apiClient.getCurrentTickerPrice(tickers.stream().map(Ticker::getTicker).toList()).block().getBody().getPrices();
+
         for (int i = 0; i < tickers.size(); i++) {
             RebalancingTicker rebalancingTicker = rebalancingTickerRepository.save(RebalancingTicker.builder()
                     .rebalancing(rebalancing)
                     .ticker(tickers.get(i))
                     .isBuy(true)
                     .number(stockNumPerTicker.get(i))
+                    .price(tickerPrices.get(i).getCurrent_price())
                     .build());
             rebalancing.getRebalancingTickers().add(rebalancingTicker);
 
@@ -168,10 +173,56 @@ public class PortfolioService {
                 .portfolioPerformances(portfolioPerformances)
                 .build();
     }
+    @Transactional
+    public int createManualPortfolio(User user,PortfolioDto.CreateManualRequestDto request) {
+
+        float totalAsset = 0;
+        for (PortfolioDto.StockDetailDto stock : request.getStocks()) {
+            totalAsset = totalAsset + (stock.getQuantity() * stock.getPrice());
+        }
+        // 포트폴리오 생성
+        Portfolio portfolio = new Portfolio().builder()
+                .user(user)
+                .name(request.getName())
+                .country(request.getCountry())
+                .isAuto(false)
+                .initAsset(totalAsset)
+                .initCash(0)
+                .currentCash(0)
+                .riskValue(0)
+                .build();
+        portfolioRepository.save(portfolio);
+
+
+        // 주식 추가
+        for (PortfolioDto.StockDetailDto stock : request.getStocks()) {
+            Ticker ticker = tickerRepository.findByTicker(stock.getTicker());
+            PortfolioTicker portfolioTicker = new PortfolioTicker();
+            portfolioTicker.setPortfolio(portfolio);
+            portfolioTicker.setTicker(ticker);
+            portfolioTicker.setNumber(stock.getQuantity());
+            portfolioTicker.setAveragePrice(stock.getPrice());
+            portfolioTickerRepository.save(portfolioTicker);
+
+            //변동 기록 저장
+            portfolioRecordRepository.save(PortfolioRecord.builder()
+                    .portfolio(portfolio)
+                    .ticker(ticker)
+                    .number(stock.getQuantity())
+                    .price(stock.getPrice())
+                    .isBuy(stock.getIsBuy())
+                    .recordDate(LocalDateTime.now())
+                    .build());
+        }
+
+
+
+        return portfolio.getPfId();
+    }
 
     @Transactional
     public void buyStock(Integer pfId, PortfolioDto.BuyRequestDto buyRequestDto) {
-        // TODO: 평단가 업데이트, 현재 현금으로 매수 가능 여부
+        // TODO: 현재 현금으로 매수 가능 여부
         Portfolio portfolio = portfolioRepository.getReferenceById(pfId);
         List<PortfolioTicker> portfolioTickers = portfolio.getPortfolioTickers();
 
@@ -184,11 +235,35 @@ public class PortfolioService {
                 portfolioTicker.updateNumber(newQuantity);
                 portfolioTickerRepository.save(portfolioTicker);
 
+                //새 평단가 계산
+                float newAveragePrice = ((portfolioTicker.getAveragePrice() * existingQuantity) +
+                        (buyRequestDto.getPrice() * buyRequestDto.getQuantity())) /
+                        (existingQuantity + buyRequestDto.getQuantity());
+                System.out.println((portfolioTicker.getAveragePrice()+" "+ existingQuantity)+"+"+(buyRequestDto.getPrice() * buyRequestDto.getQuantity())+"/"+(portfolioTicker.getNumber()+" "+ buyRequestDto.getQuantity()));
+                portfolioTicker.setAveragePrice(newAveragePrice);
+
+                portfolioRecordRepository.save(PortfolioRecord.builder()
+                        .portfolio(portfolio)
+                        .ticker(portfolioTicker.getTicker())
+                        .number(buyRequestDto.getQuantity())
+                        .price(buyRequestDto.getPrice())
+                        .isBuy(buyRequestDto.getIsBuy())
+                        .recordDate(LocalDateTime.now())
+                        .build());
+
+                portfolioRecordRepository.save(PortfolioRecord.builder()
+                        .portfolio(portfolio)
+                        .ticker(portfolioTicker.getTicker())
+                        .number(newQuantity)
+                        .price(buyRequestDto.getPrice())
+                        .isBuy(buyRequestDto.getIsBuy())
+                        .recordDate(LocalDateTime.now())
+                        .build());
                 // 총 매수 비용 계산
-                float totalCost = buyRequestDto.getQuantity() * buyRequestDto.getPrice();
-                float newCurrentCash = portfolio.getCurrentCash() - totalCost;
-                portfolio.updateCurrentCash(newCurrentCash);
-                portfolioRepository.save(portfolio);
+//                float totalCost = buyRequestDto.getQuantity() * buyRequestDto.getPrice();
+//                float newCurrentCash = portfolio.getCurrentCash() - totalCost;
+//                portfolio.updateCurrentCash(newCurrentCash);
+//                portfolioRepository.save(portfolio);
                 return;
             }
         }
@@ -202,9 +277,18 @@ public class PortfolioService {
                 .build());
         portfolio.getPortfolioTickers().add(portfolioTicker);
 
-        float totalCost = buyRequestDto.getQuantity() * buyRequestDto.getPrice();
-        float newCurrentCash = portfolio.getCurrentCash() - totalCost;
-        portfolio.updateCurrentCash(newCurrentCash);
+        portfolioRecordRepository.save(PortfolioRecord.builder()
+                .portfolio(portfolio)
+                .ticker(portfolioTicker.getTicker())
+                .number(buyRequestDto.getQuantity())
+                .price(buyRequestDto.getPrice())
+                .isBuy(buyRequestDto.getIsBuy())
+                .recordDate(LocalDateTime.now())
+                .build());
+
+//        float totalCost = buyRequestDto.getQuantity() * buyRequestDto.getPrice();
+//        float newCurrentCash = portfolio.getCurrentCash() - totalCost;
+//        portfolio.updateCurrentCash(newCurrentCash);
         portfolioRepository.save(portfolio);
     }
 
@@ -213,7 +297,13 @@ public class PortfolioService {
         Portfolio portfolio = portfolioTicker.getPortfolio();
 
         // TODO: 매도 가능 여부(해당 티커 보유 중인지, 매도량 < 보유량인지)
+        // 매도 가능 여부 확인
         int existingQuantity = portfolioTicker.getNumber();
+        int sellQuantity = sellRequestDto.getQuantity();
+        if (existingQuantity < sellQuantity) {
+            throw new IllegalArgumentException("매도량이 보유량보다 많습니다.");
+        }
+
         int newQuantity = existingQuantity - sellRequestDto.getQuantity();
 
         float totalCost = sellRequestDto.getQuantity() * sellRequestDto.getPrice();
@@ -224,7 +314,20 @@ public class PortfolioService {
         portfolioTicker.updateNumber(newQuantity);
         portfolio.updateCurrentCash(newCurrentCash);
 
-        portfolioTickerRepository.save(portfolioTicker);
+        portfolioRecordRepository.save(PortfolioRecord.builder()
+                .portfolio(portfolio)
+                .ticker(portfolioTicker.getTicker())
+                .number(sellRequestDto.getQuantity())
+                .price(sellRequestDto.getPrice())
+                .isBuy(sellRequestDto.getIsBuy())
+                .recordDate(LocalDateTime.now())
+                .build());
+
+        if (newQuantity == 0) {
+            portfolioTickerRepository.delete(portfolioTicker);
+        } else {
+            portfolioTickerRepository.save(portfolioTicker);
+        }
         portfolioRepository.save(portfolio);
     }
 

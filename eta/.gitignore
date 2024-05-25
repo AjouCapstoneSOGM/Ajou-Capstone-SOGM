@@ -6,7 +6,6 @@ build/
 !**/src/test/**/build/
 **/src/main/resources/application.yml
 **/src/main/resources/application-*.yml
-**/src/main/resources/firebase-private-key.json
 **/.DS_Store
 
 ### STS ###

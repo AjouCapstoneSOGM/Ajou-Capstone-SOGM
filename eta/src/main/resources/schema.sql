@@ -99,6 +99,7 @@ CREATE TABLE `rebalancing_ticker` (
     `is_buy` bool NOT NULL,
     `number` int NOT NULL,
     `ticker` varchar(20) NOT NULL,
+    `price` float NOT NULL,
     PRIMARY KEY (`rn_id`, `ticker`),
     FOREIGN KEY (`rn_id`) REFERENCES `rebalancing` (`rn_id`) ON DELETE CASCADE,
     FOREIGN KEY (`ticker`) REFERENCES `ticker` (`ticker`)

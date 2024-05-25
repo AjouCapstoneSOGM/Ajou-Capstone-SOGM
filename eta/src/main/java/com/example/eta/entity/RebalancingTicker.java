@@ -31,4 +31,7 @@ public class RebalancingTicker {
 
     @Column(nullable = false)
     private int number;
+
+    @Column(nullable = false)
+    private float price;
 }

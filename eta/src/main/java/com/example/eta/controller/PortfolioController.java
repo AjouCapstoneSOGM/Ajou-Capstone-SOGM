@@ -41,6 +41,15 @@ public class PortfolioController {
         return ResponseEntity.ok(responseData);
     }
 
+    @PostMapping("/create/manual")
+    public ResponseEntity<PortfolioDto.CreateManualResponseDto> createManualPortfolio(@RequestBody PortfolioDto.CreateManualRequestDto request,
+                                                                                      @AuthenticationPrincipal String email) {
+        User user = userService.findByEmail(email);
+
+        int portfolioId = portfolioService.createManualPortfolio(user,request);
+        return ResponseEntity.ok(new PortfolioDto.CreateManualResponseDto(portfolioId));
+    }
+
     @DeleteMapping("/{port_id}")
     public ResponseEntity<Void> deletePortfolio(@PathVariable("port_id") Integer pfId) {
         portfolioService.deletePortfolio(pfId);

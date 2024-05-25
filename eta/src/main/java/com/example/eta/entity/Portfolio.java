@@ -13,6 +13,7 @@ import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
