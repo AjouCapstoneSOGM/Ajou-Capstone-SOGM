@@ -8,7 +8,7 @@ import urls from "../../utils/urls";
 import AppText from "../../utils/AppText";
 import { SafeAreaView } from "react-native-safe-area-context";
 import PortfolioPieChart from "../../utils/PortfolioPieChart";
-import { Button, Divider, color } from "@rneui/base";
+import { Button, Divider, Icon, color } from "@rneui/base";
 
 const PortfolioDetails = ({ route, navigation }) => {
   const stocksLength = 10;
@@ -222,8 +222,8 @@ const PortfolioDetails = ({ route, navigation }) => {
         >
           <AppText
             style={{
-              fontSize: 20,
-              padding: 10,
+              fontSize: 25,
+              padding: 5,
               color: "#333",
               fontWeight: "bold",
             }}
@@ -238,8 +238,8 @@ const PortfolioDetails = ({ route, navigation }) => {
                 {stocksLength === index && (
                   <AppText
                     style={{
-                      fontSize: 20,
-                      padding: 10,
+                      fontSize: 25,
+                      padding: 5,
                       color: "#333",
                       fontWeight: "bold",
                     }}

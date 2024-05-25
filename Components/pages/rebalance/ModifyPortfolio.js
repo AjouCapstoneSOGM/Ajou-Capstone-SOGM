@@ -1,13 +1,20 @@
-import React, { useEffect, useState } from "react";
-import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
-import { usePortfolio } from "../../utils/PortfolioContext";
-import AppText from "../../utils/AppText";
+import React, { useCallback, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  TextInput,
+} from "react-native";
+import PagerView from "react-native-pager-view";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Divider, Icon } from "@rneui/base";
+import { usePortfolio } from "../../utils/PortfolioContext";
+import { deepCopy, filteringNumber } from "../../utils/utils";
 import PortfolioPieChart from "../../utils/PortfolioPieChart";
+import AppText from "../../utils/AppText";
 import Loading from "../../utils/Loading";
-import { deepCopy } from "../../utils/utils";
-import PagerView from "react-native-pager-view";
 
 const ModifyPortfolio = ({ route, navigation }) => {
   const { pfId, rnId, rebalancing } = route.params;
@@ -17,14 +24,13 @@ const ModifyPortfolio = ({ route, navigation }) => {
   const [selectedId, setSelectedId] = useState();
   const [loading, setLoading] = useState(true);
   const [portfolio, setPortfolio] = useState([]);
+  const [rebalances, setRebalances] = useState([]);
 
   const calculateAfter = () => {
     if (portfolio) {
       const afterPortfolio = deepCopy(portfolio);
       afterPortfolio.detail.stocks.map((stock) => {
-        const order = rebalancing.find(
-          (order) => order.ticker === stock.ticker
-        );
+        const order = rebalances.find((order) => order.ticker === stock.ticker);
         if (order) {
           stock.quantity += order.number * (order.isBuy ? 1 : -1);
           afterPortfolio.detail.currentCash +=
@@ -34,10 +40,13 @@ const ModifyPortfolio = ({ route, navigation }) => {
       return afterPortfolio;
     }
   };
-  useEffect(() => {
-    setPortfolio(getPortfolioById(pfId));
-    setLoading(false);
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      setRebalances(rebalancing);
+      setPortfolio(getPortfolioById(pfId));
+      setLoading(false);
+    }, [])
+  );
 
   const getTotalValue = () => {
     const totalPortfolioValue =
@@ -103,8 +112,14 @@ const ModifyPortfolio = ({ route, navigation }) => {
     return updated;
   };
 
+  const handleChangePrices = (index, value) => {
+    const newRebalances = [...rebalances];
+    if (value <= 9999999) newRebalances[index].price = filteringNumber(value);
+    setRebalances(newRebalances);
+  };
+
   const handleModify = async () => {
-    const rebalanceData = updateKey([...rebalancing]);
+    const rebalanceData = updateKey([...rebalances]);
     setLoading(true);
     await fetchModify(rebalanceData, pfId, rnId);
     await loadData();
@@ -117,7 +132,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
     <SafeAreaView style={styles.container}>
       <View style={styles.textContainer}>
         <AppText style={{ fontSize: 30, fontWeight: "bold", color: "#333" }}>
-          리밸런싱 할 종목 {rebalancing.length}개가 있어요
+          리밸런싱 할 종목 {rebalances.length}개가 있어요
         </AppText>
         <Button
           buttonStyle={{ marginHorizontal: -10 }}
@@ -180,8 +195,8 @@ const ModifyPortfolio = ({ route, navigation }) => {
             <AppText style={styles.columnPrice}>가격</AppText>
             <AppText style={styles.columnRateDiff}>비중 변화</AppText>
           </View>
-          <ScrollView>
-            {rebalancing.map(
+          <ScrollView keyboardShouldPersistTaps="handled">
+            {rebalances.map(
               (item, index) =>
                 item.isBuy === true && (
                   <View key={index} style={styles.rebalanceItem}>
@@ -207,7 +222,13 @@ const ModifyPortfolio = ({ route, navigation }) => {
                       <AppText style={styles.itemNumber}>
                         {item.number}주
                       </AppText>
-                      <AppText style={styles.itemPrice}>{item.price}원</AppText>
+                      <TextInput
+                        style={styles.itemPrice}
+                        value={item.price.toString()}
+                        onChangeText={(text) => handleChangePrices(index, text)}
+                        placeholder={item.price.toString()}
+                        placeholderTextColor="#bbb"
+                      />
                       <AppText style={styles.itemRateDiff}>
                         {getRateDiff(item.ticker)}%
                       </AppText>
@@ -241,7 +262,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
             <AppText style={styles.columnRateDiff}>비중 변화</AppText>
           </View>
           <ScrollView>
-            {rebalancing.map(
+            {rebalances.map(
               (item, index) =>
                 item.isBuy === false && (
                   <View key={index} style={styles.rebalanceItem}>
@@ -283,7 +304,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
         buttonStyle={styles.nextButton}
         title="반영"
         onPress={() => handleModify()}
-        disabled={!(checkList.length === rebalancing.length)}
+        disabled={!(checkList.length === rebalances.length)}
       />
     </SafeAreaView>
   );
@@ -338,6 +359,7 @@ const styles = StyleSheet.create({
   column: {
     flexDirection: "row",
     marginLeft: 40,
+    marginVertical: 8,
   },
   columnName: {
     flex: 1.6,

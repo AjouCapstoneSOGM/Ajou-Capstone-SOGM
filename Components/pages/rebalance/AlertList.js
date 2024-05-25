@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
   alertContent: {
     fontSize: 16,
     color: "#f0f0f0",
-    marginLeft: 22,
+    marginLeft: 10,
     paddingBottom: 20,
   },
 });
