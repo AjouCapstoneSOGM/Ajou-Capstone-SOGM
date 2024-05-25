@@ -3,10 +3,12 @@ package com.example.eta.controller;
 import com.example.eta.dto.UserDto;
 import com.example.eta.entity.User;
 import com.example.eta.exception.EmailAlreadyExistsException;
+import com.example.eta.service.TokenService;
 import com.example.eta.service.UserService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -28,12 +30,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    private final AuthenticationManager authenticationManager;
-    private final PasswordEncoder passwordEncoder;
-    private final UserService userService;
     @Value("${spring.jwt.header}")
     private String header;
     @Value("${spring.jwt.prefix}")
@@ -41,11 +41,10 @@ public class AuthController {
     @Value("${spring.jwt.secret}")
     private String secret;
 
-    public AuthController(AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, UserService userService) {
-        this.authenticationManager = authenticationManager;
-        this.passwordEncoder = passwordEncoder;
-        this.userService = userService;
-    }
+    private final AuthenticationManager authenticationManager;
+    private final PasswordEncoder passwordEncoder;
+    private final UserService userService;
+    private final TokenService tokenService;
 
     @PostMapping("/login")
     public ResponseEntity<Object> authorize(@RequestBody UserDto.LoginDto loginDto) {
@@ -63,12 +62,16 @@ public class AuthController {
                 .signWith(key)
                 .compact();
 
+        // expo 토큰 저장
+        tokenService.saveToken(userService.findByEmail(loginDto.getEmail()), loginDto.getExpoPushToken());
+
         // 응답
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(header, prefix + jwt);
         HashMap<String, Object> response = new HashMap<>() {{
             put("token", jwt);
             put("user_id", userService.findByEmail(loginDto.getEmail()).getUserId());
+            put("name", userService.findByEmail(loginDto.getEmail()).getName());
         }};
 
         return new ResponseEntity<>(response, httpHeaders, HttpStatus.OK);

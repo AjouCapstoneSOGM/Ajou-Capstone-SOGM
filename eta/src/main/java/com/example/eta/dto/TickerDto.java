@@ -26,4 +26,22 @@ public class TickerDto {
     public static class TickerInfoListDto {
         private List<TickerInfo> searchedList;
     }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class TickerPrice {
+        private String ticker;
+        private float current_price;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class TickerPriceListDto {
+        private List<TickerPrice> prices;
+    }
+
 }

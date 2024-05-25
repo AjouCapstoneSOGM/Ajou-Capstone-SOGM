@@ -36,6 +36,7 @@ public class RebalancingService {
         List<RebalancingDto.RebalancingListDto> rebalancingListDtos = new ArrayList<>();
         for (Rebalancing rebalancing : rebalancings) {
             int rnId = rebalancing.getRnId();
+            LocalDateTime createdDate = rebalancing.getCreatedDate();
             List<RebalancingDto.RebalancingInfo> rebalancingInfos = new ArrayList<>();
             for (RebalancingTicker rebalancingTicker : rebalancing.getRebalancingTickers()) {
                 Optional<Ticker> ticker = tickerRepository.findById(rebalancingTicker.getTicker().getTicker());
@@ -43,11 +44,13 @@ public class RebalancingService {
                         value.getTicker(),
                         value.getName(),
                         rebalancingTicker.getNumber(),
-                        rebalancingTicker.getIsBuy()
+                        rebalancingTicker.getIsBuy(),
+                        rebalancingTicker.getPrice()
                 )));
             }
             rebalancingListDtos.add(RebalancingDto.RebalancingListDto.builder()
                     .rnId(rnId)
+                    .createdDate(createdDate)
                     .rebalancings(rebalancingInfos)
                     .build());
         }

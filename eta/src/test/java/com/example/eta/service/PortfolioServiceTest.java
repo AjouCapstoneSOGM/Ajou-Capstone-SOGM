@@ -116,6 +116,7 @@ public class PortfolioServiceTest {
         for (RebalancingTicker rt : rebalancing.getRebalancingTickers()) {
             assertTrue(rt.getIsBuy());
             assertNotEquals(0, rt.getNumber());
+            assertNotEquals(0, rt.getPrice());
         }
     }
 }
