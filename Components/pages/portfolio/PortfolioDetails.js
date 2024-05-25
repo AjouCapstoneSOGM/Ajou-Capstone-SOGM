@@ -149,7 +149,9 @@ const PortfolioDetails = ({ route, navigation }) => {
             />
             <Button
               type="clear"
-              onPress={() => {}}
+              onPress={() => {
+                navigation.navigate("ManagementPage", { portfolio });
+              }}
               icon={{
                 name: "settings-sharp",
                 type: "ionicon",
@@ -195,9 +197,10 @@ const PortfolioDetails = ({ route, navigation }) => {
       </View>
       <View style={styles.chartContainer}>
         <PortfolioPieChart
-          data={portfolio.stocks}
-          cash={portfolio.currentCash}
+          data={portfolio}
+          cash={portfolio}
           selectedId={selectedId}
+          size={1}
         />
         {selectedId !== null && (
           <View style={{ position: "absolute", alignItems: "center" }}>

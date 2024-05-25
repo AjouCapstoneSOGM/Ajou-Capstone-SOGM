@@ -40,7 +40,7 @@ const ManagementPage = ({ route, navigation }) => {
   if (portfolio) {
     return (
       <View style={styles.container}>
-        <AppText style={styles.header}>{portfolio.name}이름</AppText>
+        <AppText style={styles.header}>{portfolio.name}</AppText>
         <TouchableOpacity style={styles.Button} onPress={alertDelete}>
           <AppText style={{ color: "red", fontSize: 20 }}>
             포트폴리오 삭제

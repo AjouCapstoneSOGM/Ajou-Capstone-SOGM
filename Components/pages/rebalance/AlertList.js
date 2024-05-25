@@ -47,7 +47,16 @@ const AlertList = ({ route, navigation }) => {
           const { buyCount, sellCount } = getIsBuyCount(item.rebalancings);
           return (
             <View key={index}>
-              <TouchableOpacity style={styles.alertContainer}>
+              <TouchableOpacity
+                style={styles.alertContainer}
+                onPress={() => {
+                  navigation.navigate("ModifyPortfolio", {
+                    pfId: item.pfId,
+                    rnId: item.rnId,
+                    rebalancing: item.rebalancings,
+                  });
+                }}
+              >
                 <View style={styles.alertHeader}>
                   <AppText>
                     <Icon

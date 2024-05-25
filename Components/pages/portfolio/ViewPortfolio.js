@@ -31,10 +31,13 @@ const PortfolioList = ({ navigation }) => {
   };
 
   const sumAllPrices = () => {
-    return portfolios.reduce((total, portfolio) => {
-      const stockTotal = getTotalPrice(portfolio.detail.stocks);
-      return total + stockTotal + portfolio.detail.currentCash;
-    }, 0);
+    if (portfolios) {
+      return portfolios.reduce((total, portfolio) => {
+        const stockTotal = getTotalPrice(portfolio.detail.stocks);
+        return total + stockTotal + portfolio.detail.currentCash;
+      }, 0);
+    }
+    return 0;
   };
 
   const handlePageChange = (e) => {
@@ -57,10 +60,9 @@ const PortfolioList = ({ navigation }) => {
         </AppText>
       </View>
       <View style={styles.chartContainer}>
-        <PortfolioPieChart
-          data={portfolios[selectedIndex].detail.stocks}
-          cash={portfolios[selectedIndex].detail.currentCash}
-        />
+        {portfolios[selectedIndex] && (
+          <PortfolioPieChart data={portfolios[selectedIndex].detail} size={1} />
+        )}
       </View>
       <PagerView
         style={styles.listContainer}
