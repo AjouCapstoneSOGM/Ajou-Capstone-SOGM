@@ -2,12 +2,15 @@ package com.example.eta.controller;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.example.eta.dto.UserDto;
+import com.example.eta.repository.TokenRepository;
+import com.example.eta.service.TokenService;
 import com.example.eta.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
@@ -31,6 +34,9 @@ public class AuthControllerTest {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private TokenRepository tokenRepository;
 
     @Autowired
     private MockMvc mockMvc;
@@ -66,7 +72,7 @@ public class AuthControllerTest {
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(InfoDto)));
 
-        UserDto.LoginDto loginDto = new UserDto.LoginDto("james@domain.com", "password!");
+        UserDto.LoginDto loginDto = new UserDto.LoginDto("james@domain.com", "password!", "fcmToken");
 
         // when, then
         MockHttpServletResponse response = mockMvc.perform(post("/api/auth/login")
@@ -76,5 +82,9 @@ public class AuthControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(header().exists("Authorization"))
                 .andReturn().getResponse();
+
+        assertTrue(JsonPath.parse(response.getContentAsString()).read("$.name").equals("James"));
+        tokenRepository.findById(userService.findByEmail("james@domain.com").getUserId())
+                .ifPresent(token -> assertNotNull(token.getExpoPushToken()));
     }
 }
