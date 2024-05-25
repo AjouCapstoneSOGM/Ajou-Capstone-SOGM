@@ -100,7 +100,7 @@ const PortfolioList = ({ navigation }) => {
       <View style={styles.portfolioContainer}>
         {portfolios.map((portfolio) => {
           const roi = getTotalROI(portfolio.detail);
-          const roiFormatted = roi >= 0 ? `+${roi}` : `${roi}`;
+          const roiFormatted = roi > 0 ? `+${roi}` : `${roi}`;
           const currentCash = portfolio.detail.currentCash;
 
           return (
@@ -129,7 +129,11 @@ const PortfolioList = ({ navigation }) => {
                   <AppText
                     style={[
                       { fontSize: 17, fontWeight: "bold" },
-                      roi >= 0 ? { color: "#ff3a00" } : { color: "#0c5bff" },
+                      roi > 0
+                        ? { color: "#ff3a00" }
+                        : roi < 0
+                        ? { color: "#0c5bff" }
+                        : { color: "#666" },
                     ]}
                   >
                     {roiFormatted}%

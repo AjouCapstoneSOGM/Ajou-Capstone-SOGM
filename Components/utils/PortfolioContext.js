@@ -85,10 +85,14 @@ export const PortfolioProvider = ({ children }) => {
   };
 
   const sortStocks = (stocks) => {
-    const sortedStocks = stocks.sort(
+    const generalStocks = stocks.filter((stock) => stock.equity === "보통주");
+    const otherStocks = stocks.filter((stock) => stock.equity !== "보통주");
+
+    generalStocks.sort(
       (a, b) => b.averageCost * b.quantity - a.averageCost * a.quantity
     );
-    return sortedStocks;
+
+    return [...generalStocks, ...otherStocks];
   };
 
   const fetchAllCurrent = async (portfoliosWithStocks) => {
