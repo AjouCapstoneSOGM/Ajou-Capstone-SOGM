@@ -10,7 +10,6 @@ export const PortfolioProvider = ({ children }) => {
   const [portfolios, setPortfolios] = useState([]);
   const [portLoading, setPortLoading] = useState(true);
   const [rebalances, setRebalances] = useState([]);
-  const { isLoggedIn } = useAuth();
 
   const removePortfolios = () => {
     setPortfolios([]);

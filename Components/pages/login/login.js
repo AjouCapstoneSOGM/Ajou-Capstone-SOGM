@@ -31,6 +31,7 @@ const Login = ({ navigation }) => {
         body: JSON.stringify({
           email: useremail,
           password: password,
+          expoPushToken: "testToken",
         }),
       });
       if (response.ok) {

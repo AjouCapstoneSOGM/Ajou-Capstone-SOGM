@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import { VictoryPie } from "victory-native";
+import { VictoryPie, VictoryAnimation } from "victory-native";
 
 const PortfolioPieChart = ({ data, cash, selectedId }) => {
   const colorScale = [
@@ -31,9 +31,21 @@ const PortfolioPieChart = ({ data, cash, selectedId }) => {
       <VictoryPie
         data={chartData}
         colorScale={colorScale}
-        innerRadius={({ index }) => (index === selectedId ? 85 : 95)}
-        radius={({ index }) => (index === selectedId ? 155 : 140)}
+        innerRadius={({ index }) => (index === selectedId ? 80 : 105)}
+        radius={140}
         labels={() => {}}
+        animate={{
+          duration: 300,
+          onLoad: { duration: 300 },
+          onExit: {
+            duration: 300,
+            before: () => ({ y: 0, label: " " }),
+          },
+          onEnter: {
+            duration: 300,
+            before: () => ({ y: 0, label: " " }),
+          },
+        }}
         style={styles.chart}
       />
     </View>

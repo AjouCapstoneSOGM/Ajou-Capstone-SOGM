@@ -30,11 +30,15 @@ const HeaderComponent = () => {
         />
       )}
       <View style={styles.buttonContainer}>
-        <Button
-          type="clear"
-          onPress={() => {}}
-          icon={{ name: "bell-fill", type: "octicon", color: "#333" }}
-        />
+        {isLoggedIn && (
+          <Button
+            type="clear"
+            onPress={() => {
+              navigation.navigate("AlertList");
+            }}
+            icon={{ name: "bell-fill", type: "octicon", color: "#333" }}
+          />
+        )}
         <Button
           type="clear"
           onPress={() => {}}

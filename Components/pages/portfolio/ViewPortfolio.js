@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, TouchableOpacity, StyleSheet } from "react-native";
 import { usePortfolio } from "../../utils/PortfolioContext";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -12,6 +12,7 @@ import PortfolioPieChart from "../../utils/PortfolioPieChart";
 
 const PortfolioList = ({ navigation }) => {
   const { portfolios } = usePortfolio();
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
   const getTotalPrice = (stocks) => {
     const totalPrice = stocks.reduce(
@@ -36,6 +37,10 @@ const PortfolioList = ({ navigation }) => {
     }, 0);
   };
 
+  const handlePageChange = (e) => {
+    setSelectedIndex(e.nativeEvent.position);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <HeaderComponent />
@@ -51,7 +56,17 @@ const PortfolioList = ({ navigation }) => {
           <AppText style={{ fontSize: 20 }}>원</AppText>
         </AppText>
       </View>
-      <PagerView style={styles.listContainer} initialPage={0}>
+      <View style={styles.chartContainer}>
+        <PortfolioPieChart
+          data={portfolios[selectedIndex].detail.stocks}
+          cash={portfolios[selectedIndex].detail.currentCash}
+        />
+      </View>
+      <PagerView
+        style={styles.listContainer}
+        initialPage={0}
+        onPageSelected={handlePageChange}
+      >
         {portfolios &&
           portfolios.map((portfolio, index) => {
             const roi = getTotalROI(portfolio.detail);
@@ -59,7 +74,14 @@ const PortfolioList = ({ navigation }) => {
             const currentCash = portfolio.detail.currentCash;
             return (
               <View key={index}>
-                <TouchableOpacity style={styles.portfolio}>
+                <TouchableOpacity
+                  style={styles.portfolio}
+                  onPress={() => {
+                    navigation.navigate("PortfolioDetails", {
+                      id: portfolio.id,
+                    });
+                  }}
+                >
                   <View style={styles.portfolioHeader}>
                     <View
                       style={{ flexDirection: "row", alignItems: "center" }}
@@ -129,14 +151,11 @@ const PortfolioList = ({ navigation }) => {
                     </AppText>
                   </View>
                 </TouchableOpacity>
-                <PortfolioPieChart
-                  data={portfolio.detail.stocks}
-                  cash={currentCash}
-                />
               </View>
             );
           })}
       </PagerView>
+
       <TouchableOpacity
         style={styles.floatingButton}
         onPress={() => {
@@ -180,6 +199,10 @@ const styles = StyleSheet.create({
   },
   portfolioContent: {
     justifyContent: "space-around",
+  },
+  chartContainer: {
+    position: "absolute",
+    bottom: 70,
   },
   floatingButton: {
     position: "absolute",
