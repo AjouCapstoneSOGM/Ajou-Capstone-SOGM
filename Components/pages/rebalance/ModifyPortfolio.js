@@ -161,15 +161,12 @@ const ModifyPortfolio = ({ route, navigation }) => {
             수정 후
           </AppText>
         </View>
-        <View style={styles.chartBefore}>
+        <View style={styles.chartContent}>
           <PortfolioPieChart
             data={portfolio.detail}
             selectedId={selectedId}
             size={0.5}
           />
-        </View>
-
-        <View style={styles.chartAfter}>
           <PortfolioPieChart
             data={calculateAfter().detail}
             selectedId={selectedId}
@@ -333,24 +330,16 @@ const styles = StyleSheet.create({
   },
   chartTitle: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-evenly",
     alignItems: "center",
-    paddingHorizontal: 65,
   },
-  chartBefore: {
-    position: "absolute",
-    left: "-25%",
-    top: -50,
-  },
-  chartAfter: {
-    position: "absolute",
-    right: "-25%",
-    top: -50,
+  chartContent: {
+    flexDirection: "row",
+    justifyContent: "space-around",
   },
   rebalanceContainer: {
     flex: 1,
     backgroundColor: "#333",
-    marginTop: 220,
   },
   rebalanceList: {
     padding: 20,
