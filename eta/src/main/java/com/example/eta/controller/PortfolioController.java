@@ -1,5 +1,6 @@
 package com.example.eta.controller;
 
+import com.example.eta.auth.entity.UserPrincipal;
 import com.example.eta.dto.PortfolioDto;
 import com.example.eta.entity.Portfolio;
 import com.example.eta.entity.User;
@@ -25,9 +26,9 @@ public class PortfolioController {
 
     @PostMapping("/create/auto")
     public ResponseEntity<Map<String, Integer>> createAutoPortfolio(@RequestBody PortfolioDto.CreateRequestDto createRequestDto,
-                                                                    @AuthenticationPrincipal String email) throws Exception {
+                                                                    @AuthenticationPrincipal UserPrincipal userPrincipal) throws Exception {
         // 유저 정보 가져오기
-        User user = userService.findByEmail(email);
+        User user = userService.findByEmail(userPrincipal.getEmail());
 
         // DB에 포트폴리오 생성
         Portfolio portfolio = portfolioService.createInitAutoPortfolio(user, createRequestDto);
@@ -48,7 +49,7 @@ public class PortfolioController {
     }
 
     @GetMapping("/{port_id}/performance")
-    public ResponseEntity<PortfolioDto.PerformanceResponseDto> getPortfolioPerformance(@PathVariable("port_id") Integer pfId, @AuthenticationPrincipal String email) {
+    public ResponseEntity<PortfolioDto.PerformanceResponseDto> getPortfolioPerformance(@PathVariable("port_id") Integer pfId) {
         return ResponseEntity.ok(portfolioService.getPerformanceData(pfId));
     }
 
@@ -65,8 +66,8 @@ public class PortfolioController {
     }
 
     @GetMapping
-    public ResponseEntity<PortfolioDto.PortfolioInfoListDto> getPortfolioInfos(@AuthenticationPrincipal String email) {
-        User user = userService.findByEmail(email);
+    public ResponseEntity<PortfolioDto.PortfolioInfoListDto> getPortfolioInfos(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        User user = userService.findByEmail(userPrincipal.getEmail());
 
         List<PortfolioDto.PortfolioInfo> portfolioInfos = new ArrayList<>();
         for (Portfolio portfolio : user.getPortfolios()) {
