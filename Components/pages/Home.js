@@ -51,16 +51,16 @@ const Home = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <HeaderComponent />
-      <ScrollView>
-        <View style={styles.searchBarContainer}>
-          <SearchBar
-            placeholder="주식종목 검색"
-            onChangeText={updateSearch}
-            value={search}
-            containerStyle={styles.searchContainer}
-            inputContainerStyle={styles.searchInputContainer}
-          ></SearchBar>
-        </View>
+      <View style={styles.searchBarContainer}>
+        <SearchBar
+          placeholder="주식종목 검색"
+          onChangeText={updateSearch}
+          value={search}
+          containerStyle={styles.searchContainer}
+          inputContainerStyle={styles.searchInputContainer}
+        ></SearchBar>
+      </View>
+      <ScrollView style={styles.mainTheme}>
         <View style={styles.FGIContainer}>
           <View style={styles.FGIHeader}>
             <AppText
@@ -121,6 +121,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f0f0f0",
   },
   searchBarContainer: {
+    height: 90,
     backgroundColor: "#f0f0f0",
     paddingVertical: 20,
     paddingHorizontal: 20,
@@ -138,8 +139,10 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     height: 40,
   },
-  FGIContainer: {
+  mainTheme: {
     backgroundColor: "#333",
+  },
+  FGIContainer: {
     paddingHorizontal: 10,
     paddingVertical: 30,
   },
@@ -162,7 +165,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   newsContainer: {
-    backgroundColor: "#333",
     paddingHorizontal: 10,
     paddingVertical: 30,
   },

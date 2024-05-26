@@ -31,6 +31,7 @@ const Login = ({ navigation }) => {
         body: JSON.stringify({
           email: useremail,
           password: password,
+          expoPushToken: "testToken",
         }),
       });
       if (response.ok) {
@@ -39,7 +40,7 @@ const Login = ({ navigation }) => {
         login();
         await loadData();
         setLoading(false);
-        navigation.navigate("Home", { screen: "Home" });
+        navigation.goBack();
       }
     } catch (error) {
       console.error("Error:", error);

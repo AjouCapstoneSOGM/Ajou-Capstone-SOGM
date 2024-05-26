@@ -49,7 +49,7 @@ const AutoPortfolio = ({ step, setDisabled }) => {
 
   useEffect(() => {
     if (step === 1) {
-      if (amount < 100000) setDisabled(true);
+      if (amount < 1000000) setDisabled(true);
       else setDisabled(false);
     }
   }, [step, amount]);
@@ -118,87 +118,7 @@ const AutoPortfolio = ({ step, setDisabled }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
     alignItems: "stretch",
-  },
-  textContainer: {
-    flex: 1,
-    justifyContent: "center",
-    padding: 20,
-  },
-  inputContainer: {
-    flex: 2,
-    alignItems: "stretch",
-    padding: 20,
-  },
-  riskContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    padding: 20,
-  },
-  riskInfo: {
-    flex: 1,
-    padding: 30,
-    marginTop: 30,
-  },
-  infoText: {
-    fontSize: 18,
-    marginBottom: 40,
-    textAlign: "justify",
-  },
-  input_Amount: {
-    justifyContent: "center", // 가로 방향에서 중앙 정렬
-    marginVertical: 10,
-    fontSize: 30,
-    borderBottomWidth: 1,
-  },
-  addButton: {
-    backgroundColor: "#ddd",
-    marginRight: 10,
-    padding: 8,
-    borderRadius: 5,
-  },
-  input_Risk: {
-    justifyContent: "center", // 가로 방향에서 중앙 정렬
-    height: 100,
-    backgroundColor: "#ddd",
-    alignItems: "center",
-    padding: 15,
-    borderRadius: 5,
-  },
-  sectorContainer: {
-    flex: 2,
-    flexDirection: "row",
-    padding: 20,
-    flexWrap: "wrap",
-    alignItems: "flex-start",
-  },
-  input_Interest: {
-    flexGrow: 1,
-    justifyContent: "center", // 가로 방향에서 중앙 정렬
-    backgroundColor: "#ddd",
-    alignItems: "center",
-    padding: 15,
-    borderRadius: 10,
-    margin: 10,
-  },
-  selectedInput: {
-    backgroundColor: "#6495ED",
-  },
-  buttonContainer: {
-    alignItems: "stretch",
-    padding: 20,
-  },
-  disabledButton: {
-    backgroundColor: "#DADADA", // 비활성화 상태의 배경색 변경
-  },
-  button: {
-    justifyContent: "center", // 가로 방향에서 중앙 정렬
-    backgroundColor: "#6495ED",
-    alignItems: "center",
-    alignSelf: "stretch",
-    borderRadius: 10,
-    padding: 18,
   },
 });
 export default AutoPortfolio;

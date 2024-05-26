@@ -7,12 +7,12 @@ import SocialLogin from "./pages/login/sociallogin";
 import Signup from "./pages/login/signup";
 import Home from "./pages/Home";
 import NewsSummary from "./pages/NewsSummary";
+import AlertList from "./pages/rebalance/AlertList";
 import ViewPortfolio from "./pages/portfolio/ViewPortfolio";
 import PortfolioDetails from "./pages/portfolio/PortfolioDetails";
 import ManagementPage from "./pages/portfolio/ManagePortfolio";
 import MakePortfolio from "./pages/make/MakePortfolio";
 import ModifyPortfolio from "./pages/rebalance/ModifyPortfolio";
-import RebalanceList from "./pages/rebalance/RebalanceList";
 import { AuthProvider } from "./utils/AuthContext";
 import { PortfolioProvider } from "./utils/PortfolioContext";
 
@@ -33,11 +33,11 @@ function ScreenStack() {
       <Stack.Screen name="SocialLogin" component={SocialLogin} />
       <Stack.Screen name="Signup" component={Signup} />
       <Stack.Screen name="Home" component={Home} />
+      <Stack.Screen name="AlertList" component={AlertList} />
       <Stack.Screen name="ViewPortfolio" component={ViewPortfolio} />
       <Stack.Screen name="NewsSummary" component={NewsSummary} />
       <Stack.Screen name="PortfolioDetails" component={PortfolioDetails} />
       <Stack.Screen name="ManagementPage" component={ManagementPage} />
-      <Stack.Screen name="RebalanceList" component={RebalanceList} />
       <Stack.Screen name="ModifyPortfolio" component={ModifyPortfolio} />
       <Stack.Screen name="MakePortfolio" component={MakePortfolio} />
     </Stack.Navigator>

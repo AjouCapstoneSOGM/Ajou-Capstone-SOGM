@@ -1,8 +1,8 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import { VictoryPie } from "victory-native";
+import { VictoryPie, VictoryAnimation } from "victory-native";
 
-const PortfolioPieChart = ({ data, cash, selectedId }) => {
+const PortfolioPieChart = ({ data, selectedId, size }) => {
   const colorScale = [
     "hsl(348, 100%, 80%)", // 파스텔 핑크,
     "hsl(207, 94%, 80%)", // 파스텔 블루,
@@ -19,34 +19,35 @@ const PortfolioPieChart = ({ data, cash, selectedId }) => {
     "#ccc",
   ];
 
-  const chartData = data.map((stock) => ({
+  const chartData = data.stocks.map((stock) => ({
     x: stock.companyName,
-    y: stock.averageCost * stock.quantity,
+    y: stock.currentPrice * stock.quantity,
   }));
 
-  chartData.push({ x: "현금", y: cash });
-
+  chartData.push({ x: "현금", y: data.currentCash });
   return (
-    <View style={styles.chartContainer}>
-      <VictoryPie
-        data={chartData}
-        colorScale={colorScale}
-        innerRadius={({ index }) => (index === selectedId ? 85 : 95)}
-        radius={({ index }) => (index === selectedId ? 155 : 140)}
-        labels={() => {}}
-        style={styles.chart}
-      />
-    </View>
+    <VictoryPie
+      data={chartData}
+      colorScale={colorScale}
+      innerRadius={({ index }) =>
+        index === selectedId ? 80 * size : 105 * size
+      }
+      radius={140 * size}
+      labels={() => {}}
+      animate={{
+        duration: 300,
+        onLoad: { duration: 300 },
+        onExit: {
+          duration: 300,
+          before: () => ({ y: 0, label: " " }),
+        },
+        onEnter: {
+          duration: 300,
+          before: () => ({ y: 0, label: " " }),
+        },
+      }}
+    />
   );
 };
-
-const styles = StyleSheet.create({
-  chartContainer: {
-    justifyContent: "flex-start",
-    alignItems: "center",
-    flexDirection: "row",
-  },
-  chart: {},
-});
-
+const styles = StyleSheet.create({});
 export default PortfolioPieChart;

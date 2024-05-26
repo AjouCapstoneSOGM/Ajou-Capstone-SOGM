@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState } from "react";
 import urls from "./urls";
 import GetCurrentPrice from "./GetCurrentPrice";
 import { useAuth } from "./AuthContext";
@@ -10,7 +10,6 @@ export const PortfolioProvider = ({ children }) => {
   const [portfolios, setPortfolios] = useState([]);
   const [portLoading, setPortLoading] = useState(true);
   const [rebalances, setRebalances] = useState([]);
-  const { isLoggedIn } = useAuth();
 
   const removePortfolios = () => {
     setPortfolios([]);
@@ -205,14 +204,16 @@ export const PortfolioProvider = ({ children }) => {
     } catch (error) {
       console.error(error);
     }
-    await loadData();
   };
 
   const getPortfolioById = (id) => {
-    return portfolios.find((portfolio) => portfolio.id === id);
+    if (!portLoading)
+      return portfolios.find((portfolio) => portfolio.id === id);
+    return;
   };
 
   const loadData = async () => {
+    setPortLoading(true);
     const portData = await fetchPortfolios();
     const portfolioList = portData.portfolios;
     const portfolioIds = getPortfolioIds(portfolioList);

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
 import AutoPortfolio from "./auto/AutoPortfolio.js";
 import MakeManualPortfolio from "./MakeManualPortfolio.js";
@@ -10,11 +10,15 @@ import { SafeAreaView } from "react-native-safe-area-context";
 const MakePortfolio = ({ navigation }) => {
   const [step, setStep] = useState(0);
   const [path, setPath] = useState("");
-  const [disabled, setDisabled] = useState(false);
+  const [disabled, setDisabled] = useState(true);
 
   const handleNextStep = () => {
     setStep(step + 1);
   };
+
+  useEffect(() => {
+    if (path) setDisabled(false);
+  }, [path]);
 
   return (
     <SafeAreaView style={styles.container}>

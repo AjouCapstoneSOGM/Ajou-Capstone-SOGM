@@ -1,19 +1,103 @@
-import React, { useEffect, useState } from "react";
-import { View, TouchableOpacity, StyleSheet, Alert } from "react-native";
-import { ScrollView, TextInput } from "react-native-gesture-handler";
-import { arraysEqual, deepCopy, filteringNumber } from "../../utils/utils";
-import GetCurrentPrice from "../../utils/GetCurrentPrice";
+import React, { useCallback, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  TextInput,
+} from "react-native";
+import PagerView from "react-native-pager-view";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Button, Divider, Icon } from "@rneui/base";
 import { usePortfolio } from "../../utils/PortfolioContext";
+import { deepCopy, filteringNumber } from "../../utils/utils";
+import PortfolioPieChart from "../../utils/PortfolioPieChart";
 import AppText from "../../utils/AppText";
 import Loading from "../../utils/Loading";
 
 const ModifyPortfolio = ({ route, navigation }) => {
+  const { pfId, rnId, rebalancing } = route.params;
+  const { getPortfolioById, fetchModify, loadData, portfolios } =
+    usePortfolio();
+  const [checkList, setCheckList] = useState([]);
+  const [selectedId, setSelectedId] = useState();
   const [loading, setLoading] = useState(true);
+  const [portfolio, setPortfolio] = useState([]);
   const [rebalances, setRebalances] = useState([]);
-  const [rebalancesOffer, setRebalancesOffer] = useState([]);
-  const { fetchModify } = usePortfolio();
-  const rnId = route.params.rnId;
-  const portId = route.params.portId;
+
+  const calculateAfter = () => {
+    if (portfolio) {
+      const afterPortfolio = deepCopy(portfolio);
+      afterPortfolio.detail.stocks.map((stock) => {
+        const order = rebalances.find((order) => order.ticker === stock.ticker);
+        if (order) {
+          stock.quantity += order.number * (order.isBuy ? 1 : -1);
+          afterPortfolio.detail.currentCash +=
+            order.number * order.price * (order.isBuy ? -1 : 1);
+        }
+      });
+      return afterPortfolio;
+    }
+  };
+  useFocusEffect(
+    useCallback(() => {
+      setRebalances(rebalancing);
+      setPortfolio(getPortfolioById(pfId));
+      setLoading(false);
+    }, [])
+  );
+
+  const getTotalValue = () => {
+    const totalPortfolioValue =
+      portfolio.detail.stocks.reduce((acc, stock) => {
+        return acc + stock.currentPrice * stock.quantity;
+      }, 0) + portfolio.detail.currentCash;
+    return totalPortfolioValue;
+  };
+
+  const calculateRate = (stocks) => {
+    const result = stocks.map((stock) => {
+      const marketValue = stock.currentPrice * stock.quantity;
+      const rate = marketValue / getTotalValue();
+      return {
+        companyName: stock.companyName,
+        ticker: stock.ticker,
+        rate: (rate * 100).toFixed(2), // 퍼센트로 표현
+      };
+    });
+    return result;
+  };
+
+  const getRateDiff = (ticker) => {
+    const afterPortfolio = calculateAfter();
+    const stockRate = calculateRate(portfolio.detail.stocks);
+    const afterStockRate = calculateRate(afterPortfolio.detail.stocks);
+    const beforeRate = stockRate.filter((stock) => stock.ticker === ticker);
+    const afterRate = afterStockRate.filter((stock) => stock.ticker === ticker);
+    return afterRate[0].rate - beforeRate[0].rate;
+  };
+
+  const checkTickerExists = (ticker) => {
+    return checkList.some((item) => item.ticker === ticker);
+  };
+
+  const handleCheckList = (ticker) => {
+    setCheckList((prevTickers) => {
+      const index = prevTickers.findIndex((item) => item.ticker === ticker);
+      if (index === -1) {
+        return [...prevTickers, { ticker }];
+      } else {
+        return prevTickers.filter((item, idx) => idx !== index);
+      }
+    });
+  };
+  const handleSelectedId = (ticker) => {
+    const index = portfolio.detail.stocks.findIndex(
+      (item) => item.ticker === ticker
+    );
+    setSelectedId(index);
+  };
 
   const updateKey = (reblances) => {
     const updated = reblances.map((stock) => {
@@ -28,244 +112,312 @@ const ModifyPortfolio = ({ route, navigation }) => {
     return updated;
   };
 
-  const handleModify = async () => {
-    const rebalanceData = updateKey([...rebalances]);
-    Alert.alert("수정 확인", "위 항목으로 포트폴리오를 수정하실건가요?", [
-      {
-        text: "취소",
-        onPress: () => {},
-      },
-      {
-        text: "확인",
-        onPress: async () => {
-          setLoading(true);
-          try {
-            await fetchModify(rebalanceData, portId, rnId);
-
-            // 변경 여부 확인
-            if (!arraysEqual(rebalances, rebalancesOffer)) {
-              console.log("다릅니다.");
-            }
-
-            // 수정 완료 알림
-            Alert.alert("수정 완료", "수정이 완료되었습니다.", [
-              {
-                text: "확인",
-                onPress: () => {
-                  navigation.navigate("PortfolioDetails", { id: portId });
-                },
-                style: "destructive", // iOS에서만 적용되는 스타일 옵션
-              },
-            ]);
-          } catch (error) {
-            console.error("수정 중 오류 발생:", error);
-            Alert.alert(
-              "수정 실패",
-              "수정 중 오류가 발생했습니다. 다시 시도해주세요.",
-              [{ text: "확인", onPress: () => {} }]
-            );
-          } finally {
-            setLoading(false);
-          }
-        },
-        style: "destructive", // iOS에서만 적용되는 스타일 옵션
-      },
-    ]);
-  };
-
-  const fetchAllCurrent = async (tickerList) => {
-    const result = await Promise.all(tickerList.map(GetCurrentPrice));
-    return result;
-  };
-
   const handleChangePrices = (index, value) => {
     const newRebalances = [...rebalances];
     if (value <= 9999999) newRebalances[index].price = filteringNumber(value);
     setRebalances(newRebalances);
   };
 
-  const handleChangeBuy = (index, value) => {
-    const newRebalances = [...rebalances];
-    newRebalances[index].isBuy = value;
-    setRebalances(newRebalances);
+  const handleModify = async () => {
+    const rebalanceData = updateKey([...rebalances]);
+    setLoading(true);
+    await fetchModify(rebalanceData, pfId, rnId);
+    await loadData();
+    setLoading(false);
+    navigation.replace("PortfolioDetails", { id: pfId });
   };
 
-  const handleChangeNumber = (index, value) => {
-    const newRebalances = [...rebalances];
-    if (value <= 9999) newRebalances[index].number = filteringNumber(value);
-    setRebalances(newRebalances);
-  };
-
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const stockList = route.params.list;
-        const tickerList = stockList.map((item) => item.ticker);
-        const currentPrices = await fetchAllCurrent(tickerList);
-        const rebalancesWithCurrent = stockList.map((item, index) => ({
-          ...item,
-          price: currentPrices[index].currentPrice,
-        }));
-
-        const deepcopyResult1 = deepCopy(rebalancesWithCurrent);
-        const deepcopyResult2 = deepCopy(rebalancesWithCurrent);
-
-        setRebalancesOffer(deepcopyResult1);
-        setRebalances(deepcopyResult2);
-        setLoading(false);
-      } catch (error) {
-        console.error("Failed to load data", error);
-      }
-    };
-
-    loadData();
-  }, []);
-
-  if (loading) {
-    return <Loading />;
-  }
+  if (loading) return <Loading />;
   return (
-    <View style={styles.container}>
-      <ScrollView>
-        <View style={styles.rebalanceContainer}>
-          {rebalances.map((item, index) => (
-            <View style={styles.rebalanceBlock} key={index}>
-              <View>
-                <AppText style={{ fontSize: 20, paddingHorizontal: 10 }}>
-                  {item.name}
-                </AppText>
-              </View>
-              <View style={styles.inputContainer}>
-                <View style={styles.inputTextContainer}>
-                  <TextInput
-                    style={styles.input_Price}
-                    keyboardType="numeric"
-                    value={item.price.toString()}
-                    onChangeText={(text) => handleChangePrices(index, text)}
-                    placeholder={rebalancesOffer[index].price.toString()}
-                    placeholderTextColor="#bbb"
-                  />
-                  <AppText style={{ fontWeight: "bold", fontSize: 17 }}>
-                    원에&nbsp;&nbsp;
-                  </AppText>
-                  <TextInput
-                    style={styles.input_Quantity}
-                    keyboardType="numeric"
-                    value={item.number.toString()}
-                    placeholder={rebalancesOffer[index].number.toString()}
-                    placeholderTextColor="#bbb"
-                    onChangeText={(text) => handleChangeNumber(index, text)}
-                  />
-                  <AppText style={{ fontWeight: "bold", fontSize: 17 }}>
-                    주를
-                  </AppText>
-                </View>
-                <View style={styles.tradeButtonContainer}>
-                  <TouchableOpacity
-                    style={[
-                      styles.tradeButton,
-                      item.isBuy ? { backgroundColor: "#6495ED" } : "",
-                    ]}
-                    onPress={() => handleChangeBuy(index, true)}
-                  >
-                    <AppText
-                      style={[
-                        { fontSize: 18 },
-                        item.isBuy ? { color: "white" } : "",
-                      ]}
-                    >
-                      매수
-                    </AppText>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[
-                      styles.tradeButton,
-                      !item.isBuy ? { backgroundColor: "#6495ED" } : "",
-                    ]}
-                    onPress={() => handleChangeBuy(index, false)}
-                  >
-                    <AppText
-                      style={[
-                        { fontSize: 18 },
-                        !item.isBuy ? { color: "white" } : "",
-                      ]}
-                    >
-                      매도
-                    </AppText>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </View>
-          ))}
+    <SafeAreaView style={styles.container}>
+      <View style={styles.textContainer}>
+        <AppText style={{ fontSize: 30, fontWeight: "bold", color: "#333" }}>
+          리밸런싱 할 종목 {rebalances.length}개가 있어요
+        </AppText>
+        <Button
+          buttonStyle={{ marginHorizontal: -10 }}
+          type="clear"
+          onPress={() => {}}
+          icon={{
+            name: "questioncircleo",
+            type: "antdesign",
+            color: "#333",
+          }}
+        />
+      </View>
+      <View style={styles.chartContainer}>
+        <View style={styles.chartTitle}>
+          <AppText style={{ color: "#333", fontSize: 23, fontWeight: "bold" }}>
+            수정 전
+          </AppText>
+          <Icon name="right" type="antdesign" color="#333" />
+          <AppText style={{ color: "#333", fontSize: 23, fontWeight: "bold" }}>
+            수정 후
+          </AppText>
         </View>
-      </ScrollView>
-      <TouchableOpacity style={styles.button} onPress={() => handleModify()}>
-        <AppText style={{ fontSize: 18, color: "white" }}>수정</AppText>
-      </TouchableOpacity>
-    </View>
+        <View style={styles.chartBefore}>
+          <PortfolioPieChart
+            data={portfolio.detail}
+            selectedId={selectedId}
+            size={0.5}
+          />
+        </View>
+
+        <View style={styles.chartAfter}>
+          <PortfolioPieChart
+            data={calculateAfter().detail}
+            selectedId={selectedId}
+            size={0.5}
+          />
+        </View>
+      </View>
+      <PagerView style={styles.rebalanceContainer} initialPage={0}>
+        <View style={styles.rebalanceList}>
+          <View style={styles.rebalanceHeader}>
+            <AppText style={{ color: "#f0f0f0", fontSize: 20 }}>
+              매수할 종목
+            </AppText>
+            <Button
+              buttonStyle={{ marginHorizontal: -10 }}
+              type="clear"
+              onPress={() => {}}
+              icon={{
+                name: "questioncircleo",
+                type: "antdesign",
+                color: "#f0f0f0",
+              }}
+            />
+          </View>
+          <Divider />
+          <View style={styles.column}>
+            <AppText style={styles.columnName}>기업명</AppText>
+            <AppText style={styles.columnNumber}>수량</AppText>
+            <AppText style={styles.columnPrice}>가격</AppText>
+            <AppText style={styles.columnRateDiff}>비중 변화</AppText>
+          </View>
+          <ScrollView keyboardShouldPersistTaps="handled">
+            {rebalances.map(
+              (item, index) =>
+                item.isBuy === true && (
+                  <View key={index} style={styles.rebalanceItem}>
+                    <Button
+                      buttonStyle={{ marginLeft: -10 }}
+                      type="clear"
+                      onPress={() => {
+                        handleCheckList(item.ticker);
+                      }}
+                      icon={{
+                        name: "checkcircle",
+                        type: "antdesign",
+                        color: checkTickerExists(item.ticker)
+                          ? "#97f697"
+                          : "#808080",
+                      }}
+                    />
+                    <TouchableOpacity
+                      style={styles.rebalanceItemContent}
+                      onPress={() => handleSelectedId(item.ticker)}
+                    >
+                      <AppText style={styles.itemName}>{item.name}</AppText>
+                      <AppText style={styles.itemNumber}>
+                        {item.number}주
+                      </AppText>
+                      <TextInput
+                        style={styles.itemPrice}
+                        value={item.price.toString()}
+                        onChangeText={(text) => handleChangePrices(index, text)}
+                        placeholder={item.price.toString()}
+                        placeholderTextColor="#bbb"
+                      />
+                      <AppText style={styles.itemRateDiff}>
+                        {getRateDiff(item.ticker)}%
+                      </AppText>
+                    </TouchableOpacity>
+                  </View>
+                )
+            )}
+          </ScrollView>
+        </View>
+        <View style={styles.rebalanceList}>
+          <View style={styles.rebalanceHeader}>
+            <AppText style={{ color: "#f0f0f0", fontSize: 20 }}>
+              매도할 종목
+            </AppText>
+            <Button
+              buttonStyle={{ marginHorizontal: -10 }}
+              type="clear"
+              onPress={() => {}}
+              icon={{
+                name: "questioncircleo",
+                type: "antdesign",
+                color: "#f0f0f0",
+              }}
+            />
+          </View>
+          <Divider />
+          <View style={styles.column}>
+            <AppText style={styles.columnName}>기업명</AppText>
+            <AppText style={styles.columnNumber}>수량</AppText>
+            <AppText style={styles.columnPrice}>가격</AppText>
+            <AppText style={styles.columnRateDiff}>비중 변화</AppText>
+          </View>
+          <ScrollView>
+            {rebalances.map(
+              (item, index) =>
+                item.isBuy === false && (
+                  <View key={index} style={styles.rebalanceItem}>
+                    <Button
+                      buttonStyle={{ marginLeft: -10 }}
+                      type="clear"
+                      onPress={() => {
+                        handleCheckList(item.ticker);
+                      }}
+                      icon={{
+                        name: "checkcircle",
+                        type: "antdesign",
+                        color: checkTickerExists(item.ticker)
+                          ? "#97f697"
+                          : "#808080",
+                      }}
+                    />
+                    <TouchableOpacity
+                      style={styles.rebalanceItemContent}
+                      onPress={() => handleSelectedId(item.ticker)}
+                    >
+                      <AppText style={styles.itemName}>{item.name}</AppText>
+                      <AppText style={styles.itemNumber}>
+                        {item.number}주
+                      </AppText>
+                      <AppText style={styles.itemPrice}>{item.price}원</AppText>
+                      <AppText style={styles.itemRateDiff}>
+                        {getRateDiff(item.ticker)}%
+                      </AppText>
+                    </TouchableOpacity>
+                  </View>
+                )
+            )}
+          </ScrollView>
+        </View>
+      </PagerView>
+      <Button
+        containerStyle={styles.nextButtonContainer}
+        buttonStyle={styles.nextButton}
+        title="반영"
+        onPress={() => handleModify()}
+        disabled={!(checkList.length === rebalances.length)}
+      />
+    </SafeAreaView>
   );
 };
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "space-between",
     alignItems: "stretch",
-    padding: 5,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#f0f0f0",
+  },
+  textContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 15,
+    paddingTop: 70,
+  },
+  chartContainer: {
+    marginTop: 20,
+  },
+  chartTitle: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 65,
+  },
+  chartBefore: {
+    position: "absolute",
+    left: "-25%",
+    top: -50,
+  },
+  chartAfter: {
+    position: "absolute",
+    right: "-25%",
+    top: -50,
   },
   rebalanceContainer: {
-    justifyContent: "flex-start",
+    flex: 1,
+    backgroundColor: "#333",
+    marginTop: 220,
   },
-  rebalanceBlock: {
-    alignItems: "stretch",
-    borderBottomWidth: 1,
-    borderColor: "#ddd",
-    padding: 10,
-    marginVertical: 5,
+  rebalanceList: {
+    padding: 20,
+    paddingBottom: 80,
   },
-  inputContainer: {
+  rebalanceHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "stretch",
-    marginTop: 10,
+    alignItems: "center",
+    paddingBottom: 5,
   },
-  inputTextContainer: {
+  column: {
     flexDirection: "row",
-    flexGrow: 1,
-    justifyContent: "space-evenly",
-    alignItems: "center",
+    marginLeft: 40,
+    marginVertical: 8,
   },
-  input_Price: {
-    width: 72,
-    marginVertical: 12,
-    fontSize: 18,
-    borderBottomWidth: 1,
+  columnName: {
+    flex: 1.6,
+    color: "#808080",
+    textAlign: "center",
   },
-  input_Quantity: {
-    width: 42,
-    marginVertical: 12,
-    fontSize: 18,
-    borderBottomWidth: 1,
+  columnNumber: {
+    flex: 1,
+    color: "#808080",
+    textAlign: "center",
   },
-  tradeButtonContainer: {
+  columnPrice: {
+    flex: 1.5,
+    color: "#808080",
+    textAlign: "center",
+  },
+  columnRateDiff: {
+    flex: 1.5,
+    color: "#808080",
+    textAlign: "center",
+  },
+  rebalanceItem: {
     flexDirection: "row",
-    justifyContent: "space-evenly",
-    alignItems: "center",
-    flexGrow: 1,
+    marginVertical: 5,
   },
-  tradeButton: {
-    borderRadius: 8,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    backgroundColor: "#aaa",
-  },
-  button: {
-    justifyContent: "center", // 가로 방향에서 중앙 정렬
-    backgroundColor: "#6495ED",
+  rebalanceItemContent: {
+    flex: 1,
+    flexDirection: "row",
     alignItems: "center",
+  },
+  itemName: {
+    flex: 1.5,
+    color: "#f0f0f0",
+    marginRight: 10,
+    fontWeight: "bold",
+  },
+  itemNumber: {
+    flex: 1,
+    color: "#f0f0f0",
+  },
+  itemPrice: {
+    flex: 1.5,
+    color: "#f0f0f0",
+  },
+  itemRateDiff: {
+    flex: 1,
+    color: "#f0f0f0",
+  },
+  nextButton: {
+    backgroundColor: "#6262e8",
     borderRadius: 10,
-    padding: 18,
-    margin: 5,
+    height: 60,
+  },
+  nextButtonContainer: {
+    position: "absolute",
+    bottom: 20,
+    left: 20,
+    right: 20,
   },
 });
 
