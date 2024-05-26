@@ -16,6 +16,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class ControllerTestUtils {
 
+    // TODO: 회원가입 코드 재작성
+    // 메일 보내는 부분을 제외하고, 나머지 부분(코드 검증 후 회원가입)을 API로 구현
+
     public static String signUpLogin(MockMvc mockMvc) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
         UserDto.InfoDto InfoDto = new UserDto.InfoDto("James", "james@domain.com", "password!");

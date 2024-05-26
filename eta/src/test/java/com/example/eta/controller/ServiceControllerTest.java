@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
+import com.example.eta.service.UserService;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -30,12 +31,15 @@ public class ServiceControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private UserService userService;
+
     @Test
     @DisplayName("섹터 목록 API")
     @Transactional
     public void testGetAllSectors() throws Exception {
         // given 회원가입, 로그인 후 jwt토큰 획득
-        String authorizationHeader = signUpLogin(mockMvc);
+        String authorizationHeader = signUpLogin(mockMvc, userService);
 
         // when, then
         MockHttpServletResponse getAllSectorsResponse = mockMvc.perform(get("/api/sector/list")

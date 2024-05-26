@@ -5,6 +5,7 @@ import com.example.eta.entity.User;
 import com.example.eta.auth.enums.RoleType;
 import com.example.eta.repository.PortfolioRepository;
 import com.example.eta.repository.UserRepository;
+import com.example.eta.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,6 +34,9 @@ public class PortfolioControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private PortfolioRepository portfolioRepository;
 
     @Autowired
@@ -43,7 +47,7 @@ public class PortfolioControllerTest {
     @Transactional
     public void testPortfolioAuthorization() throws Exception {
         // 회원가입, 로그인 후 토큰 반환
-        String authorizationHeader = signUpLogin(mockMvc);
+        String authorizationHeader = signUpLogin(mockMvc, userService);
 
         // 다른 유저로 포트폴리오 생성
         User user = userRepository.save(new User().builder()

@@ -8,8 +8,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import com.example.eta.auth.enums.RoleType;
 import com.example.eta.dto.UserDto;
 import com.example.eta.entity.SignupInfo;
+import com.example.eta.entity.User;
 import com.example.eta.exception.signup.CodeExpiredException;
 import com.example.eta.exception.signup.CodeVerificationFailedException;
 import com.example.eta.exception.signup.MissingSignupAttemptException;
@@ -33,6 +35,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -135,6 +138,8 @@ public class AuthControllerTest {
     }
 
 
+    // TODO: 회원가입 코드 재작성
+    // 메일 보내는 부분을 제외하고, 나머지 부분(코드 검증 후 회원가입)을 API로 구현
     @Test
     @DisplayName("회원가입 API(정상적인 경우)")
     @Transactional
@@ -161,12 +166,16 @@ public class AuthControllerTest {
     public void testLogin() throws Exception {
         // given
         ObjectMapper objectMapper = new ObjectMapper();
-        UserDto.InfoDto InfoDto = new UserDto.InfoDto("James", "james@domain.com", "password!");
-        mockMvc.perform(post("/api/auth/signup")
-                .contentType("application/json")
-                .content(objectMapper.writeValueAsString(InfoDto)));
+        userService.join(User.builder()
+                .email("james@domain.com")
+                .password("password!")
+                .name("James")
+                .createdDate(LocalDateTime.now())
+                .roleType(RoleType.ROLE_USER)
+                .enabled(true)
+                .build());
 
-        UserDto.LoginDto loginDto = new UserDto.LoginDto("james@domain.com", "password!", "fcmToken");
+        UserDto.LoginDto loginDto = new UserDto.LoginDto("james@domain.com", "password!", "expoPushToken");
 
         // when, then
         MockHttpServletResponse response = mockMvc.perform(post("/api/auth/login")

@@ -44,8 +44,8 @@ public class PortfolioController {
 
     @PostMapping("/create/manual")
     public ResponseEntity<PortfolioDto.CreateManualResponseDto> createManualPortfolio(@RequestBody PortfolioDto.CreateManualRequestDto request,
-                                                                                      @AuthenticationPrincipal String email) {
-        User user = userService.findByEmail(email);
+                                                                                      @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        User user = userService.findByEmail(userPrincipal.getEmail());
 
         int portfolioId = portfolioService.createManualPortfolio(user,request);
         return ResponseEntity.ok(new PortfolioDto.CreateManualResponseDto(portfolioId));
