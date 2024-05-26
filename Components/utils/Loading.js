@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  View,
-  ActivityIndicator,
-  Modal,
-  StyleSheet,
-  Dimensions,
-} from "react-native";
+import { View, ActivityIndicator, Modal, StyleSheet } from "react-native";
 
 const Loading = ({ size = "large", color = "#aaa" }) => {
   return (

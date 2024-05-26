@@ -83,9 +83,6 @@ const AutoPortfolio = ({ step, setDisabled }) => {
             interest={interest}
           />
         );
-
-      default:
-        setCurrentStep(0);
     }
   };
   return <View style={styles.container}>{renderAutoStep()}</View>;

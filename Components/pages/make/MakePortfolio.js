@@ -20,7 +20,7 @@ const MakePortfolio = ({ navigation }) => {
   };
 
   useEffect(() => {
-    if (path === "manual" && step === 4) {
+    if ((path === "manual" && step === 4) || (path === "auto" && step === 5)) {
       loadData();
       navigation.popToTop();
       navigation.navigate("ViewPortfolio");

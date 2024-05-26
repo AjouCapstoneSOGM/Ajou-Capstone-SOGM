@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, TouchableOpacity, StyleSheet } from "react-native";
+import { View, TouchableOpacity, StyleSheet, Dimensions } from "react-native";
 import { usePortfolio } from "../../utils/PortfolioContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Icon, Button } from "@rneui/base";
@@ -10,6 +10,8 @@ import FooterComponent from "../../utils/Footer";
 import HeaderComponent from "../../utils/Header";
 import PortfolioPieChart from "../../utils/PortfolioPieChart";
 import Loading from "../../utils/Loading";
+
+const window = Dimensions.get("window");
 
 const PortfolioList = ({ navigation }) => {
   const { portfolios, loadData, portLoading } = usePortfolio();
@@ -229,7 +231,8 @@ const styles = StyleSheet.create({
   },
   chartContainer: {
     position: "absolute",
-    bottom: 70,
+    alignSelf: "center",
+    bottom: 100,
   },
   floatingButton: {
     position: "absolute",
