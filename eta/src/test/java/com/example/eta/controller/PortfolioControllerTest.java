@@ -2,6 +2,7 @@ package com.example.eta.controller;
 
 import com.example.eta.entity.Portfolio;
 import com.example.eta.entity.User;
+import com.example.eta.auth.enums.RoleType;
 import com.example.eta.repository.PortfolioRepository;
 import com.example.eta.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -50,7 +51,7 @@ public class PortfolioControllerTest {
                 .isVerified(false)
                 .password("password!")
                 .name("James")
-                .role("USER")
+                .roleType(RoleType.ROLE_USER)
                 .createdDate(LocalDateTime.now())
                 .enabled(true).build());
         int pfId = portfolioRepository.save(Portfolio.builder()

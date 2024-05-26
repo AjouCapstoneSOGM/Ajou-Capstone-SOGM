@@ -1,15 +1,17 @@
 package com.example.eta.controller;
 
+import com.example.eta.api.ApiClientSocial;
+import com.example.eta.auth.entity.UserPrincipal;
+import com.example.eta.auth.enums.SocialType;
+import com.example.eta.auth.jwt.JwtTokenProvider;
 import com.example.eta.dto.UserDto;
 import com.example.eta.entity.SignupInfo;
 import com.example.eta.entity.User;
+import com.example.eta.auth.enums.RoleType;
 import com.example.eta.exception.signup.EmailAlreadyExistsException;
-import com.example.eta.exception.signup.SignupTokenVerificationFailedException;
 import com.example.eta.service.SignupInfoService;
 import com.example.eta.service.TokenService;
 import com.example.eta.service.UserService;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,16 +20,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
-import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,40 +40,40 @@ public class AuthController {
     private String header;
     @Value("${spring.jwt.prefix}")
     private String prefix;
-    @Value("${spring.jwt.secret}")
-    private String secret;
 
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
     private final TokenService tokenService;
     private final SignupInfoService signupInfoService;
+    private final ApiClientSocial apiClientSocial;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @PostMapping("/login")
     public ResponseEntity<Object> authorize(@RequestBody UserDto.LoginDto loginDto) {
+
+        // TODO: 예외 처리(소셜 계정, 비밀번호 제한)
+
+        User user = userService.findByEmail(loginDto.getEmail());
+
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword());
+                new UsernamePasswordAuthenticationToken(UserPrincipal.create(user), loginDto.getPassword());
 
         // 인증
-        Authentication authentication = authenticationManager.authenticate(authenticationToken);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        authenticationManager.authenticate(authenticationToken);
 
         // JWT 토큰 발급
-        SecretKey key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-        String jwt = Jwts.builder()
-                .setClaims(Map.of("email", loginDto.getEmail()))
-                .signWith(key)
-                .compact();
+        String jwt = jwtTokenProvider.generateJwtToken(user);
 
         // expo 토큰 저장
-        tokenService.saveToken(userService.findByEmail(loginDto.getEmail()), loginDto.getExpoPushToken());
+        tokenService.saveToken(user, loginDto.getExpoPushToken());
 
         // 응답
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(header, prefix + jwt);
         HashMap<String, Object> response = new HashMap<>() {{
             put("token", jwt);
-            put("user_id", userService.findByEmail(loginDto.getEmail()).getUserId());
+            put("user_id", user.getUserId());
             put("name", userService.findByEmail(loginDto.getEmail()).getName());
         }};
 
@@ -109,7 +108,7 @@ public class AuthController {
         user.setPassword(passwordEncoder.encode(InfoDto.getPassword()));
         user.setEmail(InfoDto.getEmail());
         user.setIsVerified(false);
-        user.setRole("USER");
+        user.setRoleType(RoleType.ROLE_USER);
         user.setCreatedDate(LocalDateTime.now());
         user.setEnabled(true);
 
@@ -119,5 +118,51 @@ public class AuthController {
 
         signupInfoService.deleteSignupInfo(signupInfo);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/social-login/kakao")
+    public ResponseEntity<?> socialLoginKakao(@RequestBody Map<String, String> requestBody) {
+        String accessToken = requestBody.get("accessToken");
+        try {
+            Map<String, Object> kakaoUserDetails = apiClientSocial.getKakaoUserDetails(accessToken).block().getBody();
+            String kakaoId = kakaoUserDetails.get("id").toString();
+            String kakaoName = ((Map<String, Object>)kakaoUserDetails.get("properties")).get("nickname").toString();
+
+            User user;
+            // 존재하지 않은 회원일 시 생성
+            if (!userService.isExistEmail(kakaoId)) {
+                user = User.builder()
+                        .email(kakaoId)
+                        .name(kakaoName)
+                        .socialType(SocialType.KAKAO)
+                        .roleType(RoleType.ROLE_USER)
+                        .createdDate(LocalDateTime.now())
+                        .enabled(true)
+                        .build();
+                userService.join(user);
+            }
+            else {
+                user = userService.findByEmail(kakaoId);
+            }
+
+            // JWT 토큰 발급
+            String jwt = jwtTokenProvider.generateJwtToken(user);
+
+            // expo 토큰 저장
+            tokenService.saveToken(userService.findByEmail(kakaoId), requestBody.get("expoPushToken"));
+
+            // 응답
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.add(header, prefix + jwt);
+            HashMap<String, Object> response = new HashMap<>() {{
+                put("token", jwt);
+                put("user_id", user.getUserId());
+            }};
+
+            return new ResponseEntity<>(response, httpHeaders, HttpStatus.OK);
+        }
+        catch (WebClientResponseException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 }

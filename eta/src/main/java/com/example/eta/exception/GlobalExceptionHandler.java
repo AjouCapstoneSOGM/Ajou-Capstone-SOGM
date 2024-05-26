@@ -23,6 +23,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = {AuthenticationException.class})
     protected ResponseEntity<Void> handleAuthenticationException(AuthenticationException e) {
+        e.printStackTrace();
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
