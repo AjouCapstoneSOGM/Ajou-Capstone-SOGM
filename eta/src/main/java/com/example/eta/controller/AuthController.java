@@ -2,7 +2,7 @@ package com.example.eta.controller;
 
 import com.example.eta.dto.UserDto;
 import com.example.eta.entity.User;
-import com.example.eta.exception.EmailAlreadyExistsException;
+import com.example.eta.exception.signup.EmailAlreadyExistsException;
 import com.example.eta.service.SignupInfoService;
 import com.example.eta.service.TokenService;
 import com.example.eta.service.UserService;
@@ -89,8 +89,11 @@ public class AuthController {
     }
 
     @PostMapping("verify-email")
-    public ResponseEntity<Void> verifyEmailByCode(@RequestBody Map<String, String> request) {
-        return null;
+    public ResponseEntity<Map<String, String>> verifyEmailByCode(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        String code = request.get("code");
+        String signupToken = signupInfoService.verifyCodeAndIssueSignupToken(email, code);
+        return ResponseEntity.ok(Map.of("signupToken", signupToken));
     }
 
     @Deprecated

@@ -3,6 +3,8 @@ package com.example.eta.exception;
 import com.example.eta.scheduler.PortfolioScheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailSendException;
@@ -14,14 +16,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
+@Order(value = Ordered.LOWEST_PRECEDENCE)
 public class GlobalExceptionHandler {
 
     private Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
-
-    @ExceptionHandler(value = {EmailAlreadyExistsException.class})
-    protected ResponseEntity<Map<String, String>> handleEmailAlreadyExistsException(EmailAlreadyExistsException e) {
-        return new ResponseEntity<>(HttpStatus.CONFLICT);
-    }
 
     @ExceptionHandler(value = {AuthenticationException.class})
     protected ResponseEntity<Void> handleAuthenticationException(AuthenticationException e) {

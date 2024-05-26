@@ -1,16 +1,20 @@
 package com.example.eta.controller.utils;
 
 import com.example.eta.dto.UserDto;
+import com.example.eta.service.SignupInfoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class controllerTestUtils {
+public class ControllerTestUtils {
 
     public static String signUpLogin(MockMvc mockMvc) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -29,5 +33,15 @@ public class controllerTestUtils {
                 .andReturn().getResponse();
 
         return loginResponse.getHeader("Authorization");
+    }
+
+    public static Map<String, String> getRequestBodyForCodeValidation(SignupInfoService signupInfoService) {
+        String email = "test@asdf.com";
+        String code = signupInfoService.generateCode();
+
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("email", email);
+        requestBody.put("code", code);
+        return requestBody;
     }
 }

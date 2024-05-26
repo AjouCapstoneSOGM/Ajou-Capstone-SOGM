@@ -1,7 +1,10 @@
 package com.example.eta.service;
 
 import com.example.eta.entity.SignupInfo;
-import com.example.eta.exception.EmailAlreadyExistsException;
+import com.example.eta.exception.signup.EmailAlreadyExistsException;
+import com.example.eta.exception.signup.CodeExpiredException;
+import com.example.eta.exception.signup.CodeVerificationFailedException;
+import com.example.eta.exception.signup.MissingSignupAttemptException;
 import com.example.eta.repository.SignupInfoRepository;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.transaction.Transactional;
@@ -15,6 +18,8 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 public class SignupInfoService {
+
+    static final int SIGNUP_TOKEN_LENGTH = 16;
 
     @Value("${spring.mail.username}")
     private String senderEmail;
@@ -42,8 +47,27 @@ public class SignupInfoService {
         signupInfoRepository.save(signupInfo);
     }
 
-    public String generateCode() {
-        return String.format("%06d", (int) (Math.random() * (1000000)));
+    @Transactional
+    public String verifyCodeAndIssueSignupToken(String email, String code) {
+        if (!signupInfoRepository.existsById(email)) {
+            throw new MissingSignupAttemptException();
+        }
+
+        SignupInfo signupInfo = signupInfoRepository.findById(email).get();
+        if (signupInfo.getCodeExpires().isBefore(LocalDateTime.now())) {
+            throw new CodeExpiredException();
+        }
+        if (!signupInfo.getCode().equals(code)) {
+            throw new CodeVerificationFailedException();
+        }
+        if (signupInfo.getIsVerified()) {
+            return signupInfo.getSignupToken();
+        }
+
+        signupInfo.setIsVerified(true);
+        String signupToken = generateSignupToken();
+        signupInfo.setSignupToken(signupToken);
+        return signupToken;
     }
 
     public void sendVerificationEmail(String email, String code) throws Exception {
@@ -56,5 +80,28 @@ public class SignupInfoService {
         body += "<h1>" + code + "</h1>";
         message.setText(body,"UTF-8", "html");
         javaMailSender.send(message);
+    }
+
+    public String generateCode() {
+        return String.format("%06d", (int) (Math.random() * (1000000)));
+    }
+
+    public String generateSignupToken(){
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < SIGNUP_TOKEN_LENGTH; i++) {
+            int random = (int) (Math.random() * 3);
+            switch (random) {
+                case 0:
+                    stringBuilder.append((char) ((int) (Math.random() * 26) + 65));
+                    break;
+                case 1:
+                    stringBuilder.append((char) ((int) (Math.random() * 26) + 97));
+                    break;
+                case 2:
+                    stringBuilder.append((int) (Math.random() * 10));
+                    break;
+            }
+        }
+        return stringBuilder.toString();
     }
 }
