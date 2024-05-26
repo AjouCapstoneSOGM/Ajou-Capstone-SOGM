@@ -1,35 +1,28 @@
 {
   "expo": {
-    "name": "Component",
+    "name": "eta",
     "slug": "components",
     "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "ios": {
-      "supportsTablet": true
-    },
+    "platforms": ["ios", "android", "web"],
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF"
-      },
-      "package": "com.sogm.pushalarmtest",
+      "package": "com.sogm.eta",
       "googleServicesFile": "./google-services.json"
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
-    },
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ]
+    ],
     "extra": {
       "eas": {
-        "projectId": "f3f90f52-c78a-4e7e-a7b0-ac053ff5dd0c"
+        "projectId": "ce6ad48d-d4d9-4edb-a805-42523d361e8b"
       }
     },
-    "owner": "leeyongsoo"
+    "owner": "ysw2"
   }
 }
