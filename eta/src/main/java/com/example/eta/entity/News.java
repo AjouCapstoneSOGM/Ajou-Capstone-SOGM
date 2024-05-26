@@ -22,6 +22,7 @@ public class News {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ticker")
     private Ticker ticker;
+
     @Column(name = "summary", nullable = false, columnDefinition = "TEXT")
     private String summary;
 }
