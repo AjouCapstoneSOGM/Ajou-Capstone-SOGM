@@ -18,6 +18,15 @@ CREATE TABLE `token` (
     FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`)
 );
 
+CREATE TABLE `signup_info` (
+    `email` varchar(100) NOT NULL,
+    `code` varchar(6) NOT NULL,
+    `code_expires` datetime NOT NULL,
+    `is_verified` bool NOT NULL,
+    `signup_token` varchar(20) NULL,
+    PRIMARY KEY (`email`)
+);
+
 CREATE TABLE `portfolio` (
     `pf_id` int NOT NULL AUTO_INCREMENT,
     `name` varchar(100),
