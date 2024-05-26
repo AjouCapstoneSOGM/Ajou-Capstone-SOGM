@@ -32,4 +32,9 @@ public class SignupExceptionHandler {
     protected ResponseEntity<Map<String, String>> handleCodeExpiredException(CodeExpiredException e) {
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
+
+    @ExceptionHandler(value = {SignupTokenVerificationFailedException.class})
+    protected ResponseEntity<Map<String, String>> handleSignupTokenVerificationFailedException(SignupTokenVerificationFailedException e) {
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    }
 }

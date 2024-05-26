@@ -1,10 +1,7 @@
 package com.example.eta.service;
 
 import com.example.eta.entity.SignupInfo;
-import com.example.eta.exception.signup.EmailAlreadyExistsException;
-import com.example.eta.exception.signup.CodeExpiredException;
-import com.example.eta.exception.signup.CodeVerificationFailedException;
-import com.example.eta.exception.signup.MissingSignupAttemptException;
+import com.example.eta.exception.signup.*;
 import com.example.eta.repository.SignupInfoRepository;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.transaction.Transactional;
@@ -68,6 +65,24 @@ public class SignupInfoService {
         String signupToken = generateSignupToken();
         signupInfo.setSignupToken(signupToken);
         return signupToken;
+    }
+
+    public SignupInfo verifySignupToken(String email, String signupToken) {
+        if (!signupInfoRepository.existsById(email)) {
+            throw new MissingSignupAttemptException();
+        }
+
+        SignupInfo signupInfo = signupInfoRepository.findById(email).get();
+
+        if(!signupInfo.getSignupToken().equals(signupToken)) {
+            throw new SignupTokenVerificationFailedException();
+        }
+
+        return signupInfo;
+    }
+
+    public void deleteSignupInfo(SignupInfo signupInfo) {
+        signupInfoRepository.delete(signupInfo);
     }
 
     public void sendVerificationEmail(String email, String code) throws Exception {

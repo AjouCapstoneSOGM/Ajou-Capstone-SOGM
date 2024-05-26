@@ -1,8 +1,10 @@
 package com.example.eta.controller;
 
 import com.example.eta.dto.UserDto;
+import com.example.eta.entity.SignupInfo;
 import com.example.eta.entity.User;
 import com.example.eta.exception.signup.EmailAlreadyExistsException;
+import com.example.eta.exception.signup.SignupTokenVerificationFailedException;
 import com.example.eta.service.SignupInfoService;
 import com.example.eta.service.TokenService;
 import com.example.eta.service.UserService;
@@ -96,10 +98,11 @@ public class AuthController {
         return ResponseEntity.ok(Map.of("signupToken", signupToken));
     }
 
-    @Deprecated
     @PostMapping("/signup")
     public ResponseEntity<Object> signup(@RequestBody @Valid UserDto.InfoDto InfoDto) throws RuntimeException {
         if (userService.isExistEmail(InfoDto.getEmail())) throw new EmailAlreadyExistsException();
+
+        SignupInfo signupInfo = signupInfoService.verifySignupToken(InfoDto.getEmail(), InfoDto.getSignupToken());
 
         User user = new User();
         user.setName(InfoDto.getName());
@@ -113,6 +116,8 @@ public class AuthController {
         HashMap<String, Object> response = new HashMap<>() {{
             put("user_id", userService.join(user));
         }};
+
+        signupInfoService.deleteSignupInfo(signupInfo);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 }
