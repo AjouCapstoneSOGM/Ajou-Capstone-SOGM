@@ -3,6 +3,7 @@ package com.example.eta.controller;
 import com.example.eta.dto.UserDto;
 import com.example.eta.entity.User;
 import com.example.eta.exception.EmailAlreadyExistsException;
+import com.example.eta.service.SignupInfoService;
 import com.example.eta.service.TokenService;
 import com.example.eta.service.UserService;
 import io.jsonwebtoken.Jwts;
@@ -45,6 +46,7 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final UserService userService;
     private final TokenService tokenService;
+    private final SignupInfoService signupInfoService;
 
     @PostMapping("/login")
     public ResponseEntity<Object> authorize(@RequestBody UserDto.LoginDto loginDto) {
@@ -77,6 +79,21 @@ public class AuthController {
         return new ResponseEntity<>(response, httpHeaders, HttpStatus.OK);
     }
 
+    @PostMapping("/send-verification-code")
+    public ResponseEntity<Void> sendVerificationCode(@RequestBody Map<String, String> request) throws Exception {
+        String email = request.get("email");
+        String code = signupInfoService.generateCode();
+        signupInfoService.addUnverifiedEmailInfo(email, code);
+        signupInfoService.sendVerificationEmail(email, code);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("verify-email")
+    public ResponseEntity<Void> verifyEmailByCode(@RequestBody Map<String, String> request) {
+        return null;
+    }
+
+    @Deprecated
     @PostMapping("/signup")
     public ResponseEntity<Object> signup(@RequestBody @Valid UserDto.InfoDto InfoDto) throws RuntimeException {
         if (userService.isExistEmail(InfoDto.getEmail())) throw new EmailAlreadyExistsException();
