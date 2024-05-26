@@ -12,7 +12,6 @@ import { useAuth } from "../../utils/AuthContext.js";
 import AppText from "../../utils/AppText.js";
 import { usePortfolio } from "../../utils/PortfolioContext.js";
 import Loading from "../../utils/Loading.js";
-import { usePushNotifications } from '../../utils/PushNotificationContext.js';
 
 const Login = ({ navigation }) => {
   const [useremail, setUseremail] = useState("test@test.com"); //
@@ -20,7 +19,6 @@ const Login = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const { loadData } = usePortfolio();
-  //const { expoPushToken } = usePushNotifications();
 
   const fetchLoginInfo = async () => {
     try {
@@ -33,7 +31,7 @@ const Login = ({ navigation }) => {
         body: JSON.stringify({
           email: useremail,
           password: password,
-          expoPushToken: "expoPushToken",
+          expoPushToken: "testToken",
         }),
       });
       if (response.ok) {

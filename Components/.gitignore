@@ -1,4 +1,3 @@
-
 # Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
 
 utils/urls.js
@@ -72,7 +71,6 @@ render.experimental.xml
 
 # Google Services (e.g. APIs or Firebase)
 google-services.json
-firebaseConfig.js
 
 # Android Profiling
 *.hprof
