@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { useFocusEffect } from "@react-navigation/native";
+import { CommonActions, useFocusEffect } from "@react-navigation/native";
 import {
   View,
   StyleSheet,
@@ -124,7 +124,13 @@ const ModifyPortfolio = ({ route, navigation }) => {
     await fetchModify(rebalanceData, pfId, rnId);
     await loadData();
     setLoading(false);
-    navigation.replace("PortfolioDetails", { id: pfId });
+    navigation.popToTop();
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 1,
+        routes: [{ name: "ViewPortfolio" }, { name: "PortfolioDetail" }],
+      })
+    );
   };
 
   if (loading) return <Loading />;

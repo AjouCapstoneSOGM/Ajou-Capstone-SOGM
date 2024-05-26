@@ -8,7 +8,7 @@ import urls from "../../utils/urls";
 import AppText from "../../utils/AppText";
 import { SafeAreaView } from "react-native-safe-area-context";
 import PortfolioPieChart from "../../utils/PortfolioPieChart";
-import { Button, Divider, Icon, color } from "@rneui/base";
+import { Button, Divider } from "@rneui/base";
 
 const PortfolioDetails = ({ route, navigation }) => {
   const stocksLength = 10;
@@ -176,7 +176,9 @@ const PortfolioDetails = ({ route, navigation }) => {
             ? "안정투자형"
             : portfolio.riskValue === 2
             ? "위험중립형"
-            : "적극투자형"}
+            : portfolio.riskValue === 3
+            ? "위험중립형"
+            : ""}
         </AppText>
         <View style={styles.outlineDetail}>
           <View style={styles.outlineDetailBox}>
@@ -200,7 +202,7 @@ const PortfolioDetails = ({ route, navigation }) => {
           data={portfolio}
           cash={portfolio}
           selectedId={selectedId}
-          size={1}
+          size={0.95}
         />
         {selectedId !== null && (
           <View style={{ position: "absolute", alignItems: "center" }}>

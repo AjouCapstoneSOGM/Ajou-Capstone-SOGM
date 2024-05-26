@@ -1,20 +1,31 @@
 import React, { useEffect, useState } from "react";
 import { View, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
 import AutoPortfolio from "./auto/AutoPortfolio.js";
-import MakeManualPortfolio from "./MakeManualPortfolio.js";
+import ManualPortfolio from "./manual/ManualPortfolio.js";
 import { useAuth } from "../../utils/AuthContext.js";
 import AppText from "../../utils/AppText.js";
 import { Button, Divider, Icon } from "@rneui/base";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { usePortfolio } from "../../utils/PortfolioContext.js";
+import Loading from "../../utils/Loading.js";
 
 const MakePortfolio = ({ navigation }) => {
   const [step, setStep] = useState(0);
   const [path, setPath] = useState("");
   const [disabled, setDisabled] = useState(true);
+  const { loadData } = usePortfolio();
 
   const handleNextStep = () => {
     setStep(step + 1);
   };
+
+  useEffect(() => {
+    if (path === "manual" && step === 4) {
+      loadData();
+      navigation.popToTop();
+      navigation.navigate("ViewPortfolio");
+    }
+  }, [step]);
 
   useEffect(() => {
     if (path) setDisabled(false);
@@ -99,7 +110,9 @@ const MakePortfolio = ({ navigation }) => {
       {step >= 1 && path === "auto" && (
         <AutoPortfolio step={step} setDisabled={setDisabled} />
       )}
-
+      {step >= 1 && path === "manual" && (
+        <ManualPortfolio step={step} setDisabled={setDisabled} />
+      )}
       <Button
         containerStyle={styles.nextButtonContainer}
         buttonStyle={styles.nextButton}

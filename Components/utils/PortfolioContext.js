@@ -239,6 +239,9 @@ export const PortfolioProvider = ({ children }) => {
         getPortfolioById,
         fetchModify,
         removePortfolios,
+        fetchStocksByPortfolioId,
+        fetchCurrentPrice,
+        fetchRebalanceList,
         loadData,
         portLoading,
       }}

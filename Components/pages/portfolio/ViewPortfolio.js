@@ -9,11 +9,17 @@ import AppText from "../../utils/AppText";
 import FooterComponent from "../../utils/Footer";
 import HeaderComponent from "../../utils/Header";
 import PortfolioPieChart from "../../utils/PortfolioPieChart";
+import Loading from "../../utils/Loading";
 
 const PortfolioList = ({ navigation }) => {
-  const { portfolios } = usePortfolio();
+  const { portfolios, loadData, portLoading } = usePortfolio();
   const [selectedIndex, setSelectedIndex] = useState(0);
 
+  const portfolioExist = () => {
+    if (portLoading) return false;
+    if (portfolios.length > 0) return true;
+    return false;
+  };
   const getTotalPrice = (stocks) => {
     const totalPrice = stocks.reduce(
       (acc, cur) => acc + cur.currentPrice * cur.quantity,
@@ -31,7 +37,7 @@ const PortfolioList = ({ navigation }) => {
   };
 
   const sumAllPrices = () => {
-    if (portfolios) {
+    if (portfolioExist()) {
       return portfolios.reduce((total, portfolio) => {
         const stockTotal = getTotalPrice(portfolio.detail.stocks);
         return total + stockTotal + portfolio.detail.currentCash;
@@ -44,9 +50,13 @@ const PortfolioList = ({ navigation }) => {
     setSelectedIndex(e.nativeEvent.position);
   };
 
+  const reloadData = async () => {
+    await loadData();
+  };
   return (
     <SafeAreaView style={styles.container}>
       <HeaderComponent />
+      {portLoading && <Loading />}
       <View style={styles.totalContainer}>
         <AppText style={{ fontSize: 25 }}>
           <AppText style={{ fontWeight: "bold" }}>테스트</AppText>
@@ -59,18 +69,23 @@ const PortfolioList = ({ navigation }) => {
           <AppText style={{ fontSize: 20 }}>원</AppText>
         </AppText>
       </View>
-      <View style={styles.chartContainer}>
-        {portfolios[selectedIndex] && (
-          <PortfolioPieChart data={portfolios[selectedIndex].detail} size={1} />
-        )}
-      </View>
-      <PagerView
-        style={styles.listContainer}
-        initialPage={0}
-        onPageSelected={handlePageChange}
-      >
-        {portfolios &&
-          portfolios.map((portfolio, index) => {
+      {portfolioExist() && (
+        <View style={styles.chartContainer}>
+          {portfolios[selectedIndex] && (
+            <PortfolioPieChart
+              data={portfolios[selectedIndex].detail}
+              size={1}
+            />
+          )}
+        </View>
+      )}
+      {portfolioExist() && (
+        <PagerView
+          style={styles.listContainer}
+          initialPage={0}
+          onPageSelected={handlePageChange}
+        >
+          {portfolios.map((portfolio, index) => {
             const roi = getTotalROI(portfolio.detail);
             const roiFormatted = roi > 0 ? `+${roi}` : `${roi}`;
             const currentCash = portfolio.detail.currentCash;
@@ -149,15 +164,17 @@ const PortfolioList = ({ navigation }) => {
                         ? "안정투자형"
                         : portfolio.riskValue === 2
                         ? "위험중립형"
-                        : "적극투자형"}
+                        : portfolio.riskValue === 3
+                        ? "적극투자형"
+                        : ""}
                     </AppText>
                   </View>
                 </TouchableOpacity>
               </View>
             );
           })}
-      </PagerView>
-
+        </PagerView>
+      )}
       <TouchableOpacity
         style={styles.floatingButton}
         onPress={() => {
@@ -165,6 +182,14 @@ const PortfolioList = ({ navigation }) => {
         }}
       >
         <Icon name="plus" type="antdesign" color="#f0f0f0" />
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.reloadButton}
+        onPress={() => {
+          reloadData();
+        }}
+      >
+        <Icon name="reload1" type="antdesign" color="#f0f0f0" />
       </TouchableOpacity>
       <FooterComponent />
     </SafeAreaView>
@@ -210,6 +235,22 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 90,
     right: 15,
+    width: 80,
+    height: 80,
+    borderRadius: 50,
+    backgroundColor: "#333",
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 5, // for Android shadow
+    shadowColor: "#000", // for iOS shadow
+    shadowOffset: { width: 0, height: 2 }, // for iOS shadow
+    shadowOpacity: 0.3, // for iOS shadow
+    shadowRadius: 2, // for iOS shadow
+  },
+  reloadButton: {
+    position: "absolute",
+    bottom: 90,
+    left: 15,
     width: 80,
     height: 80,
     borderRadius: 50,

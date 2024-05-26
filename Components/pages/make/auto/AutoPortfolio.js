@@ -8,6 +8,7 @@ import Loading from "../../../utils/Loading";
 import AutoPage1 from "./AutoPage1";
 import AutoPage2 from "./AutoPage2";
 import AutoPage3 from "./AutoPage3";
+import AutoPage4 from "./AutoPage4";
 
 const AutoPortfolio = ({ step, setDisabled }) => {
   const { loadData } = usePortfolio();
@@ -15,37 +16,6 @@ const AutoPortfolio = ({ step, setDisabled }) => {
   const [riskLevel, setRiskLevel] = useState("");
   const [interest, setInterest] = useState("");
   const [sector, setSector] = useState("");
-
-  const fetchUserInfo = async (userInfo) => {
-    setPortLoading(true);
-    try {
-      const token = await getUsertoken();
-      const response = await fetch(
-        `${urls.springUrl}/api/portfolio/create/auto`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            country: "KOR",
-            sector: [userInfo.interest],
-            asset: userInfo.amount,
-            riskValue: userInfo.riskLevel,
-          }),
-        }
-      );
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Success:", data);
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      throw error;
-    }
-    await loadData();
-  };
 
   useEffect(() => {
     if (step === 1) {
@@ -105,9 +75,15 @@ const AutoPortfolio = ({ step, setDisabled }) => {
             setInterest={setInterest}
           />
         );
-
       case 4:
-        return <Loading />;
+        return (
+          <AutoPage4
+            amount={amount}
+            riskLevel={riskLevel}
+            interest={interest}
+          />
+        );
+
       default:
         setCurrentStep(0);
     }
