@@ -11,7 +11,6 @@ import AutoPage3 from "./AutoPage3";
 import AutoPage4 from "./AutoPage4";
 
 const AutoPortfolio = ({ step, setDisabled }) => {
-  const { loadData } = usePortfolio();
   const [amount, setAmount] = useState("");
   const [riskLevel, setRiskLevel] = useState("");
   const [interest, setInterest] = useState("");

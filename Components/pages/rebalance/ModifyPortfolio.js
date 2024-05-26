@@ -124,11 +124,13 @@ const ModifyPortfolio = ({ route, navigation }) => {
     await fetchModify(rebalanceData, pfId, rnId);
     await loadData();
     setLoading(false);
-    navigation.popToTop();
     navigation.dispatch(
       CommonActions.reset({
         index: 1,
-        routes: [{ name: "ViewPortfolio" }, { name: "PortfolioDetail" }],
+        routes: [
+          { name: "ViewPortfolio" },
+          { name: "PortfolioDetails", params: { id: pfId } },
+        ],
       })
     );
   };
