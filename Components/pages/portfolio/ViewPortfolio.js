@@ -10,11 +10,14 @@ import FooterComponent from "../../utils/Footer";
 import HeaderComponent from "../../utils/Header";
 import PortfolioPieChart from "../../utils/PortfolioPieChart";
 import Loading from "../../utils/Loading";
+import { getUserName } from "../../utils/localStorageUtils";
+import { useAuth } from "../../utils/AuthContext";
 
 const window = Dimensions.get("window");
 
 const PortfolioList = ({ navigation }) => {
   const { portfolios, loadData, portLoading } = usePortfolio();
+  const { userName } = useAuth();
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const portfolioExist = () => {
@@ -61,7 +64,7 @@ const PortfolioList = ({ navigation }) => {
       {portLoading && <Loading />}
       <View style={styles.totalContainer}>
         <AppText style={{ fontSize: 25 }}>
-          <AppText style={{ fontWeight: "bold" }}>테스트</AppText>
+          <AppText style={{ fontWeight: "bold" }}>{userName}</AppText>
           <AppText>님 총 자산</AppText>
         </AppText>
         <AppText>

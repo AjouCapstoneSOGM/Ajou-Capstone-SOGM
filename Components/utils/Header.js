@@ -1,21 +1,22 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { Button } from "@rneui/base";
 import AppText from "./AppText";
 import { useAuth } from "./AuthContext";
 import { useNavigation } from "@react-navigation/native";
+import { getUserName } from "./localStorageUtils";
 
 const HeaderComponent = () => {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, userName } = useAuth();
   const navigation = useNavigation();
 
   return (
     <View style={styles.header}>
       {isLoggedIn && (
         <AppText>
-          <AppText
-            style={[styles.title, { fontWeight: "bold" }]}
-          >{`${"테스트"}`}</AppText>
+          <AppText style={[styles.title, { fontWeight: "bold" }]}>
+            {userName}
+          </AppText>
           <AppText style={styles.title}>님 안녕하세요!</AppText>
         </AppText>
       )}

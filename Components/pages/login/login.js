@@ -7,7 +7,7 @@ import {
   TextInput,
 } from "react-native";
 import urls from "../../utils/urls";
-import { setUsertoken } from "../../utils/localStorageUtils.js";
+import { setUserName, setUsertoken } from "../../utils/localStorageUtils.js";
 import { useAuth } from "../../utils/AuthContext.js";
 import AppText from "../../utils/AppText.js";
 import { usePortfolio } from "../../utils/PortfolioContext.js";
@@ -36,7 +36,8 @@ const Login = ({ navigation }) => {
       });
       if (response.ok) {
         const data = await response.json();
-        setUsertoken(data.token);
+        await setUsertoken(data.token);
+        await setUserName(data.name);
         login();
         await loadData();
         setLoading(false);

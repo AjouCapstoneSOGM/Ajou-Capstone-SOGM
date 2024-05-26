@@ -1,15 +1,26 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { getUserName } from "./localStorageUtils";
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userName, setUserName] = useState("");
 
   const login = () => setIsLoggedIn(true);
   const logout = () => setIsLoggedIn(false);
 
+  useEffect(() => {
+    const loadData = async () => {
+      const username = await getUserName();
+      setUserName(username);
+    };
+
+    loadData();
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login, logout }}>
+    <AuthContext.Provider value={{ isLoggedIn, userName, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
