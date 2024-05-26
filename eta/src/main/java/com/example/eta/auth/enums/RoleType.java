@@ -1,14 +1,14 @@
-package com.example.eta.enums;
+package com.example.eta.auth.enums;
 
 import lombok.Getter;
 
 @Getter
-public enum Role {
+public enum RoleType {
     ROLE_USER("일반 사용자");
 
     private String description;
 
-    Role(String description) {
+    RoleType(String description) {
         this.description = description;
     }
 }

@@ -1,5 +1,6 @@
 package com.example.eta.aspect;
 
+import com.example.eta.auth.entity.UserPrincipal;
 import com.example.eta.exception.NotFoundException;
 import com.example.eta.exception.OwnershipException;
 import com.example.eta.repository.PortfolioRepository;
@@ -27,7 +28,7 @@ public class PortfolioControllerAspect {
         String[] parameterNames = signature.getParameterNames();
         Object[] parameterValues = joinPoint.getArgs();
 
-        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = ((UserPrincipal) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getEmail();
         Integer pfId = null;
 
         for (int i = 0; i < parameterNames.length; i++) {

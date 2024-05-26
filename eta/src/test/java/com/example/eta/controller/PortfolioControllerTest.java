@@ -1,35 +1,27 @@
 package com.example.eta.controller;
 
-import com.example.eta.dto.PortfolioDto;
-import com.example.eta.dto.UserDto;
 import com.example.eta.entity.Portfolio;
 import com.example.eta.entity.User;
-import com.example.eta.enums.Role;
+import com.example.eta.auth.enums.RoleType;
 import com.example.eta.repository.PortfolioRepository;
 import com.example.eta.repository.UserRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.JsonPath;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static com.example.eta.controller.utils.controllerTestUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -59,7 +51,7 @@ public class PortfolioControllerTest {
                 .isVerified(false)
                 .password("password!")
                 .name("James")
-                .role(Role.ROLE_USER)
+                .roleType(RoleType.ROLE_USER)
                 .createdDate(LocalDateTime.now())
                 .enabled(true).build());
         int pfId = portfolioRepository.save(Portfolio.builder()

@@ -4,23 +4,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.example.eta.dto.PortfolioDto;
 import com.example.eta.entity.*;
-import com.example.eta.enums.Role;
+import com.example.eta.auth.enums.RoleType;
 import com.example.eta.repository.*;
-import com.example.eta.service.PortfolioService;
-import org.aspectj.apache.bcel.Repository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
-import org.springframework.stereotype.Service;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -55,7 +47,7 @@ public class PortfolioServiceTest {
                 .isVerified(false)
                 .password("password!")
                 .name("James")
-                .role(Role.ROLE_USER)
+                .roleType(RoleType.ROLE_USER)
                 .createdDate(LocalDateTime.now())
                 .enabled(true).build());
 
@@ -84,7 +76,7 @@ public class PortfolioServiceTest {
                 .isVerified(false)
                 .password("password!")
                 .name("James")
-                .role(Role.ROLE_USER)
+                .roleType(RoleType.ROLE_USER)
                 .createdDate(LocalDateTime.now())
                 .enabled(true).build());
         String sector = "G25";

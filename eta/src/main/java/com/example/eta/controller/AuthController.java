@@ -2,7 +2,7 @@ package com.example.eta.controller;
 
 import com.example.eta.dto.UserDto;
 import com.example.eta.entity.User;
-import com.example.eta.enums.Role;
+import com.example.eta.auth.enums.RoleType;
 import com.example.eta.exception.EmailAlreadyExistsException;
 import com.example.eta.service.TokenService;
 import com.example.eta.service.UserService;
@@ -49,6 +49,8 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<Object> authorize(@RequestBody UserDto.LoginDto loginDto) {
+        // TODO: 로그인 이메일 비어있거나, 비밀번호 길이가 10 미만일 경우 예외 처리
+
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword());
 
@@ -86,7 +88,7 @@ public class AuthController {
         user.setPassword(passwordEncoder.encode(InfoDto.getPassword()));
         user.setEmail(InfoDto.getEmail());
         user.setIsVerified(false);
-        user.setRole(Role.ROLE_USER);
+        user.setRoleType(RoleType.ROLE_USER);
         user.setCreatedDate(LocalDateTime.now());
         user.setEnabled(true);
 
