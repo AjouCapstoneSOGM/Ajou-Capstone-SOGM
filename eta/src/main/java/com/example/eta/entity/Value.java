@@ -3,11 +3,13 @@ package com.example.eta.entity;
 import com.example.eta.entity.compositekey.ValueId;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@Setter
 @IdClass(ValueId.class)
 @Table(name = "value")
 public class Value {
