@@ -77,9 +77,9 @@ public class PortfolioController {
     public ResponseEntity<PortfolioDto.PortfolioInfoListDto> getPortfolioInfos(@AuthenticationPrincipal String email) {
         User user = userService.findByEmail(email);
 
-        List<PortfolioDto.PortfolioInfo> portfolioInfos = new ArrayList<>();
+        List<PortfolioDto.PortfolioInfoDto> portfolioInfos = new ArrayList<>();
         for (Portfolio portfolio : user.getPortfolios()) {
-            PortfolioDto.PortfolioInfo portfolioInfo = PortfolioDto.PortfolioInfo.builder()
+            PortfolioDto.PortfolioInfoDto portfolioInfo = PortfolioDto.PortfolioInfoDto.builder()
                     .id(portfolio.getPfId())
                     .name(portfolio.getName())
                     .isAuto(portfolio.getIsAuto())

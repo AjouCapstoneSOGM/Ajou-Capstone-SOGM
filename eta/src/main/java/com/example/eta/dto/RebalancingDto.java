@@ -13,13 +13,13 @@ public class RebalancingDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class RebalancingApplyListDto {
-        private List<RebalancingApplyInfo> rnList;
+        private List<RebalancingApplyInfoDto> rnList;
     }
 
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class RebalancingApplyInfo {
+    public static class RebalancingApplyInfoDto {
         private String ticker;
         private Boolean isBuy;
         private int quantity;
@@ -30,10 +30,10 @@ public class RebalancingDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class RebalancingInfo {
+    public static class RebalancingInfoDto {
         private String ticker;
         private String name;
-        private int number;
+        private int quantity;
         private Boolean isBuy;
         private float price;
     }
@@ -45,7 +45,7 @@ public class RebalancingDto {
     public static class RebalancingListDto {
         private int rnId;
         private LocalDateTime createdDate;
-        private List<RebalancingInfo> rebalancings;
+        private List<RebalancingInfoDto> rebalancings;
     }
 
     @Data
