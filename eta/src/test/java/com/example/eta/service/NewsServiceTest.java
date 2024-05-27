@@ -1,6 +1,6 @@
 package com.example.eta.service;
 
-import com.example.eta.api.ApiClient;
+import com.example.eta.api.ApiClientFastApi;
 import com.example.eta.dto.NewsDto;
 import com.example.eta.entity.News;
 import com.example.eta.entity.Ticker;
@@ -19,7 +19,6 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -32,7 +31,7 @@ class NewsServiceTest {
     private TickerRepository tickerRepository;
 
     @Mock
-    private ApiClient apiClient;
+    private ApiClientFastApi apiClientFastApi;
 
     @InjectMocks
     private NewsService newsService;
@@ -76,7 +75,7 @@ class NewsServiceTest {
         when(newsRepository.findFirstByTickerTickerOrderByDateDesc(anyString()))
                 .thenReturn(Optional.empty());
 
-        when(apiClient.getNewsFromFastApi(anyString()))
+        when(apiClientFastApi.getNewsFromFastApi(anyString()))
                 .thenReturn(Mono.just(ResponseEntity.ok(newsDto)));
 
         // When
@@ -95,7 +94,7 @@ class NewsServiceTest {
                 .thenReturn(Optional.of(news));
 
         // When
-        when(apiClient.getNewsFromFastApi(anyString()))
+        when(apiClientFastApi.getNewsFromFastApi(anyString()))
                 .thenReturn(Mono.just(ResponseEntity.ok(newsDto)));
 
         when(tickerRepository.findByTicker(anyString())).thenReturn((ticker));
