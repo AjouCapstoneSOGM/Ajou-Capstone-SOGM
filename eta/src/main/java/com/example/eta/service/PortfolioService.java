@@ -1,6 +1,6 @@
 package com.example.eta.service;
 
-import com.example.eta.api.ApiClient;
+import com.example.eta.api.ApiClientFastApi;
 import com.example.eta.dto.PortfolioDto;
 import com.example.eta.dto.TickerDto;
 import com.example.eta.entity.*;
@@ -27,7 +27,7 @@ public class PortfolioService {
     private final RebalancingTickerRepository rebalancingTickerRepository;
     private final PortfolioRecordRepository portfolioRecordRepository;
     private final PriceRepository priceRepository;
-    private final ApiClient apiClient;
+    private final ApiClientFastApi apiClientFastApi;
 
     /**
      * 포트폴리오의 종목별 비중을 계산하고, 포트폴리오의 총자산(현금+보유종목)을 반환합니다.
@@ -106,7 +106,7 @@ public class PortfolioService {
             }
         }
 
-        PortfolioDto.CreatedResultFromFastApiDto createdResultFromFastApiDto = apiClient.getCreatedPortfolioApi(PortfolioDto.CreateRequestToFastApiDto.builder()
+        PortfolioDto.CreatedResultFromFastApiDto createdResultFromFastApiDto = apiClientFastApi.getCreatedPortfolioApi(PortfolioDto.CreateRequestToFastApiDto.builder()
                 .tickers(postfixedTickers)
                 .safe_asset_ratio(
                         createRequestDto.getRiskValue() == 1 ? 0.3f :
@@ -126,7 +126,7 @@ public class PortfolioService {
                 .build();
         rebalancingRepository.save(rebalancing);
 
-        List<TickerDto.TickerPrice> tickerPrices = apiClient.getCurrentTickerPrice(tickers.stream().map(Ticker::getTicker).toList()).block().getBody().getPrices();
+        List<TickerDto.TickerPrice> tickerPrices = apiClientFastApi.getCurrentTickerPrice(tickers.stream().map(Ticker::getTicker).toList()).block().getBody().getPrices();
 
         for (int i = 0; i < tickers.size(); i++) {
             RebalancingTicker rebalancingTicker = rebalancingTickerRepository.save(RebalancingTicker.builder()
