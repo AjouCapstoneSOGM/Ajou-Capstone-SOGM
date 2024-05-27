@@ -79,7 +79,6 @@ const AlertList = ({ route, navigation }) => {
                   개의 매도 알림이 생성되었어요
                 </AppText>
               </TouchableOpacity>
-              <Divider />
             </View>
           );
         })}

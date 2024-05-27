@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { VictoryPie, VictoryAnimation } from "victory-native";
 
 const PortfolioPieChart = ({ data, selectedId, size }) => {
+  const [chartData, setChartData] = useState([]);
   const colorScale = [
     "hsl(348, 100%, 80%)", // 파스텔 핑크,
     "hsl(207, 94%, 80%)", // 파스텔 블루,
@@ -19,12 +20,18 @@ const PortfolioPieChart = ({ data, selectedId, size }) => {
     "#ccc",
   ];
 
-  const chartData = data.stocks.map((stock) => ({
-    x: stock.companyName,
-    y: stock.currentPrice * stock.quantity,
-  }));
+  useEffect(() => {
+    const chartData = data.stocks.map((stock) => ({
+      x: stock.companyName,
+      y: stock.currentPrice * stock.quantity,
+    }));
+    chartData.push({ x: "현금", y: data.currentCash });
+    while (chartData.length < 13) {
+      chartData.push({ x: "dummy", y: 0 });
+    }
+    setChartData(chartData);
+  }, [data]);
 
-  chartData.push({ x: "현금", y: data.currentCash });
   return (
     <VictoryPie
       data={chartData}
@@ -32,6 +39,8 @@ const PortfolioPieChart = ({ data, selectedId, size }) => {
       innerRadius={({ index }) =>
         index === selectedId ? 80 * size : 105 * size
       }
+      width={350 * size}
+      height={350 * size}
       radius={140 * size}
       labels={() => {}}
       animate={{
@@ -49,5 +58,4 @@ const PortfolioPieChart = ({ data, selectedId, size }) => {
     />
   );
 };
-const styles = StyleSheet.create({});
 export default PortfolioPieChart;

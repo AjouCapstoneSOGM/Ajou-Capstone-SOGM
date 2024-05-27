@@ -75,7 +75,7 @@ const Home = ({ navigation }) => {
               icon={{
                 name: "questioncircleo",
                 type: "antdesign",
-                color: "white",
+                color: "#f0f0f0",
               }}
             />
           </View>
