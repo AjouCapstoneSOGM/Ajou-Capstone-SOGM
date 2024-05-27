@@ -22,7 +22,7 @@ public class TickerController {
     private final TickerService tickerService;
 
     @GetMapping("/{ticker}")
-    public ResponseEntity<TickerDto.TickerDetailDto> getTicker(@PathVariable String ticker) {
+    public ResponseEntity<TickerDto.TickerDetailDto> getTicker(@PathVariable("ticker") String ticker) {
         TickerDto.TickerDetailDto tickerDetailDto = tickerService.getTickerInfo(ticker);
         return ResponseEntity.ok(tickerDetailDto);
     }
