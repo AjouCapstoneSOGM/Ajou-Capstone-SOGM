@@ -1,11 +1,14 @@
 package com.example.eta.controller.utils;
 
 import com.example.eta.dto.UserDto;
+import com.example.eta.entity.SignupInfo;
+import com.example.eta.repository.SignupInfoRepository;
 import com.example.eta.service.SignupInfoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,20 +19,27 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class ControllerTestUtils {
 
-    // TODO: 회원가입 코드 재작성
-    // 메일 보내는 부분을 제외하고, 나머지 부분(코드 검증 후 회원가입)을 API로 구현
-
-    public static String signUpLogin(MockMvc mockMvc) throws Exception {
+    public static String signUpLogin(MockMvc mockMvc, SignupInfoRepository signupInfoRepository) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
-        UserDto.InfoDto InfoDto = new UserDto.InfoDto("James", "james@domain.com", "password!");
+
+        signupInfoRepository.save(SignupInfo.builder()
+                .email("james@domain.com")
+                .code("000000")
+                .isVerified(true)
+                .codeExpires(LocalDateTime.now().plusMinutes(5))
+                .signupToken("abcdefgh12345678")
+                .build());
+
+        UserDto.InfoDto InfoDto = new UserDto.InfoDto("James", "james@domain.com", "abcdefgh12345678", "password!");
         mockMvc.perform(post("/api/auth/signup")
                 .contentType("application/json")
-                .content(objectMapper.writeValueAsString(InfoDto)));
+                .content(objectMapper.writeValueAsString(InfoDto)))
+                .andDo(print());
 
         UserDto.LoginDto loginDto = new UserDto.LoginDto("james@domain.com", "password!", "fcmToken");
         MockHttpServletResponse loginResponse = mockMvc.perform(post("/api/auth/login")
-                        .contentType("application/json")
-                        .content(objectMapper.writeValueAsString(loginDto)))
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(loginDto)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(header().exists("Authorization"))

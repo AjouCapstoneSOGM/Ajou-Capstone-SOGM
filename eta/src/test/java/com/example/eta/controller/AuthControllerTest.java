@@ -60,13 +60,14 @@ public class AuthControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    private ObjectMapper objectMapper = new ObjectMapper();
+
     @Test
     @DisplayName("인증번호 입력 API(정상적인 경우)")
     @Transactional
     public void testVerifyEmailByCode() throws Exception {
         Map<String, String> requestBody = getRequestBodyForCodeValidation(signupInfoService);
         signupInfoService.addUnverifiedEmailInfo(requestBody.get("email"), requestBody.get("code"));
-        ObjectMapper objectMapper = new ObjectMapper();
 
         MockHttpServletResponse response = mockMvc.perform(post("/api/auth/verify-email")
                 .contentType("application/json")
@@ -84,7 +85,6 @@ public class AuthControllerTest {
     @Transactional
     public void testVerifyEmailByCodeMissingSignupAttempt() throws Exception {
         Map<String, String> requestBody = getRequestBodyForCodeValidation(signupInfoService);
-        ObjectMapper objectMapper = new ObjectMapper();
 
         ResultActions resultActions = mockMvc.perform(post("/api/auth/verify-email")
                     .contentType("application/json")
@@ -104,7 +104,6 @@ public class AuthControllerTest {
         signupInfoService.addUnverifiedEmailInfo(requestBody.get("email"), "000000");
 
         requestBody.put("code", "111111");
-        ObjectMapper objectMapper = new ObjectMapper();
 
         ResultActions resultActions = mockMvc.perform(post("/api/auth/verify-email")
                 .contentType("application/json")
@@ -125,7 +124,6 @@ public class AuthControllerTest {
 
         SignupInfo signupInfo = signupInfoRepository.findById(requestBody.get("email")).get();
         signupInfo.setCodeExpires(signupInfo.getCodeExpires().minusMinutes(10));
-        ObjectMapper objectMapper = new ObjectMapper();
 
         ResultActions resultActions = mockMvc.perform(post("/api/auth/verify-email")
                 .contentType("application/json")
@@ -137,18 +135,19 @@ public class AuthControllerTest {
         });
     }
 
-
-    // TODO: 회원가입 코드 재작성
-    // 메일 보내는 부분을 제외하고, 나머지 부분(코드 검증 후 회원가입)을 API로 구현
     @Test
     @DisplayName("회원가입 API(정상적인 경우)")
     @Transactional
     public void testSignUp() throws Exception {
-        // given
-        UserDto.InfoDto InfoDto = new UserDto.InfoDto("James", "james@domain.com", "password!");
-        ObjectMapper objectMapper = new ObjectMapper();
+        signupInfoRepository.save(SignupInfo.builder()
+                .email("james@domain.com")
+                .code("000000")
+                .isVerified(true)
+                .codeExpires(LocalDateTime.now().plusMinutes(5))
+                .signupToken("abcdefgh12345678")
+                .build());
 
-        // when, then
+        UserDto.InfoDto InfoDto = new UserDto.InfoDto("James", "james@domain.com", "abcdefgh12345678", "password!");
         MockHttpServletResponse response = mockMvc.perform(post("/api/auth/signup")
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(InfoDto)))
@@ -164,20 +163,21 @@ public class AuthControllerTest {
     @DisplayName("로그인, jwt 발급 API(정상적인 경우)")
     @Transactional
     public void testLogin() throws Exception {
-        // given
-        ObjectMapper objectMapper = new ObjectMapper();
-        userService.join(User.builder()
+        signupInfoRepository.save(SignupInfo.builder()
                 .email("james@domain.com")
-                .password("password!")
-                .name("James")
-                .createdDate(LocalDateTime.now())
-                .roleType(RoleType.ROLE_USER)
-                .enabled(true)
+                .code("000000")
+                .isVerified(true)
+                .codeExpires(LocalDateTime.now().plusMinutes(5))
+                .signupToken("abcdefgh12345678")
                 .build());
 
-        UserDto.LoginDto loginDto = new UserDto.LoginDto("james@domain.com", "password!", "expoPushToken");
+        UserDto.InfoDto InfoDto = new UserDto.InfoDto("James", "james@domain.com", "abcdefgh12345678", "password!");
+        mockMvc.perform(post("/api/auth/signup")
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(InfoDto)))
+                .andDo(print());
 
-        // when, then
+        UserDto.LoginDto loginDto = new UserDto.LoginDto("james@domain.com", "password!", "expoPushToken");
         MockHttpServletResponse response = mockMvc.perform(post("/api/auth/login")
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(loginDto)))

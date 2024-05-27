@@ -1,5 +1,6 @@
 package com.example.eta.intercepter;
 
+import com.example.eta.auth.entity.UserPrincipal;
 import com.example.eta.exception.NotFoundException;
 import com.example.eta.exception.OwnershipException;
 import com.example.eta.repository.PortfolioRepository;
@@ -25,7 +26,7 @@ public class RebalancingAuthorizationInterceptor implements HandlerInterceptor {
     @Override
     @Transactional
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws RuntimeException {
-        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = ((UserPrincipal)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getEmail();
 
         Map<String, String> pathVariables = (Map<String, String>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 

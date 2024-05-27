@@ -89,7 +89,7 @@ public class AuthController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("verify-email")
+    @PostMapping("/verify-email")
     public ResponseEntity<Map<String, String>> verifyEmailByCode(@RequestBody Map<String, String> request) {
         String email = request.get("email");
         String code = request.get("code");
