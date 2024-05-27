@@ -155,24 +155,4 @@ public class RebalancingService {
             return portfolioScheduler.createProportionRebalancing(portfolio);
         } else return -1;
     }
-
-    public RebalancingDto.RebalancingListDto getRebalancing(Integer rnId) {
-        Rebalancing rebalancing = rebalancingRepository.findById(rnId).get();
-        List<RebalancingDto.RebalancingInfo> rebalancingInfos = new ArrayList<>();
-        for (RebalancingTicker rebalancingTicker : rebalancing.getRebalancingTickers()) {
-            Optional<Ticker> ticker = tickerRepository.findById(rebalancingTicker.getTicker().getTicker());
-            ticker.ifPresent(value -> rebalancingInfos.add(new RebalancingDto.RebalancingInfo(
-                    value.getTicker(),
-                    value.getName(),
-                    rebalancingTicker.getNumber(),
-                    rebalancingTicker.getIsBuy(),
-                    rebalancingTicker.getPrice()
-            )));
-        }
-        return RebalancingDto.RebalancingListDto.builder()
-                .rnId(rebalancing.getRnId())
-                .createdDate(rebalancing.getCreatedDate())
-                .rebalancings(rebalancingInfos)
-                .build();
-    }
 }
