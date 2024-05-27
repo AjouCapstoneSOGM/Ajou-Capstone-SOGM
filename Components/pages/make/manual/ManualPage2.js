@@ -1,11 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-} from "react-native";
+import { View, TextInput, StyleSheet, ScrollView } from "react-native";
 import AppText from "../../../utils/AppText";
 import { filteringNumber } from "../../../utils/utils";
 import GetCurrentPrice from "../../../utils/GetCurrentPrice";

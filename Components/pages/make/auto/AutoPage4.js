@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  Image,
+} from "react-native";
 import { getUsertoken } from "../../../utils/localStorageUtils";
 import urls from "../../../utils/urls";
 import Loading from "../../../utils/Loading";
@@ -10,7 +16,7 @@ import PortfolioPieChart from "../../../utils/PortfolioPieChart";
 import { Icon } from "@rneui/base";
 import { colorScale } from "../../../utils/utils";
 
-const AutoPage4 = ({ amount, riskLevel, interest }) => {
+const AutoPage4 = ({ amount, riskLevel, interest, step }) => {
   const { fetchStocksByPortfolioId, fetchCurrentPrice, fetchRebalanceList } =
     usePortfolio();
   const [loading, setLoading] = useState(true);
@@ -70,9 +76,22 @@ const AutoPage4 = ({ amount, riskLevel, interest }) => {
       }
     };
 
-    fetchAutoInfo();
+    if (portfolio.length === 0) fetchAutoInfo();
   }, []);
-  if (loading) return <Loading />;
+  if (loading)
+    return (
+      <View style={styles.container}>
+        <View style={styles.textContainer}>
+          <AppText style={styles.titleText}>
+            {"\n"}
+            {"\n"}
+          </AppText>
+        </View>
+        <View style={styles.contentsContainer}>
+          <Loading />
+        </View>
+      </View>
+    );
 
   const result1 = () => {
     return (
@@ -84,8 +103,12 @@ const AutoPage4 = ({ amount, riskLevel, interest }) => {
             현재 기업들의 가치지표 순위에 따라 다음과 같은 종목이 선별되었어요
           </AppText>
         </View>
+        <View style={styles.column}>
+          <AppText style={styles.columnName}>종목</AppText>
+          <AppText style={styles.columnTicker}>티커</AppText>
+        </View>
         <View style={styles.labelContainer}>
-          <ScrollView contentContainerStyle={{ paddingBottom: 150 }}>
+          <ScrollView>
             {portfolio.stocks.map(
               (stock, index) =>
                 stock.equity === "보통주" && (
@@ -116,8 +139,12 @@ const AutoPage4 = ({ amount, riskLevel, interest }) => {
             그리고 두 개의 안전자산을 포함시킬게요{"\n"}
           </AppText>
         </View>
+        <View style={styles.column}>
+          <AppText style={styles.columnName}>종목</AppText>
+          <AppText style={styles.columnTicker}>티커</AppText>
+        </View>
         <View style={styles.labelContainer}>
-          <ScrollView contentContainerStyle={{ paddingBottom: 150 }}>
+          <ScrollView>
             {portfolio.stocks.map(
               (stock, index) =>
                 stock.equity === "안전자산" && (
@@ -141,49 +168,88 @@ const AutoPage4 = ({ amount, riskLevel, interest }) => {
   const result3 = () => {
     return (
       <View style={styles.pageContainer}>
-        <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
-          <View style={styles.chartContainer}>
-            <PortfolioPieChart
-              data={{
-                currentCash: 0,
-                stocks: initRebalance.rebalancings.map((stock) => ({
-                  companyName: stock.name,
-                  quantity: stock.number,
-                  currentPrice: stock.price,
-                })),
-              }}
-              selectedId={selectedId}
-              size={0.6}
-            />
-          </View>
-          <View>
-            <AppText
-              style={{ color: "#f0f0f0", marginBottom: 10, fontWeight: "bold" }}
+        <View style={styles.chartContainer}>
+          <PortfolioPieChart
+            data={{
+              currentCash: 0,
+              stocks: initRebalance.rebalancings.map((stock) => ({
+                companyName: stock.name,
+                quantity: stock.number,
+                currentPrice: stock.price,
+              })),
+            }}
+            selectedId={selectedId}
+            size={0.6}
+          />
+        </View>
+        <View>
+          <AppText
+            style={{ color: "#f0f0f0", marginBottom: 10, fontWeight: "bold" }}
+          >
+            다음과 같은 비율로 종목이 구성돼요
+          </AppText>
+        </View>
+        <View style={[styles.column, { paddingLeft: 20 }]}>
+          <AppText style={styles.columnName}>종목</AppText>
+          <AppText style={styles.columnNumber}>수량</AppText>
+          <AppText style={styles.columnPrice}>1주 당 금액</AppText>
+        </View>
+        <ScrollView>
+          {initRebalance.rebalancings.map((stock, index) => (
+            <TouchableOpacity
+              key={index}
+              style={styles.labelItemContent}
+              onPress={() => handleSelectedId(index)}
             >
-              다음과 같은 비율로 종목이 구성돼요
-            </AppText>
-            {initRebalance.rebalancings.map((stock, index) => (
-              <TouchableOpacity
-                key={index}
-                style={styles.labelItemContent}
-                onPress={() => handleSelectedId(index)}
-              >
-                <Icon
-                  name="checkcircle"
-                  type="antdesign"
-                  color={colorScale[index]}
-                  size={15}
-                  style={{ marginRight: 5 }}
-                />
-                <AppText style={styles.itemName}>{stock.name}</AppText>
-                <AppText style={styles.itemNumber}>{stock.number}주</AppText>
-                <AppText style={styles.itemPrice}>
-                  {Number(stock.price).toLocaleString()}원
-                </AppText>
-              </TouchableOpacity>
-            ))}
-          </View>
+              <Icon
+                name="checkcircle"
+                type="antdesign"
+                color={colorScale[index]}
+                size={15}
+                style={{ marginRight: 5 }}
+              />
+              <AppText style={styles.itemName}>{stock.name}</AppText>
+              <AppText style={styles.itemNumber}>{stock.number}주</AppText>
+              <AppText style={styles.itemPrice}>
+                {Number(stock.price).toLocaleString()}원
+              </AppText>
+            </TouchableOpacity>
+          ))}
         </ScrollView>
+      </View>
+    );
+  };
+  const result4 = () => {
+    return (
+      <View style={styles.pageContainer}>
+        <View style={styles.infoContainer}>
+          <ScrollView>
+            <AppText
+              style={{ color: "#ffbf44", fontSize: 20, fontWeight: "bold" }}
+            >
+              최초 포트폴리오에 관한 자세한 정보는 리밸런싱 알림의 형태로
+              제공돼요.
+            </AppText>
+            <View style={styles.imageContainer}>
+              <Image
+                source={require("../../../assets/images/guide.png")}
+                style={styles.image}
+              />
+            </View>
+            <AppText style={{ color: "#f0f0f0", fontSize: 16 }}>
+              포트폴리오 상세 정보 페이지에서 포트폴리오 정보를 확인하고, 다른
+              주식 거래 서비스를 통해 종목을 직접 매수하고 난 뒤에, 알림을
+              반영하면 포트폴리오가 완성돼요.
+              {"\n\n"}
+            </AppText>
+            <AppText
+              style={{ color: "#f0f0f0", fontSize: 20, fontWeight: "bold" }}
+            >
+              이후에도 저희가 알림을 통해 지속적으로 포트폴리오 관리를
+              도와드릴게요!
+            </AppText>
+          </ScrollView>
+        </View>
       </View>
     );
   };
@@ -193,11 +259,10 @@ const AutoPage4 = ({ amount, riskLevel, interest }) => {
         <AppText style={styles.titleText}>생성이 완료되었어요!{"\n"}</AppText>
       </View>
       <View style={styles.contentsContainer}>
-        <PagerView style={styles.contentsContainer} initialPage={0}>
-          {result1()}
-          {result2()}
-          {result3()}
-        </PagerView>
+        {step === 4 && result1()}
+        {step === 5 && result2()}
+        {step === 6 && result3()}
+        {step === 7 && result4()}
       </View>
     </View>
   );
@@ -223,18 +288,44 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "stretch",
     backgroundColor: "#333",
-    paddingVertical: 20,
+    paddingTop: 20,
+  },
+  column: {
+    flexDirection: "row",
+    marginBottom: 10,
+  },
+  columnName: {
+    flex: 1,
+    color: "#808080",
+    textAlign: "center",
+  },
+  columnNumber: {
+    flex: 1,
+    color: "#808080",
+    textAlign: "center",
+  },
+  columnPrice: {
+    flex: 1,
+    color: "#808080",
+    textAlign: "center",
+  },
+  columnTicker: {
+    flex: 1,
+    color: "#808080",
+    textAlign: "center",
   },
   pageContainer: {
+    flex: 1,
     paddingHorizontal: 20,
   },
   infoContainer: {
+    flex: 1,
     alignItems: "flex-start",
-    marginBottom: 20,
+    marginBottom: 10,
   },
   labelItemContent: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
     alignItems: "center",
     paddingBottom: 12,
     marginTop: 12,
@@ -246,11 +337,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   itemName: {
-    flex: 1.5,
+    flex: 1,
     color: "#f0f0f0",
     marginRight: 10,
     fontWeight: "bold",
-    textAlign: "left",
+    textAlign: "center",
     fontSize: 15,
   },
   itemNumber: {
@@ -266,8 +357,21 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   itemTicker: {
+    flex: 1,
     color: "#f0f0f0",
     textAlign: "center",
     fontSize: 15,
+  },
+  imageContainer: {
+    marginVertical: 30,
+    width: "100%",
+    height: 200,
+    borderColor: "#888",
+    borderWidth: 1,
+  },
+  image: {
+    width: "100%",
+    height: 200,
+    resizeMode: "contain",
   },
 });

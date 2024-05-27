@@ -2,9 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View, StyleSheet } from "react-native";
 import urls from "../../../utils/urls";
 import { getUsertoken } from "../../../utils/localStorageUtils";
-import { usePortfolio } from "../../../utils/PortfolioContext";
 
-import Loading from "../../../utils/Loading";
 import AutoPage1 from "./AutoPage1";
 import AutoPage2 from "./AutoPage2";
 import AutoPage3 from "./AutoPage3";
@@ -80,6 +78,34 @@ const AutoPortfolio = ({ step, setDisabled }) => {
             amount={amount}
             riskLevel={riskLevel}
             interest={interest}
+            step={step}
+          />
+        );
+      case 5:
+        return (
+          <AutoPage4
+            amount={amount}
+            riskLevel={riskLevel}
+            interest={interest}
+            step={step}
+          />
+        );
+      case 6:
+        return (
+          <AutoPage4
+            amount={amount}
+            riskLevel={riskLevel}
+            interest={interest}
+            step={step}
+          />
+        );
+      case 7:
+        return (
+          <AutoPage4
+            amount={amount}
+            riskLevel={riskLevel}
+            interest={interest}
+            step={step}
           />
         );
     }

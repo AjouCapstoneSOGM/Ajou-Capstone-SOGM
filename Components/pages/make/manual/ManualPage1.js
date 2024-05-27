@@ -45,7 +45,7 @@ const ManualPage1 = ({ stockList, setStockList }) => {
             </TouchableOpacity>
           ))}
         </View>
-        <ScrollView contentContainerStyle={{ paddingBottom: 90 }}>
+        <ScrollView>
           {suggestions &&
             suggestions.map((item, index) => (
               <TouchableOpacity

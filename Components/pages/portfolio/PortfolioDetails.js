@@ -1,5 +1,11 @@
 import React, { useState, useCallback } from "react";
-import { View, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  View,
+  ScrollView,
+  TouchableOpacity,
+  StyleSheet,
+  TextInput,
+} from "react-native";
 import { usePortfolio } from "../../utils/PortfolioContext";
 import { getUsertoken } from "../../utils/localStorageUtils";
 import { useFocusEffect } from "@react-navigation/native";
@@ -8,11 +14,12 @@ import urls from "../../utils/urls";
 import AppText from "../../utils/AppText";
 import { SafeAreaView } from "react-native-safe-area-context";
 import PortfolioPieChart from "../../utils/PortfolioPieChart";
-import { Button, Divider } from "@rneui/base";
+import { Button, Divider, Icon, Overlay } from "@rneui/base";
+import { filteringNumber } from "../../utils/utils";
 
 const PortfolioDetails = ({ route, navigation }) => {
   const stocksLength = 10;
-  const { getPortfolioById, portfolios } = usePortfolio();
+  const { getPortfolioById, portfolios, loadData } = usePortfolio();
   const [portfolio, setPortfolio] = useState({
     id: null,
     name: "",
@@ -21,9 +28,18 @@ const PortfolioDetails = ({ route, navigation }) => {
     totalPrice: 0,
     initialAsset: 0,
     riskValue: 0,
+    auto: true,
   });
   const [selectedId, setSelectedId] = useState(null);
   const [alertExist, setAlertExist] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [modifyQuantity, setModifyQuantity] = useState(0);
+  const [modifyPrice, setModifyPrice] = useState(0);
+  const [modifyBuy, setModifyBuy] = useState(true);
+
+  const toggleModal = () => {
+    setIsVisible(!isVisible);
+  };
   const colorScale = [
     "hsl(348, 100%, 80%)", // 파스텔 핑크,
     "hsl(207, 94%, 80%)", // 파스텔 블루,
@@ -39,6 +55,66 @@ const PortfolioDetails = ({ route, navigation }) => {
     "#888",
     "#ccc",
   ];
+
+  const fetchModifyStockManual = async () => {
+    try {
+      const token = await getUsertoken();
+      const response = await fetch(
+        `${urls.springUrl}/api/portfolio/${portfolio.id}/${
+          modifyBuy ? "buy" : "sell"
+        }`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            ticker: portfolio.stocks[selectedId].ticker,
+            isBuy: modifyBuy,
+            quantity: modifyQuantity,
+            price: modifyPrice,
+          }),
+        }
+      );
+      if (response.ok) {
+      } else {
+        console.error("Error occured");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const resetModifyData = () => {
+    setModifyBuy(true);
+    setModifyPrice(0);
+    setModifyQuantity(0);
+  };
+
+  const handleQuantityChange = (newQuantity) => {
+    const currentQuantity = portfolio.stocks[selectedId].quantity;
+    if (!modifyBuy && Number(newQuantity) > Number(currentQuantity))
+      newQuantity = String(currentQuantity);
+    if (Number(newQuantity) < 0) newQuantity = "0";
+    if (Number(newQuantity) > 9999) newQuantity = "9999";
+    setModifyQuantity(filteringNumber(newQuantity));
+  };
+
+  const handlePriceChange = (newPrice) => {
+    if (Number(newPrice) < 0) newPrice = "0";
+    if (Number(newPrice) > 9999999) newPrice = "9999999";
+    setModifyPrice(Number(filteringNumber(newPrice)));
+  };
+
+  const handleBuyChange = (isBuy) => {
+    setModifyBuy(!isBuy);
+    if (
+      isBuy ===
+      Number(modifyQuantity) > Number(portfolio.stocks[selectedId].quantity)
+    )
+      setModifyQuantity(portfolio.stocks[selectedId].quantity);
+  };
+
   const getAlertExists = async (id) => {
     try {
       const token = await getUsertoken();
@@ -109,24 +185,27 @@ const PortfolioDetails = ({ route, navigation }) => {
   };
   useFocusEffect(
     useCallback(() => {
-      const loadData = async () => {
+      const loadPortfolio = async () => {
         try {
           const currentPortfolio = getPortfolioById(route.params.id);
-          await getAlertExists(currentPortfolio.id);
-          setPortfolio({
-            id: currentPortfolio.id,
-            name: currentPortfolio.name,
-            stocks: currentPortfolio.detail.stocks,
-            currentCash: currentPortfolio.detail.currentCash,
-            initialAsset: currentPortfolio.detail.initialAsset,
-            riskValue: currentPortfolio.riskValue,
-          });
+          if (currentPortfolio) {
+            await getAlertExists(currentPortfolio.id);
+            setPortfolio({
+              id: currentPortfolio.id,
+              name: currentPortfolio.name,
+              stocks: currentPortfolio.detail.stocks,
+              currentCash: currentPortfolio.detail.currentCash,
+              initialAsset: currentPortfolio.detail.initialAsset,
+              riskValue: currentPortfolio.riskValue,
+              auto: currentPortfolio.auto,
+            });
+          }
         } catch (error) {
           console.log("Detail loadData error: ", error);
         }
       };
 
-      loadData();
+      loadPortfolio();
     }, [portfolios])
   );
 
@@ -214,6 +293,16 @@ const PortfolioDetails = ({ route, navigation }) => {
             </AppText>
           </View>
         )}
+        {!portfolio.auto && (
+          <TouchableOpacity
+            style={styles.floatingButton}
+            onPress={() => {
+              navigation.navigate("AddStockInManual", { pfId: portfolio.id });
+            }}
+          >
+            <Icon name="plus" type="antdesign" color="#f0f0f0" />
+          </TouchableOpacity>
+        )}
       </View>
       <View style={styles.itemContainer}>
         <ScrollView
@@ -257,14 +346,34 @@ const PortfolioDetails = ({ route, navigation }) => {
                   onPress={() => handleSelectedId(index)}
                 >
                   <View style={styles.companyInfo}>
-                    <AppText
-                      style={{
-                        fontSize: 18,
-                        color: "#f0f0f0",
-                      }}
+                    <View
+                      style={{ flexDirection: "row", alignItems: "center" }}
                     >
-                      {item.companyName}
-                    </AppText>
+                      <AppText
+                        style={{
+                          fontSize: 18,
+                          color: "#f0f0f0",
+                        }}
+                      >
+                        {item.companyName}
+                      </AppText>
+                      {!portfolio.auto && (
+                        <Button
+                          type="clear"
+                          onPress={() => {
+                            setModifyPrice(item.currentPrice);
+                            toggleModal();
+                            setSelectedId(index);
+                          }}
+                          icon={{
+                            name: "pencil",
+                            type: "ionicon",
+                            color: "#f0f0f0",
+                            size: 15,
+                          }}
+                        />
+                      )}
+                    </View>
                     <View>
                       <AppText style={[styles.itemText, { color: "#aaa" }]}>
                         {Number(item.currentPrice).toLocaleString()} 원
@@ -358,6 +467,107 @@ const PortfolioDetails = ({ route, navigation }) => {
           })}
         </ScrollView>
       </View>
+      {selectedId !== null && (
+        <Overlay
+          isVisible={isVisible}
+          onBackdropPress={() => {
+            setSelectedId(null);
+            resetModifyData();
+            toggleModal();
+          }}
+          overlayStyle={styles.overlay}
+        >
+          <Button
+            containerStyle={styles.closeButton}
+            onPress={() => {
+              setSelectedId(null);
+              resetModifyData();
+              toggleModal();
+            }}
+            type="clear"
+            icon={{ name: "close", type: "antdesign", color: "#f0f0f0" }}
+          />
+          <AppText
+            style={{ color: "#f0f0f0", fontSize: 20, fontWeight: "bold" }}
+          >
+            종목 수정
+          </AppText>
+          <View style={styles.content}>
+            <AppText
+              style={{
+                fontSize: 20,
+                fontWeight: "bold",
+                color: "#f0f0f0",
+                marginBottom: 20,
+              }}
+            >
+              {portfolio.stocks[selectedId].companyName}
+            </AppText>
+            <View style={styles.contentsItem}>
+              <View style={styles.quantityContainer}>
+                <Button
+                  buttonStyle={{ marginHorizontal: -10 }}
+                  type="clear"
+                  onPress={() => {
+                    handleQuantityChange(String(Number(modifyQuantity) - 1));
+                  }}
+                  icon={{
+                    name: "minuscircleo",
+                    type: "antdesign",
+                    color: "#f0f0f0",
+                    size: 18,
+                  }}
+                />
+                <TextInput
+                  value={String(modifyQuantity)}
+                  onChangeText={(value) => handleQuantityChange(value)}
+                  style={styles.inputQuantity}
+                  keyboardType="numeric"
+                />
+                <Button
+                  buttonStyle={{ marginHorizontal: -10 }}
+                  type="clear"
+                  onPress={() => {
+                    handleQuantityChange(String(Number(modifyQuantity) + 1));
+                  }}
+                  icon={{
+                    name: "pluscircleo",
+                    type: "antdesign",
+                    color: "#f0f0f0",
+                    size: 18,
+                  }}
+                />
+              </View>
+              <TextInput
+                value={String(modifyPrice)}
+                onChangeText={(value) => handlePriceChange(value)}
+                style={styles.inputPrice}
+                keyboardType="numeric"
+              />
+              <Button
+                containerStyle={{ flex: 0.7 }}
+                titleStyle={{ color: modifyBuy ? "#ff5858" : "#5878ff" }}
+                title={modifyBuy ? "매수" : "매도"}
+                type="clear"
+                onPress={() => {
+                  handleBuyChange(modifyBuy);
+                }}
+              />
+            </View>
+          </View>
+          <Button
+            buttonStyle={styles.submitButton}
+            title="반영"
+            disabled={modifyQuantity == 0}
+            onPress={async () => {
+              await fetchModifyStockManual();
+              resetModifyData();
+              await loadData();
+              toggleModal();
+            }}
+          />
+        </Overlay>
+      )}
     </SafeAreaView>
   );
 };
@@ -452,6 +662,75 @@ const styles = StyleSheet.create({
   itemText: {
     fontSize: 14,
     textAlign: "right", // 텍스트를 가운데 정렬
+  },
+  floatingButton: {
+    position: "absolute",
+    bottom: 0,
+    right: 15,
+    width: 69,
+    height: 69,
+    borderRadius: 50,
+    backgroundColor: "#333",
+    justifyContent: "center",
+    alignItems: "center",
+    elevation: 5, // for Android shadow
+    shadowColor: "#000", // for iOS shadow
+    shadowOffset: { width: 0, height: 2 }, // for iOS shadow
+    shadowOpacity: 0.3, // for iOS shadow
+    shadowRadius: 2, // for iOS shadow
+  },
+  overlay: {
+    width: "90%",
+    borderRadius: 10,
+    backgroundColor: "#333",
+  },
+  content: {
+    paddingTop: 40,
+    paddingHorizontal: 10,
+  },
+  text: {
+    fontSize: 16,
+    marginBottom: 20,
+    color: "#f0f0f0",
+  },
+  closeButton: {
+    marginHorizontal: -5,
+    position: "absolute",
+    top: 3,
+    right: 3,
+  },
+  contentsItem: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    paddingBottom: 20,
+    borderBottomColor: "#434343",
+    borderBottomWidth: 1,
+  },
+  quantityContainer: {
+    flex: 1.1,
+    flexDirection: "row",
+  },
+  inputQuantity: {
+    color: "#f0f0f0",
+    borderBottomWidth: 1,
+    borderBottomColor: "#888",
+    marginHorizontal: 10,
+    width: 40,
+    textAlign: "center",
+  },
+  inputPrice: {
+    flex: 0.5,
+    color: "#f0f0f0",
+    fontSize: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#888",
+    width: 60,
+  },
+  submitButton: {
+    backgroundColor: "#6262e8",
+    borderRadius: 10,
+    height: 40,
   },
 });
 export default PortfolioDetails;

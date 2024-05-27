@@ -10,6 +10,7 @@ import NewsSummary from "./pages/NewsSummary";
 import AlertList from "./pages/rebalance/AlertList";
 import ViewPortfolio from "./pages/portfolio/ViewPortfolio";
 import PortfolioDetails from "./pages/portfolio/PortfolioDetails";
+import AddStockInManual from "./pages/portfolio/AddStockInManual";
 import ManagementPage from "./pages/portfolio/ManagePortfolio";
 import MakePortfolio from "./pages/make/MakePortfolio";
 import ModifyPortfolio from "./pages/rebalance/ModifyPortfolio";
@@ -37,6 +38,7 @@ function ScreenStack() {
       <Stack.Screen name="ViewPortfolio" component={ViewPortfolio} />
       <Stack.Screen name="NewsSummary" component={NewsSummary} />
       <Stack.Screen name="PortfolioDetails" component={PortfolioDetails} />
+      <Stack.Screen name="AddStockInManual" component={AddStockInManual} />
       <Stack.Screen name="ManagementPage" component={ManagementPage} />
       <Stack.Screen name="ModifyPortfolio" component={ModifyPortfolio} />
       <Stack.Screen name="MakePortfolio" component={MakePortfolio} />

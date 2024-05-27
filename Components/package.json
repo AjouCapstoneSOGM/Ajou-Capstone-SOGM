@@ -47,6 +47,7 @@
     "react-native-elements": "^3.4.3",
     "react-native-gesture-handler": "~2.16.1",
     "react-native-global-props": "^1.1.5",
+    "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-level-fs": "^3.0.0",
     "react-native-linear-gradient": "^2.8.3",
     "react-native-os": "^1.2.6",
