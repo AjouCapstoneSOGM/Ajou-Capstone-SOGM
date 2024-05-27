@@ -159,10 +159,10 @@ public class PortfolioService {
     public PortfolioDto.PerformanceResponseDto getPerformanceData(Integer pfId) {
         Portfolio portfolio = portfolioRepository.findById(pfId).get();
 
-        List<PortfolioDto.PortfolioPerformance> portfolioPerformances = new ArrayList<>();
+        List<PortfolioDto.PortfolioPerformanceDto> portfolioPerformances = new ArrayList<>();
         for (PortfolioTicker pt : portfolio.getPortfolioTickers()) {
             Ticker ticker = pt.getTicker();
-            portfolioPerformances.add(PortfolioDto.PortfolioPerformance.builder()
+            portfolioPerformances.add(PortfolioDto.PortfolioPerformanceDto.builder()
                     .ticker(ticker.getTicker())
                     .quantity(pt.getNumber())
                     .companyName(ticker.getName())
