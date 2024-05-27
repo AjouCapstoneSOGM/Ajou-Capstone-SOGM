@@ -1,8 +1,8 @@
 package com.example.eta.intercepter;
 
 import com.example.eta.auth.entity.UserPrincipal;
-import com.example.eta.exception.NotFoundException;
-import com.example.eta.exception.OwnershipException;
+import com.example.eta.exception.authorization.NotFoundException;
+import com.example.eta.exception.authorization.OwnershipException;
 import com.example.eta.repository.PortfolioRepository;
 import com.example.eta.repository.RebalancingRepository;
 import jakarta.servlet.http.HttpServletRequest;

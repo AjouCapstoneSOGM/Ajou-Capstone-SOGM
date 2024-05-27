@@ -1,15 +1,13 @@
 package com.example.eta.intercepter;
 
 import com.example.eta.auth.entity.UserPrincipal;
-import com.example.eta.exception.NotFoundException;
-import com.example.eta.exception.OwnershipException;
+import com.example.eta.exception.authorization.NotFoundException;
+import com.example.eta.exception.authorization.OwnershipException;
 import com.example.eta.repository.PortfolioRepository;
-import com.example.eta.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;

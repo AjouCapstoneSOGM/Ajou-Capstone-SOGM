@@ -89,7 +89,8 @@ public class AuthControllerTest {
         ResultActions resultActions = mockMvc.perform(post("/api/auth/verify-email")
                     .contentType("application/json")
                     .content(objectMapper.writeValueAsString(requestBody)))
-                    .andDo(print());
+                    .andDo(print())
+                    .andExpect(status().isNotFound());
 
         resultActions.andExpect(result -> {
             assertTrue(result.getResolvedException() instanceof MissingSignupAttemptException);
@@ -108,7 +109,8 @@ public class AuthControllerTest {
         ResultActions resultActions = mockMvc.perform(post("/api/auth/verify-email")
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(requestBody)))
-                .andDo(print());
+                .andDo(print())
+                .andExpect(status().isForbidden());
 
         resultActions.andExpect(result -> {
             assertTrue(result.getResolvedException() instanceof CodeVerificationFailedException);
@@ -128,7 +130,8 @@ public class AuthControllerTest {
         ResultActions resultActions = mockMvc.perform(post("/api/auth/verify-email")
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(requestBody)))
-                .andDo(print());
+                .andDo(print())
+                .andExpect(status().isUnauthorized());
 
         resultActions.andExpect(result -> {
             assertTrue(result.getResolvedException() instanceof CodeExpiredException);

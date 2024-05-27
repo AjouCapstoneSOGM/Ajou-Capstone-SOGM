@@ -71,7 +71,7 @@ public class PortfolioControllerTest {
                 .build()).getPfId();
 
         mockMvc.perform(get("/api/portfolio/"+pfId+"/performance")
-                        .header("Authorization", authorizationHeader))
+                .header("Authorization", authorizationHeader))
                 .andDo(print())
                 .andExpect(status().isForbidden());
     }

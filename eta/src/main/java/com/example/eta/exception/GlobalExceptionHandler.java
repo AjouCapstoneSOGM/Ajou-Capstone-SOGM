@@ -1,6 +1,5 @@
 package com.example.eta.exception;
 
-import com.example.eta.scheduler.PortfolioScheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
@@ -12,9 +11,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @RestControllerAdvice
 @Order(value = Ordered.LOWEST_PRECEDENCE)
 public class GlobalExceptionHandler {
@@ -25,16 +21,6 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<Void> handleAuthenticationException(AuthenticationException e) {
         e.printStackTrace();
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-    }
-
-    @ExceptionHandler(value = {NotFoundException.class})
-    protected ResponseEntity<Void> handleNotFoundException(NotFoundException e) {
-        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-    }
-
-    @ExceptionHandler(value = {OwnershipException.class})
-    protected ResponseEntity<Void> handleOwnershipException(OwnershipException e) {
-        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(value = {FailToSendPushNotificationException.class})
