@@ -20,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -164,5 +165,12 @@ public class AuthController {
         catch (WebClientResponseException e) {
             return ResponseEntity.badRequest().build();
         }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        User user = userService.findByEmail(userPrincipal.getEmail());
+        tokenService.deleteToken(user);
+        return ResponseEntity.ok().build();
     }
 }
