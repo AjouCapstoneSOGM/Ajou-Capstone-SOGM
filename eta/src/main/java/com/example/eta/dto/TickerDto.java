@@ -30,6 +30,11 @@ public class TickerDto {
         private Float per;
         private Float pbr;
         private Float twelveMonthRet;
+        private int roeRank;
+        private int roaRank;
+        private int perRank;
+        private int pbrRank;
+        private int twelveMonthRetRank;
     }
 
     @Data

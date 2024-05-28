@@ -124,7 +124,6 @@ CREATE TABLE `value` (
     `GM` float NULL,
     `OP` float NULL,
     `CFROA` float NULL,
-    `EV/EBITDA` float NULL,
     `EV/sales` float NULL,
     `PER` float NULL,
     `PBR` float NULL,

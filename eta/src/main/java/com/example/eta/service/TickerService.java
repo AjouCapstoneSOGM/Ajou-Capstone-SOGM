@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 
@@ -31,54 +32,72 @@ public class TickerService {
         Value value = valueRepository.findFirstByTickerTickerOrderByScoreDateDesc(ticker)
                 .orElseThrow(() -> new IllegalArgumentException("Value not found"));
 
-        // 모든 티커의 지표값을 조회
-//        List<Value> allValues = valueRepository.findAll();
+        List<Value> allValues = valueRepository.findBySectorName(String.valueOf(tickerEntity.getSector().getSectorName()));
 
 
-//        for (Value val : allValues) {
-//            System.out.println("Value: " + val +
-//                    ", ROE: " + val.getRoe() +
-//                    ", ROA: " + val.getRoa() +
-//                    ", PER: " + val.getPer() +
-//                    ", PBR: " + val.getPbr() +
-//                    ", 12MonthRet: " + val.getTwelveMonthRet());
-//        }
+        for (int i = 0; i < allValues.size(); i++) {
+            if (allValues.get(i).getPer() == null) {
+                allValues.get(i).setPer((float) -99);
+            }
+        }
+        for (int i = 0; i < allValues.size(); i++) {
+            if (allValues.get(i).getPbr() == null) {
+                allValues.get(i).setPbr((float) -99);
+            }
+        }
+        for (int i = 0; i < allValues.size(); i++) {
+            if (allValues.get(i).getRoa() == null) {
+                allValues.get(i).setRoa((float) -99);
+            }
+        }
+        for (int i = 0; i < allValues.size(); i++) {
+            if (allValues.get(i).getRoe() == null) {
+                allValues.get(i).setRoe((float) -99);
+            }
+        }
+        for (int i = 0; i < allValues.size(); i++) {
+            if (allValues.get(i).getTwelveMonthRet() == null) {
+                allValues.get(i).setTwelveMonthRet((float) -99);
+            }
+        }
+        System.out.println("TickerService.getTickerInfo"+ (tickerEntity.getSector().getSectorName()));
+
 
         // 순위 계산
-//        int roeRank = calculateRank(allValues, Value::getRoe, value.getRoe());
-//        int roaRank = calculateRank(allValues, Value::getRoa, value.getRoa());
-//        int perRank = calculateRank(allValues, Value::getPer, value.getPer());
-//        int pbrRank = calculateRank(allValues, Value::getPbr, value.getPbr());
-//        int twelveMonthRetRank = calculateRank(allValues, Value::getTwelveMonthRet, value.getTwelveMonthRet());
+        int roeRank = calculateRank(allValues, Value::getRoe, value.getRoe());
+        int roaRank = calculateRank(allValues, Value::getRoa, value.getRoa());
+        int perRank = calculateRank(allValues, Value::getPer, value.getPer());
+        int pbrRank = calculateRank(allValues, Value::getPbr, value.getPbr());
+        int twelveMonthRetRank = calculateRank(allValues, Value::getTwelveMonthRet, value.getTwelveMonthRet());
 
         return TickerDto.TickerDetailDto.builder()
                 .name(tickerEntity.getName())
                 .ticker(tickerEntity.getTicker())
-                .roe(value.getRoe())
-                .roa(value.getRoa())
-                .per(value.getPer())
-                .pbr(value.getPbr())
-                .twelveMonthRet(value.getTwelveMonthRet())
-//                .roeRank(roeRank)
-//                .roaRank(roaRank)
-//                .perRank(perRank)
-//                .pbrRank(pbrRank)
-//                .twelveMonthRetRank(twelveMonthRetRank)
+                .roe(Float.valueOf(Math.round(value.getRoe()*1000))/10)
+                .roa(Float.valueOf(Math.round(value.getRoa()*1000))/10)
+                .per(Float.valueOf(Math.round(value.getPer()*1000))/10)
+                .pbr(Float.valueOf(Math.round(value.getPbr()*1000))/10)
+                .twelveMonthRet(Float.valueOf(Math.round(value.getTwelveMonthRet()*1000))/10)
+                .roeRank(roeRank)
+                .roaRank(roaRank)
+                .perRank(perRank)
+                .pbrRank(pbrRank)
+                .twelveMonthRetRank(twelveMonthRetRank)
                 .build();
     }
 
-//    private int calculateRank(List<Value> values, ToDoubleFunction<Value> valueExtractor, double targetValue) {
-//        // null 값을 가진 항목들을 제외하고 순위를 매깁니다.
-//        List<Value> sortedValues = values.stream()
-//                .filter(val -> val != null && valueExtractor.applyAsDouble(val) != 0 && !Double.isNaN(valueExtractor.applyAsDouble(val))) // null 값 및 NaN 필터링
-//                .sorted(Comparator.comparingDouble(valueExtractor).reversed())
-//                .collect(Collectors.toList());
-//
-//        for (int i = 0; i < sortedValues.size(); i++) {
-//            if (valueExtractor.applyAsDouble(sortedValues.get(i)) == targetValue) {
-//                return i + 1; // 순위는 1부터 시작
-//            }
-//        }
-//        return -1; // 에러 처리
-//    }
+    private int calculateRank(List<Value> values, ToDoubleFunction<Value> valueExtractor, Float targetValue) {
+        List<Value> sortedValues = values.stream()
+                .sorted(Comparator.comparingDouble(valueExtractor).reversed())
+                .toList();
+
+        System.out.println("TickerService.calculateRank: "+sortedValues.size());
+
+        for (int i = 0; i < sortedValues.size(); i++) {
+            if (valueExtractor.applyAsDouble(sortedValues.get(i)) == targetValue) {
+                return i + 1;
+            }
+        }
+        return -1;
+    }
 }

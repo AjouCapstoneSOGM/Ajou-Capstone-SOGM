@@ -44,9 +44,6 @@ public class Value {
     @Column(name = "cfroa", nullable = true)
     private Float cfroa;
 
-    @Column(name = "ev_ebitda", nullable = true)
-    private Float evEbitda;
-
     @Column(name = "ev_sales", nullable = true)
     private Float evSales;
 
