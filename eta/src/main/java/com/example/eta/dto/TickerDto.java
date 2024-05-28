@@ -35,6 +35,7 @@ public class TickerDto {
         private int perRank;
         private int pbrRank;
         private int twelveMonthRetRank;
+        private int total;
     }
 
     @Data

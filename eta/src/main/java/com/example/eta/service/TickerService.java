@@ -83,6 +83,7 @@ public class TickerService {
                 .perRank(perRank)
                 .pbrRank(pbrRank)
                 .twelveMonthRetRank(twelveMonthRetRank)
+                .total(allValues.size())
                 .build();
     }
 
@@ -90,8 +91,6 @@ public class TickerService {
         List<Value> sortedValues = values.stream()
                 .sorted(Comparator.comparingDouble(valueExtractor).reversed())
                 .toList();
-
-        System.out.println("TickerService.calculateRank: "+sortedValues.size());
 
         for (int i = 0; i < sortedValues.size(); i++) {
             if (valueExtractor.applyAsDouble(sortedValues.get(i)) == targetValue) {
