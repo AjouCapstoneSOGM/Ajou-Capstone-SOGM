@@ -10,10 +10,7 @@ import FooterComponent from "../../utils/Footer";
 import HeaderComponent from "../../utils/Header";
 import PortfolioPieChart from "../../utils/PortfolioPieChart";
 import Loading from "../../utils/Loading";
-import { getUserName } from "../../utils/localStorageUtils";
 import { useAuth } from "../../utils/AuthContext";
-
-const window = Dimensions.get("window");
 
 const PortfolioList = ({ navigation }) => {
   const { portfolios, loadData, portLoading } = usePortfolio();
@@ -109,7 +106,7 @@ const PortfolioList = ({ navigation }) => {
                       style={{ flexDirection: "row", alignItems: "center" }}
                     >
                       <AppText style={{ color: "#f0f0f0" }}>
-                        {"테스트의 포트폴리오 1"}
+                        {portfolio.name}
                       </AppText>
                       <Button
                         type="clear"

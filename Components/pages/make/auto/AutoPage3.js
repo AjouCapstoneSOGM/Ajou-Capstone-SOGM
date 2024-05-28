@@ -27,7 +27,7 @@ const AutoPage3 = ({ sector, interest, setInterest }) => {
         </AppText>
       </View>
       <View style={styles.sectorContainer}>
-        <ScrollView contentContainerStyle={{ paddingBottom: 80 }}>
+        <ScrollView>
           {Object.entries(sector).map(([code, name], index) => (
             <TouchableOpacity
               key={code}
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#333",
     paddingHorizontal: 20,
-    paddingVertical: 40,
+    paddingVertical: 20,
   },
   sectorContent: {
     flexDirection: "row",

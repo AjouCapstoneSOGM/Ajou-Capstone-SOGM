@@ -55,7 +55,20 @@ const ManualPage3 = ({ stockList }) => {
     fetchManualInfo();
   }, [stockList]);
 
-  if (loading) return <Loading />;
+  if (loading)
+    return (
+      <View style={styles.container}>
+        <View style={styles.textContainer}>
+          <AppText style={styles.titleText}>
+            {"\n"}
+            {"\n"}
+          </AppText>
+        </View>
+        <View style={styles.contentsContainer}>
+          <Loading />
+        </View>
+      </View>
+    );
   return (
     <View style={styles.container}>
       <View style={styles.textContainer}>

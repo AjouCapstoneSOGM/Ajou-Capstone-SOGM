@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   TextInput,
 } from "react-native";
-import PagerView from "react-native-pager-view";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Divider, Icon } from "@rneui/base";
 import { usePortfolio } from "../../utils/PortfolioContext";
@@ -15,16 +14,29 @@ import { deepCopy, filteringNumber } from "../../utils/utils";
 import PortfolioPieChart from "../../utils/PortfolioPieChart";
 import AppText from "../../utils/AppText";
 import Loading from "../../utils/Loading";
+import InfoModal from "../../utils/InfoModal";
 
 const ModifyPortfolio = ({ route, navigation }) => {
   const { pfId, rnId, rebalancing } = route.params;
-  const { getPortfolioById, fetchModify, loadData, portfolios } =
-    usePortfolio();
-  const [checkList, setCheckList] = useState([]);
+  const { getPortfolioById, fetchModify, loadData } = usePortfolio();
   const [selectedId, setSelectedId] = useState();
   const [loading, setLoading] = useState(true);
   const [portfolio, setPortfolio] = useState([]);
   const [rebalances, setRebalances] = useState([]);
+  const [isVisible, setIsVisible] = useState(false);
+  const [info, setInfo] = useState("");
+
+  const toggleModal = () => {
+    setIsVisible(!isVisible);
+  };
+
+  const isPortfolioInit = () => {
+    if (portfolio) {
+      if (portfolio.detail.currentCash === portfolio.detail.initialAsset)
+        return true;
+      else return false;
+    }
+  };
 
   const calculateAfter = () => {
     if (portfolio) {
@@ -40,6 +52,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
       return afterPortfolio;
     }
   };
+
   useFocusEffect(
     useCallback(() => {
       setRebalances(rebalancing);
@@ -76,21 +89,6 @@ const ModifyPortfolio = ({ route, navigation }) => {
     const beforeRate = stockRate.filter((stock) => stock.ticker === ticker);
     const afterRate = afterStockRate.filter((stock) => stock.ticker === ticker);
     return afterRate[0].rate - beforeRate[0].rate;
-  };
-
-  const checkTickerExists = (ticker) => {
-    return checkList.some((item) => item.ticker === ticker);
-  };
-
-  const handleCheckList = (ticker) => {
-    setCheckList((prevTickers) => {
-      const index = prevTickers.findIndex((item) => item.ticker === ticker);
-      if (index === -1) {
-        return [...prevTickers, { ticker }];
-      } else {
-        return prevTickers.filter((item, idx) => idx !== index);
-      }
-    });
   };
   const handleSelectedId = (ticker) => {
     const index = portfolio.detail.stocks.findIndex(
@@ -140,12 +138,20 @@ const ModifyPortfolio = ({ route, navigation }) => {
     <SafeAreaView style={styles.container}>
       <View style={styles.textContainer}>
         <AppText style={{ fontSize: 30, fontWeight: "bold", color: "#333" }}>
-          리밸런싱 할 종목 {rebalances.length}개가 있어요
+          {isPortfolioInit() ? "최초 매수를" : "리밸런싱을"} 해야하는 종목{" "}
+          {rebalances.length}개가 있어요
         </AppText>
         <Button
           buttonStyle={{ marginHorizontal: -10 }}
           type="clear"
-          onPress={() => {}}
+          onPress={() => {
+            toggleModal();
+            setInfo(
+              isPortfolioInit()
+                ? "포트폴리오 생성 직후에는 종목을 직접 반영해야 해요.\n\n하단의 종목 리스트를 확인하여 직접 주식을 매수해주세요."
+                : "리밸런싱(Rebalancing)이란?\n\n리밸런싱은 투자 포트폴리오의 자산 비율을 조정하는 과정입니다.\n주식, 채권, 현금 등 다양한 자산이 포함된 포트폴리오에서 각 자산의 비율이 시장 변동에 따라 원래의 목표 비율에서 벗어나게 되면, 이를 다시 조정하여 원래의 비율로 되돌리는 것이 리밸런싱입니다.\n\n\n리밸런싱 방법\n\n1. 현재 포트폴리오의 자산 비율을 확인합니다.\n2. 목표 비율과 비교하여 초과 또는 부족한 자산을 파악합니다.\n3. 초과 자산을 매도하고 부족 자산을 매수하여 목표 비율로 조정합니다."
+            );
+          }}
           icon={{
             name: "questioncircleo",
             type: "antdesign",
@@ -176,16 +182,24 @@ const ModifyPortfolio = ({ route, navigation }) => {
           />
         </View>
       </View>
-      <PagerView style={styles.rebalanceContainer} initialPage={0}>
-        <View style={styles.rebalanceList}>
-          <View style={styles.rebalanceHeader}>
-            <AppText style={{ color: "#f0f0f0", fontSize: 20 }}>
-              매수할 종목
+      <View style={styles.headerContainer}>
+        <View style={styles.rebalanceHeader}>
+          <AppText style={{ color: "#f0f0f0", fontSize: 20 }}>
+            대상 종목
+          </AppText>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <AppText style={{ color: "#777", fontSize: 13 }}>
+              가격이 달라요!{" "}
             </AppText>
             <Button
               buttonStyle={{ marginHorizontal: -10 }}
               type="clear"
-              onPress={() => {}}
+              onPress={() => {
+                toggleModal();
+                setInfo(
+                  `표시되는 1주 당 금액은 알림 생성 당시의 금액을 나타냅니다.\n\n만일 표시된 금액이 실제로 매수/매도하려는 금액과 다를 경우엔 알맞게 수정해주세요.`
+                );
+              }}
               icon={{
                 name: "questioncircleo",
                 type: "antdesign",
@@ -193,124 +207,61 @@ const ModifyPortfolio = ({ route, navigation }) => {
               }}
             />
           </View>
-          <Divider />
-          <View style={styles.column}>
-            <AppText style={styles.columnName}>기업명</AppText>
-            <AppText style={styles.columnNumber}>수량</AppText>
-            <AppText style={styles.columnPrice}>가격</AppText>
-            <AppText style={styles.columnRateDiff}>비중 변화</AppText>
-          </View>
-          <ScrollView keyboardShouldPersistTaps="handled">
-            {rebalances.map(
-              (item, index) =>
-                item.isBuy === true && (
-                  <View key={index} style={styles.rebalanceItem}>
-                    <Button
-                      buttonStyle={{ marginLeft: -10 }}
-                      type="clear"
-                      onPress={() => {
-                        handleCheckList(item.ticker);
-                      }}
-                      icon={{
-                        name: "checkcircle",
-                        type: "antdesign",
-                        color: checkTickerExists(item.ticker)
-                          ? "#97f697"
-                          : "#808080",
-                      }}
-                    />
-                    <TouchableOpacity
-                      style={styles.rebalanceItemContent}
-                      onPress={() => handleSelectedId(item.ticker)}
-                    >
-                      <AppText style={styles.itemName}>{item.name}</AppText>
-                      <AppText style={styles.itemNumber}>
-                        {item.number}주
-                      </AppText>
-                      <TextInput
-                        style={styles.itemPrice}
-                        value={item.price.toString()}
-                        onChangeText={(text) => handleChangePrices(index, text)}
-                        placeholder={item.price.toString()}
-                        placeholderTextColor="#bbb"
-                      />
-                      <AppText style={styles.itemRateDiff}>
-                        {getRateDiff(item.ticker)}%
-                      </AppText>
-                    </TouchableOpacity>
-                  </View>
-                )
-            )}
-          </ScrollView>
         </View>
-        <View style={styles.rebalanceList}>
-          <View style={styles.rebalanceHeader}>
-            <AppText style={{ color: "#f0f0f0", fontSize: 20 }}>
-              매도할 종목
-            </AppText>
-            <Button
-              buttonStyle={{ marginHorizontal: -10 }}
-              type="clear"
-              onPress={() => {}}
-              icon={{
-                name: "questioncircleo",
-                type: "antdesign",
-                color: "#f0f0f0",
-              }}
-            />
-          </View>
-          <Divider />
-          <View style={styles.column}>
-            <AppText style={styles.columnName}>기업명</AppText>
-            <AppText style={styles.columnNumber}>수량</AppText>
-            <AppText style={styles.columnPrice}>가격</AppText>
-            <AppText style={styles.columnRateDiff}>비중 변화</AppText>
-          </View>
-          <ScrollView>
-            {rebalances.map(
-              (item, index) =>
-                item.isBuy === false && (
-                  <View key={index} style={styles.rebalanceItem}>
-                    <Button
-                      buttonStyle={{ marginLeft: -10 }}
-                      type="clear"
-                      onPress={() => {
-                        handleCheckList(item.ticker);
-                      }}
-                      icon={{
-                        name: "checkcircle",
-                        type: "antdesign",
-                        color: checkTickerExists(item.ticker)
-                          ? "#97f697"
-                          : "#808080",
-                      }}
-                    />
-                    <TouchableOpacity
-                      style={styles.rebalanceItemContent}
-                      onPress={() => handleSelectedId(item.ticker)}
-                    >
-                      <AppText style={styles.itemName}>{item.name}</AppText>
-                      <AppText style={styles.itemNumber}>
-                        {item.number}주
-                      </AppText>
-                      <AppText style={styles.itemPrice}>{item.price}원</AppText>
-                      <AppText style={styles.itemRateDiff}>
-                        {getRateDiff(item.ticker)}%
-                      </AppText>
-                    </TouchableOpacity>
-                  </View>
-                )
-            )}
-          </ScrollView>
+        <Divider />
+        <View style={styles.column}>
+          <AppText style={styles.columnName}>기업명</AppText>
+          <AppText style={styles.columnNumber}>수량</AppText>
+          <AppText style={styles.columnPrice}>1주 당 금액</AppText>
+          <AppText style={styles.columnRateDiff}>비중 변화</AppText>
         </View>
-      </PagerView>
-      <Button
-        containerStyle={styles.nextButtonContainer}
-        buttonStyle={styles.nextButton}
-        title="반영"
-        onPress={() => handleModify()}
-        disabled={!(checkList.length === rebalances.length)}
-      />
+      </View>
+      <View style={{ flex: 2 }}>
+        <ScrollView style={styles.rebalanceList}>
+          {rebalances.map(
+            (item, index) =>
+              item.isBuy === true && (
+                <View key={index} style={styles.rebalanceItem}>
+                  <TouchableOpacity
+                    style={styles.rebalanceItemContent}
+                    onPress={() => handleSelectedId(item.ticker)}
+                  >
+                    <AppText style={styles.itemName}>{item.name}</AppText>
+                    <AppText style={styles.itemNumber}>
+                      {item.number * (item.isBuy ? 1 : -1)}주
+                    </AppText>
+                    <TextInput
+                      style={styles.itemPrice}
+                      value={item.price.toString()}
+                      onChangeText={(text) => handleChangePrices(index, text)}
+                      placeholder={item.price.toString()}
+                      placeholderTextColor="#bbb"
+                    />
+                    <AppText
+                      style={[
+                        styles.itemRateDiff,
+                        { color: item.isBuy ? "#ff5858" : "#5878ff" },
+                      ]}
+                    >
+                      {item.isBuy ? "+" : ""}
+                      {getRateDiff(item.ticker)}%
+                    </AppText>
+                  </TouchableOpacity>
+                </View>
+              )
+          )}
+        </ScrollView>
+      </View>
+      <View style={styles.nextButtonContainer}>
+        <Button
+          buttonStyle={styles.nextButton}
+          title="반영"
+          onPress={() => handleModify()}
+        />
+      </View>
+      <InfoModal isVisible={isVisible} onToggle={toggleModal}>
+        {info}
+      </InfoModal>
     </SafeAreaView>
   );
 };
@@ -328,7 +279,8 @@ const styles = StyleSheet.create({
     paddingTop: 70,
   },
   chartContainer: {
-    marginTop: 20,
+    flex: 1,
+    marginVertical: 20,
   },
   chartTitle: {
     flexDirection: "row",
@@ -339,13 +291,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
   },
-  rebalanceContainer: {
-    flex: 1,
-    backgroundColor: "#333",
-  },
   rebalanceList: {
-    padding: 20,
-    paddingBottom: 80,
+    backgroundColor: "#333",
+    paddingHorizontal: 20,
+  },
+  headerContainer: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    backgroundColor: "#333",
   },
   rebalanceHeader: {
     flexDirection: "row",
@@ -355,11 +308,10 @@ const styles = StyleSheet.create({
   },
   column: {
     flexDirection: "row",
-    marginLeft: 40,
     marginVertical: 8,
   },
   columnName: {
-    flex: 1.6,
+    flex: 1.3,
     color: "#808080",
     textAlign: "center",
   },
@@ -369,12 +321,12 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   columnPrice: {
-    flex: 1.5,
+    flex: 1.2,
     color: "#808080",
     textAlign: "center",
   },
   columnRateDiff: {
-    flex: 1.5,
+    flex: 1,
     color: "#808080",
     textAlign: "center",
   },
@@ -388,22 +340,25 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   itemName: {
-    flex: 1.5,
+    flex: 1.3,
     color: "#f0f0f0",
-    marginRight: 10,
     fontWeight: "bold",
+    textAlign: "center",
   },
   itemNumber: {
     flex: 1,
     color: "#f0f0f0",
+    textAlign: "center",
   },
   itemPrice: {
-    flex: 1.5,
+    flex: 1.2,
     color: "#f0f0f0",
+    textAlign: "center",
   },
   itemRateDiff: {
     flex: 1,
     color: "#f0f0f0",
+    textAlign: "center",
   },
   nextButton: {
     backgroundColor: "#6262e8",
@@ -411,10 +366,9 @@ const styles = StyleSheet.create({
     height: 60,
   },
   nextButtonContainer: {
-    position: "absolute",
-    bottom: 20,
-    left: 20,
-    right: 20,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
+    backgroundColor: "#333",
   },
 });
 

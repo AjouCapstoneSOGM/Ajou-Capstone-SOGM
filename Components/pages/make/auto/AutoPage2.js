@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
   },
   safeInfoContainer: {
     position: "absolute",
-    bottom: 90,
+    bottom: 5,
     left: 20,
   },
   safeinfoText: {
