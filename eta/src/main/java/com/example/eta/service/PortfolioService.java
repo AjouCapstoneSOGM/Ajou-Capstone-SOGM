@@ -188,6 +188,7 @@ public class PortfolioService {
         Portfolio portfolio = new Portfolio().builder()
                 .user(user)
                 .name(request.getName())
+                .createdDate(LocalDateTime.now())
                 .country(request.getCountry())
                 .isAuto(false)
                 .initAsset(totalAsset)

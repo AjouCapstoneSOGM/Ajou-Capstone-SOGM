@@ -25,8 +25,17 @@ public class TickerDto {
     public static class TickerDetailDto{
         private String name;
         private String ticker;
-        private float roe;
-        private float per;
+        private Float roe;
+        private Float roa;
+        private Float per;
+        private Float pbr;
+        private Float twelveMonthRet;
+        private int roeRank;
+        private int roaRank;
+        private int perRank;
+        private int pbrRank;
+        private int twelveMonthRetRank;
+        private int total;
     }
 
     @Data
