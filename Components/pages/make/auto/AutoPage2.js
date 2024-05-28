@@ -106,11 +106,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f0f0f0",
   },
-  topDivider: {
-    marginTop: 10,
-    borderWidth: 4,
-    borderColor: "#333",
-  },
   safeInfoContainer: {
     position: "absolute",
     bottom: 5,
