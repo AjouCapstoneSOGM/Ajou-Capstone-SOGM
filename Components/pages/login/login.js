@@ -1,24 +1,22 @@
 import React, { useState } from "react";
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  TextInput,
-} from "react-native";
+import { View, StyleSheet, TouchableOpacity, Image, TextInput } from "react-native";
+
 import urls from "../../utils/urls";
-import { setUsertoken } from "../../utils/localStorageUtils.js";
+import { setUserName, setUsertoken } from "../../utils/localStorageUtils.js";
 import { useAuth } from "../../utils/AuthContext.js";
 import AppText from "../../utils/AppText.js";
 import { usePortfolio } from "../../utils/PortfolioContext.js";
 import Loading from "../../utils/Loading.js";
+import { usePushNotifications } from '../../utils/PushNotificationContext.js';
 
 const Login = ({ navigation }) => {
   const [useremail, setUseremail] = useState("test@test.com"); //
   const [password, setPassword] = useState("1234"); //
   const [loading, setLoading] = useState(false);
+
   const { login } = useAuth();
   const { loadData } = usePortfolio();
+  const { expoPushToken } = usePushNotifications();
 
   const fetchLoginInfo = async () => {
     try {
@@ -31,12 +29,13 @@ const Login = ({ navigation }) => {
         body: JSON.stringify({
           email: useremail,
           password: password,
-          expoPushToken: "testToken",
+          expoPushToken: expoPushToken,
         }),
       });
       if (response.ok) {
         const data = await response.json();
-        setUsertoken(data.token);
+        await setUsertoken(data.token);
+        await setUserName(data.name);
         login();
         await loadData();
         setLoading(false);
@@ -47,6 +46,20 @@ const Login = ({ navigation }) => {
       throw error;
     }
   };
+
+  const handleSocialLogin = () => {
+    setLoading(true);
+    navigation.navigate('SocialLogin');
+
+    const unsubscribe = navigation.addListener('focus', () => {
+        //api 작동 후 주석 해제 필요
+        //login();
+        //loadData();
+        setLoading(false);
+        navigation.goBack();
+        unsubscribe();
+    });   
+  }
 
   if (loading) return <Loading />;
   return (
@@ -80,9 +93,7 @@ const Login = ({ navigation }) => {
         </TouchableOpacity>
       </View>
       <TouchableOpacity
-        onPress={() =>
-          navigation.navigate("SocialLogin", { screen: "SocialLogin" })
-        }
+        onPress={handleSocialLogin}
         style={styles.socialButton}
       >
         <Image
