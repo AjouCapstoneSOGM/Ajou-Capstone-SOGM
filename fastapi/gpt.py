@@ -10,7 +10,7 @@ class Chatbot:
 
     async def summary(self, data, ticker):
         completion = self.client.chat.completions.create(
-            model="ft:gpt-3.5-turbo-0125:personal::9LakEBxS",
+            model="gpt-4o",  # "ft:gpt-3.5-turbo-0125:personal::9LakEBxS",
             messages=[
                 {
                     "role": "system",
