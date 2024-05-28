@@ -17,8 +17,7 @@ import { Icon } from "@rneui/base";
 import { colorScale } from "../../../utils/utils";
 
 const AutoPage4 = ({ amount, riskLevel, interest, step }) => {
-  const { fetchStocksByPortfolioId, fetchCurrentPrice, fetchRebalanceList } =
-    usePortfolio();
+  const { fetchStocksByPortfolioId, fetchRebalanceList } = usePortfolio();
   const [loading, setLoading] = useState(true);
   const [pfId, setPfId] = useState("");
   const [portfolio, setPortfolio] = useState([]);
@@ -39,7 +38,7 @@ const AutoPage4 = ({ amount, riskLevel, interest, step }) => {
         setInitRebalance(rebalance[0]);
         setLoading(false);
       };
-      loadPortfolio();
+      if (!portfolio) loadPortfolio();
     }
   }, [pfId]);
 
@@ -319,10 +318,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   infoContainer: {
-    flex: 1,
     alignItems: "flex-start",
     marginBottom: 10,
   },
+  labelContainer: {},
   labelItemContent: {
     flexDirection: "row",
     justifyContent: "space-around",
