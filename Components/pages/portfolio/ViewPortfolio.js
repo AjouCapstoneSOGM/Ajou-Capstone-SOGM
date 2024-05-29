@@ -11,6 +11,7 @@ import HeaderComponent from "../../utils/Header";
 import PortfolioPieChart from "../../utils/PortfolioPieChart";
 import Loading from "../../utils/Loading";
 import { useAuth } from "../../utils/AuthContext";
+import { width, height } from "../../utils/utils";
 
 const PortfolioList = ({ navigation }) => {
   const { portfolios, loadData, portLoading } = usePortfolio();
@@ -76,7 +77,7 @@ const PortfolioList = ({ navigation }) => {
           {portfolios[selectedIndex] && (
             <PortfolioPieChart
               data={portfolios[selectedIndex].detail}
-              size={1}
+              size={width * 1}
             />
           )}
         </View>
@@ -205,26 +206,26 @@ const styles = StyleSheet.create({
     backgroundColor: "#f0f0f0",
   },
   totalContainer: {
-    paddingVertical: 30,
-    paddingHorizontal: 20,
+    paddingVertical: height * 15,
+    paddingHorizontal: width * 15,
   },
   listContainer: {
     flex: 1,
   },
   portfolio: {
-    height: 200,
+    height: height * 180,
     backgroundColor: "#333",
     borderRadius: 30,
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    marginHorizontal: 20,
-    marginTop: 35,
+    paddingVertical: height * 15,
+    paddingHorizontal: width * 25,
+    marginHorizontal: width * 15,
+    marginTop: height * 5,
   },
   portfolioHeader: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 30,
+    marginBottom: height * 20,
   },
   portfolioContent: {
     justifyContent: "space-around",
@@ -232,14 +233,14 @@ const styles = StyleSheet.create({
   chartContainer: {
     position: "absolute",
     alignSelf: "center",
-    bottom: 100,
+    bottom: height * 90,
   },
   floatingButton: {
     position: "absolute",
-    bottom: 90,
-    right: 15,
-    width: 80,
-    height: 80,
+    bottom: height * 90,
+    right: width * 15,
+    width: width * 60,
+    height: height * 60,
     borderRadius: 50,
     backgroundColor: "#333",
     justifyContent: "center",
@@ -252,10 +253,10 @@ const styles = StyleSheet.create({
   },
   reloadButton: {
     position: "absolute",
-    bottom: 90,
-    left: 15,
-    width: 80,
-    height: 80,
+    bottom: height * 90,
+    left: width * 15,
+    width: width * 60,
+    height: height * 60,
     borderRadius: 50,
     backgroundColor: "#333",
     justifyContent: "center",

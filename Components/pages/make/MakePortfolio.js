@@ -6,6 +6,7 @@ import AppText from "../../utils/AppText.js";
 import { Button, Divider, Icon } from "@rneui/base";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { usePortfolio } from "../../utils/PortfolioContext.js";
+import { width, height } from "../../utils/utils";
 
 const MakePortfolio = ({ navigation }) => {
   const [step, setStep] = useState(0);
@@ -129,7 +130,7 @@ const styles = StyleSheet.create({
   topDivider: {
     marginVertical: 70,
     borderWidth: 4,
-    borderColor: "#bbb",
+    borderColor: "#333",
   },
   textContainer: {
     paddingHorizontal: 10,
@@ -138,8 +139,8 @@ const styles = StyleSheet.create({
   contentsContainer: {
     flex: 1,
     backgroundColor: "#333",
-    paddingHorizontal: 20,
-    paddingVertical: 40,
+    paddingHorizontal: width * 20,
+    paddingVertical: height * 15,
   },
   selectAutoButton: {
     flexDirection: "row",
@@ -148,11 +149,11 @@ const styles = StyleSheet.create({
   nextButton: {
     backgroundColor: "#6262e8",
     borderRadius: 10,
-    height: 60,
+    height: height * 50,
   },
   nextButtonContainer: {
     paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingBottom: height * 5,
     backgroundColor: "#333",
   },
 });

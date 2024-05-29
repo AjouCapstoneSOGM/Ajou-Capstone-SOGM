@@ -15,8 +15,7 @@ import AppText from "../../utils/AppText";
 import { SafeAreaView } from "react-native-safe-area-context";
 import PortfolioPieChart from "../../utils/PortfolioPieChart";
 import { Button, Divider, Icon, Overlay } from "@rneui/base";
-import { filteringNumber } from "../../utils/utils";
-import StockInfo from "./StockInfo";
+import { width, height, filteringNumber, colorScale } from "../../utils/utils";
 
 const PortfolioDetails = ({ route, navigation }) => {
   const stocksLength = 10;
@@ -33,37 +32,14 @@ const PortfolioDetails = ({ route, navigation }) => {
   });
   const [selectedId, setSelectedId] = useState(null);
   const [alertExist, setAlertExist] = useState(false);
-
-  const [infoVisible, setInfoVisible] = useState(false);
-  const [stockInfoVisible, setStockInfoVisible] = useState(false);
-
+  const [isVisible, setIsVisible] = useState(false);
   const [modifyQuantity, setModifyQuantity] = useState(0);
   const [modifyPrice, setModifyPrice] = useState(0);
   const [modifyBuy, setModifyBuy] = useState(true);
 
-  const toggleInfoModal = () => {
-    setInfoVisible(!infoVisible);
+  const toggleModal = () => {
+    setIsVisible(!isVisible);
   };
-
-  const toggleStockModal = () => {
-    setStockInfoVisible(!stockInfoVisible);
-  };
-
-  const colorScale = [
-    "hsl(348, 100%, 80%)", // 파스텔 핑크,
-    "hsl(207, 94%, 80%)", // 파스텔 블루,
-    "hsl(48, 100%, 78%)", // 파스텔 옐로우,
-    "hsl(144, 76%, 76%)", // 파스텔 그린,
-    "hsl(20, 100%, 72%)", // 파스텔 오렌지,
-    "hsl(262, 100%, 80%)", // 파스텔 퍼플,
-    "hsl(174, 100%, 70%)", // 파스텔 시안,
-    "hsl(338, 90%, 72%)", // 파스텔 레드,
-    "hsl(20, 20%, 60%)", // 연 회색,
-    "hsl(300, 90%, 80%)", // 파스텔 시안-그린,
-    "#555",
-    "#888",
-    "#ccc",
-  ];
 
   const fetchModifyStockManual = async () => {
     try {
@@ -290,14 +266,14 @@ const PortfolioDetails = ({ route, navigation }) => {
           data={portfolio}
           cash={portfolio}
           selectedId={selectedId}
-          size={0.95}
+          size={width * 0.6}
         />
         {selectedId !== null && (
           <View style={{ position: "absolute", alignItems: "center" }}>
             <AppText style={[styles.centerText, { fontWeight: "bold" }]}>{`${
               (getStockRate(selectedId).toFixed(3) * 1000) / 10 // 소숫점 계산 오류 방지를 위함
             }%`}</AppText>
-            <AppText style={[styles.centerText, { fontSize: 13 }]}>
+            <AppText style={[styles.centerText, { fontSize: 12 }]}>
               {portfolio.stocks[selectedId].companyName}
             </AppText>
           </View>
@@ -318,7 +294,8 @@ const PortfolioDetails = ({ route, navigation }) => {
           contentContainerStyle={{
             paddingBottom: selectedId === null ? 60 : 20,
           }}
-          showsVerticalScrollIndicator={false}
+          showsVerticalScrollIndicator={true}
+          persistentScrollbar={true}
         >
           <AppText
             style={{
@@ -371,7 +348,7 @@ const PortfolioDetails = ({ route, navigation }) => {
                           type="clear"
                           onPress={() => {
                             setModifyPrice(item.currentPrice);
-                            toggleInfoModal();
+                            toggleModal();
                             setSelectedId(index);
                           }}
                           icon={{
@@ -405,14 +382,14 @@ const PortfolioDetails = ({ route, navigation }) => {
                     color={colorScale[index]}
                     width={2}
                     style={{
-                      marginVertical: 10,
+                      marginVertical: height * 10,
                     }}
                   />
                   <View style={styles.myInfo}>
                     <View>
                       <AppText
                         style={{
-                          fontSize: 25,
+                          fontSize: 20,
                           color: "#f0f0f0",
                           fontWeight: "bold",
                         }}
@@ -445,7 +422,11 @@ const PortfolioDetails = ({ route, navigation }) => {
                       <View style={styles.utilContainer}>
                         <TouchableOpacity
                           style={styles.utilButton}
-                          onPress={toggleStockModal}
+                          onPress={() => {
+                            navigation.navigate("NewsSummary", {
+                              ticker: item.ticker,
+                            });
+                          }}
                         >
                           <AppText style={{ fontSize: 18, color: "#f0f0f0" }}>
                             종목 정보
@@ -473,112 +454,105 @@ const PortfolioDetails = ({ route, navigation }) => {
         </ScrollView>
       </View>
       {selectedId !== null && (
-        <React.Fragment>
-          <StockInfo
-            isVisible={stockInfoVisible}
-            onToggle={toggleStockModal}
-            ticker={portfolio.stocks[selectedId].ticker}
-          />
-          <Overlay
-            isVisible={infoVisible}
-            onBackdropPress={() => {
+        <Overlay
+          isVisible={isVisible}
+          onBackdropPress={() => {
+            setSelectedId(null);
+            resetModifyData();
+            toggleModal();
+          }}
+          overlayStyle={styles.overlay}
+        >
+          <Button
+            containerStyle={styles.closeButton}
+            onPress={() => {
               setSelectedId(null);
               resetModifyData();
-              toggleInfoModal();
+              toggleModal();
             }}
-            overlayStyle={styles.overlay}
+            type="clear"
+            icon={{ name: "close", type: "antdesign", color: "#f0f0f0" }}
+          />
+          <AppText
+            style={{ color: "#f0f0f0", fontSize: 20, fontWeight: "bold" }}
           >
-            <Button
-              containerStyle={styles.closeButton}
-              onPress={() => {
-                setSelectedId(null);
-                resetModifyData();
-                toggleInfoModal();
-              }}
-              type="clear"
-              icon={{ name: "close", type: "antdesign", color: "#f0f0f0" }}
-            />
+            종목 수정
+          </AppText>
+          <View style={styles.content}>
             <AppText
-              style={{ color: "#f0f0f0", fontSize: 20, fontWeight: "bold" }}
+              style={{
+                fontSize: 20,
+                fontWeight: "bold",
+                color: "#f0f0f0",
+                marginBottom: 20,
+              }}
             >
-              종목 수정
+              {portfolio.stocks[selectedId].companyName}
             </AppText>
-            <View style={styles.content}>
-              <AppText
-                style={{
-                  fontSize: 20,
-                  fontWeight: "bold",
-                  color: "#f0f0f0",
-                  marginBottom: 20,
-                }}
-              >
-                {portfolio.stocks[selectedId].companyName}
-              </AppText>
-              <View style={styles.contentsItem}>
-                <View style={styles.quantityContainer}>
-                  <Button
-                    buttonStyle={{ marginHorizontal: -10 }}
-                    type="clear"
-                    onPress={() => {
-                      handleQuantityChange(String(Number(modifyQuantity) - 1));
-                    }}
-                    icon={{
-                      name: "minuscircleo",
-                      type: "antdesign",
-                      color: "#f0f0f0",
-                      size: 18,
-                    }}
-                  />
-                  <TextInput
-                    value={String(modifyQuantity)}
-                    onChangeText={(value) => handleQuantityChange(value)}
-                    style={styles.inputQuantity}
-                    keyboardType="numeric"
-                  />
-                  <Button
-                    buttonStyle={{ marginHorizontal: -10 }}
-                    type="clear"
-                    onPress={() => {
-                      handleQuantityChange(String(Number(modifyQuantity) + 1));
-                    }}
-                    icon={{
-                      name: "pluscircleo",
-                      type: "antdesign",
-                      color: "#f0f0f0",
-                      size: 18,
-                    }}
-                  />
-                </View>
+            <View style={styles.contentsItem}>
+              <View style={styles.quantityContainer}>
+                <Button
+                  buttonStyle={{ marginHorizontal: -10 }}
+                  type="clear"
+                  onPress={() => {
+                    handleQuantityChange(String(Number(modifyQuantity) - 1));
+                  }}
+                  icon={{
+                    name: "minuscircleo",
+                    type: "antdesign",
+                    color: "#f0f0f0",
+                    size: 18,
+                  }}
+                />
                 <TextInput
-                  value={String(modifyPrice)}
-                  onChangeText={(value) => handlePriceChange(value)}
-                  style={styles.inputPrice}
+                  value={String(modifyQuantity)}
+                  onChangeText={(value) => handleQuantityChange(value)}
+                  style={styles.inputQuantity}
                   keyboardType="numeric"
                 />
                 <Button
-                  containerStyle={{ flex: 0.7 }}
-                  titleStyle={{ color: modifyBuy ? "#ff5858" : "#5878ff" }}
-                  title={modifyBuy ? "매수" : "매도"}
+                  buttonStyle={{ marginHorizontal: -10 }}
                   type="clear"
                   onPress={() => {
-                    handleBuyChange(modifyBuy);
+                    handleQuantityChange(String(Number(modifyQuantity) + 1));
+                  }}
+                  icon={{
+                    name: "pluscircleo",
+                    type: "antdesign",
+                    color: "#f0f0f0",
+                    size: 18,
                   }}
                 />
               </View>
+              <TextInput
+                value={String(modifyPrice)}
+                onChangeText={(value) => handlePriceChange(value)}
+                style={styles.inputPrice}
+                keyboardType="numeric"
+              />
+              <Button
+                containerStyle={{ flex: 0.7 }}
+                titleStyle={{ color: modifyBuy ? "#ff5858" : "#5878ff" }}
+                title={modifyBuy ? "매수" : "매도"}
+                type="clear"
+                onPress={() => {
+                  handleBuyChange(modifyBuy);
+                }}
+              />
             </View>
-            <Button
-              buttonStyle={styles.submitButton}
-              title="반영"
-              disabled={modifyQuantity == 0}
-              onPress={async () => {
-                await fetchModifyStockManual();
-                resetModifyData();
-                await loadData();
-                toggleInfoModal();
-              }}
-            />
-          </Overlay>
-        </React.Fragment>
+          </View>
+          <Button
+            buttonStyle={styles.submitButton}
+            title="반영"
+            disabled={modifyQuantity == 0}
+            onPress={async () => {
+              await fetchModifyStockManual();
+              resetModifyData();
+              await loadData();
+              toggleModal();
+            }}
+          />
+        </Overlay>
       )}
     </SafeAreaView>
   );
@@ -592,7 +566,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#333",
   },
   outline: {
-    padding: 10,
+    padding: width * 10,
     backgroundColor: "#333",
   },
   outlineHeader: {
@@ -631,15 +605,17 @@ const styles = StyleSheet.create({
     backgroundColor: "#f0f0f0",
     alignItems: "center", // 자식 요소를 수평 중앙 정렬
     justifyContent: "center", // 자식 요소를 수직 중앙 정렬
-    padding: 20,
+    padding: height * -10,
+    marginTop: height * 0,
   },
   centerText: {
     fontSize: 20,
   },
   itemContainer: {
     flex: 4,
+    marginTop: height * -30,
     backgroundColor: "#f0f0f0",
-    padding: 10,
+    padding: width * 10,
   },
   item: {
     justifyContent: "flex-start", // 내용을 세로 방향으로 중앙 정렬
@@ -677,10 +653,10 @@ const styles = StyleSheet.create({
   },
   floatingButton: {
     position: "absolute",
-    bottom: 0,
-    right: 15,
-    width: 69,
-    height: 69,
+    bottom: height * 35,
+    right: width * 20,
+    width: width * 50,
+    height: width * 50,
     borderRadius: 50,
     backgroundColor: "#333",
     justifyContent: "center",
