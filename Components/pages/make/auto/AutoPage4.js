@@ -18,8 +18,7 @@ import { colorScale } from "../../../utils/utils";
 import { width, height } from "../../../utils/utils";
 
 const AutoPage4 = ({ amount, riskLevel, interest, step }) => {
-  const { fetchStocksByPortfolioId, fetchCurrentPrice, fetchRebalanceList } =
-    usePortfolio();
+  const { fetchStocksByPortfolioId, fetchRebalanceList } = usePortfolio();
   const [loading, setLoading] = useState(true);
   const [pfId, setPfId] = useState("");
   const [portfolio, setPortfolio] = useState([]);
@@ -175,7 +174,7 @@ const AutoPage4 = ({ amount, riskLevel, interest, step }) => {
               currentCash: 0,
               stocks: initRebalance.rebalancings.map((stock) => ({
                 companyName: stock.name,
-                quantity: stock.number,
+                quantity: stock.quantity,
                 currentPrice: stock.price,
               })),
             }}
@@ -210,7 +209,7 @@ const AutoPage4 = ({ amount, riskLevel, interest, step }) => {
                 style={{ marginRight: 5 }}
               />
               <AppText style={styles.itemName}>{stock.name}</AppText>
-              <AppText style={styles.itemNumber}>{stock.number}주</AppText>
+              <AppText style={styles.itemNumber}>{stock.quantity}주</AppText>
               <AppText style={styles.itemPrice}>
                 {Number(stock.price).toLocaleString()}원
               </AppText>
@@ -307,14 +306,13 @@ const styles = StyleSheet.create({
   },
   columnName: {
     flex: 1,
-    marginLeft: width * 20,
-    marginRight: width * 35,
     color: "#808080",
     textAlign: "center",
   },
   columnNumber: {
     flex: 1,
     color: "#808080",
+    textAlign: "center",
   },
   columnPrice: {
     flex: 1,
@@ -347,7 +345,6 @@ const styles = StyleSheet.create({
   itemName: {
     flex: 1,
     color: "#f0f0f0",
-    marginRight: width * -15,
     fontWeight: "bold",
     textAlign: "center",
     fontSize: 14,

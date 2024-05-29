@@ -15,7 +15,6 @@ const RebalanceList = ({ route, navigation }) => {
     const rebalance = rebalances.filter(
       (rebalance) => (rebalance.pfId = portfolioId)
     );
-    console.log(rebalance);
     setRebalanceList(rebalance);
   }, []);
 
