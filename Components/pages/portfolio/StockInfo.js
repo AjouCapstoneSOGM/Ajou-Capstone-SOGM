@@ -17,13 +17,6 @@ const StockInfo = ({ isVisible, onToggle, ticker }) => {
     PER: 0,
   });
 
-  const ex_data = {
-    name: "삼성전자",
-    ticker: "005930",
-    ROE: 1.1,
-    PER: 1.1,
-  };
-
   const toggleInfoModal = () => {
     setInfoVisible(!infoVisible);
   };
@@ -50,8 +43,7 @@ const StockInfo = ({ isVisible, onToggle, ticker }) => {
   useEffect(() => {
     const loadInfo = async () => {
       try {
-        // const data = await stockInfo(ticker);
-        const data = ex_data;
+        const data = await stockInfo(ticker);
         setInfo(data);
         setLoading(false);
       } catch (error) {
@@ -60,7 +52,7 @@ const StockInfo = ({ isVisible, onToggle, ticker }) => {
     };
 
     loadInfo();
-  }, []);
+  }, [ticker]);
 
   return (
     <Overlay
@@ -110,13 +102,31 @@ const StockInfo = ({ isVisible, onToggle, ticker }) => {
             </View>
             <View style={styles.stockColumn}>
               <AppText style={styles.infoText}>ROE</AppText>
-              <AppText style={styles.infoText}>{info.ROE}</AppText>
-              <AppText style={styles.infoText}>순위</AppText>
+              <AppText style={styles.infoText}>{info.roe}</AppText>
+              <AppText style={styles.infoText}>
+                {info.roeRank} / {info.total}
+              </AppText>
+            </View>
+            <View style={styles.stockColumn}>
+              <AppText style={styles.infoText}>ROE</AppText>
+              <AppText style={styles.infoText}>{info.roa}</AppText>
+              <AppText style={styles.infoText}>
+                {info.roaRank} / {info.total}
+              </AppText>
             </View>
             <View style={styles.stockColumn}>
               <AppText style={styles.infoText}>PER</AppText>
-              <AppText style={styles.infoText}>{info.PER}</AppText>
-              <AppText style={styles.infoText}>순위</AppText>
+              <AppText style={styles.infoText}>{info.per}</AppText>
+              <AppText style={styles.infoText}>
+                {info.perRank} / {info.total}
+              </AppText>
+            </View>
+            <View style={styles.stockColumn}>
+              <AppText style={styles.infoText}>PER</AppText>
+              <AppText style={styles.infoText}>{info.pbr}</AppText>
+              <AppText style={styles.infoText}>
+                {info.pbrRank} / {info.total}
+              </AppText>
             </View>
             <AppText style={styles.text}></AppText>
           </View>

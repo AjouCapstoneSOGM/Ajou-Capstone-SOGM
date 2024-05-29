@@ -16,6 +16,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import PortfolioPieChart from "../../utils/PortfolioPieChart";
 import { Button, Divider, Icon, Overlay } from "@rneui/base";
 import { width, height, filteringNumber, colorScale } from "../../utils/utils";
+import StockInfo from "./StockInfo";
 
 const PortfolioDetails = ({ route, navigation }) => {
   const stocksLength = 10;
@@ -32,13 +33,18 @@ const PortfolioDetails = ({ route, navigation }) => {
   });
   const [selectedId, setSelectedId] = useState(null);
   const [alertExist, setAlertExist] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
+  const [infoVisible, setInfoVisible] = useState(false);
+  const [stockInfoVisible, setStockInfoVisible] = useState(false);
   const [modifyQuantity, setModifyQuantity] = useState(0);
   const [modifyPrice, setModifyPrice] = useState(0);
   const [modifyBuy, setModifyBuy] = useState(true);
 
-  const toggleModal = () => {
-    setIsVisible(!isVisible);
+  const toggleInfoModal = () => {
+    setInfoVisible(!infoVisible);
+  };
+
+  const toggleStockModal = () => {
+    setStockInfoVisible(!stockInfoVisible);
   };
 
   const fetchModifyStockManual = async () => {
@@ -94,7 +100,7 @@ const PortfolioDetails = ({ route, navigation }) => {
   const handleBuyChange = (isBuy) => {
     setModifyBuy(!isBuy);
     if (
-      isBuy ===
+      isBuy &&
       Number(modifyQuantity) > Number(portfolio.stocks[selectedId].quantity)
     )
       setModifyQuantity(portfolio.stocks[selectedId].quantity);
@@ -138,7 +144,7 @@ const PortfolioDetails = ({ route, navigation }) => {
   };
   const getStockRate = (id) => {
     const stockRate =
-      (portfolio.stocks[id].quantity * portfolio.stocks[id].averageCost) /
+      (portfolio.stocks[id].quantity * portfolio.stocks[id].currentPrice) /
       getTotalPrice();
 
     return stockRate;
@@ -348,7 +354,7 @@ const PortfolioDetails = ({ route, navigation }) => {
                           type="clear"
                           onPress={() => {
                             setModifyPrice(item.currentPrice);
-                            toggleModal();
+                            toggleInfoModal();
                             setSelectedId(index);
                           }}
                           icon={{
@@ -422,11 +428,7 @@ const PortfolioDetails = ({ route, navigation }) => {
                       <View style={styles.utilContainer}>
                         <TouchableOpacity
                           style={styles.utilButton}
-                          onPress={() => {
-                            navigation.navigate("NewsSummary", {
-                              ticker: item.ticker,
-                            });
-                          }}
+                          onPress={toggleStockModal}
                         >
                           <AppText style={{ fontSize: 18, color: "#f0f0f0" }}>
                             종목 정보
@@ -454,105 +456,112 @@ const PortfolioDetails = ({ route, navigation }) => {
         </ScrollView>
       </View>
       {selectedId !== null && (
-        <Overlay
-          isVisible={isVisible}
-          onBackdropPress={() => {
-            setSelectedId(null);
-            resetModifyData();
-            toggleModal();
-          }}
-          overlayStyle={styles.overlay}
-        >
-          <Button
-            containerStyle={styles.closeButton}
-            onPress={() => {
+        <React.Fragment>
+          <StockInfo
+            isVisible={stockInfoVisible}
+            onToggle={toggleStockModal}
+            ticker={portfolio.stocks[selectedId].ticker}
+          />
+          <Overlay
+            isVisible={infoVisible}
+            onBackdropPress={() => {
               setSelectedId(null);
               resetModifyData();
-              toggleModal();
+              toggleInfoModal();
             }}
-            type="clear"
-            icon={{ name: "close", type: "antdesign", color: "#f0f0f0" }}
-          />
-          <AppText
-            style={{ color: "#f0f0f0", fontSize: 20, fontWeight: "bold" }}
+            overlayStyle={styles.overlay}
           >
-            종목 수정
-          </AppText>
-          <View style={styles.content}>
-            <AppText
-              style={{
-                fontSize: 20,
-                fontWeight: "bold",
-                color: "#f0f0f0",
-                marginBottom: 20,
+            <Button
+              containerStyle={styles.closeButton}
+              onPress={() => {
+                setSelectedId(null);
+                resetModifyData();
+                toggleInfoModal();
               }}
+              type="clear"
+              icon={{ name: "close", type: "antdesign", color: "#f0f0f0" }}
+            />
+            <AppText
+              style={{ color: "#f0f0f0", fontSize: 20, fontWeight: "bold" }}
             >
-              {portfolio.stocks[selectedId].companyName}
+              종목 수정
             </AppText>
-            <View style={styles.contentsItem}>
-              <View style={styles.quantityContainer}>
-                <Button
-                  buttonStyle={{ marginHorizontal: -10 }}
-                  type="clear"
-                  onPress={() => {
-                    handleQuantityChange(String(Number(modifyQuantity) - 1));
-                  }}
-                  icon={{
-                    name: "minuscircleo",
-                    type: "antdesign",
-                    color: "#f0f0f0",
-                    size: 18,
-                  }}
-                />
+            <View style={styles.content}>
+              <AppText
+                style={{
+                  fontSize: 20,
+                  fontWeight: "bold",
+                  color: "#f0f0f0",
+                  marginBottom: 20,
+                }}
+              >
+                {portfolio.stocks[selectedId].companyName}
+              </AppText>
+              <View style={styles.contentsItem}>
+                <View style={styles.quantityContainer}>
+                  <Button
+                    buttonStyle={{ marginHorizontal: -10 }}
+                    type="clear"
+                    onPress={() => {
+                      handleQuantityChange(String(Number(modifyQuantity) - 1));
+                    }}
+                    icon={{
+                      name: "minuscircleo",
+                      type: "antdesign",
+                      color: "#f0f0f0",
+                      size: 18,
+                    }}
+                  />
+                  <TextInput
+                    value={String(modifyQuantity)}
+                    onChangeText={(value) => handleQuantityChange(value)}
+                    style={styles.inputQuantity}
+                    keyboardType="numeric"
+                  />
+                  <Button
+                    buttonStyle={{ marginHorizontal: -10 }}
+                    type="clear"
+                    onPress={() => {
+                      handleQuantityChange(String(Number(modifyQuantity) + 1));
+                    }}
+                    icon={{
+                      name: "pluscircleo",
+                      type: "antdesign",
+                      color: "#f0f0f0",
+                      size: 18,
+                    }}
+                  />
+                </View>
                 <TextInput
-                  value={String(modifyQuantity)}
-                  onChangeText={(value) => handleQuantityChange(value)}
-                  style={styles.inputQuantity}
+                  value={String(modifyPrice)}
+                  onChangeText={(value) => handlePriceChange(value)}
+                  style={styles.inputPrice}
                   keyboardType="numeric"
                 />
                 <Button
-                  buttonStyle={{ marginHorizontal: -10 }}
+                  containerStyle={{ flex: 0.7 }}
+                  titleStyle={{ color: modifyBuy ? "#ff5858" : "#5878ff" }}
+                  title={modifyBuy ? "매수" : "매도"}
                   type="clear"
                   onPress={() => {
-                    handleQuantityChange(String(Number(modifyQuantity) + 1));
-                  }}
-                  icon={{
-                    name: "pluscircleo",
-                    type: "antdesign",
-                    color: "#f0f0f0",
-                    size: 18,
+                    handleBuyChange(modifyBuy);
                   }}
                 />
               </View>
-              <TextInput
-                value={String(modifyPrice)}
-                onChangeText={(value) => handlePriceChange(value)}
-                style={styles.inputPrice}
-                keyboardType="numeric"
-              />
-              <Button
-                containerStyle={{ flex: 0.7 }}
-                titleStyle={{ color: modifyBuy ? "#ff5858" : "#5878ff" }}
-                title={modifyBuy ? "매수" : "매도"}
-                type="clear"
-                onPress={() => {
-                  handleBuyChange(modifyBuy);
-                }}
-              />
             </View>
-          </View>
-          <Button
-            buttonStyle={styles.submitButton}
-            title="반영"
-            disabled={modifyQuantity == 0}
-            onPress={async () => {
-              await fetchModifyStockManual();
-              resetModifyData();
-              await loadData();
-              toggleModal();
-            }}
-          />
-        </Overlay>
+            <Button
+              buttonStyle={styles.submitButton}
+              title="반영"
+              disabled={modifyQuantity == 0}
+              onPress={async () => {
+                await fetchModifyStockManual();
+                resetModifyData();
+                await loadData();
+                toggleInfoModal();
+              }}
+            />
+          </Overlay>
+        </React.Fragment>
       )}
     </SafeAreaView>
   );
