@@ -16,6 +16,7 @@ import MakePortfolio from "./pages/make/MakePortfolio";
 import ModifyPortfolio from "./pages/rebalance/ModifyPortfolio";
 import { AuthProvider } from "./utils/AuthContext";
 import { PortfolioProvider } from "./utils/PortfolioContext";
+import { PushNotificationProvider } from './utils/PushNotificationContext.js';
 
 import { setCustomText } from "react-native-global-props";
 import { useEffect, useState } from "react";
@@ -75,11 +76,13 @@ export default function App() {
   return (
     <AuthProvider>
       <PortfolioProvider>
-        <SafeAreaProvider>
-          <NavigationContainer>
-            <ScreenStack />
-          </NavigationContainer>
-        </SafeAreaProvider>
+        <PushNotificationProvider>
+          <SafeAreaProvider>
+            <NavigationContainer>
+              <ScreenStack />
+            </NavigationContainer>
+          </SafeAreaProvider>
+        </PushNotificationProvider>
       </PortfolioProvider>
     </AuthProvider>
   );
