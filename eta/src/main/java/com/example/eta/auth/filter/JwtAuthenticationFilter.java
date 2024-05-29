@@ -61,7 +61,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     // 로그인, 회원가입 API는 JWT 인증 필터 무시
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        List<String> pathsToExclude = List.of("/api/auth/", "/docs", "/oauth2/authorization");
-        return pathsToExclude.stream().anyMatch(path -> request.getRequestURI().startsWith(path));
+        String requestURI = request.getRequestURI();
+        if ((requestURI.startsWith("/api/auth/") || requestURI.startsWith("/docs")) && !requestURI.equals("/api/auth/logout")) {
+            return true;
+        }
+        return false;
     }
 }
