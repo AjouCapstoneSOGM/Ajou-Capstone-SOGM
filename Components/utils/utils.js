@@ -1,3 +1,5 @@
+import { Dimensions } from "react-native";
+
 export const deepCopy = (obj) => {
   if (obj === null || typeof obj !== "object") {
     return obj;
@@ -60,7 +62,19 @@ export const colorScale = [
   "hsl(338, 90%, 72%)", // 파스텔 레드,
   "hsl(20, 20%, 60%)", // 연 회색,
   "hsl(300, 90%, 80%)", // 파스텔 시안-그린,
-  "#555",
-  "#888",
+  "#00ac00",
+  "#ffd700",
   "#ccc",
 ];
+
+export const basicDimensions = {
+  // 디자이너가 작업하고 있는 XD파일 스크린의 세로,가로
+  height: 800,
+  width: 360,
+};
+
+export const height = // 높이 변환 작업
+  (Dimensions.get("screen").height * (1 / basicDimensions.height)).toFixed(2);
+
+export const width = // 가로 변환 작업
+  (Dimensions.get("screen").width * (1 / basicDimensions.width)).toFixed(2);
