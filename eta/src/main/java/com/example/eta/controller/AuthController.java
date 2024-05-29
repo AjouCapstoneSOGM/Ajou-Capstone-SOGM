@@ -75,7 +75,7 @@ public class AuthController {
         HashMap<String, Object> response = new HashMap<>() {{
             put("token", jwt);
             put("user_id", user.getUserId());
-            put("name", userService.findByEmail(loginDto.getEmail()).getName());
+            put("name", user.getName());
         }};
 
         return new ResponseEntity<>(response, httpHeaders, HttpStatus.OK);
@@ -158,6 +158,7 @@ public class AuthController {
             HashMap<String, Object> response = new HashMap<>() {{
                 put("token", jwt);
                 put("user_id", user.getUserId());
+                put("name", user.getName());
             }};
 
             return new ResponseEntity<>(response, httpHeaders, HttpStatus.OK);
