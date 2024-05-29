@@ -11,6 +11,7 @@ public class UserDto {
     public static class InfoDto {
         private String name;
         private String email;
+        private String signupToken;
         private String password;
 
     }

@@ -1,7 +1,15 @@
 import React from "react";
-import { View, StyleSheet, Alert, TouchableOpacity } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Alert,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
 import { usePortfolio } from "../../utils/PortfolioContext";
 import AppText from "../../utils/AppText";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Button, Divider } from "@rneui/base";
 
 const ManagementPage = ({ route, navigation }) => {
   const { fetchDelete } = usePortfolio();
@@ -26,8 +34,10 @@ const ManagementPage = ({ route, navigation }) => {
 
   const handleDelete = async () => {
     const result = await fetchDelete(portfolio.id);
-    if (result) navigation.popToTop();
-    else
+    if (result) {
+      navigation.popToTop();
+      navigation.navigate("ViewPortfolio");
+    } else
       Alert.alert("삭제 실패", "삭제에 실패했습니다", [
         {
           text: "확인",
@@ -39,14 +49,28 @@ const ManagementPage = ({ route, navigation }) => {
 
   if (portfolio) {
     return (
-      <View style={styles.container}>
-        <AppText style={styles.header}>{portfolio.name}이름</AppText>
-        <TouchableOpacity style={styles.Button} onPress={alertDelete}>
-          <AppText style={{ color: "red", fontSize: 20 }}>
-            포트폴리오 삭제
-          </AppText>
-        </TouchableOpacity>
-      </View>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <Button
+            type="clear"
+            onPress={() => {
+              navigation.goBack();
+            }}
+            icon={{ name: "left", type: "antdesign", color: "#333" }}
+          />
+        </View>
+        <View style={styles.textContainer}>
+          <AppText style={{ fontSize: 30, fontWeight: "bold" }}>설정</AppText>
+        </View>
+        <ScrollView style={styles.settingList}>
+          <TouchableOpacity onPress={alertDelete} style={styles.settingItem}>
+            <AppText style={{ color: "#ff5858", fontSize: 20 }}>
+              포트폴리오 삭제
+            </AppText>
+          </TouchableOpacity>
+          <Divider />
+        </ScrollView>
+      </SafeAreaView>
     );
   }
 };
@@ -54,20 +78,24 @@ const ManagementPage = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "flex-start",
     alignItems: "stretch",
-    padding: 10,
+    backgroundColor: "#f0f0f0",
   },
   header: {
-    fontSize: 22,
-    marginBottom: 30,
-    padding: 10,
+    height: 60,
+    alignItems: "flex-start",
   },
-  Button: {
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: "#ddd", // 옅은 회색
-    padding: 15,
+  textContainer: {
+    height: 90,
+    padding: 20,
+  },
+  settingList: {
+    backgroundColor: "#333",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+  },
+  settingItem: {
+    paddingVertical: 10,
   },
 });
 

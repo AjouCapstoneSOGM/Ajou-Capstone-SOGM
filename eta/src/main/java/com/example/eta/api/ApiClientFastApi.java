@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class ApiClient {
+public class ApiClientFastApi {
 
     @Value("${fastApi.url}")
     private String baseUrl;

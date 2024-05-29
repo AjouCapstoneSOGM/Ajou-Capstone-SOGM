@@ -18,6 +18,25 @@ public class TickerDto {
         private String name;
         private String exchange;
     }
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class TickerDetailDto{
+        private String name;
+        private String ticker;
+        private Float roe;
+        private Float roa;
+        private Float per;
+        private Float pbr;
+        private Float twelveMonthRet;
+        private int roeRank;
+        private int roaRank;
+        private int perRank;
+        private int pbrRank;
+        private int twelveMonthRetRank;
+        private int total;
+    }
 
     @Data
     @Builder

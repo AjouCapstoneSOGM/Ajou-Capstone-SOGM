@@ -13,6 +13,19 @@ export const setUsertoken = async (value) => {
   }
 };
 
+export const setUserName = async (name) => {
+  try {
+    await AsyncStorage.setItem("username", name);
+    console.log("name saved successfully");
+  } catch (e) {
+    console.log("Name saved error : Asynce Storage");
+  }
+};
+
+export const getUserName = async () => {
+  return await AsyncStorage.getItem("username");
+};
+
 export const removeUsertoken = async () => {
   return await AsyncStorage.removeItem("usertoken");
 };

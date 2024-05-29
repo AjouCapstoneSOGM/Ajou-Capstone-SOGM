@@ -6,18 +6,29 @@ import {
   Image,
   TextInput,
 } from "react-native";
+import { Divider } from "react-native-elements";
+
 import urls from "../../utils/urls";
-import { setUsertoken } from "../../utils/localStorageUtils.js";
+import { setUserName, setUsertoken } from "../../utils/localStorageUtils.js";
 import { useAuth } from "../../utils/AuthContext.js";
 import AppText from "../../utils/AppText.js";
+import { usePortfolio } from "../../utils/PortfolioContext.js";
+import Loading from "../../utils/Loading.js";
+import { usePushNotifications } from "../../utils/PushNotificationContext.js";
+import { width, height } from "../../utils/utils";
 
 const Login = ({ navigation }) => {
   const [useremail, setUseremail] = useState("test@test.com"); //
   const [password, setPassword] = useState("1234"); //
+  const [loading, setLoading] = useState(false);
+
   const { login } = useAuth();
+  const { loadData } = usePortfolio();
+  const { expoPushToken } = usePushNotifications();
 
   const fetchLoginInfo = async () => {
     try {
+      setLoading(true);
       const response = await fetch(`${urls.springUrl}/api/auth/login`, {
         method: "POST",
         headers: {
@@ -26,13 +37,17 @@ const Login = ({ navigation }) => {
         body: JSON.stringify({
           email: useremail,
           password: password,
+          expoPushToken: expoPushToken,
         }),
       });
       if (response.ok) {
         const data = await response.json();
-        setUsertoken(data.token);
+        await setUsertoken(data.token);
+        await setUserName(data.name);
         login();
-        navigation.navigate("Home", { screen: "Home" });
+        await loadData();
+        setLoading(false);
+        navigation.goBack();
       }
     } catch (error) {
       console.error("Error:", error);
@@ -40,10 +55,37 @@ const Login = ({ navigation }) => {
     }
   };
 
+  const handleSocialLogin = () => {
+    setLoading(true);
+    navigation.navigate("SocialLogin");
+
+    const unsubscribe = navigation.addListener("focus", () => {
+      //api 작동 후 주석 해제 필요
+      //login();
+      //loadData();
+      setLoading(false);
+      navigation.goBack();
+      unsubscribe();
+    });
+  };
+
+  if (loading) return <Loading />;
   return (
     <View style={styles.container}>
-      <AppText style={styles.HomeText}>로그인</AppText>
-
+      <View style={styles.textWrapper}>
+        <View style={styles.textContainer}>
+          <AppText style={styles.largeText}>E </AppText>
+          <AppText style={styles.smallText}>asiest</AppText>
+        </View>
+        <View style={styles.textContainer}>
+          <AppText style={styles.largeText}>T </AppText>
+          <AppText style={styles.smallText}>rading</AppText>
+        </View>
+        <View style={styles.textContainer}>
+          <AppText style={styles.largeText}>A </AppText>
+          <AppText style={styles.smallText}>ssistance</AppText>
+        </View>
+      </View>
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.inputBox}
@@ -59,23 +101,29 @@ const Login = ({ navigation }) => {
           secureTextEntry
         ></TextInput>
       </View>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity onPress={fetchLoginInfo} style={styles.button}>
+      <View style={styles.loginButtonContainer}>
+        <TouchableOpacity onPress={fetchLoginInfo} style={styles.loginButton}>
           <AppText style={styles.buttonText}>로그인</AppText>
         </TouchableOpacity>
+      </View>
+      <View style={styles.buttonWrapper}>
+        <TouchableOpacity
+          onPress={fetchLoginInfo}
+          style={styles.passwordButton}
+        >
+          <AppText style={styles.buttonText}>비밀번호 찾기</AppText>
+        </TouchableOpacity>
+        <View style={styles.dividerWrapper}>
+          <Divider style={styles.divider} />
+        </View>
         <TouchableOpacity
           onPress={() => navigation.navigate("Signup")}
-          style={styles.button}
+          style={styles.signupButton}
         >
           <AppText style={styles.buttonText}>회원가입</AppText>
         </TouchableOpacity>
       </View>
-      <TouchableOpacity
-        onPress={() =>
-          navigation.navigate("SocialLogin", { screen: "SocialLogin" })
-        }
-        style={styles.socialButton}
-      >
+      <TouchableOpacity onPress={handleSocialLogin} style={styles.socialButton}>
         <Image
           source={require("../../assets/images/kakao_login_medium_wide.png")}
           style={styles.image}
@@ -92,37 +140,71 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "stretch",
-    backgroundColor: "#fff",
+    backgroundColor: "#333",
   },
   HomeText: {
     paddingBottom: "15%",
     fontSize: 30,
     textAlign: "center",
+    color: "white",
+  },
+  textContainer: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    marginTop: height * -10,
+  },
+  textWrapper: {
+    alignItems: "flex-start",
+    marginLeft: width * 70,
+  },
+  buttonWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 20,
+  },
+  dividerWrapper: {
+    position: "absolute",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 20,
   },
   inputContainer: {
     alignItems: "stretch",
-    padding: 20,
-    paddingBottom: 10,
+    padding: width * 15,
+    paddingHorizontal: width * 20,
+    paddingBottom: height * 10,
   },
-  buttonContainer: {
+  loginButtonContainer: {
     alignItems: "stretch",
-    padding: 20,
-    paddingTop: 10,
+    justifyContent: "center",
+    paddingVertical: height,
+    paddingHorizontal: width * 30,
   },
   inputBox: {
     backgroundColor: "#eee",
     padding: 10,
-    marginVertical: 5,
+    marginVertical: height * 5,
     marginHorizontal: 10,
-    borderRadius: 5,
+    borderRadius: 40,
   },
-  button: {
-    backgroundColor: "#6495ED",
-    padding: 15,
-    marginVertical: 5,
-    marginHorizontal: 10,
-    borderRadius: 5,
+  passwordButton: {
+    backgroundColor: "transparent",
+    marginVertical: height * 5,
+    marginLeft: width * -30,
+    marginHorizontal: width * 0,
+    borderRadius: 30,
     alignItems: "center",
+    justifyContent: "center",
+  },
+  signupButton: {
+    backgroundColor: "transparent",
+    marginVertical: height * 5,
+    marginLeft: width * 80,
+    borderRadius: 30,
+    alignItems: "flex-end",
+    justifyContent: "flex-end",
   },
   socialButton: {
     alignSelf: "center",
@@ -132,5 +214,28 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "white",
     fontSize: 17,
+  },
+  divider: {
+    width: 1,
+    height: height * 40,
+    backgroundColor: "gray",
+    marginHorizontal: 10,
+  },
+  loginButton: {
+    backgroundColor: "#6495ed",
+    borderRadius: 30,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 10,
+    borderRadius: 40,
+  },
+  largeText: {
+    fontSize: 40,
+    fontWeight: "bold",
+    color: "#6495ed",
+  },
+  smallText: {
+    fontSize: 20,
+    color: "white",
   },
 });

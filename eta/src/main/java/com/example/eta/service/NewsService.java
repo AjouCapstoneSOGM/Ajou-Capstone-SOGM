@@ -1,6 +1,6 @@
 package com.example.eta.service;
 
-import com.example.eta.api.ApiClient;
+import com.example.eta.api.ApiClientFastApi;
 import com.example.eta.dto.NewsDto;
 import com.example.eta.entity.News;
 import com.example.eta.entity.Ticker;
@@ -8,7 +8,6 @@ import com.example.eta.repository.NewsRepository;
 import com.example.eta.repository.TickerRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -23,7 +22,7 @@ public class NewsService {
 
     private final NewsRepository newsRepository;
     private final TickerRepository tickerRepository;
-    private final ApiClient apiClient;
+    private final ApiClientFastApi apiClientFastApi;
 
     @Transactional
     public NewsDto getNews(String ticker) {
@@ -33,7 +32,7 @@ public class NewsService {
             News news = optionalNews.get();
             return new NewsDto(news.getSummary());
         } else {
-            Mono<ResponseEntity<NewsDto>> responseEntityMono = apiClient.getNewsFromFastApi(ticker);
+            Mono<ResponseEntity<NewsDto>> responseEntityMono = apiClientFastApi.getNewsFromFastApi(ticker);
 
             // 비동기 작업을 동기로 처리
             ResponseEntity<NewsDto> responseEntity = responseEntityMono.block();

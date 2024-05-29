@@ -21,6 +21,11 @@ public class TickerController {
     private final NewsService newsService;
     private final TickerService tickerService;
 
+    @GetMapping("/{ticker}")
+    public ResponseEntity<TickerDto.TickerDetailDto> getTicker(@PathVariable("ticker") String ticker) {
+        TickerDto.TickerDetailDto tickerDetailDto = tickerService.getTickerInfo(ticker);
+        return ResponseEntity.ok(tickerDetailDto);
+    }
     @GetMapping("/{ticker}/news")
     public ResponseEntity<NewsDto> getNews(@PathVariable String ticker) {
         NewsDto newsDto = newsService.getNews(ticker);

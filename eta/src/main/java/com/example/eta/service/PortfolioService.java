@@ -1,6 +1,6 @@
 package com.example.eta.service;
 
-import com.example.eta.api.ApiClient;
+import com.example.eta.api.ApiClientFastApi;
 import com.example.eta.dto.PortfolioDto;
 import com.example.eta.dto.TickerDto;
 import com.example.eta.entity.*;
@@ -27,7 +27,7 @@ public class PortfolioService {
     private final RebalancingTickerRepository rebalancingTickerRepository;
     private final PortfolioRecordRepository portfolioRecordRepository;
     private final PriceRepository priceRepository;
-    private final ApiClient apiClient;
+    private final ApiClientFastApi apiClientFastApi;
 
     /**
      * 포트폴리오의 종목별 비중을 계산하고, 포트폴리오의 총자산(현금+보유종목)을 반환합니다.
@@ -54,9 +54,14 @@ public class PortfolioService {
 
     @Transactional
     public Portfolio createInitAutoPortfolio(User user, PortfolioDto.CreateRequestDto createRequestDto) {
+        String name = createRequestDto.getName();
+        if (name == null) {
+            name = user.getName() + "의 자동 포트폴리오 " + (user.getPortfolios().size() + 1);
+        }
+
         Portfolio portfolio = new Portfolio().builder()
                 .user(user)
-                .name(createRequestDto.getName())
+                .name(name)
                 .country(createRequestDto.getCountry())
                 .isAuto(true)
                 .initAsset(createRequestDto.getAsset())
@@ -65,6 +70,7 @@ public class PortfolioService {
                 .riskValue(createRequestDto.getRiskValue())
                 .build();
         portfolioRepository.save(portfolio);
+        user.getPortfolios().add(portfolio);
 
         for (Sector sector : sectorRepository.findAllById(createRequestDto.getSector())) {
             PortfolioSector portfolioSector = new PortfolioSector().builder()
@@ -100,7 +106,7 @@ public class PortfolioService {
             }
         }
 
-        PortfolioDto.CreatedResultFromFastApiDto createdResultFromFastApiDto = apiClient.getCreatedPortfolioApi(PortfolioDto.CreateRequestToFastApiDto.builder()
+        PortfolioDto.CreatedResultFromFastApiDto createdResultFromFastApiDto = apiClientFastApi.getCreatedPortfolioApi(PortfolioDto.CreateRequestToFastApiDto.builder()
                 .tickers(postfixedTickers)
                 .safe_asset_ratio(
                         createRequestDto.getRiskValue() == 1 ? 0.3f :
@@ -120,7 +126,7 @@ public class PortfolioService {
                 .build();
         rebalancingRepository.save(rebalancing);
 
-        List<TickerDto.TickerPrice> tickerPrices = apiClient.getCurrentTickerPrice(tickers.stream().map(Ticker::getTicker).toList()).block().getBody().getPrices();
+        List<TickerDto.TickerPrice> tickerPrices = apiClientFastApi.getCurrentTickerPrice(tickers.stream().map(Ticker::getTicker).toList()).block().getBody().getPrices();
 
         for (int i = 0; i < tickers.size(); i++) {
             RebalancingTicker rebalancingTicker = rebalancingTickerRepository.save(RebalancingTicker.builder()
@@ -143,8 +149,6 @@ public class PortfolioService {
             portfolio.getPortfolioTickers().add(portfolioTicker);
         }
 
-        // TODO: 채권 추가
-
         portfolioRepository.save(portfolio);
     }
 
@@ -155,10 +159,10 @@ public class PortfolioService {
     public PortfolioDto.PerformanceResponseDto getPerformanceData(Integer pfId) {
         Portfolio portfolio = portfolioRepository.findById(pfId).get();
 
-        List<PortfolioDto.PortfolioPerformance> portfolioPerformances = new ArrayList<>();
+        List<PortfolioDto.PortfolioPerformanceDto> portfolioPerformances = new ArrayList<>();
         for (PortfolioTicker pt : portfolio.getPortfolioTickers()) {
             Ticker ticker = pt.getTicker();
-            portfolioPerformances.add(PortfolioDto.PortfolioPerformance.builder()
+            portfolioPerformances.add(PortfolioDto.PortfolioPerformanceDto.builder()
                     .ticker(ticker.getTicker())
                     .quantity(pt.getNumber())
                     .companyName(ticker.getName())
@@ -184,6 +188,7 @@ public class PortfolioService {
         Portfolio portfolio = new Portfolio().builder()
                 .user(user)
                 .name(request.getName())
+                .createdDate(LocalDateTime.now())
                 .country(request.getCountry())
                 .isAuto(false)
                 .initAsset(totalAsset)
