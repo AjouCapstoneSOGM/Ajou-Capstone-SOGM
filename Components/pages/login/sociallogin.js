@@ -1,3 +1,11 @@
+import React, { useState } from "react";
+import { View, StyleSheet, ActivityIndicator } from "react-native";
+import urls from "../../utils/urls";
+import { WebView } from "react-native-webview";
+
+import { setUserName, setUsertoken } from "../../utils/localStorageUtils.js";
+import { usePushNotifications } from "../../utils/PushNotificationContext.js";
+
 const REST_API_KEY = "fb89b59e48d1926cb3653c68bc05de5e";
 const REDIRECT_URI = "https://sogm.ajou.ac.kr/oauth";
 const KAKAO_LOGIN_URL = `https://kauth.kakao.com/oauth/authorize?client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}&response_type=code`;
