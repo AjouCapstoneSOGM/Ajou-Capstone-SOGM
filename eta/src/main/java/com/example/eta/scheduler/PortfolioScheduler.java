@@ -35,6 +35,7 @@ public class PortfolioScheduler {
     private Logger logger = LoggerFactory.getLogger(PortfolioScheduler.class);
 
     @Scheduled(cron = "0 0 0 * * 1-5")
+    @Transactional
     public void doProportionRebalancing() {
         for (Portfolio portfolio : portfolioRepository.findAllByIsAutoIsTrue()) {
             updateProportion(portfolio);
