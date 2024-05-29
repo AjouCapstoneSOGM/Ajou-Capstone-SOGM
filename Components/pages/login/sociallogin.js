@@ -24,7 +24,7 @@ const SocialLogin = ({ navigation }) => {
         },
         body: JSON.stringify({
           accessToken: requestCode,
-          expoPushToken: "expoPushToken",
+          expoPushToken: expoPushToken,
         }),
       });
       if (response.ok) {

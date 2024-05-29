@@ -122,7 +122,7 @@ const Signup = ({ navigation }) => {
       else if(respone == 403) {
         Alert.alert("인증번호가 잘못되었습니다.")
       }
-      else{
+      else if(respone == 200){
         Alert.alert("회원가입 완료", "회원가입이 완료되었습니다.", [
         {
           text: "확인",
@@ -132,8 +132,10 @@ const Signup = ({ navigation }) => {
           style: "destructive",
         },
       ]);
-
-      }
+    }
+    else {
+      Alert.alert("다시 시도해 주세요.");
+    }
       
     }
   };
@@ -165,26 +167,29 @@ const Signup = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <AppText style={styles.HomeText}>회원가입</AppText>
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.inputBox}
-          value={username}
-          placeholder="이름"
-          onChangeText={setUsername}
-        />
-        <View style={styles.emailContainer}>
+      <View style={styles.allContainer}>
+        <View style={styles.inputContainer}>
           <TextInput
-            onChangeText={setUseremail}
+            style={styles.inputBox}
+            value={username}
+            placeholder="닉네임"
+            onChangeText={setUsername}
+            placeholderTextColor="grey"
+          ></TextInput>
+        </View>
+        <View style={styles.verifyInputContainer}>
+          <TextInput
+            style={styles.verifyInputBox}
             value={useremail}
+            onChangeText={setUseremail}
             placeholder="이메일"
-            style={[styles.inputBox, { flex: 1 }]}
+            placeholderTextColor="grey"
           />
           <TouchableOpacity
-            onPress={sendVerificationCode}
             style={styles.verifyButton}
-            disabled={!isEmailValid(useremail)}
+            onPress={sendVerificationCode}
           >
-            <AppText style={styles.verifyButtonText}>인증하기</AppText>
+            <AppText style={styles.verifybuttonText}>인증번호 전송</AppText>
           </TouchableOpacity>
         </View>
         {!checkEmail && useremail && (
@@ -192,40 +197,54 @@ const Signup = ({ navigation }) => {
             올바른 형식을 입력해주세요
           </AppText>
         )}
-        <TextInput
-          onChangeText={setPassword}
-          value={password}
-          placeholder="비밀번호"
-          style={styles.inputBox}
-          secureTextEntry
-        />
-        {!checkPwLen && password && (
-          <AppText style={styles.notificationText}>
-            비밀번호는 {MinPasswordLength}자리 이상이어야 합니다
-          </AppText>
-        )}
-        <TextInput
-          onChangeText={setpwcheck}
-          value={pwcheck}
-          placeholder="비밀번호 확인"
-          style={styles.inputBox}
-          secureTextEntry
-        />
-        {!checkPw && pwcheck && (
-          <AppText style={styles.notificationText}>
-            비밀번호를 정확히 입력해주세요
-          </AppText>
-        )}
-        <TextInput
-          onChangeText={setVerificationCode}
-          value={verificationCode}
-          placeholder="인증 코드"
-          style={styles.inputBox}
-        />
-        <TouchableOpacity onPress={verifyCode} style={styles.verifyButton}>
-          <AppText style={styles.verifyButtonText}>인증 코드 확인</AppText>
-        </TouchableOpacity>
+        <View style={styles.verifyInputContainer}>
+          <TextInput
+            value={verificationCode}
+            onChangeText={setVerificationCode}
+            placeholder="인증번호"
+            style={styles.verifyInputBox}
+            placeholderTextColor="grey"
+            keyboardType="number-pad"
+          ></TextInput>
+          <TouchableOpacity
+            style={styles.verifyButton}
+            onPress={verifyCode}
+          >
+            <AppText style={styles.verifybuttonText}>인증번호 확인</AppText>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.inputContainer}>
+          <TextInput
+            onChangeText={setPassword}
+            value={password}
+            placeholder="비밀번호"
+            style={styles.inputBox}
+            secureTextEntry
+            placeholderTextColor="grey"
+          ></TextInput>
+          {!checkPwLen && password && (
+            <AppText style={styles.notificationText}>
+              비밀번호는 {MinPasswordLength}자리 이상이어야 합니다
+            </AppText>
+          )}
+        </View>
+        <View style={styles.inputContainer}>
+          <TextInput
+            onChangeText={setpwcheck}
+            value={pwcheck}
+            placeholder="비밀번호 확인"
+            style={styles.inputBox}
+            secureTextEntry
+            placeholderTextColor="grey"
+          ></TextInput>
+          {!checkPw && pwcheck && (
+            <AppText style={styles.notificationText}>
+              비밀번호를 정확히 입력해주세요
+            </AppText>
+          )}
+        </View>
       </View>
+
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           onPress={handleSignUp}
