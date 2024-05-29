@@ -5,6 +5,7 @@ import AppText from "./AppText";
 import { useAuth } from "./AuthContext";
 import { useNavigation } from "@react-navigation/native";
 import { getUserName } from "./localStorageUtils";
+import { height, width } from "./utils";
 
 const HeaderComponent = () => {
   const { isLoggedIn, userName } = useAuth();
@@ -52,12 +53,12 @@ const HeaderComponent = () => {
 
 const styles = StyleSheet.create({
   header: {
-    height: 60,
+    height: height * 60,
     backgroundColor: "#f0f0f0",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingLeft: 10,
+    paddingLeft: width * 15,
   },
   title: {
     fontSize: 20,

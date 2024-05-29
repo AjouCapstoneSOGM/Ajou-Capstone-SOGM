@@ -7,10 +7,15 @@ import FooterComponent from "../utils/Footer.js";
 import { SearchBar } from "@rneui/themed";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { width, height } from "../utils/utils";
+import InfoModal from "../utils/InfoModal";
 
 const Home = ({ navigation }) => {
   const [FGI, setFGI] = useState(55);
   const [search, setSearch] = useState("");
+  const [isVisible, setIsVisible] = useState(false);
+  const [FGIinfo, setFGIinfo] = useState(55);
+
   const news = [
     {
       title: "아스트라제네카, 2030년까지 800억달러 매출 목표",
@@ -48,6 +53,10 @@ const Home = ({ navigation }) => {
     setSearch(search);
   };
 
+  const toggleModal = () => {
+    setIsVisible(!isVisible);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <HeaderComponent />
@@ -71,7 +80,12 @@ const Home = ({ navigation }) => {
             <Button
               buttonStyle={{ marginHorizontal: -10 }}
               type="clear"
-              onPress={() => {}}
+              onPress={() => {
+                toggleModal();
+                setFGIinfo(
+                  `CNN에서 제공하는 공포탐욕지수(Fear & Greed Index)는 주식시장의 투자 심리를 나타내는 지표입니다.\n\n0~25: "극심한 공포" 구간, 좋은 매수 기회로 여겨집니다.\n25~50: "공포" 구간, 좋은 매수 기회로 여겨집니다.\n50~75: "탐욕" 구간, 주의가 필요합니다.\n75~100: "극심한 탐욕" 구간, 매도 시점을 고려해볼 수 있습니다. `
+                );
+              }}
               icon={{
                 name: "questioncircleo",
                 type: "antdesign",
@@ -79,6 +93,7 @@ const Home = ({ navigation }) => {
               }}
             />
           </View>
+
           <View style={styles.FGIContent}>
             <AppText style={{ fontSize: 20 }}>
               <AppText style={{ fontSize: 25, fontWeight: "bold" }}>
@@ -108,9 +123,12 @@ const Home = ({ navigation }) => {
           ))}
         </View>
       </ScrollView>
-      <View style={{ height: 70 }} />
+      <View style={{ height: height * 30 }} />
       {/* footer 높이 만큼 증가 */}
       <FooterComponent />
+      <InfoModal isVisible={isVisible} onToggle={toggleModal}>
+        {FGIinfo}
+      </InfoModal>
     </SafeAreaView>
   );
 };
@@ -121,30 +139,30 @@ const styles = StyleSheet.create({
     backgroundColor: "#f0f0f0",
   },
   searchBarContainer: {
-    height: 90,
+    height: height * 80,
     backgroundColor: "#f0f0f0",
-    paddingVertical: 20,
-    paddingHorizontal: 20,
+    paddingVertical: height * 20,
+    paddingHorizontal: width * 15,
   },
   searchContainer: {
     borderRadius: 30,
     borderBottomColor: "transparent",
     borderTopColor: "transparent",
-    padding: 4,
+    padding: width * 5,
     paddingRight: 50,
-    height: 50,
+    height: height * 50,
   },
   searchInputContainer: {
     backgroundColor: "#f0f0f0",
     borderRadius: 30,
-    height: 40,
+    height: height * 40,
   },
   mainTheme: {
     backgroundColor: "#333",
   },
   FGIContainer: {
-    paddingHorizontal: 10,
-    paddingVertical: 30,
+    paddingHorizontal: width * 20,
+    paddingVertical: height * 10,
   },
   FGIHeader: {
     flexDirection: "row",
@@ -165,19 +183,19 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   newsContainer: {
-    paddingHorizontal: 10,
-    paddingVertical: 30,
+    paddingHorizontal: width * 10,
+    paddingVertical: height * 15,
   },
   newsHeader: {
     fontSize: 20,
     fontWeight: "bold",
     color: "#f0f0f0",
-    marginBottom: 30,
+    marginBottom: height * 15,
   },
   newsTitle: {
     fontSize: 18,
     color: "#f0f0f0",
-    marginBottom: 15,
+    marginBottom: height * 10,
   },
 });
 export default Home;

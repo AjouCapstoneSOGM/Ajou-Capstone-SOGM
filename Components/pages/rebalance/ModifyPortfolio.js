@@ -10,7 +10,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Divider, Icon } from "@rneui/base";
 import { usePortfolio } from "../../utils/PortfolioContext";
-import { deepCopy, filteringNumber } from "../../utils/utils";
+import { width, height, deepCopy, filteringNumber } from "../../utils/utils";
 import PortfolioPieChart from "../../utils/PortfolioPieChart";
 import AppText from "../../utils/AppText";
 import Loading from "../../utils/Loading";
@@ -137,12 +137,12 @@ const ModifyPortfolio = ({ route, navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.textContainer}>
-        <AppText style={{ fontSize: 30, fontWeight: "bold", color: "#333" }}>
+        <AppText style={{ fontSize: 25, fontWeight: "bold", color: "#333" }}>
           {isPortfolioInit() ? "최초 매수를" : "리밸런싱을"} 해야하는 종목{" "}
           {rebalances.length}개가 있어요
         </AppText>
         <Button
-          buttonStyle={{ marginHorizontal: -10 }}
+          buttonStyle={{ marginHorizontal: width * 10 }}
           type="clear"
           onPress={() => {
             toggleModal();
@@ -161,24 +161,24 @@ const ModifyPortfolio = ({ route, navigation }) => {
       </View>
       <View style={styles.chartContainer}>
         <View style={styles.chartTitle}>
-          <AppText style={{ color: "#333", fontSize: 23, fontWeight: "bold" }}>
-            수정 전
+          <AppText style={{ color: "#333", fontSize: 20, fontWeight: "bold" }}>
+            {isPortfolioInit() ? "자산배분" : "리밸런싱"}전
           </AppText>
           <Icon name="right" type="antdesign" color="#333" />
-          <AppText style={{ color: "#333", fontSize: 23, fontWeight: "bold" }}>
-            수정 후
+          <AppText style={{ color: "#333", fontSize: 20, fontWeight: "bold" }}>
+            {isPortfolioInit() ? "자산배분" : "리밸런싱"}후
           </AppText>
         </View>
         <View style={styles.chartContent}>
           <PortfolioPieChart
             data={portfolio.detail}
             selectedId={selectedId}
-            size={0.5}
+            size={width * 0.5}
           />
           <PortfolioPieChart
             data={calculateAfter().detail}
             selectedId={selectedId}
-            size={0.5}
+            size={width * 0.5}
           />
         </View>
       </View>
@@ -197,7 +197,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
               onPress={() => {
                 toggleModal();
                 setInfo(
-                  `표시되는 1주 당 금액은 알림 생성 당시의 금액을 나타냅니다.\n\n만일 표시된 금액이 실제로 매수/매도하려는 금액과 다를 경우엔 알맞게 수정해주세요.`
+                  `표시되는 한 주당 금액은 포트폴리오 비중 계산에 사용한 전날 종가 금액을 나타냅니다.\n\n만일 표시된 금액이 실제로 매수/매도하려는 금액과 다를 경우엔 알맞게 수정해주세요.`
                 );
               }}
               icon={{
@@ -212,12 +212,12 @@ const ModifyPortfolio = ({ route, navigation }) => {
         <View style={styles.column}>
           <AppText style={styles.columnName}>기업명</AppText>
           <AppText style={styles.columnNumber}>수량</AppText>
-          <AppText style={styles.columnPrice}>1주 당 금액</AppText>
+          <AppText style={styles.columnPrice}>한 주당 금액</AppText>
           <AppText style={styles.columnRateDiff}>비중 변화</AppText>
         </View>
       </View>
       <View style={{ flex: 2 }}>
-        <ScrollView style={styles.rebalanceList}>
+        <ScrollView style={styles.rebalanceList} persistentScrollbar={true}>
           {rebalances.map(
             (item, index) =>
               item.isBuy === true && (
@@ -236,6 +236,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
                       onChangeText={(text) => handleChangePrices(index, text)}
                       placeholder={item.price.toString()}
                       placeholderTextColor="#bbb"
+                      keyboardType="number-pad"
                     />
                     <AppText
                       style={[
@@ -276,28 +277,33 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     padding: 15,
-    paddingTop: 70,
+    paddingTop: height * 30,
+    marginBottom: height * -15,
   },
   chartContainer: {
     flex: 1,
-    marginVertical: 20,
+    marginVertical: height * 20,
+    marginBottom: height * 35,
   },
   chartTitle: {
     flexDirection: "row",
-    justifyContent: "space-evenly",
+    justifyContent: "space-between",
+    paddingHorizontal: width * 45,
     alignItems: "center",
   },
   chartContent: {
     flexDirection: "row",
-    justifyContent: "space-around",
+    justifyContent: "space-evenly",
+    alignItems: "center",
+    padding: 0,
   },
   rebalanceList: {
     backgroundColor: "#333",
-    paddingHorizontal: 20,
+    paddingHorizontal: width * 15,
   },
   headerContainer: {
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingTop: height * 10,
     backgroundColor: "#333",
   },
   rebalanceHeader: {
@@ -341,17 +347,20 @@ const styles = StyleSheet.create({
   },
   itemName: {
     flex: 1.3,
+    fontSize: 13,
     color: "#f0f0f0",
     fontWeight: "bold",
     textAlign: "center",
   },
   itemNumber: {
     flex: 1,
+    fontSize: 14,
     color: "#f0f0f0",
     textAlign: "center",
   },
   itemPrice: {
     flex: 1.2,
+    fontSize: 15,
     color: "#f0f0f0",
     textAlign: "center",
   },
@@ -363,7 +372,7 @@ const styles = StyleSheet.create({
   nextButton: {
     backgroundColor: "#6262e8",
     borderRadius: 10,
-    height: 60,
+    height: 50,
   },
   nextButtonContainer: {
     paddingBottom: 20,

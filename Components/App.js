@@ -16,7 +16,7 @@ import MakePortfolio from "./pages/make/MakePortfolio";
 import ModifyPortfolio from "./pages/rebalance/ModifyPortfolio";
 import { AuthProvider } from "./utils/AuthContext";
 import { PortfolioProvider } from "./utils/PortfolioContext";
-import { PushNotificationProvider } from './utils/PushNotificationContext.js';
+import { PushNotificationProvider } from "./utils/PushNotificationContext.js";
 
 import { setCustomText } from "react-native-global-props";
 import { useEffect, useState } from "react";

@@ -3,6 +3,7 @@ import { View, StyleSheet } from "react-native";
 import { Button } from "@rneui/themed";
 import { useNavigation } from "@react-navigation/native";
 import { useAuth } from "./AuthContext";
+import { height, width } from "./utils";
 
 const FooterComponent = () => {
   const navigation = useNavigation();
@@ -57,13 +58,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
-    height: 70,
+    height: height * 70,
     backgroundColor: "#333",
     borderTopColor: "#e1e1e1",
     position: "absolute",
-    bottom: 0,
-    right: 0,
-    left: 0,
+    bottom: height * 0,
+    right: width * 0,
+    left: width * 0,
   },
   buttonContainer: {
     flex: 1,
