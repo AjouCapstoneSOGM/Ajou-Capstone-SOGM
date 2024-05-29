@@ -27,7 +27,7 @@ const AutoPage3 = ({ sector, interest, setInterest }) => {
         </AppText>
       </View>
       <View style={styles.sectorContainer}>
-        <ScrollView>
+        <ScrollView persistentScrollbar={true}>
           {Object.entries(sector).map(([code, name], index) => (
             <TouchableOpacity
               key={code}

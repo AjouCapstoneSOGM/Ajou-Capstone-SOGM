@@ -15,9 +15,11 @@ import PagerView from "react-native-pager-view";
 import PortfolioPieChart from "../../../utils/PortfolioPieChart";
 import { Icon } from "@rneui/base";
 import { colorScale } from "../../../utils/utils";
+import { width, height } from "../../../utils/utils";
 
 const AutoPage4 = ({ amount, riskLevel, interest, step }) => {
-  const { fetchStocksByPortfolioId, fetchRebalanceList } = usePortfolio();
+  const { fetchStocksByPortfolioId, fetchCurrentPrice, fetchRebalanceList } =
+    usePortfolio();
   const [loading, setLoading] = useState(true);
   const [pfId, setPfId] = useState("");
   const [portfolio, setPortfolio] = useState([]);
@@ -38,7 +40,7 @@ const AutoPage4 = ({ amount, riskLevel, interest, step }) => {
         setInitRebalance(rebalance[0]);
         setLoading(false);
       };
-      if (!portfolio) loadPortfolio();
+      loadPortfolio();
     }
   }, [pfId]);
 
@@ -107,7 +109,7 @@ const AutoPage4 = ({ amount, riskLevel, interest, step }) => {
           <AppText style={styles.columnTicker}>티커</AppText>
         </View>
         <View style={styles.labelContainer}>
-          <ScrollView>
+          <ScrollView persistentScrollbar={true}>
             {portfolio.stocks.map(
               (stock, index) =>
                 stock.equity === "보통주" && (
@@ -178,7 +180,7 @@ const AutoPage4 = ({ amount, riskLevel, interest, step }) => {
               })),
             }}
             selectedId={selectedId}
-            size={0.6}
+            size={width * 0.55}
           />
         </View>
         <View>
@@ -275,36 +277,48 @@ const styles = StyleSheet.create({
     alignItems: "stretch",
   },
   textContainer: {
-    paddingHorizontal: 10,
-    paddingBottom: 20,
+    paddingHorizontal: width * 10,
+    paddingBottom: height * 10,
   },
   titleText: {
     fontSize: 30,
     fontWeight: "bold",
     color: "#333",
   },
+  infoContainer: {
+    marginTop: height * -10,
+    marginBottom: height * 10,
+  },
   contentsContainer: {
     flex: 1,
     alignItems: "stretch",
     backgroundColor: "#333",
-    paddingTop: 20,
+    paddingTop: height * 20,
+  },
+  labelContainer: {
+    flex: 1,
+    alignItems: "stretch",
+    backgroundColor: "#333",
+    paddingTop: 0,
   },
   column: {
     flexDirection: "row",
-    marginBottom: 10,
+    marginBottom: height * 5,
   },
   columnName: {
     flex: 1,
+    marginLeft: width * 20,
+    marginRight: width * 35,
     color: "#808080",
     textAlign: "center",
   },
   columnNumber: {
     flex: 1,
     color: "#808080",
-    textAlign: "center",
   },
   columnPrice: {
     flex: 1,
+    marginRight: width * 15,
     color: "#808080",
     textAlign: "center",
   },
@@ -315,13 +329,8 @@ const styles = StyleSheet.create({
   },
   pageContainer: {
     flex: 1,
-    paddingHorizontal: 20,
+    paddingHorizontal: height * 15,
   },
-  infoContainer: {
-    alignItems: "flex-start",
-    marginBottom: 10,
-  },
-  labelContainer: {},
   labelItemContent: {
     flexDirection: "row",
     justifyContent: "space-around",
@@ -338,10 +347,10 @@ const styles = StyleSheet.create({
   itemName: {
     flex: 1,
     color: "#f0f0f0",
-    marginRight: 10,
+    marginRight: width * -15,
     fontWeight: "bold",
     textAlign: "center",
-    fontSize: 15,
+    fontSize: 14,
   },
   itemNumber: {
     flex: 1,

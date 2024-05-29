@@ -3,6 +3,7 @@ import { View, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
 import AppText from "../../../utils/AppText";
 import { VictoryPie, VictoryLabel } from "victory-native";
 import { Icon } from "@rneui/base";
+import { width, height } from "../../../utils/utils";
 
 const AutoPage2 = ({ riskLevel, setRiskLevel }) => {
   const riskText = ["안정투자형", "위험중립형", "적극투자형"];
@@ -52,7 +53,7 @@ const AutoPage2 = ({ riskLevel, setRiskLevel }) => {
             <AppText
               style={{
                 color: riskColor[index],
-                fontSize: 25,
+                fontSize: 18,
                 fontWeight: "bold",
               }}
             >
@@ -60,42 +61,48 @@ const AutoPage2 = ({ riskLevel, setRiskLevel }) => {
             </AppText>
           </TouchableOpacity>
         ))}
-        {riskLevel && (
-          <ScrollView>
-            <View style={styles.chartContainer}>
-              <VictoryPie
-                colorScale={["tomato", "green"]}
-                data={[
-                  { x: "주식", y: stock[riskLevel - 1] },
-                  { x: "안전자산", y: safe[riskLevel - 1] },
-                ]}
-                width={250}
-                height={250}
-                labelComponent={
-                  <VictoryLabel style={{ fill: "#f0f0f0", fontSize: 13 }} />
-                }
-                labelRadius={({ innerRadius }) => innerRadius + 25}
-              />
-            </View>
-            <View style={styles.infoContainer}>
-              <AppText style={styles.infoText}>
-                {infoText[riskLevel - 1][0]}
-              </AppText>
-              <AppText style={styles.infoText}>
-                {infoText[riskLevel - 1][1]}
-              </AppText>
-              <AppText style={styles.infoText}>
-                {infoText[riskLevel - 1][2]}
-              </AppText>
-            </View>
-          </ScrollView>
-        )}
-        <View style={styles.safeInfoContainer}>
-          <AppText style={styles.safeinfoText}>안전자산이란?</AppText>
-          <AppText style={styles.safeinfoText}>
-            주식과 움직임이 반대인 달러와 금으로 구성되어 있습니다.
-          </AppText>
-        </View>
+        <ScrollView persistentScrollbar={true}>
+          {riskLevel && (
+            <>
+              <View style={styles.chartContainer}>
+                <VictoryPie
+                  colorScale={["tomato", "green"]}
+                  data={[
+                    { x: "주식", y: stock[riskLevel - 1] },
+                    { x: "안전자산", y: safe[riskLevel - 1] },
+                  ]}
+                  width={width * 250}
+                  height={width * 250}
+                  labelComponent={
+                    <VictoryLabel
+                      style={{
+                        fill: "#f0f0f0",
+                        fontSize: 12,
+                        fontWeight: "bold",
+                      }}
+                    />
+                  }
+                  labelRadius={({ innerRadius }) => innerRadius + width * 40}
+                />
+              </View>
+              <View style={styles.infoContainer}>
+                <AppText style={styles.infoText}>
+                  {infoText[riskLevel - 1][0]}
+                </AppText>
+                <AppText style={styles.infoText}>
+                  {infoText[riskLevel - 1][1]}
+                </AppText>
+                <AppText style={styles.infoText}>
+                  {infoText[riskLevel - 1][2]}
+                </AppText>
+                <AppText style={styles.safeinfoText}>안전자산이란?</AppText>
+                <AppText style={styles.safeinfoText}>
+                  주식과 움직임이 반대인 달러와 금으로 구성되어 있습니다.
+                </AppText>
+              </View>
+            </>
+          )}
+        </ScrollView>
       </View>
     </View>
   );
@@ -106,21 +113,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f0f0f0",
   },
-  safeInfoContainer: {
-    position: "absolute",
-    bottom: 5,
-    left: 20,
-  },
   safeinfoText: {
-    fontSize: 11,
-    color: "#808080",
+    fontSize: 13,
+    color: "#c0c0c0",
   },
   contentsContainer: {
     flex: 1,
     alignItems: "stretch",
     backgroundColor: "#333",
-    paddingHorizontal: 20,
-    paddingTop: 10,
+    paddingHorizontal: width * 15,
+    paddingTop: height * 5,
   },
   textContainer: {
     paddingHorizontal: 10,
@@ -134,9 +136,9 @@ const styles = StyleSheet.create({
   input_Risk: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 15,
-    paddingBottom: 15,
-    borderBottomWidth: 1,
+    marginTop: height * 10,
+    paddingBottom: height * 10,
+    borderBottomWidth: 1.5,
     borderColor: "#808080",
   },
   riskInfo: {
@@ -154,6 +156,7 @@ const styles = StyleSheet.create({
     color: "#f0f0f0",
   },
   chartContainer: {
+    marginTop: height * -35,
     alignItems: "center",
   },
 });
