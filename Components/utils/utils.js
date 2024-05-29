@@ -1,3 +1,5 @@
+import { Dimensions } from "react-native";
+
 export const deepCopy = (obj) => {
   if (obj === null || typeof obj !== "object") {
     return obj;
@@ -48,3 +50,31 @@ export const arraysEqual = (arr1, arr2) => {
 export const filteringNumber = (value) => {
   return value.replace(/[^0-9]/g, "");
 };
+
+export const colorScale = [
+  "hsl(348, 100%, 80%)", // 파스텔 핑크,
+  "hsl(207, 94%, 80%)", // 파스텔 블루,
+  "hsl(48, 100%, 78%)", // 파스텔 옐로우,
+  "hsl(144, 76%, 76%)", // 파스텔 그린,
+  "hsl(20, 100%, 72%)", // 파스텔 오렌지,
+  "hsl(262, 100%, 80%)", // 파스텔 퍼플,
+  "hsl(174, 100%, 70%)", // 파스텔 시안,
+  "hsl(338, 90%, 72%)", // 파스텔 레드,
+  "hsl(20, 20%, 60%)", // 연 회색,
+  "hsl(300, 90%, 80%)", // 파스텔 시안-그린,
+  "#00ac00",
+  "#ffd700",
+  "#ccc",
+];
+
+export const basicDimensions = {
+  // 디자이너가 작업하고 있는 XD파일 스크린의 세로,가로
+  height: 800,
+  width: 360,
+};
+
+export const height = // 높이 변환 작업
+  (Dimensions.get("screen").height * (1 / basicDimensions.height)).toFixed(2);
+
+export const width = // 가로 변환 작업
+  (Dimensions.get("screen").width * (1 / basicDimensions.width)).toFixed(2);
