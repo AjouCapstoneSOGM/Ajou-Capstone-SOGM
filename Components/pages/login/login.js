@@ -1,11 +1,5 @@
 import React, { useState } from "react";
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  TextInput,
-} from "react-native";
+import { View, StyleSheet, TouchableOpacity, Image, TextInput } from "react-native";
 import { Divider } from "react-native-elements";
 
 import urls from "../../utils/urls";
@@ -60,9 +54,8 @@ const Login = ({ navigation }) => {
     navigation.navigate("SocialLogin");
 
     const unsubscribe = navigation.addListener("focus", () => {
-      //api 작동 후 주석 해제 필요
-      //login();
-      //loadData();
+      login();
+      loadData();
       setLoading(false);
       navigation.goBack();
       unsubscribe();
