@@ -20,7 +20,7 @@ Notifications.setNotificationHandler({
 });
 
 export const PushNotificationProvider = ({ children }) => {
-  const [expoPushToken, setExpoPushToken] = useState("");
+  const [expoPushToken, setExpoPushToken] = useState("emptyExpoToken");
   const [notification, setNotification] = useState(false);
   const notificationListener = useRef();
   const responseListener = useRef();
