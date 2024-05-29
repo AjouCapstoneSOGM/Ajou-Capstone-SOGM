@@ -4,6 +4,8 @@ import urls from "../utils/urls.js";
 import { ScrollView } from "react-native-gesture-handler";
 import AppText from "../utils/AppText.js";
 import Loading from "../utils/Loading.js";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Button, Icon } from "@rneui/base";
 
 const NewsSummary = ({ route }) => {
   const [loading, setLoading] = useState(true);
@@ -23,9 +25,13 @@ const NewsSummary = ({ route }) => {
           ticker: ticker,
         }),
       });
+
       if (response.ok) {
-        const data = await response.json();
-        return data.summary;
+        if (response.status === 204) return "";
+        else {
+          const data = await response.json();
+          return data.summary;
+        }
       } else {
         console.log("fetch error: ", response.status);
         return [];
@@ -37,7 +43,7 @@ const NewsSummary = ({ route }) => {
   };
 
   const isNewsExist = () => {
-    if (summary) {
+    if (summary.length > 0) {
       return true;
     }
     return false;
@@ -47,7 +53,17 @@ const NewsSummary = ({ route }) => {
     const loadData = async () => {
       try {
         const result = await fetchNewsSummary(ticker);
-        setSummary(result);
+        if (result.length > 0) {
+          const sections = result.trim().split("## ").slice(1);
+          const summaryJson = sections.map((section) => {
+            const [title, ...contentArray] = section.split("\n");
+            return {
+              title: title.trim(),
+              content: contentArray.join("\n").trim(),
+            };
+          });
+          setSummary(summaryJson);
+        }
         setLoading(false);
       } catch (error) {
         console.error("Data load error: ", error);
@@ -61,75 +77,91 @@ const NewsSummary = ({ route }) => {
   }
 
   return (
-    <View style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {isNewsExist() ? (
-          summary.map((news, index) => (
-            <View key={index} style={styles.newsContainer}>
-              <View style={styles.header}>
-                <AppText style={styles.title}>{news.title}</AppText>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <Button
+          type="clear"
+          onPress={() => {
+            navigation.goBack();
+          }}
+          icon={{ name: "left", type: "antdesign", color: "#333" }}
+        />
+      </View>
+      <View style={styles.textContainer}>
+        <AppText style={{ fontSize: 30, fontWeight: "bold" }}>뉴스</AppText>
+      </View>
+      <View style={styles.newsContainer}>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <AppText style={{ color: "#888", fontWeight: "bold" }}>
+            아래 뉴스는 ChatGPT를 통하여 요약되었습니다.{"  "}
+          </AppText>
+          <Icon name="robot" type="material-community" color="#888" />
+        </View>
+        <ScrollView>
+          {isNewsExist() ? (
+            summary.map((news, index) => (
+              <View key={index} style={styles.newsContent}>
+                <View style={styles.newsHeader}>
+                  <AppText style={styles.title}>{news.title}</AppText>
+                </View>
+                <View style={styles.newsItem}>
+                  <AppText style={styles.content}>&ensp;{news.content}</AppText>
+                </View>
               </View>
-              <View style={styles.newsItem}>
-                <AppText style={styles.content}>&ensp;{news.content}</AppText>
-              </View>
+            ))
+          ) : (
+            <View style={styles.newsContainer}>
+              <AppText style={styles.title}>최근 뉴스가 없습니다.</AppText>
             </View>
-          ))
-        ) : (
-          <View style={styles.newsContainer}>
-            <AppText>뉴스가 없습니다.</AppText>
-          </View>
-        )}
-      </ScrollView>
-    </View>
+          )}
+        </ScrollView>
+      </View>
+    </SafeAreaView>
   );
 };
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 5,
-  },
-
-  newsContainer: {
-    flex: 1,
-    margin: 5,
-    backgroundColor: "#d5d5d5", // 신문의 전형적인 회색 톤 배경
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 30,
+    alignItems: "stretch",
+    backgroundColor: "#f0f0f0",
   },
   header: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 12,
-    textAlign: "left", // 헤더는 왼쪽 정렬
-    borderBottomWidth: 2,
-    borderColor: "#333", // 헤더 아래의 강조선
+    height: 60,
+    alignItems: "flex-start",
+  },
+  textContainer: {
+    height: 90,
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+  },
+  newsContainer: {
+    flex: 1,
+    padding: 10,
+    backgroundColor: "#333",
+  },
+  newsContent: {
+    padding: 5,
+    marginVertical: 20,
+  },
+  newsHeader: {
+    borderColor: "#777",
+    borderBottomWidth: 1,
+    marginVertical: 10,
+    paddingVertical: 10,
   },
   newsItem: {
     alignItems: "stretch",
-    backgroundColor: "#fff", // 각 뉴스 아이템의 배경은 흰색
-    padding: 10,
-    marginBottom: 5,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5, // 상자 그림자로 입체감 주기
+    backgroundColor: "#333",
   },
   title: {
-    fontSize: 20,
+    fontSize: 25,
     fontWeight: "bold",
-    marginBottom: 6,
+    color: "#f0f0f0",
   },
   content: {
     fontSize: 15,
-    lineHeight: 25, // 텍스트 줄 간격
-    color: "#333", // 어두운 회색 텍스트
+    lineHeight: 20,
+    color: "#f0f0f0",
     textAlign: "justify",
   },
 });

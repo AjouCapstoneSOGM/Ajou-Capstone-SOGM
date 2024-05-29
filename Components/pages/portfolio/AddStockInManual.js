@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
   topDivider: {
     marginVertical: 70,
     borderWidth: 4,
-    borderColor: "#333",
+    borderColor: "#bbb",
   },
   textContainer: {
     paddingHorizontal: 10,
