@@ -1,6 +1,7 @@
 package com.example.eta.controller;
 
 import static com.example.eta.controller.utils.ControllerTestUtils.getRequestBodyForCodeValidation;
+import static com.example.eta.controller.utils.ControllerTestUtils.signUpLogin;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -192,5 +193,21 @@ public class AuthControllerTest {
         assertTrue(JsonPath.parse(response.getContentAsString()).read("$.name").equals("James"));
         tokenRepository.findById(userService.findByEmail("james@domain.com").getUserId())
                 .ifPresent(token -> assertNotNull(token.getExpoPushToken()));
+    }
+
+    @Test
+    @DisplayName("로그아웃 테스트")
+    @Transactional
+    public void testLogout() throws Exception {
+        // 회원가입, 로그인 후 토큰 반환
+        String authorizationHeader = signUpLogin(mockMvc, signupInfoRepository);
+        System.out.println(authorizationHeader);
+
+        mockMvc.perform(post("/api/auth/logout")
+                .header("Authorization", authorizationHeader))
+                .andDo(print()).andExpect(status().isOk());
+
+        User user = userService.findByEmail("james@domain.com");
+        assertTrue(tokenRepository.findById(user.getUserId()).isEmpty());
     }
 }
