@@ -16,17 +16,14 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class SignupInfoService {
 
-    static final int SIGNUP_TOKEN_LENGTH = 16;
+    static final int SIGNUP_TOKEN_LENGTH = 10;
 
-    @Value("${spring.mail.username}")
-    private String senderEmail;
-
-    private final JavaMailSender javaMailSender;
     private final UserService userService;
+    private final MailService mailService;
     private final SignupInfoRepository signupInfoRepository;
 
     @Transactional
-    public void addUnverifiedEmailInfo(String email, String code) {
+    public void addUnverifiedEmailInfo(String email, String code) throws Exception{
         if (userService.isExistEmail(email)) {
             throw new EmailAlreadyExistsException();
         }
@@ -42,6 +39,7 @@ public class SignupInfoService {
                 .isVerified(false)
                 .build();
         signupInfoRepository.save(signupInfo);
+        mailService.sendMail(email, "eta 인증 번호", "<h3>아래 인증 번호를 입력해서 이메일을 인증하십시오.</h3><h1>" + code + "</h1>");
     }
 
     @Transactional
@@ -83,18 +81,6 @@ public class SignupInfoService {
 
     public void deleteSignupInfo(SignupInfo signupInfo) {
         signupInfoRepository.delete(signupInfo);
-    }
-
-    public void sendVerificationEmail(String email, String code) throws Exception {
-        MimeMessage message = javaMailSender.createMimeMessage();
-        message.setFrom(senderEmail);
-        message.setRecipients(MimeMessage.RecipientType.TO, email);
-        message.setSubject("eta 인증 번호");
-        String body = "";
-        body += "<h3>" + "아래 인증 번호를 입력해서 이메일을 인증하십시오." + "</h3>";
-        body += "<h1>" + code + "</h1>";
-        message.setText(body,"UTF-8", "html");
-        javaMailSender.send(message);
     }
 
     public String generateCode() {

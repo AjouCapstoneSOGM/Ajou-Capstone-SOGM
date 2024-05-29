@@ -48,16 +48,12 @@ public class AuthControllerTest {
 
     @Autowired
     private UserService userService;
-
     @Autowired
     private TokenRepository tokenRepository;
-
     @Autowired
     private SignupInfoService signupInfoService;
-
     @Autowired
     private SignupInfoRepository signupInfoRepository;
-
     @Autowired
     private MockMvc mockMvc;
 
@@ -201,7 +197,6 @@ public class AuthControllerTest {
     public void testLogout() throws Exception {
         // 회원가입, 로그인 후 토큰 반환
         String authorizationHeader = signUpLogin(mockMvc, signupInfoRepository);
-        System.out.println(authorizationHeader);
 
         mockMvc.perform(post("/api/auth/logout")
                 .header("Authorization", authorizationHeader))

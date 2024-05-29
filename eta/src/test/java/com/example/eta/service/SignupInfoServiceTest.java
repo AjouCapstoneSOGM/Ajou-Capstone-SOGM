@@ -26,7 +26,7 @@ public class SignupInfoServiceTest {
     @Test
     @Transactional
     @DisplayName("미인증 이메일 정보 저장 테스트")
-    public void testAddUnverifiedEmailInfo() {
+    public void testAddUnverifiedEmailInfo() throws Exception {
         String email = "test@asdf.com";
         String code = signupInfoService.generateCode();
 
