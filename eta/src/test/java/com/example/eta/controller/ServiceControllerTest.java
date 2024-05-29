@@ -1,17 +1,16 @@
 package com.example.eta.controller;
 
-import static com.example.eta.controller.utils.controllerTestUtils.*;
+import static com.example.eta.controller.utils.ControllerTestUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
-import com.example.eta.dto.UserDto;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.example.eta.repository.SignupInfoRepository;
+import com.example.eta.service.UserService;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -25,8 +24,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 @SpringBootTest
 @AutoConfigureMockMvc
 @ExtendWith(SpringExtension.class)
@@ -35,12 +32,15 @@ public class ServiceControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private SignupInfoRepository signupInfoRepository;
+
     @Test
     @DisplayName("섹터 목록 API")
     @Transactional
     public void testGetAllSectors() throws Exception {
         // given 회원가입, 로그인 후 jwt토큰 획득
-        String authorizationHeader = signUpLogin(mockMvc);
+        String authorizationHeader = signUpLogin(mockMvc, signupInfoRepository);
 
         // when, then
         MockHttpServletResponse getAllSectorsResponse = mockMvc.perform(get("/api/sector/list")

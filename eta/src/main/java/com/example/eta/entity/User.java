@@ -1,5 +1,7 @@
 package com.example.eta.entity;
 
+import com.example.eta.auth.enums.RoleType;
+import com.example.eta.auth.enums.SocialType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
@@ -25,7 +27,7 @@ public class User {
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
     private Token token;
 
-    @JsonIgnore
+    @Builder.Default
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<Portfolio> portfolios = new ArrayList<>();
 
@@ -42,7 +44,12 @@ public class User {
     private String name;
 
     @Column(nullable = false)
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private RoleType roleType;
+
+    @Column
+    @Enumerated(EnumType.STRING)
+    private SocialType socialType;
 
     @Column(nullable = false)
     private LocalDateTime createdDate;
