@@ -8,7 +8,6 @@ import pandas as pd
 from pandas_datareader import data as web
 import yfinance as yf
 from datetime import datetime, timedelta
-import time
 from scipy.optimize import minimize
 import warnings
 
@@ -907,6 +906,7 @@ class backtest:
     ):
         asset_num = int_asset_num[:-num_safe]
         remaining_decimals = int_asset_num - np.floor(int_asset_num)
+        print(remaining_decimals)
 
         cash = (current_price * remaining_decimals).sum()
         int_asset_num_stock_all_old = int_asset_num[:-num_safe]
@@ -954,7 +954,7 @@ class backtest:
     ):
 
         total_invest_money = total_current_invest
-        new_asset_num = (total_invest_money * initial_ratio / current_price).astype(int)
+        new_asset_num = total_invest_money * initial_ratio / current_price
         new_asset_num, cash_hold = self.optimize_investment(
             new_asset_num, current_price, total_invest_money, initial_ratio, num_safe
         )
@@ -1292,9 +1292,10 @@ class back_test_main:
         return portfolioBacktesting
 
 
-sector_id = "G55"
+sector_id = "G20"
 invest_money = 5000000
 safe_asset = 0.3
 
 back_test = back_test_main()
 portfolioBacktesting = back_test.run(sector_id, invest_money, safe_asset)
+print(portfolioBacktesting)
