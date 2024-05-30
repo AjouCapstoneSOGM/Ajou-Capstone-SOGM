@@ -30,7 +30,6 @@ const ManualPage3 = ({ stockList }) => {
               Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify({
-              name: "테스트",
               country: "KOR",
               stocks: stockList.map((stock) => ({
                 ticker: stock.ticker,
