@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
-import { VictoryPie, VictoryAnimation } from "victory-native";
+import { VictoryPie } from "victory-native";
+import { height, width } from "./utils";
 
 const PortfolioPieChart = ({ data, selectedId, size }) => {
   const [chartData, setChartData] = useState([]);
@@ -39,8 +39,8 @@ const PortfolioPieChart = ({ data, selectedId, size }) => {
       innerRadius={({ index }) =>
         index === selectedId ? 80 * size : 105 * size
       }
-      width={350 * size}
-      height={350 * size}
+      width={width * 250 * size}
+      height={height * 250 * size}
       radius={140 * size}
       labels={() => {}}
       animate={{
