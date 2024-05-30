@@ -179,6 +179,10 @@ public class PortfolioService {
     }
     @Transactional
     public int createManualPortfolio(User user,PortfolioDto.CreateManualRequestDto request) {
+        String name = request.getName();
+        if (name == null) {
+            name = user.getName() + "의 자동 포트폴리오 " + (user.getPortfolios().size() + 1);
+        }
 
         float totalAsset = 0;
         for (PortfolioDto.StockDetailDto stock : request.getStocks()) {
@@ -187,7 +191,7 @@ public class PortfolioService {
         // 포트폴리오 생성
         Portfolio portfolio = new Portfolio().builder()
                 .user(user)
-                .name(request.getName())
+                .name(name)
                 .createdDate(LocalDateTime.now())
                 .country(request.getCountry())
                 .isAuto(false)
@@ -310,14 +314,16 @@ public class PortfolioService {
         }
 
         int newQuantity = existingQuantity - sellRequestDto.getQuantity();
-
-        float totalCost = sellRequestDto.getQuantity() * sellRequestDto.getPrice();
-
-        float newCurrentCash = portfolio.getCurrentCash() + totalCost;
-        portfolio.updateCurrentCash(newCurrentCash);
-
         portfolioTicker.updateNumber(newQuantity);
-        portfolio.updateCurrentCash(newCurrentCash);
+
+        //수동일 경우 현금 보유량 계산하지 않음
+        if ( portfolio.getIsAuto()) {
+            float totalCost = sellRequestDto.getQuantity() * sellRequestDto.getPrice();
+
+            float newCurrentCash = portfolio.getCurrentCash() + totalCost;
+            portfolio.updateCurrentCash(newCurrentCash);
+            portfolio.updateCurrentCash(newCurrentCash);
+        }
 
         portfolioRecordRepository.save(PortfolioRecord.builder()
                 .portfolio(portfolio)
@@ -345,5 +351,6 @@ public class PortfolioService {
         return portfolioTickerRepository.findByPortfolioAndTicker(portfolio, ticker)
                 .orElseThrow(() -> new IllegalArgumentException("PortfolioTicker not found"));
     }
+
 }
 
