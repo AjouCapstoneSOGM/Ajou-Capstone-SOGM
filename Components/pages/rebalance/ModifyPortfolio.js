@@ -44,9 +44,9 @@ const ModifyPortfolio = ({ route, navigation }) => {
       afterPortfolio.detail.stocks.map((stock) => {
         const order = rebalances.find((order) => order.ticker === stock.ticker);
         if (order) {
-          stock.quantity += order.number * (order.isBuy ? 1 : -1);
+          stock.quantity += order.quantity * (order.isBuy ? 1 : -1);
           afterPortfolio.detail.currentCash +=
-            order.number * order.price * (order.isBuy ? -1 : 1);
+            order.quantity * order.price * (order.isBuy ? -1 : 1);
         }
       });
       return afterPortfolio;
@@ -76,7 +76,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
       return {
         companyName: stock.companyName,
         ticker: stock.ticker,
-        rate: (rate * 100).toFixed(2), // 퍼센트로 표현
+        rate: (rate * 100).toFixed(3), // 퍼센트로 표현
       };
     });
     return result;
@@ -88,7 +88,8 @@ const ModifyPortfolio = ({ route, navigation }) => {
     const afterStockRate = calculateRate(afterPortfolio.detail.stocks);
     const beforeRate = stockRate.filter((stock) => stock.ticker === ticker);
     const afterRate = afterStockRate.filter((stock) => stock.ticker === ticker);
-    return afterRate[0].rate - beforeRate[0].rate;
+
+    return (afterRate[0].rate - beforeRate[0].rate).toFixed(2);
   };
   const handleSelectedId = (ticker) => {
     const index = portfolio.detail.stocks.findIndex(
@@ -101,7 +102,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
     const updated = reblances.map((stock) => {
       return {
         isBuy: stock.isBuy,
-        quantity: Number(stock.number),
+        quantity: Number(stock.quantity),
         price: parseFloat(stock.price),
         ticker: stock.ticker,
       };
@@ -137,7 +138,9 @@ const ModifyPortfolio = ({ route, navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.textContainer}>
-        <AppText style={{ fontSize: 25, fontWeight: "bold", color: "#333" }}>
+        <AppText
+          style={{ flex: 1, fontSize: 25, fontWeight: "bold", color: "#333" }}
+        >
           {isPortfolioInit() ? "최초 매수를" : "리밸런싱을"} 해야하는 종목{" "}
           {rebalances.length}개가 있어요
         </AppText>
@@ -218,39 +221,36 @@ const ModifyPortfolio = ({ route, navigation }) => {
       </View>
       <View style={{ flex: 2 }}>
         <ScrollView style={styles.rebalanceList} persistentScrollbar={true}>
-          {rebalances.map(
-            (item, index) =>
-              item.isBuy === true && (
-                <View key={index} style={styles.rebalanceItem}>
-                  <TouchableOpacity
-                    style={styles.rebalanceItemContent}
-                    onPress={() => handleSelectedId(item.ticker)}
-                  >
-                    <AppText style={styles.itemName}>{item.name}</AppText>
-                    <AppText style={styles.itemNumber}>
-                      {item.number * (item.isBuy ? 1 : -1)}주
-                    </AppText>
-                    <TextInput
-                      style={styles.itemPrice}
-                      value={item.price.toString()}
-                      onChangeText={(text) => handleChangePrices(index, text)}
-                      placeholder={item.price.toString()}
-                      placeholderTextColor="#bbb"
-                      keyboardType="number-pad"
-                    />
-                    <AppText
-                      style={[
-                        styles.itemRateDiff,
-                        { color: item.isBuy ? "#ff5858" : "#5878ff" },
-                      ]}
-                    >
-                      {item.isBuy ? "+" : ""}
-                      {getRateDiff(item.ticker)}%
-                    </AppText>
-                  </TouchableOpacity>
-                </View>
-              )
-          )}
+          {rebalances.map((item, index) => (
+            <View key={index} style={styles.rebalanceItem}>
+              <TouchableOpacity
+                style={styles.rebalanceItemContent}
+                onPress={() => handleSelectedId(item.ticker)}
+              >
+                <AppText style={styles.itemName}>{item.name}</AppText>
+                <AppText style={styles.itemNumber}>
+                  {item.quantity * (item.isBuy ? 1 : -1)}주
+                </AppText>
+                <TextInput
+                  style={styles.itemPrice}
+                  value={item.price.toString()}
+                  onChangeText={(text) => handleChangePrices(index, text)}
+                  placeholder={item.price.toString()}
+                  placeholderTextColor="#bbb"
+                  keyboardType="number-pad"
+                />
+                <AppText
+                  style={[
+                    styles.itemRateDiff,
+                    { color: item.isBuy ? "#ff5858" : "#5878ff" },
+                  ]}
+                >
+                  {item.isBuy ? "+" : ""}
+                  {getRateDiff(item.ticker)}%
+                </AppText>
+              </TouchableOpacity>
+            </View>
+          ))}
         </ScrollView>
       </View>
       <View style={styles.nextButtonContainer}>
@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
   },
   chartContent: {
     flexDirection: "row",
-    justifyContent: "space-evenly",
+    justifyContent: "space-around",
     alignItems: "center",
     padding: 0,
   },

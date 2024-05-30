@@ -1,12 +1,23 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/AntDesign";
 import AppText from "../../../utils/AppText";
 import { Button, SearchBar } from "@rneui/base";
 import { useSearch } from "../../../utils/SearchStock";
+import StockInfo from "../../portfolio/StockInfo";
 
 const ManualPage1 = ({ stockList, setStockList }) => {
   const { query, setQuery, suggestions } = useSearch();
+  const [stockInfoVisible, setStockInfoVisible] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(null);
+
+  const toggleStockModal = () => {
+    setStockInfoVisible(!stockInfoVisible);
+  };
+
+  const handleSelectedIndex = (index) => {
+    setSelectedIndex(index);
+  };
 
   const handleSelectedStocks = (stock) => {
     setStockList((prevSelectedStocks) => {
@@ -72,7 +83,10 @@ const ManualPage1 = ({ stockList, setStockList }) => {
                   <Button
                     buttonStyle={styles.infoButton}
                     type="clear"
-                    onPress={() => {}}
+                    onPress={() => {
+                      handleSelectedIndex(index);
+                      toggleStockModal();
+                    }}
                     icon={{
                       name: "infocirlceo",
                       type: "antdesign",
@@ -84,6 +98,13 @@ const ManualPage1 = ({ stockList, setStockList }) => {
             ))}
         </ScrollView>
       </View>
+      {selectedIndex !== null && (
+        <StockInfo
+          isVisible={stockInfoVisible}
+          onToggle={toggleStockModal}
+          ticker={suggestions[selectedIndex].ticker}
+        />
+      )}
     </View>
   );
 };
