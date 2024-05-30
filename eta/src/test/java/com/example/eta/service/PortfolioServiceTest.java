@@ -8,10 +8,13 @@ import com.example.eta.entity.*;
 import com.example.eta.auth.enums.RoleType;
 import com.example.eta.repository.*;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -39,7 +42,7 @@ public class PortfolioServiceTest {
     @Autowired
     private PortfolioTickerRepository portfolioTickerRepository;
 
-    @InjectMocks
+    @Autowired
     private PortfolioService portfolioService;
 
     @Test
@@ -119,50 +122,51 @@ public class PortfolioServiceTest {
         }
     }
     @Test
+    @Transactional
     void testSellStock_ManualPortfolio_CashNotUpdated() {
-        // Arrange
-        Integer pfId = 1;
-        String ticker = "AAPL";
-        int existingQuantity = 10;
+        User user = userRepository.save(new User().builder()
+                .email("james001@foo.bar")
+                .isVerified(false)
+                .password("password!")
+                .name("James")
+                .roleType(RoleType.ROLE_USER)
+                .createdDate(LocalDateTime.now())
+                .enabled(true).build());
+
+        Portfolio portfolio = portfolioRepository.save(new Portfolio().builder()
+                .pfId(40)
+                .user(user)
+                .isAuto(false)
+                .country("KOR")
+                .currentCash(1000.0f)
+                .build()
+        );
+
+        Ticker tickerEntity = new Ticker();
+        tickerEntity.setName("삼성전자");
+        tickerEntity.setTicker("005390");
+
+        PortfolioTicker portfolioTicker = portfolioTickerRepository.save(new PortfolioTicker().builder()
+                .portfolio(portfolio)
+                .averagePrice(1000.f)
+                .ticker(tickerEntity)
+                .number(10)
+                .build()
+        );
+
         int sellQuantity = 5;
         float sellPrice = 150.0f;
 
         PortfolioDto.sellRequestDto sellRequestDto = PortfolioDto.sellRequestDto.builder()
-                .ticker(ticker)
+                .ticker(tickerEntity.getTicker())
                 .quantity(sellQuantity)
                 .price(sellPrice)
                 .isBuy(false)
                 .build();
 
-        String tickerId = "005930";
-        Ticker tickerEntity = new Ticker();
-        tickerEntity.setName("Sample Name");
-        tickerEntity.setTicker(tickerId);
+        portfolioService.sellStock(portfolio.getPfId(), sellRequestDto);
 
-        Portfolio portfolio = Portfolio.builder()
-                .pfId(pfId)
-                .isAuto(false)
-                .currentCash(1000.0f)
-                .build();
-
-        PortfolioTicker portfolioTicker = PortfolioTicker.builder()
-                .portfolio(portfolio)
-                .ticker(tickerEntity)
-                .number(existingQuantity)
-                .build();
-
-        when(portfolioTickerRepository.findByPortfolioAndTicker(portfolio, tickerEntity))
-                .thenReturn(Optional.of(portfolioTicker));
-        when(portfolioRepository.findById(pfId)).thenReturn(Optional.of(portfolio));
-
-        // Act
-        portfolioService.sellStock(pfId, sellRequestDto);
-
-        // Assert
-        verify(portfolioTickerRepository, times(1)).save(any(PortfolioTicker.class));
-        verify(portfolioRecordRepository, times(1)).save(any(PortfolioRecord.class));
-        verify(portfolioRepository, times(1)).save(any(Portfolio.class));
-        assertEquals(1000.0f, portfolio.getCurrentCash(), 0.01);
+        Portfolio updatedPortfolio = portfolioRepository.findById(portfolio.getPfId()).orElseThrow();
+        assertEquals(1000.0f, updatedPortfolio.getCurrentCash(), 0.01);
     }
-
 }
