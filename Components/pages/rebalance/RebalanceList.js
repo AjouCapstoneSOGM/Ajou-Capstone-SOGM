@@ -4,50 +4,19 @@ import { getUsertoken } from "../../utils/localStorageUtils";
 import urls from "../../utils/urls";
 import AppText from "../../utils/AppText";
 import Loading from "../../utils/Loading";
+import { usePortfolio } from "../../utils/PortfolioContext";
 
 const RebalanceList = ({ route, navigation }) => {
   const portfolioId = route.params.id;
+  const { rebalances } = usePortfolio();
   const [rebalanceList, setRebalanceList] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetchRebalanceList = async () => {
-    try {
-      const token = await getUsertoken();
-      const response = await fetch(
-        `${urls.springUrl}/api/rebalancing/${portfolioId}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (response.ok) {
-        const data = await response.json();
-        return data.rebalancing;
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        const result = await fetchRebalanceList();
-        setRebalanceList(result);
-        setLoading(false);
-      } catch (error) {
-        console.error("Failed to load data", error);
-      }
-    };
-
-    loadData();
+    const rebalance = rebalances.filter(
+      (rebalance) => (rebalance.pfId = portfolioId)
+    );
+    setRebalanceList(rebalance);
   }, []);
-
-  if (loading) {
-    return <Loading />;
-  }
 
   return (
     <View style={styles.container}>
@@ -60,7 +29,7 @@ const RebalanceList = ({ route, navigation }) => {
             style={styles.alertBox}
             onPress={() => {
               navigation.navigate("ModifyPortfolio", {
-                portId: portfolioId,
+                portId: rebalance.pfId,
                 rnId: rebalance.rnId,
                 list: [...rebalance.rebalancings],
               });

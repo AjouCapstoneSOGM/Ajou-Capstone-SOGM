@@ -58,7 +58,7 @@ public class PortfolioDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class PortfolioPerformance {
+    public static class PortfolioPerformanceDto {
         private Integer quantity;
         private Float averageCost;
         private String ticker;
@@ -73,10 +73,11 @@ public class PortfolioDto {
     public static class PerformanceResponseDto {
         private float currentCash;
         private float initialAsset;
-        private List<PortfolioPerformance> portfolioPerformances;
+        private List<PortfolioPerformanceDto> portfolioPerformances;
     }
 
     @Data
+    @Builder
     @NoArgsConstructor
     @AllArgsConstructor
     public static class sellRequestDto {
@@ -90,7 +91,7 @@ public class PortfolioDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class PortfolioInfo {
+    public static class PortfolioInfoDto {
         private int id;
         private String name;
         private String country;
@@ -105,7 +106,7 @@ public class PortfolioDto {
     @AllArgsConstructor
     public static class PortfolioInfoListDto {
         private int count;
-        private List<PortfolioInfo> portfolios;
+        private List<PortfolioInfoDto> portfolios;
     }
     @Data
     @NoArgsConstructor

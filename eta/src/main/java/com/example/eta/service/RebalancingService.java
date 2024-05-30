@@ -37,10 +37,10 @@ public class RebalancingService {
         for (Rebalancing rebalancing : rebalancings) {
             int rnId = rebalancing.getRnId();
             LocalDateTime createdDate = rebalancing.getCreatedDate();
-            List<RebalancingDto.RebalancingInfo> rebalancingInfos = new ArrayList<>();
+            List<RebalancingDto.RebalancingInfoDto> rebalancingInfos = new ArrayList<>();
             for (RebalancingTicker rebalancingTicker : rebalancing.getRebalancingTickers()) {
                 Optional<Ticker> ticker = tickerRepository.findById(rebalancingTicker.getTicker().getTicker());
-                ticker.ifPresent(value -> rebalancingInfos.add(new RebalancingDto.RebalancingInfo(
+                ticker.ifPresent(value -> rebalancingInfos.add(new RebalancingDto.RebalancingInfoDto(
                         value.getTicker(),
                         value.getName(),
                         rebalancingTicker.getNumber(),
@@ -64,7 +64,7 @@ public class RebalancingService {
         Optional<Portfolio> optionalPortfolio = portfolioRepository.findById(pfId);
         Portfolio portfolio = optionalPortfolio.get();
 
-        for (RebalancingDto.RebalancingApplyInfo detail : rebalancingApplyListDto.getRnList()) {
+        for (RebalancingDto.RebalancingApplyInfoDto detail : rebalancingApplyListDto.getRnList()) {
             Ticker ticker = tickerRepository.findByTicker(detail.getTicker());
             if (ticker != null) {
                 // PortfolioTicker 정보를 조회하거나 새로 생성

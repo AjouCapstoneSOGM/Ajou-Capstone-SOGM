@@ -1,25 +1,26 @@
-import React, {
-  useState,
-  useEffect,
-  useLayoutEffect,
-  useCallback,
-} from "react";
-import { View, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
-import Icon from "react-native-vector-icons/AntDesign";
-import { VictoryPie } from "victory-native";
+import React, { useState, useCallback } from "react";
+import {
+  View,
+  ScrollView,
+  TouchableOpacity,
+  StyleSheet,
+  TextInput,
+} from "react-native";
 import { usePortfolio } from "../../utils/PortfolioContext";
 import { getUsertoken } from "../../utils/localStorageUtils";
 import { useFocusEffect } from "@react-navigation/native";
 
 import urls from "../../utils/urls";
 import AppText from "../../utils/AppText";
-import Loading from "../../utils/Loading";
-import NotificationBubble from "../../utils/Notification";
+import { SafeAreaView } from "react-native-safe-area-context";
+import PortfolioPieChart from "../../utils/PortfolioPieChart";
+import { Button, Divider, Icon, Overlay } from "@rneui/base";
+import { width, height, filteringNumber, colorScale } from "../../utils/utils";
+import StockInfo from "./StockInfo";
 
 const PortfolioDetails = ({ route, navigation }) => {
   const stocksLength = 10;
-  const { getPortfolioById, portfolios } = usePortfolio();
-  const [loading, setLoading] = useState(true);
+  const { getPortfolioById, portfolios, loadData } = usePortfolio();
   const [portfolio, setPortfolio] = useState({
     id: null,
     name: "",
@@ -27,27 +28,83 @@ const PortfolioDetails = ({ route, navigation }) => {
     currentCash: 0,
     totalPrice: 0,
     initialAsset: 0,
+    riskValue: 0,
+    auto: true,
   });
   const [selectedId, setSelectedId] = useState(null);
-  const [chartData, setChartData] = useState([]);
   const [alertExist, setAlertExist] = useState(false);
-  const [notificationVisible, setNotificationVisible] = useState(false);
+  const [infoVisible, setInfoVisible] = useState(false);
+  const [stockInfoVisible, setStockInfoVisible] = useState(false);
+  const [modifyQuantity, setModifyQuantity] = useState(0);
+  const [modifyPrice, setModifyPrice] = useState(0);
+  const [modifyBuy, setModifyBuy] = useState(true);
 
-  const colorScale = [
-    "hsl(348, 100%, 80%)", // 파스텔 핑크,
-    "hsl(207, 94%, 80%)", // 파스텔 블루,
-    "hsl(48, 100%, 78%)", // 파스텔 옐로우,
-    "hsl(144, 76%, 76%)", // 파스텔 그린,
-    "hsl(20, 100%, 72%)", // 파스텔 오렌지,
-    "hsl(262, 100%, 80%)", // 파스텔 퍼플,
-    "hsl(174, 100%, 70%)", // 파스텔 시안,
-    "hsl(338, 90%, 72%)", // 파스텔 레드,
-    "hsl(20, 20%, 60%)", // 연 회색,
-    "hsl(300, 90%, 80%)", // 파스텔 시안-그린,
-    "#333",
-    "#777",
-    "#ccc",
-  ];
+  const toggleInfoModal = () => {
+    setInfoVisible(!infoVisible);
+  };
+
+  const toggleStockModal = () => {
+    setStockInfoVisible(!stockInfoVisible);
+  };
+
+  const fetchModifyStockManual = async () => {
+    try {
+      const token = await getUsertoken();
+      const response = await fetch(
+        `${urls.springUrl}/api/portfolio/${portfolio.id}/${
+          modifyBuy ? "buy" : "sell"
+        }`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            ticker: portfolio.stocks[selectedId].ticker,
+            isBuy: modifyBuy,
+            quantity: modifyQuantity,
+            price: modifyPrice,
+          }),
+        }
+      );
+      if (response.ok) {
+      } else {
+        console.error("Error occured");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const resetModifyData = () => {
+    setModifyBuy(true);
+    setModifyPrice(0);
+    setModifyQuantity(0);
+  };
+
+  const handleQuantityChange = (newQuantity) => {
+    const currentQuantity = portfolio.stocks[selectedId].quantity;
+    if (!modifyBuy && Number(newQuantity) > Number(currentQuantity))
+      newQuantity = String(currentQuantity);
+    if (Number(newQuantity) < 0) newQuantity = "0";
+    if (Number(newQuantity) > 9999) newQuantity = "9999";
+    setModifyQuantity(filteringNumber(newQuantity));
+  };
+
+  const handlePriceChange = (newPrice) => {
+    if (Number(newPrice) < 0) newPrice = "0";
+    if (Number(newPrice) > 9999999) newPrice = "9999999";
+    setModifyPrice(Number(filteringNumber(newPrice)));
+  };
+
+  const handleBuyChange = (isBuy) => {
+    setModifyBuy(!isBuy);
+    if (
+      isBuy &&
+      Number(modifyQuantity) > Number(portfolio.stocks[selectedId].quantity)
+    )
+      setModifyQuantity(portfolio.stocks[selectedId].quantity);
+  };
 
   const getAlertExists = async (id) => {
     try {
@@ -71,16 +128,6 @@ const PortfolioDetails = ({ route, navigation }) => {
     }
   };
 
-  const isPortfolioInitState = () => {
-    if (
-      portfolio.currentCash === portfolio.initialAsset &&
-      portfolio.initialAsset !== 0 &&
-      alertExist
-    )
-      return true;
-    return false;
-  };
-
   const handleSelectedId = (index) => {
     if (selectedId === index) setSelectedId(null);
     else setSelectedId(index);
@@ -97,7 +144,7 @@ const PortfolioDetails = ({ route, navigation }) => {
   };
   const getStockRate = (id) => {
     const stockRate =
-      (portfolio.stocks[id].quantity * portfolio.stocks[id].averageCost) /
+      (portfolio.stocks[id].quantity * portfolio.stocks[id].currentPrice) /
       getTotalPrice();
 
     return stockRate;
@@ -115,10 +162,12 @@ const PortfolioDetails = ({ route, navigation }) => {
     const benefit = getTotalPrice() - portfolio.initialAsset;
     const roi = ((benefit / portfolio.initialAsset) * 100).toFixed(2);
     const roiFormatted = roi > 0 ? `+${roi}` : `${roi}`;
-    const color = roi > 0 ? "#ff3a00" : roi < 0 ? "#0c5bff" : "#666";
+    const color = roi > 0 ? "#ff5858" : roi < 0 ? "#5878ff" : "#666";
     return (
       <View style={{ flexDirection: "row" }}>
-        <AppText>{benefit.toLocaleString()} 원 </AppText>
+        <AppText style={{ color: "#f0f0f0" }}>
+          {benefit.toLocaleString()} 원{" "}
+        </AppText>
         <AppText style={{ fontSize: 14, color: color }}>
           {roiFormatted}%
         </AppText>
@@ -127,94 +176,123 @@ const PortfolioDetails = ({ route, navigation }) => {
   };
   useFocusEffect(
     useCallback(() => {
-      const loadData = async () => {
+      const loadPortfolio = async () => {
         try {
           const currentPortfolio = getPortfolioById(route.params.id);
-          await getAlertExists(currentPortfolio.id);
-          setPortfolio({
-            id: currentPortfolio.id,
-            name: currentPortfolio.name,
-            stocks: currentPortfolio.detail.stocks,
-            currentCash: currentPortfolio.detail.currentCash,
-            initialAsset: currentPortfolio.detail.initialAsset,
-          });
-          setLoading(false);
+          if (currentPortfolio) {
+            await getAlertExists(currentPortfolio.id);
+            setPortfolio({
+              id: currentPortfolio.id,
+              name: currentPortfolio.name,
+              stocks: currentPortfolio.detail.stocks,
+              currentCash: currentPortfolio.detail.currentCash,
+              initialAsset: currentPortfolio.detail.initialAsset,
+              riskValue: currentPortfolio.riskValue,
+              auto: currentPortfolio.auto,
+            });
+          }
         } catch (error) {
           console.log("Detail loadData error: ", error);
         }
       };
 
-      loadData();
+      loadPortfolio();
     }, [portfolios])
   );
 
-  useEffect(() => {
-    if (portfolio.id) {
-      setNotificationVisible(isPortfolioInitState());
-      const data = portfolio.stocks.map((stock) => ({
-        x: stock.companyName,
-        y: stock.averageCost * stock.quantity,
-      }));
-      data.push({ x: "현금", y: portfolio.currentCash });
-      setChartData(data);
-    }
-  }, [portfolio]); // portfolio 상태가 변경될 때마다 이 effect 실행
-
-  useLayoutEffect(() => {
-    if (portfolio) {
-      navigation.setOptions({
-        title: `테스트의 포트폴리오1`, // 실행 시간에 제목 변경
-        headerRight: () => (
-          <TouchableOpacity
-            style={styles.manageButton}
-            onPress={() => navigation.navigate("ManagementPage", { portfolio })}
-          >
-            <AppText style={{ fontSize: 16, color: "white" }}>관리</AppText>
-          </TouchableOpacity>
-        ),
-      });
-    }
-  }, [portfolio]);
-
-  if (loading) {
-    return <Loading />;
-  }
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.outline}>
-        <AppText style={{ fontSize: 17 }}>총 자산</AppText>
-        <AppText style={{ fontSize: 25 }}>
+        <View style={styles.outlineHeader}>
+          <AppText style={{ fontSize: 17, color: "#f0f0f0" }}>총 자산</AppText>
+          <View style={{ flexDirection: "row" }}>
+            <Button
+              type="clear"
+              onPress={() => {
+                navigation.navigate("AlertList", { pfId: portfolio.id });
+              }}
+              icon={{
+                name: "bell-fill",
+                type: "octicon",
+                color: alertExist ? "#fedf3e" : "#f0f0f0",
+              }}
+            />
+            <Button
+              type="clear"
+              onPress={() => {
+                navigation.navigate("ManagementPage", { portfolio });
+              }}
+              icon={{
+                name: "settings-sharp",
+                type: "ionicon",
+                color: "#f0f0f0",
+              }}
+            />
+          </View>
+        </View>
+        <AppText style={{ fontSize: 25, color: "#f0f0f0", fontWeight: "bold" }}>
           {getTotalPrice().toLocaleString()} 원
+        </AppText>
+        <AppText
+          style={
+            portfolio.riskValue === 1
+              ? { color: "#91ff91" }
+              : portfolio.riskValue === 2
+              ? { color: "#ffbf44" }
+              : { color: "#ff5858" }
+          }
+        >
+          {portfolio.riskValue === 1
+            ? "안정투자형"
+            : portfolio.riskValue === 2
+            ? "위험중립형"
+            : portfolio.riskValue === 3
+            ? "위험중립형"
+            : ""}
         </AppText>
         <View style={styles.outlineDetail}>
           <View style={styles.outlineDetailBox}>
-            <AppText style={{ fontWeight: "bold" }}>평가손익</AppText>
+            <AppText style={{ fontWeight: "bold", color: "#f0f0f0" }}>
+              평가손익
+            </AppText>
             {getPortfolioROI()}
           </View>
           <View style={styles.outlineDetailBox}>
-            <AppText style={{ fontWeight: "bold" }}>현금</AppText>
-            <AppText>{portfolio.currentCash.toLocaleString()} 원</AppText>
+            <AppText style={{ fontWeight: "bold", color: "#f0f0f0" }}>
+              현금
+            </AppText>
+            <AppText style={{ color: "#f0f0f0" }}>
+              {portfolio.currentCash.toLocaleString()} 원
+            </AppText>
           </View>
         </View>
       </View>
       <View style={styles.chartContainer}>
-        <VictoryPie
-          data={chartData}
-          colorScale={colorScale}
-          innerRadius={({ index }) => (index === selectedId ? 65 : 75)}
-          radius={({ index }) => (index === selectedId ? 125 : 110)}
-          labels={() => ""}
-          style={styles.chart}
+        <PortfolioPieChart
+          data={portfolio}
+          cash={portfolio}
+          selectedId={selectedId}
+          size={width * 0.6}
         />
         {selectedId !== null && (
           <View style={{ position: "absolute", alignItems: "center" }}>
             <AppText style={[styles.centerText, { fontWeight: "bold" }]}>{`${
               (getStockRate(selectedId).toFixed(3) * 1000) / 10 // 소숫점 계산 오류 방지를 위함
             }%`}</AppText>
-            <AppText style={[styles.centerText, { fontSize: 13 }]}>
+            <AppText style={[styles.centerText, { fontSize: 12 }]}>
               {portfolio.stocks[selectedId].companyName}
             </AppText>
           </View>
+        )}
+        {!portfolio.auto && (
+          <TouchableOpacity
+            style={styles.floatingButton}
+            onPress={() => {
+              navigation.navigate("AddStockInManual", { pfId: portfolio.id });
+            }}
+          >
+            <Icon name="plus" type="antdesign" color="#f0f0f0" />
+          </TouchableOpacity>
         )}
       </View>
       <View style={styles.itemContainer}>
@@ -222,25 +300,33 @@ const PortfolioDetails = ({ route, navigation }) => {
           contentContainerStyle={{
             paddingBottom: selectedId === null ? 60 : 20,
           }}
-          showsVerticalScrollIndicator={false}
+          showsVerticalScrollIndicator={true}
+          persistentScrollbar={true}
         >
-          <AppText style={{ fontSize: 20, padding: 10, color: "#666" }}>
+          <AppText
+            style={{
+              fontSize: 25,
+              padding: 5,
+              color: "#333",
+              fontWeight: "bold",
+            }}
+          >
             주식
           </AppText>
           {portfolio.stocks.map((item, index) => {
             const roi = getStockROI(index);
             const roiFormatted = roi > 0 ? `+${roi}` : `${roi}`;
-            {
-              index === stocksLength - 1 && (
-                <AppText style={{ fontSize: 20, padding: 10, color: "#666" }}>
-                  안전자산
-                </AppText>
-              );
-            }
             return (
               <React.Fragment key={index}>
                 {stocksLength === index && (
-                  <AppText style={{ fontSize: 20, padding: 10, color: "#666" }}>
+                  <AppText
+                    style={{
+                      fontSize: 25,
+                      padding: 5,
+                      color: "#333",
+                      fontWeight: "bold",
+                    }}
+                  >
                     안전자산
                   </AppText>
                 )}
@@ -251,68 +337,78 @@ const PortfolioDetails = ({ route, navigation }) => {
                   ]}
                   onPress={() => handleSelectedId(index)}
                 >
-                  <View
-                    style={{
-                      backgroundColor: colorScale[index],
-                      position: "absolute",
-                      width: 5,
-                      height: "100%",
-                    }}
-                  ></View>
-                  <View style={styles.infoContainer}>
+                  <View style={styles.companyInfo}>
                     <View
-                      style={{
-                        justifyContent: "space-between",
-                        paddingBottom: 10,
-                      }}
+                      style={{ flexDirection: "row", alignItems: "center" }}
                     >
                       <AppText
                         style={{
                           fontSize: 18,
-                          color: "#222",
+                          color: "#f0f0f0",
                         }}
                       >
                         {item.companyName}
                       </AppText>
-                      <View style={{ flexDirection: "row" }}>
-                        <AppText
-                          style={[
-                            styles.itemText,
-                            roi > 0
-                              ? { color: "#ff3a00" }
-                              : roi < 0
-                              ? { color: "#0c5bff" }
-                              : { color: "#666" },
-                          ]}
-                        >
-                          {Number(item.currentPrice).toLocaleString()} 원
-                        </AppText>
-                        <AppText
-                          style={[
-                            styles.itemText,
-                            { paddingHorizontal: 10 },
-                            roi > 0
-                              ? { color: "#ff3a00" }
-                              : roi < 0
-                              ? { color: "#0c5bff" }
-                              : { color: "#666" },
-                          ]}
-                        >
-                          {roiFormatted} %
-                        </AppText>
-                      </View>
+                      {!portfolio.auto && (
+                        <Button
+                          type="clear"
+                          onPress={() => {
+                            setModifyPrice(item.currentPrice);
+                            toggleInfoModal();
+                            setSelectedId(index);
+                          }}
+                          icon={{
+                            name: "pencil",
+                            type: "ionicon",
+                            color: "#f0f0f0",
+                            size: 15,
+                          }}
+                        />
+                      )}
                     </View>
-                    <View
-                      style={{
-                        justifyContent: "space-between",
-                        alignItems: "flex-end",
-                        paddingBottom: 20,
-                      }}
-                    >
-                      <AppText style={{ fontSize: 21 }}>
+                    <View>
+                      <AppText style={[styles.itemText, { color: "#aaa" }]}>
+                        {Number(item.currentPrice).toLocaleString()} 원
+                      </AppText>
+                      <AppText
+                        style={[
+                          styles.itemText,
+                          roi > 0
+                            ? { color: "#ff5858" }
+                            : roi < 0
+                            ? { color: "#5878ff" }
+                            : { color: "#666" },
+                        ]}
+                      >
+                        {roiFormatted} %
+                      </AppText>
+                    </View>
+                  </View>
+                  <Divider
+                    color={colorScale[index]}
+                    width={2}
+                    style={{
+                      marginVertical: height * 10,
+                    }}
+                  />
+                  <View style={styles.myInfo}>
+                    <View>
+                      <AppText
+                        style={{
+                          fontSize: 20,
+                          color: "#f0f0f0",
+                          fontWeight: "bold",
+                        }}
+                      >
                         {(item.currentPrice * item.quantity).toLocaleString()}{" "}
                         원
                       </AppText>
+                      <AppText style={{ color: "#f0f0f0" }}>
+                        <AppText style={{ fontSize: 12 }}>평단가 </AppText>
+                        <AppText>{item.averageCost.toLocaleString()}원</AppText>
+                      </AppText>
+                    </View>
+                    <View>
                       <AppText
                         style={{
                           fontSize: 13,
@@ -321,35 +417,37 @@ const PortfolioDetails = ({ route, navigation }) => {
                       >
                         {Number(item.quantity).toLocaleString()} 주
                       </AppText>
+                      <AppText style={{ color: colorScale[index] }}>{`${
+                        (getStockRate(index).toFixed(3) * 1000) / 10 // 소숫점 계산 오류 방지를 위함
+                      }%`}</AppText>
                     </View>
                   </View>
                   {selectedId === index && (
-                    <View style={styles.utilContainer}>
-                      <TouchableOpacity
-                        style={styles.utilButton}
-                        onPress={() => {
-                          navigation.navigate("NewsSummary", {
-                            ticker: item.ticker,
-                          });
-                        }}
-                      >
-                        <AppText style={{ fontSize: 18, color: "#555" }}>
-                          종목 정보
-                        </AppText>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={styles.utilButton}
-                        onPress={() => {
-                          navigation.navigate("NewsSummary", {
-                            ticker: item.ticker,
-                          });
-                        }}
-                      >
-                        <AppText style={{ fontSize: 18, color: "#555" }}>
-                          뉴스 요약
-                        </AppText>
-                      </TouchableOpacity>
-                    </View>
+                    <React.Fragment>
+                      <Divider />
+                      <View style={styles.utilContainer}>
+                        <TouchableOpacity
+                          style={styles.utilButton}
+                          onPress={toggleStockModal}
+                        >
+                          <AppText style={{ fontSize: 18, color: "#f0f0f0" }}>
+                            종목 정보
+                          </AppText>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={styles.utilButton}
+                          onPress={() => {
+                            navigation.navigate("NewsSummary", {
+                              ticker: item.ticker,
+                            });
+                          }}
+                        >
+                          <AppText style={{ fontSize: 18, color: "#f0f0f0" }}>
+                            뉴스 요약
+                          </AppText>
+                        </TouchableOpacity>
+                      </View>
+                    </React.Fragment>
                   )}
                 </TouchableOpacity>
               </React.Fragment>
@@ -357,21 +455,115 @@ const PortfolioDetails = ({ route, navigation }) => {
           })}
         </ScrollView>
       </View>
-      <TouchableOpacity
-        style={styles.alert}
-        onPress={() => {
-          navigation.navigate("RebalanceList", { id: portfolio.id });
-        }}
-      >
-        <Icon name="bells" size={35} color="#555" />
-        {alertExist && <View style={styles.alertDot} />}
-      </TouchableOpacity>
-      <NotificationBubble
-        message="포트폴리오 설정을 완료해주세요"
-        visible={notificationVisible}
-        onClose={() => setNotificationVisible(false)}
-      />
-    </View>
+      {selectedId !== null && (
+        <React.Fragment>
+          <StockInfo
+            isVisible={stockInfoVisible}
+            onToggle={toggleStockModal}
+            ticker={portfolio.stocks[selectedId].ticker}
+          />
+          <Overlay
+            isVisible={infoVisible}
+            onBackdropPress={() => {
+              setSelectedId(null);
+              resetModifyData();
+              toggleInfoModal();
+            }}
+            overlayStyle={styles.overlay}
+          >
+            <Button
+              containerStyle={styles.closeButton}
+              onPress={() => {
+                setSelectedId(null);
+                resetModifyData();
+                toggleInfoModal();
+              }}
+              type="clear"
+              icon={{ name: "close", type: "antdesign", color: "#f0f0f0" }}
+            />
+            <AppText
+              style={{ color: "#f0f0f0", fontSize: 20, fontWeight: "bold" }}
+            >
+              종목 수정
+            </AppText>
+            <View style={styles.content}>
+              <AppText
+                style={{
+                  fontSize: 20,
+                  fontWeight: "bold",
+                  color: "#f0f0f0",
+                  marginBottom: 20,
+                }}
+              >
+                {portfolio.stocks[selectedId].companyName}
+              </AppText>
+              <View style={styles.contentsItem}>
+                <View style={styles.quantityContainer}>
+                  <Button
+                    buttonStyle={{ marginHorizontal: -10 }}
+                    type="clear"
+                    onPress={() => {
+                      handleQuantityChange(String(Number(modifyQuantity) - 1));
+                    }}
+                    icon={{
+                      name: "minuscircleo",
+                      type: "antdesign",
+                      color: "#f0f0f0",
+                      size: 18,
+                    }}
+                  />
+                  <TextInput
+                    value={String(modifyQuantity)}
+                    onChangeText={(value) => handleQuantityChange(value)}
+                    style={styles.inputQuantity}
+                    keyboardType="numeric"
+                  />
+                  <Button
+                    buttonStyle={{ marginHorizontal: -10 }}
+                    type="clear"
+                    onPress={() => {
+                      handleQuantityChange(String(Number(modifyQuantity) + 1));
+                    }}
+                    icon={{
+                      name: "pluscircleo",
+                      type: "antdesign",
+                      color: "#f0f0f0",
+                      size: 18,
+                    }}
+                  />
+                </View>
+                <TextInput
+                  value={String(modifyPrice)}
+                  onChangeText={(value) => handlePriceChange(value)}
+                  style={styles.inputPrice}
+                  keyboardType="numeric"
+                />
+                <Button
+                  containerStyle={{ flex: 0.7 }}
+                  titleStyle={{ color: modifyBuy ? "#ff5858" : "#5878ff" }}
+                  title={modifyBuy ? "매수" : "매도"}
+                  type="clear"
+                  onPress={() => {
+                    handleBuyChange(modifyBuy);
+                  }}
+                />
+              </View>
+            </View>
+            <Button
+              buttonStyle={styles.submitButton}
+              title="반영"
+              disabled={modifyQuantity == 0}
+              onPress={async () => {
+                await fetchModifyStockManual();
+                resetModifyData();
+                await loadData();
+                toggleInfoModal();
+              }}
+            />
+          </Overlay>
+        </React.Fragment>
+      )}
+    </SafeAreaView>
   );
 };
 const styles = StyleSheet.create({
@@ -379,13 +571,16 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "stretch",
-    padding: 5,
     backgroundColor: "#f5f5f5",
+    backgroundColor: "#333",
   },
   outline: {
-    padding: 5,
-    borderBottomWidth: 1,
-    borderColor: "#bbb",
+    padding: width * 10,
+    backgroundColor: "#333",
+  },
+  outlineHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   outlineDetail: {
     marginTop: 10,
@@ -416,64 +611,123 @@ const styles = StyleSheet.create({
   },
   chartContainer: {
     flex: 2.5,
+    backgroundColor: "#f0f0f0",
     alignItems: "center", // 자식 요소를 수평 중앙 정렬
     justifyContent: "center", // 자식 요소를 수직 중앙 정렬
-    padding: 20,
+    padding: height * -10,
+    marginTop: height * 0,
   },
   centerText: {
     fontSize: 20,
   },
   itemContainer: {
     flex: 4,
-    borderTopWidth: 5,
-    borderColor: "#ccc",
+    marginTop: height * -30,
+    backgroundColor: "#f0f0f0",
+    padding: width * 10,
   },
   item: {
-    height: 90,
     justifyContent: "flex-start", // 내용을 세로 방향으로 중앙 정렬
     alignItems: "stretch", // 내용을 가로 방향으로 중앙 정렬
-    backgroundColor: "#f0f0f0",
-    borderBottomWidth: 1,
-    borderColor: "#ccc",
-    paddingHorizontal: 10,
+    backgroundColor: "#333",
+    borderRadius: 20,
+    padding: 15,
+    marginBottom: 10,
   },
-  selectedItem: {
-    height: 140,
-  },
-  infoContainer: {
+  companyInfo: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "stretch",
-    paddingTop: 10,
-    paddingLeft: 5,
-    height: 90,
+    alignItems: "center",
+  },
+  myInfo: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingBottom: 10,
   },
   utilContainer: {
-    height: 50,
     flexDirection: "row",
     justifyContent: "space-around",
+    padding: 5,
+    marginTop: 10,
   },
   utilButton: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    borderTopWidth: 1,
-    borderColor: "#ccc",
   },
   itemText: {
-    fontSize: 16,
-    textAlign: "center", // 텍스트를 가운데 정렬
+    fontSize: 14,
+    textAlign: "right", // 텍스트를 가운데 정렬
   },
-  manageButton: {
-    paddingRight: 20,
-  },
-  button: {
-    justifyContent: "center", // 가로 방향에서 중앙 정렬
-    backgroundColor: "#6495ED",
+  floatingButton: {
+    position: "absolute",
+    bottom: height * 35,
+    right: width * 20,
+    width: width * 50,
+    height: width * 50,
+    borderRadius: 50,
+    backgroundColor: "#333",
+    justifyContent: "center",
     alignItems: "center",
+    elevation: 5, // for Android shadow
+    shadowColor: "#000", // for iOS shadow
+    shadowOffset: { width: 0, height: 2 }, // for iOS shadow
+    shadowOpacity: 0.3, // for iOS shadow
+    shadowRadius: 2, // for iOS shadow
+  },
+  overlay: {
+    width: "90%",
     borderRadius: 10,
-    padding: 18,
-    margin: 5,
+    backgroundColor: "#333",
+  },
+  content: {
+    paddingTop: 40,
+    paddingHorizontal: 10,
+  },
+  text: {
+    fontSize: 16,
+    marginBottom: 20,
+    color: "#f0f0f0",
+  },
+  closeButton: {
+    marginHorizontal: -5,
+    position: "absolute",
+    top: 3,
+    right: 3,
+  },
+  contentsItem: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    paddingBottom: 20,
+    borderBottomColor: "#434343",
+    borderBottomWidth: 1,
+  },
+  quantityContainer: {
+    flex: 1.1,
+    flexDirection: "row",
+  },
+  inputQuantity: {
+    color: "#f0f0f0",
+    borderBottomWidth: 1,
+    borderBottomColor: "#888",
+    marginHorizontal: 10,
+    width: 40,
+    textAlign: "center",
+  },
+  inputPrice: {
+    flex: 0.5,
+    color: "#f0f0f0",
+    fontSize: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#888",
+    width: 60,
+  },
+  submitButton: {
+    backgroundColor: "#6262e8",
+    borderRadius: 10,
+    height: 40,
   },
 });
 export default PortfolioDetails;

@@ -2,6 +2,7 @@ package com.example.eta.scheduler;
 
 
 import com.example.eta.dto.PushMessageDto;
+import com.example.eta.dto.RebalancingDto;
 import com.example.eta.exception.FailToSendPushNotificationException;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -17,11 +18,12 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class PushNotificationService {
 
-    public void triggerPushNotification(String expoPushToken, String title, String body) throws FailToSendPushNotificationException {
+    public void triggerPushNotification(String expoPushToken, String title, String body, PushMessageDto.PushMessageData data) throws FailToSendPushNotificationException {
         PushMessageDto pushMessageDto = PushMessageDto.builder()
                 .to(expoPushToken)
                 .title(title)
                 .body(body)
+                .data(data)
                 .build();
 
         ResponseEntity<String> responseEntity = WebClient.builder().baseUrl("https://exp.host/--/api/v2/push/send").build()

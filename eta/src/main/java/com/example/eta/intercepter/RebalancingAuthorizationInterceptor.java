@@ -1,7 +1,8 @@
 package com.example.eta.intercepter;
 
-import com.example.eta.exception.NotFoundException;
-import com.example.eta.exception.OwnershipException;
+import com.example.eta.auth.entity.UserPrincipal;
+import com.example.eta.exception.authorization.NotFoundException;
+import com.example.eta.exception.authorization.OwnershipException;
 import com.example.eta.repository.PortfolioRepository;
 import com.example.eta.repository.RebalancingRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,7 +26,7 @@ public class RebalancingAuthorizationInterceptor implements HandlerInterceptor {
     @Override
     @Transactional
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws RuntimeException {
-        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = ((UserPrincipal)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getEmail();
 
         Map<String, String> pathVariables = (Map<String, String>) request.getAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE);
 
@@ -39,9 +40,10 @@ public class RebalancingAuthorizationInterceptor implements HandlerInterceptor {
 
         if (pathVariables.get("rn_id") == null)
             return true;
-        Integer rnId = Integer.parseInt(pathVariables.get("port_id"));
+        Integer rnId = Integer.parseInt(pathVariables.get("rn_id"));
 
         if (!rebalancingRepository.existsById(rnId)) throw new NotFoundException();
+        if (rebalancingRepository.getReferenceById(rnId).getPortfolio().getPfId() != pfId) throw new NotFoundException();
         if (!rebalancingRepository.getReferenceById(rnId).getPortfolio().getUser().getEmail().equals(email))
             throw new OwnershipException();
 

@@ -1,5 +1,7 @@
-package com.example.eta.security.jwt;
+package com.example.eta.auth.filter;
 
+import com.example.eta.auth.entity.UserPrincipal;
+import com.example.eta.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -7,6 +9,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -19,7 +22,10 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import static com.example.eta.auth.enums.RoleType.ROLE_USER;
+
 @Component
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Value("${spring.jwt.header}")
     private String header;
@@ -29,6 +35,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Value("${spring.jwt.secret}")
     private String secret;
+
+    private final UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -43,13 +51,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 .getBody();
 
         // 인증 성공 시 인증정보 SecurityContext에 저장
-        // TODO: email 말고 UserDetails를 저장하도록 구현하기
         String email = String.valueOf(claims.get("email"));
-        var auth = new UsernamePasswordAuthenticationToken(email, null, List.of(new SimpleGrantedAuthority("USER")));
-//        var auth = new UsernamePasswordAuthenticationToken(
-//                new User(String.valueOf(claims.get("email")), "", null),
-//                null,
-//                List.of(new SimpleGrantedAuthority("USER")));
+        var auth = new UsernamePasswordAuthenticationToken(UserPrincipal.create(userRepository.findByEmail(email).get()), null, List.of(new SimpleGrantedAuthority(ROLE_USER.name())));
         SecurityContextHolder.getContext().setAuthentication(auth);
 
         filterChain.doFilter(request, response);
@@ -58,7 +61,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     // 로그인, 회원가입 API는 JWT 인증 필터 무시
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        List<String> pathsToExclude = List.of("/api/auth/", "/docs");
-        return pathsToExclude.stream().anyMatch(path -> request.getRequestURI().startsWith(path));
+        String requestURI = request.getRequestURI();
+        if ((requestURI.startsWith("/api/auth/") || requestURI.startsWith("/docs")) && !requestURI.equals("/api/auth/logout")) {
+            return true;
+        }
+        return false;
     }
 }

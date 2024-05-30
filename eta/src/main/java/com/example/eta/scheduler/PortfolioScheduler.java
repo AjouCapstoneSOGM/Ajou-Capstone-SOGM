@@ -1,5 +1,6 @@
 package com.example.eta.scheduler;
 
+import com.example.eta.dto.PushMessageDto;
 import com.example.eta.entity.Portfolio;
 import com.example.eta.entity.PortfolioTicker;
 import com.example.eta.entity.Rebalancing;
@@ -9,6 +10,7 @@ import com.example.eta.repository.PriceRepository;
 import com.example.eta.repository.RebalancingRepository;
 import com.example.eta.repository.RebalancingTickerRepository;
 import com.example.eta.service.PortfolioService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +25,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PortfolioScheduler {
 
+    private final PushNotificationService pushNotificationService;
     private final PortfolioService portfolioService;
     private final PortfolioRepository portfolioRepository;
     private final PriceRepository priceRepository;
@@ -32,19 +35,18 @@ public class PortfolioScheduler {
     private Logger logger = LoggerFactory.getLogger(PortfolioScheduler.class);
 
     @Scheduled(cron = "0 0 0 * * 1-5")
+    @Transactional
     public void doProportionRebalancing() {
         for (Portfolio portfolio : portfolioRepository.findAllByIsAutoIsTrue()) {
             updateProportion(portfolio);
-            logger.info("Portfolio(id: " + portfolio.getPfId() + ") 주가별 현재 비중 업데이트됨");
             if (isProportionRebalancingNeeded(portfolio)) {
                 int rnId = createProportionRebalancing(portfolio);
-                logger.info("Portfolio(id: " + portfolio.getPfId() + ") 비중 조정 리밸런싱 알림(id:" + rnId + ") 생성됨");
-
-                //TODO: 푸시 알림 보내기
+                sendRebalancingPushNotification(portfolio.getUser().getToken().getExpoPushToken(), portfolio, rnId);
             }
         }
     }
 
+    @Transactional
     public void updateProportion(Portfolio portfolio) {
         Map<PortfolioTicker, Float> currentAmountForTicker = new HashMap<>();
         float totalAmount = portfolioService.calculateProportionAndReturnTotalAmount(portfolio, false, currentAmountForTicker);
@@ -64,7 +66,7 @@ public class PortfolioScheduler {
         });
     }
 
-
+    @Transactional
     public int createProportionRebalancing(Portfolio portfolio) {
         // 현재 총자산 계산하고, 각 종목별 비중에 따라 목표 보유량(총 가격) 계산
         Map<PortfolioTicker, Float> currentAmountForTicker = new HashMap<>();
@@ -118,5 +120,29 @@ public class PortfolioScheduler {
             }
         }
         return rebalancing.getRnId();
+    }
+
+    public void sendRebalancingPushNotification(String to, Portfolio portfolio, int rnId) {
+        String title = "리밸런싱 알림 생성";
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(portfolio.getName()).append("에 리밸런싱 해야 할 종목이 있어요!\n");
+        for(RebalancingTicker rebalancingTicker : rebalancingRepository.getReferenceById(rnId).getRebalancingTickers()) {
+            stringBuilder.append("\n").append(rebalancingTicker.getTicker().getName()).append("(").append(rebalancingTicker.getTicker().getTicker()).append(") ");
+            stringBuilder.append(rebalancingTicker.getNumber()).append("개 ");
+            if(rebalancingTicker.getIsBuy()){
+                stringBuilder.append("매수");
+            }else{
+                stringBuilder.append("매도");
+            }
+        }
+        String body = stringBuilder.toString();
+
+        PushMessageDto.PushMessageData data = PushMessageDto.PushMessageData.builder()
+                .pfId(portfolio.getPfId())
+                .rnId(rnId)
+                .build();
+
+        pushNotificationService.triggerPushNotification(to, title, body, data);
     }
 }

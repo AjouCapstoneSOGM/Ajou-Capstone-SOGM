@@ -1,13 +1,8 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  TextInput,
-  Alert,
-} from "react-native";
+import { View, StyleSheet, TouchableOpacity, Alert, TextInput } from "react-native";
 import urls from "../../utils/urls";
 import AppText from "../../utils/AppText";
+import { width, height } from "../../utils/utils";
 
 const Signup = ({ navigation }) => {
   const [username, setUsername] = useState("");
@@ -18,51 +13,130 @@ const Signup = ({ navigation }) => {
   const [checkEmail, setCheckEmail] = useState("");
   const [checkPw, setCheckPw] = useState("");
   const [checkPwLen, setCheckPwLen] = useState("");
+  const [verificationCode, setVerificationCode] = useState("");
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
+  const [signupToken, setSignupToken] = useState("");
 
   const MinPasswordLength = 10;
 
   const fetchSignupInfo = async () => {
-    fetch(`${urls.springUrl}/api/auth/signup`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: useremail,
-        password: password,
-        name: username,
-      }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Success:", data);
+    try{
+      console.log(useremail, password, username, signupToken);
+      const response = await fetch(`${urls.springUrl}/api/auth/signup`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: useremail,
+          password: password,
+          name: username,
+          signupToken: signupToken,
+        }),
       })
-      .catch((error) => {
+      const data = await response.json();
+      return data.status;
+    }catch(error) {
         console.error("Error:", error);
-      });
+    };
   };
+
+  const sendVerificationCode = async () => {
+    try{
+      const response = await fetch(`${urls.springUrl}/api/auth/send-verification-code`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: useremail,
+        }),
+      })
+      if(response.status == 200){
+        Alert.alert("인증 코드 발송", "인증 코드가 이메일로 발송되었습니다.");
+      } else if (response.status == 409){
+        Alert.alert("이미 가입된 이메일입니다.");
+      }
+      else{
+        Alert.alert("잠시 후 다시 시도해 주세요.");
+      }
+    } catch(error) {
+        console.error("Error:", error);
+      };
+  };
+
+  const verifyCode = async () => {
+    try{
+      const response =  await fetch(`${urls.springUrl}/api/auth/verify-email`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: useremail,
+          code: verificationCode,
+        }),
+      });
+      if (response.ok){
+        const data = await response.json();
+        setIsEmailVerified(true);
+        setSignupToken(data.signupToken);
+        Alert.alert("인증 성공", "이메일 인증이 완료되었습니다.");
+      }
+      else if (response.status == 401){
+        Alert.alert("인증 실패", "인증번호가 만료되었습니다.");
+      }
+      else if (response.status == 403){
+        Alert.alert("인증 실패","인증번호가 일치하지 않습니다.");
+      }
+      else if (response.status == 404){
+        Alert.alert("인증 실패","인증하기 버튼을 눌러 이메일 인증을 진행해 주세요.");
+      }
+      else{
+        Alert.alert("인증 실패","잠시 후 다시 시도해 주세요.");
+      }
+    } catch(error) {
+        console.error("Error:", error);
+    };
+  };
+
   const isEmailValid = (email) => {
     const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return regex.test(email);
   };
 
   const isValueValid = () => {
-    if (username && checkEmail && checkPw && checkPwLen) return true;
+    if (username && checkEmail && checkPw && checkPwLen && isEmailVerified) return true;
     return false;
   };
 
   const handleSignUp = async () => {
     if (isValueValid()) {
-      await fetchSignupInfo();
-      Alert.alert("회원가입 완료", "회원가입이 완료되었습니다.", [
+      const respone = await fetchSignupInfo();
+      if (respone == 409) {
+        //Alert.alert("이미 가입된 이메일입니다.")
+      }
+      else if(respone == 404) {
+        Alert.alert("이메일 인증을 진행해 주세요.")
+      }
+      else if(respone == 403) {
+        Alert.alert("인증번호가 잘못되었습니다.")
+      }
+      else if(respone == 200){
+        Alert.alert("회원가입 완료", "회원가입이 완료되었습니다.", [
         {
           text: "확인",
           onPress: () => {
-            navigation.navigate("Login");
+            navigation.goBack();
           },
           style: "destructive",
         },
       ]);
+    }
+    else {
+      Alert.alert("다시 시도해 주세요.");
+    }
+      
     }
   };
 
@@ -89,52 +163,88 @@ const Signup = ({ navigation }) => {
       else setCheckPw(true);
     }
   }, [pwcheck]);
+
   return (
     <View style={styles.container}>
       <AppText style={styles.HomeText}>회원가입</AppText>
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.inputBox}
-          value={username}
-          placeholder="이름"
-          onChangeText={setUsername}
-        ></TextInput>
-        <TextInput
-          onChangeText={setUseremail}
-          value={useremail}
-          placeholder="이메일"
-          style={styles.inputBox}
-        ></TextInput>
+      <View style={styles.allContainer}>
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.inputBox}
+            value={username}
+            placeholder="닉네임"
+            onChangeText={setUsername}
+            placeholderTextColor="grey"
+          ></TextInput>
+        </View>
+        <View style={styles.verifyInputContainer}>
+          <TextInput
+            style={styles.verifyInputBox}
+            value={useremail}
+            onChangeText={setUseremail}
+            placeholder="이메일"
+            placeholderTextColor="grey"
+          />
+          <TouchableOpacity
+            style={styles.verifyButton}
+            onPress={sendVerificationCode}
+          >
+            <AppText style={styles.verifybuttonText}>인증번호 전송</AppText>
+          </TouchableOpacity>
+        </View>
         {!checkEmail && useremail && (
           <AppText style={styles.notificationText}>
             올바른 형식을 입력해주세요
           </AppText>
         )}
-        <TextInput
-          onChangeText={setPassword}
-          value={password}
-          placeholder="비밀번호"
-          style={styles.inputBox}
-          secureTextEntry
-        ></TextInput>
-        {!checkPwLen && password && (
-          <AppText style={styles.notificationText}>
-            비밀번호는 {MinPasswordLength}자리 이상이어야 합니다
-          </AppText>
-        )}
-        <TextInput
-          onChangeText={setpwcheck}
-          value={pwcheck}
-          placeholder="비밀번호 확인"
-          style={styles.inputBox}
-          secureTextEntry
-        ></TextInput>
-        {!checkPw && pwcheck && (
-          <AppText style={styles.notificationText}>
-            비밀번호를 정확히 입력해주세요
-          </AppText>
-        )}
+        <View style={styles.verifyInputContainer}>
+          <TextInput
+            value={verificationCode}
+            onChangeText={setVerificationCode}
+            placeholder="인증번호"
+            style={styles.verifyInputBox}
+            placeholderTextColor="grey"
+            keyboardType="number-pad"
+          ></TextInput>
+          <TouchableOpacity
+            style={styles.verifyButton}
+            onPress={verifyCode}
+          >
+            <AppText style={styles.verifybuttonText}>인증번호 확인</AppText>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.inputContainer}>
+          <TextInput
+            onChangeText={setPassword}
+            value={password}
+            placeholder="비밀번호"
+            style={styles.inputBox}
+            secureTextEntry
+            placeholderTextColor="grey"
+          ></TextInput>
+          {!checkPwLen && password && (
+            <AppText style={styles.notificationText}>
+              비밀번호는 {MinPasswordLength}자리 이상이어야 합니다
+            </AppText>
+          )}
+        </View>
+        <View style={styles.inputContainer}>
+          <TextInput
+            onChangeText={setpwcheck}
+            value={pwcheck}
+            placeholder="비밀번호 확인"
+            style={styles.inputBox}
+            secureTextEntry
+            placeholderTextColor="grey"
+          ></TextInput>
+          {!checkPw && pwcheck && (
+            <AppText style={styles.notificationText}>
+              비밀번호를 정확히 입력해주세요
+            </AppText>
+          )}
+        </View>
       </View>
+
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           onPress={handleSignUp}
@@ -157,14 +267,22 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   HomeText: {
-    paddingBottom: "15%",
-    fontSize: 30,
+    paddingBottom: height * 15,
+    fontSize: 40,
     textAlign: "center",
+    color: "#333",
   },
+  allContainer: { alignItems: "stretch", padding: 10, paddingBottom: 10 },
   inputContainer: {
     alignItems: "stretch",
-    padding: 30,
-    paddingBottom: 10,
+    padding: 5,
+    paddingBottom: 5,
+  },
+  verifyInputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 5,
+    paddingBottom: 5,
   },
   notificationText: {
     marginBottom: 4,
@@ -173,15 +291,17 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     alignItems: "stretch",
-    padding: 20,
-    paddingTop: 10,
+    padding: 10,
+    paddingTop: 5,
     marginBottom: "25%",
   },
   inputBox: {
     backgroundColor: "#eee",
     padding: 10,
-    marginVertical: 5,
-    borderRadius: 5,
+    height: height * 50,
+    marginVertical: 0,
+    paddingHorizontal: 10,
+    borderRadius: 20,
   },
   button: {
     backgroundColor: "#6495ED",
@@ -197,5 +317,31 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "white",
     fontSize: 17,
+  },
+  verifyInputBox: {
+    flex: 1,
+    width: width * 10,
+    height: height * 50,
+    borderWidth: 0,
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    marginRight: -20,
+    backgroundColor: "#eee",
+  },
+  verifyButton: {
+    width: width * 100,
+    height: height * 50,
+    backgroundColor: "#6495ED",
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  buttonText: {
+    color: "white",
+    fontWeight: "bold",
+  },
+  verifybuttonText: {
+    color: "white",
+    fontWeight: "bold",
   },
 });
