@@ -179,6 +179,10 @@ public class PortfolioService {
     }
     @Transactional
     public int createManualPortfolio(User user,PortfolioDto.CreateManualRequestDto request) {
+        String name = request.getName();
+        if (name == null) {
+            name = user.getName() + "의 자동 포트폴리오 " + (user.getPortfolios().size() + 1);
+        }
 
         float totalAsset = 0;
         for (PortfolioDto.StockDetailDto stock : request.getStocks()) {
@@ -187,7 +191,7 @@ public class PortfolioService {
         // 포트폴리오 생성
         Portfolio portfolio = new Portfolio().builder()
                 .user(user)
-                .name(request.getName())
+                .name(name)
                 .createdDate(LocalDateTime.now())
                 .country(request.getCountry())
                 .isAuto(false)
