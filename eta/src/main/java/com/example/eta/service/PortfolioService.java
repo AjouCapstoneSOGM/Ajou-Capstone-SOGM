@@ -310,14 +310,16 @@ public class PortfolioService {
         }
 
         int newQuantity = existingQuantity - sellRequestDto.getQuantity();
-
-        float totalCost = sellRequestDto.getQuantity() * sellRequestDto.getPrice();
-
-        float newCurrentCash = portfolio.getCurrentCash() + totalCost;
-        portfolio.updateCurrentCash(newCurrentCash);
-
         portfolioTicker.updateNumber(newQuantity);
-        portfolio.updateCurrentCash(newCurrentCash);
+
+        //수동일 경우 현금 보유량 계산하지 않음
+        if ( portfolio.getIsAuto()) {
+            float totalCost = sellRequestDto.getQuantity() * sellRequestDto.getPrice();
+
+            float newCurrentCash = portfolio.getCurrentCash() + totalCost;
+            portfolio.updateCurrentCash(newCurrentCash);
+            portfolio.updateCurrentCash(newCurrentCash);
+        }
 
         portfolioRecordRepository.save(PortfolioRecord.builder()
                 .portfolio(portfolio)
@@ -345,5 +347,6 @@ public class PortfolioService {
         return portfolioTickerRepository.findByPortfolioAndTicker(portfolio, ticker)
                 .orElseThrow(() -> new IllegalArgumentException("PortfolioTicker not found"));
     }
+
 }
 

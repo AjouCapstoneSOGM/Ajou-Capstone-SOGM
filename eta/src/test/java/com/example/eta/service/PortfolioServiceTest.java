@@ -1,6 +1,7 @@
 package com.example.eta.service;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 import com.example.eta.dto.PortfolioDto;
 import com.example.eta.entity.*;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -17,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
@@ -27,6 +30,8 @@ public class PortfolioServiceTest {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private PortfolioRecordRepository portfolioRecordRepository;
 
     @Autowired
     private RebalancingRepository rebalancingRepository;
@@ -34,7 +39,7 @@ public class PortfolioServiceTest {
     @Autowired
     private PortfolioTickerRepository portfolioTickerRepository;
 
-    @Autowired
+    @InjectMocks
     private PortfolioService portfolioService;
 
     @Test
@@ -113,4 +118,51 @@ public class PortfolioServiceTest {
             assertNotEquals(0, rt.getPrice());
         }
     }
+    @Test
+    void testSellStock_ManualPortfolio_CashNotUpdated() {
+        // Arrange
+        Integer pfId = 1;
+        String ticker = "AAPL";
+        int existingQuantity = 10;
+        int sellQuantity = 5;
+        float sellPrice = 150.0f;
+
+        PortfolioDto.sellRequestDto sellRequestDto = PortfolioDto.sellRequestDto.builder()
+                .ticker(ticker)
+                .quantity(sellQuantity)
+                .price(sellPrice)
+                .isBuy(false)
+                .build();
+
+        String tickerId = "005930";
+        Ticker tickerEntity = new Ticker();
+        tickerEntity.setName("Sample Name");
+        tickerEntity.setTicker(tickerId);
+
+        Portfolio portfolio = Portfolio.builder()
+                .pfId(pfId)
+                .isAuto(false)
+                .currentCash(1000.0f)
+                .build();
+
+        PortfolioTicker portfolioTicker = PortfolioTicker.builder()
+                .portfolio(portfolio)
+                .ticker(tickerEntity)
+                .number(existingQuantity)
+                .build();
+
+        when(portfolioTickerRepository.findByPortfolioAndTicker(portfolio, tickerEntity))
+                .thenReturn(Optional.of(portfolioTicker));
+        when(portfolioRepository.findById(pfId)).thenReturn(Optional.of(portfolio));
+
+        // Act
+        portfolioService.sellStock(pfId, sellRequestDto);
+
+        // Assert
+        verify(portfolioTickerRepository, times(1)).save(any(PortfolioTicker.class));
+        verify(portfolioRecordRepository, times(1)).save(any(PortfolioRecord.class));
+        verify(portfolioRepository, times(1)).save(any(Portfolio.class));
+        assertEquals(1000.0f, portfolio.getCurrentCash(), 0.01);
+    }
+
 }

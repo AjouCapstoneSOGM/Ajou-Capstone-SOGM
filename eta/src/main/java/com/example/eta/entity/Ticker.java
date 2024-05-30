@@ -1,6 +1,7 @@
 package com.example.eta.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
