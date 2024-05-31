@@ -6,9 +6,7 @@ import com.example.eta.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,5 +29,20 @@ public class UserInfoController {
         userInfo.put("createdDate", user.getCreatedDate());
         userInfo.put("socialType", user.getSocialType());
         return ResponseEntity.ok(userInfo);
+    }
+
+
+    @PutMapping("/name")
+    public ResponseEntity updateName(@RequestBody Map<String, String> requestBody, @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        String email = userPrincipal.getEmail();
+        userService.updateName(email, requestBody.get("name"));
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/password")
+    public ResponseEntity updatePassword(@RequestBody Map<String, String> requestBody, @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        String email = userPrincipal.getEmail();
+        userService.updatePassword(email, requestBody.get("password"));
+        return ResponseEntity.ok().build();
     }
 }
