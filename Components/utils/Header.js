@@ -4,7 +4,6 @@ import { Button } from "@rneui/base";
 import AppText from "./AppText";
 import { useAuth } from "./AuthContext";
 import { useNavigation } from "@react-navigation/native";
-import { getUserName } from "./localStorageUtils";
 import { height, width } from "./utils";
 
 const HeaderComponent = () => {
@@ -43,7 +42,9 @@ const HeaderComponent = () => {
         )}
         <Button
           type="clear"
-          onPress={() => {}}
+          onPress={() => {
+            navigation.navigate("Settings");
+          }}
           icon={{ name: "settings-sharp", type: "ionicon", color: "#333" }}
         />
       </View>

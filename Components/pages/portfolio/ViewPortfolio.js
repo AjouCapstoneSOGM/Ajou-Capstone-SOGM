@@ -1,5 +1,11 @@
-import React, { useState } from "react";
-import { View, TouchableOpacity, StyleSheet, Dimensions } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  TouchableOpacity,
+  StyleSheet,
+  Dimensions,
+  TextInput,
+} from "react-native";
 import { usePortfolio } from "../../utils/PortfolioContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Icon, Button } from "@rneui/base";
@@ -12,17 +18,26 @@ import PortfolioPieChart from "../../utils/PortfolioPieChart";
 import Loading from "../../utils/Loading";
 import { useAuth } from "../../utils/AuthContext";
 import { width, height } from "../../utils/utils";
+import ModalComponent from "../../utils/Modal";
 
 const PortfolioList = ({ navigation }) => {
   const { portfolios, loadData, portLoading } = usePortfolio();
   const { userName } = useAuth();
+  const [nameModalVisible, setNameModalVisible] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [changedName, setChangedName] = useState("");
+
+  useEffect(() => {
+    if (portfolios[selectedIndex])
+      setChangedName(portfolios[selectedIndex].name);
+  }, [selectedIndex]);
 
   const portfolioExist = () => {
     if (portLoading) return false;
     if (portfolios.length > 0) return true;
     return false;
   };
+
   const getTotalPrice = (stocks) => {
     const totalPrice = stocks.reduce(
       (acc, cur) => acc + cur.currentPrice * cur.quantity,
@@ -56,6 +71,7 @@ const PortfolioList = ({ navigation }) => {
   const reloadData = async () => {
     await loadData();
   };
+
   return (
     <SafeAreaView style={styles.container}>
       <HeaderComponent />
@@ -77,106 +93,120 @@ const PortfolioList = ({ navigation }) => {
           {portfolios[selectedIndex] && (
             <PortfolioPieChart
               data={portfolios[selectedIndex].detail}
-              size={width * 1}
+              size={width * 0.9}
             />
           )}
         </View>
       )}
       {portfolioExist() && (
-        <PagerView
-          style={styles.listContainer}
-          initialPage={0}
-          onPageSelected={handlePageChange}
-        >
-          {portfolios.map((portfolio, index) => {
-            const roi = getTotalROI(portfolio.detail);
-            const roiFormatted = roi > 0 ? `+${roi}` : `${roi}`;
-            const currentCash = portfolio.detail.currentCash;
-            return (
-              <View key={index}>
-                <TouchableOpacity
-                  style={styles.portfolio}
-                  onPress={() => {
-                    navigation.navigate("PortfolioDetails", {
-                      id: portfolio.id,
-                    });
-                  }}
-                >
-                  <View style={styles.portfolioHeader}>
-                    <View
-                      style={{ flexDirection: "row", alignItems: "center" }}
-                    >
+        <React.Fragment>
+          <View style={styles.pageIndicator}>
+            {portfolios.map((_, index) => (
+              <AppText
+                key={index}
+                style={{ marginHorizontal: 2, color: "#333" }}
+              >
+                {selectedIndex === index ? "●" : "○"}
+              </AppText>
+            ))}
+          </View>
+          <PagerView
+            style={styles.listContainer}
+            initialPage={0}
+            onPageSelected={handlePageChange}
+          >
+            {portfolios.map((portfolio, index) => {
+              const roi = getTotalROI(portfolio.detail);
+              const roiFormatted = roi > 0 ? `+${roi}` : `${roi}`;
+              const currentCash = portfolio.detail.currentCash;
+              return (
+                <View key={index}>
+                  <TouchableOpacity
+                    style={styles.portfolio}
+                    onPress={() => {
+                      navigation.navigate("PortfolioDetails", {
+                        id: portfolio.id,
+                      });
+                    }}
+                  >
+                    <View style={styles.portfolioHeader}>
+                      <View
+                        style={{ flexDirection: "row", alignItems: "center" }}
+                      >
+                        <AppText style={{ color: "#f0f0f0" }}>
+                          {portfolio.name}
+                        </AppText>
+                        <Button
+                          type="clear"
+                          onPress={() => {
+                            setNameModalVisible(true);
+                          }}
+                          icon={{
+                            name: "pencil",
+                            type: "ionicon",
+                            color: "#f0f0f0",
+                            size: 15,
+                          }}
+                        />
+                      </View>
                       <AppText style={{ color: "#f0f0f0" }}>
-                        {portfolio.name}
+                        <AppText>
+                          {portfolio.auto ? "자동" : "수동"}
+                          {"  "}
+                        </AppText>
+                        <AppText>{portfolio.country}</AppText>
                       </AppText>
-                      <Button
-                        type="clear"
-                        onPress={() => {}}
-                        icon={{
-                          name: "pencil",
-                          type: "ionicon",
-                          color: "#f0f0f0",
-                          size: 15,
-                        }}
-                      />
                     </View>
-                    <AppText style={{ color: "#f0f0f0" }}>
-                      <AppText>
-                        {portfolio.auto ? "자동" : "수동"}
-                        {"  "}
+                    <View style={styles.portfolioContent}>
+                      <AppText
+                        style={{
+                          fontSize: 30,
+                          color: "#f0f0f0",
+                        }}
+                      >
+                        <AppText style={{ fontWeight: "bold" }}>
+                          {(
+                            getTotalPrice(portfolio.detail.stocks) + currentCash
+                          ).toLocaleString()}{" "}
+                        </AppText>
+                        <AppText style={{ fontSize: 20 }}>원</AppText>
                       </AppText>
-                      <AppText>{portfolio.country}</AppText>
-                    </AppText>
-                  </View>
-                  <View style={styles.portfolioContent}>
-                    <AppText
-                      style={{
-                        fontSize: 30,
-                        color: "#f0f0f0",
-                      }}
-                    >
-                      <AppText style={{ fontWeight: "bold" }}>
-                        {(
-                          getTotalPrice(portfolio.detail.stocks) + currentCash
-                        ).toLocaleString()}{" "}
+                      <AppText
+                        style={[
+                          { fontSize: 17, fontWeight: "bold", marginBottom: 5 },
+                          roi > 0
+                            ? { color: "#ff5858" }
+                            : roi < 0
+                            ? { color: "#5888ff" }
+                            : { color: "#666" },
+                        ]}
+                      >
+                        {roiFormatted}%
                       </AppText>
-                      <AppText style={{ fontSize: 20 }}>원</AppText>
-                    </AppText>
-                    <AppText
-                      style={[
-                        { fontSize: 17, fontWeight: "bold", marginBottom: 5 },
-                        roi > 0
-                          ? { color: "#ff5858" }
-                          : roi < 0
-                          ? { color: "#5888ff" }
-                          : { color: "#666" },
-                      ]}
-                    >
-                      {roiFormatted}%
-                    </AppText>
-                    <AppText
-                      style={
-                        portfolio.riskValue === 1
-                          ? { color: "#91ff91" }
+                      <AppText
+                        style={
+                          portfolio.riskValue === 1
+                            ? { color: "#91ff91" }
+                            : portfolio.riskValue === 2
+                            ? { color: "#ffbf44" }
+                            : { color: "#ff5858" }
+                        }
+                      >
+                        {portfolio.riskValue === 1
+                          ? "안정투자형"
                           : portfolio.riskValue === 2
-                          ? { color: "#ffbf44" }
-                          : { color: "#ff5858" }
-                      }
-                    >
-                      {portfolio.riskValue === 1
-                        ? "안정투자형"
-                        : portfolio.riskValue === 2
-                        ? "위험중립형"
-                        : portfolio.riskValue === 3
-                        ? "적극투자형"
-                        : ""}
-                    </AppText>
-                  </View>
-                </TouchableOpacity>
-              </View>
-            );
-          })}
-        </PagerView>
+                          ? "위험중립형"
+                          : portfolio.riskValue === 3
+                          ? "적극투자형"
+                          : ""}
+                      </AppText>
+                    </View>
+                  </TouchableOpacity>
+                </View>
+              );
+            })}
+          </PagerView>
+        </React.Fragment>
       )}
       <TouchableOpacity
         style={styles.floatingButton}
@@ -194,6 +224,35 @@ const PortfolioList = ({ navigation }) => {
       >
         <Icon name="reload1" type="antdesign" color="#f0f0f0" />
       </TouchableOpacity>
+      {portfolios[selectedIndex] && (
+        <ModalComponent
+          isVisible={nameModalVisible}
+          onToggle={() => setNameModalVisible(false)}
+        >
+          <React.Fragment>
+            <View style={styles.title}>
+              <AppText style={{ color: "#f0f0f0", fontSize: 20 }}>
+                이름 변경
+              </AppText>
+            </View>
+            <View>
+              <TextInput
+                style={styles.nameInput}
+                placeholder={portfolios[selectedIndex].name}
+                placeholderTextColor={"#888"}
+                value={changedName}
+                onChangeText={setChangedName}
+              />
+            </View>
+            <Button
+              buttonStyle={styles.submitButton}
+              title="반영"
+              disabled={changedName === ""}
+              onPress={async () => {}}
+            />
+          </React.Fragment>
+        </ModalComponent>
+      )}
       <FooterComponent />
     </SafeAreaView>
   );
@@ -208,6 +267,10 @@ const styles = StyleSheet.create({
   totalContainer: {
     paddingVertical: height * 15,
     paddingHorizontal: width * 15,
+  },
+  pageIndicator: {
+    flexDirection: "row",
+    alignSelf: "center",
   },
   listContainer: {
     flex: 1,
@@ -266,6 +329,21 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 }, // for iOS shadow
     shadowOpacity: 0.3, // for iOS shadow
     shadowRadius: 2, // for iOS shadow
+  },
+  title: {
+    position: "absolute",
+    top: 0,
+  },
+  nameInput: {
+    marginVertical: 20,
+    color: "#f0f0f0",
+    borderBottomWidth: 1,
+    borderBottomColor: "#434343",
+  },
+  submitButton: {
+    backgroundColor: "#6262e8",
+    borderRadius: 10,
+    height: 40,
   },
 });
 

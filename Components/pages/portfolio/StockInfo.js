@@ -5,18 +5,18 @@ import urls from "../../utils/urls";
 import { getUsertoken } from "../../utils/localStorageUtils";
 import Loading from "../../utils/Loading";
 import AppText from "../../utils/AppText";
-import InfoModal from "../../utils/InfoModal";
+import ModalComponent from "../../utils/Modal";
 
 const StockInfo = ({ isVisible, onToggle, ticker }) => {
   const [loading, setLoading] = useState(true);
   const [infoVisible, setInfoVisible] = useState(false);
   const [info, setInfo] = useState({
-    name: "",
-    ticker: "",
-    ROE: 0,
-    ROA: 0,
-    PER: 0,
-    PBR: 0,
+    name: "default",
+    ticker: "000000",
+    roe: 0,
+    roa: 0,
+    per: 0,
+    pbr: 0,
     month12: 0,
   });
 
@@ -35,6 +35,7 @@ const StockInfo = ({ isVisible, onToggle, ticker }) => {
       });
       if (response.ok) {
         const data = await response.json();
+        setInfo(data);
         return data;
       }
     } catch (error) {
@@ -46,8 +47,7 @@ const StockInfo = ({ isVisible, onToggle, ticker }) => {
   useEffect(() => {
     const loadInfo = async () => {
       try {
-        const data = await stockInfo(ticker);
-        setInfo(data);
+        await stockInfo(ticker);
         setLoading(false);
       } catch (error) {
         console.log(error);
@@ -58,36 +58,27 @@ const StockInfo = ({ isVisible, onToggle, ticker }) => {
   }, [ticker]);
 
   return (
-    <Overlay
-      isVisible={isVisible}
-      onBackdropPress={onToggle}
-      overlayStyle={styles.overlay}
-    >
-      <InfoModal isVisible={infoVisible} onToggle={toggleInfoModal}>
-        이곳에 설명 입력
-      </InfoModal>
-      <Button
-        containerStyle={styles.closeButton}
-        onPress={onToggle}
-        type="clear"
-        icon={{ name: "close", type: "antdesign", color: "#f0f0f0" }}
-      />
+    <ModalComponent isVisible={isVisible} onToggle={onToggle}>
       {loading && <Loading />}
       {!loading && (
         <React.Fragment>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <AppText style={{ color: "#888", fontSize: 20 }}>종목 정보</AppText>
-            <Button
-              containerStyle={styles.infoButton}
-              type="clear"
-              onPress={() => toggleInfoModal()}
-              icon={{
-                name: "questioncircleo",
-                type: "antdesign",
-                color: "#888",
-                size: 20,
-              }}
-            />
+          <View style={styles.title}>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <AppText style={{ color: "#888", fontSize: 20 }}>
+                종목 정보
+              </AppText>
+              <Button
+                containerStyle={styles.infoButton}
+                type="clear"
+                onPress={() => toggleInfoModal()}
+                icon={{
+                  name: "questioncircleo",
+                  type: "antdesign",
+                  color: "#888",
+                  size: 20,
+                }}
+              />
+            </View>
           </View>
           <View style={styles.content}>
             <View style={styles.stockInfoHeader}>
@@ -144,7 +135,7 @@ const StockInfo = ({ isVisible, onToggle, ticker }) => {
           </View>
         </React.Fragment>
       )}
-    </Overlay>
+    </ModalComponent>
   );
 };
 
@@ -153,6 +144,10 @@ const styles = StyleSheet.create({
     width: "90%",
     borderRadius: 10,
     backgroundColor: "#333",
+  },
+  title: {
+    position: "absolute",
+    top: 0,
   },
   content: {
     paddingTop: 20,

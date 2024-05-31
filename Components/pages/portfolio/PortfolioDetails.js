@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
   View,
   ScrollView,
@@ -8,16 +8,16 @@ import {
 } from "react-native";
 import { usePortfolio } from "../../utils/PortfolioContext";
 import { getUsertoken } from "../../utils/localStorageUtils";
-import { useFocusEffect } from "@react-navigation/native";
 
 import urls from "../../utils/urls";
 import AppText from "../../utils/AppText";
 import { SafeAreaView } from "react-native-safe-area-context";
 import PortfolioPieChart from "../../utils/PortfolioPieChart";
-import { Button, Divider, Icon, Overlay } from "@rneui/base";
+import { Button, Divider, Icon } from "@rneui/base";
 import { width, height, filteringNumber, colorScale } from "../../utils/utils";
 import StockInfo from "./StockInfo";
 import Loading from "../../utils/Loading";
+import ModalComponent from "../../utils/Modal";
 
 const PortfolioDetails = ({ route, navigation }) => {
   const stocksLength = 10;
@@ -176,33 +176,31 @@ const PortfolioDetails = ({ route, navigation }) => {
       </View>
     );
   };
-  useFocusEffect(
-    useCallback(() => {
-      const loadPortfolio = async () => {
-        try {
-          const currentPortfolio = getPortfolioById(route.params.id);
-          if (currentPortfolio) {
-            await getAlertExists(currentPortfolio.id);
-            setPortfolio({
-              id: currentPortfolio.id,
-              name: currentPortfolio.name,
-              stocks: currentPortfolio.detail.stocks,
-              currentCash: currentPortfolio.detail.currentCash,
-              initialAsset: currentPortfolio.detail.initialAsset,
-              riskValue: currentPortfolio.riskValue,
-              auto: currentPortfolio.auto,
-            });
-            setLoading(false);
-          }
-        } catch (error) {
-          console.log("Detail loadData error: ", error);
+  useEffect(() => {
+    const loadPortfolio = async () => {
+      try {
+        const currentPortfolio = getPortfolioById(route.params.id);
+        if (currentPortfolio) {
+          await getAlertExists(currentPortfolio.id);
+          setPortfolio({
+            id: currentPortfolio.id,
+            name: currentPortfolio.name,
+            stocks: currentPortfolio.detail.stocks,
+            currentCash: currentPortfolio.detail.currentCash,
+            initialAsset: currentPortfolio.detail.initialAsset,
+            riskValue: currentPortfolio.riskValue,
+            auto: currentPortfolio.auto,
+          });
           setLoading(false);
         }
-      };
+      } catch (error) {
+        console.log("Detail loadData error: ", error);
+        setLoading(false);
+      }
+    };
 
-      loadPortfolio();
-    }, [portfolios])
-  );
+    loadPortfolio();
+  }, [portfolios]);
 
   if (loading) {
     return <Loading />;
@@ -429,7 +427,7 @@ const PortfolioDetails = ({ route, navigation }) => {
                       }%`}</AppText>
                     </View>
                   </View>
-                  {selectedId === index && (
+                  {selectedId === index && item.equity === "보통주" && (
                     <React.Fragment>
                       <Divider />
                       <View style={styles.utilContainer}>
@@ -469,27 +467,15 @@ const PortfolioDetails = ({ route, navigation }) => {
             onToggle={toggleStockModal}
             ticker={portfolio.stocks[selectedId].ticker}
           />
-          <Overlay
-            isVisible={infoVisible}
-            onBackdropPress={() => {
-              setSelectedId(null);
-              resetModifyData();
-              toggleInfoModal();
-            }}
-            overlayStyle={styles.overlay}
-          >
-            <Button
-              containerStyle={styles.closeButton}
-              onPress={() => {
-                setSelectedId(null);
-                resetModifyData();
-                toggleInfoModal();
-              }}
-              type="clear"
-              icon={{ name: "close", type: "antdesign", color: "#f0f0f0" }}
-            />
+          <ModalComponent isVisible={infoVisible} onToggle={toggleInfoModal}>
             <AppText
-              style={{ color: "#f0f0f0", fontSize: 20, fontWeight: "bold" }}
+              style={{
+                position: "absolute",
+                top: 0,
+                color: "#f0f0f0",
+                fontSize: 20,
+                fontWeight: "bold",
+              }}
             >
               종목 수정
             </AppText>
@@ -567,7 +553,7 @@ const PortfolioDetails = ({ route, navigation }) => {
                 toggleInfoModal();
               }}
             />
-          </Overlay>
+          </ModalComponent>
         </React.Fragment>
       )}
     </SafeAreaView>
@@ -683,25 +669,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3, // for iOS shadow
     shadowRadius: 2, // for iOS shadow
   },
-  overlay: {
-    width: "90%",
-    borderRadius: 10,
-    backgroundColor: "#333",
-  },
   content: {
     paddingTop: 40,
     paddingHorizontal: 10,
-  },
-  text: {
-    fontSize: 16,
-    marginBottom: 20,
-    color: "#f0f0f0",
-  },
-  closeButton: {
-    marginHorizontal: -5,
-    position: "absolute",
-    top: 3,
-    right: 3,
   },
   contentsItem: {
     flexDirection: "row",

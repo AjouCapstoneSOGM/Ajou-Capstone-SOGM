@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/AntDesign";
-import AppText from "../../../utils/AppText";
 import { Button, SearchBar } from "@rneui/base";
+import AppText from "../../../utils/AppText";
 import { useSearch } from "../../../utils/SearchStock";
 import StockInfo from "../../portfolio/StockInfo";
 
@@ -98,7 +98,7 @@ const ManualPage1 = ({ stockList, setStockList }) => {
             ))}
         </ScrollView>
       </View>
-      {selectedIndex !== null && (
+      {suggestions[selectedIndex] && (
         <StockInfo
           isVisible={stockInfoVisible}
           onToggle={toggleStockModal}

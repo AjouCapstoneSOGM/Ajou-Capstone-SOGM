@@ -1,4 +1,11 @@
 import { Dimensions } from "react-native";
+import {
+  formatDistanceToNow,
+  isWithinInterval,
+  subDays,
+  format,
+} from "date-fns";
+import { ko } from "date-fns/locale";
 
 export const deepCopy = (obj) => {
   if (obj === null || typeof obj !== "object") {
@@ -78,3 +85,13 @@ export const height = // 높이 변환 작업
 
 export const width = // 가로 변환 작업
   (Dimensions.get("screen").width * (1 / basicDimensions.width)).toFixed(2);
+
+export const timeAgo = (date) => {
+  const now = new Date();
+  // 7일 이내인지 확인
+  if (isWithinInterval(date, { start: subDays(now, 7), end: now })) {
+    return formatDistanceToNow(date, { addSuffix: true, locale: ko });
+  } else {
+    return format(date, "yyyy-MM-dd");
+  }
+};
