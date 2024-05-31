@@ -77,6 +77,7 @@ public class PortfolioDto {
     }
 
     @Data
+    @Builder
     @NoArgsConstructor
     @AllArgsConstructor
     public static class sellRequestDto {

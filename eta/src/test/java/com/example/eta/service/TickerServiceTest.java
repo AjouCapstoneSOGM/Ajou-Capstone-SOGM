@@ -68,8 +68,8 @@ public class TickerServiceTest {
         assertEquals(tickerId, result.getTicker());
         assertEquals(10.5f*100, result.getRoe());
         assertEquals(5.2f*100, result.getRoa());
-        assertEquals(15.3f*100, result.getPer());
-        assertEquals(2.3f*100, result.getPbr());
+        assertEquals(15.3f, result.getPer());
+        assertEquals(2.3f, result.getPbr());
         assertEquals(8.7f*100, result.getTwelveMonthRet());
 
         assertEquals(1, result.getRoeRank());

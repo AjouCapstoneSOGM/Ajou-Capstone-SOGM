@@ -1,15 +1,20 @@
 package com.example.eta.service;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 import com.example.eta.dto.PortfolioDto;
 import com.example.eta.entity.*;
 import com.example.eta.auth.enums.RoleType;
 import com.example.eta.repository.*;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -17,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
@@ -27,6 +33,8 @@ public class PortfolioServiceTest {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private PortfolioRecordRepository portfolioRecordRepository;
 
     @Autowired
     private RebalancingRepository rebalancingRepository;
@@ -112,5 +120,53 @@ public class PortfolioServiceTest {
             assertNotEquals(0, rt.getNumber());
             assertNotEquals(0, rt.getPrice());
         }
+    }
+    @Test
+    @Transactional
+    void testSellStock_ManualPortfolio_CashNotUpdated() {
+        User user = userRepository.save(new User().builder()
+                .email("james001@foo.bar")
+                .isVerified(false)
+                .password("password!")
+                .name("James")
+                .roleType(RoleType.ROLE_USER)
+                .createdDate(LocalDateTime.now())
+                .enabled(true).build());
+
+        Portfolio portfolio = portfolioRepository.save(new Portfolio().builder()
+                .pfId(40)
+                .user(user)
+                .isAuto(false)
+                .country("KOR")
+                .currentCash(1000.0f)
+                .build()
+        );
+
+        Ticker tickerEntity = new Ticker();
+        tickerEntity.setName("삼성전자");
+        tickerEntity.setTicker("005390");
+
+        PortfolioTicker portfolioTicker = portfolioTickerRepository.save(new PortfolioTicker().builder()
+                .portfolio(portfolio)
+                .averagePrice(1000.f)
+                .ticker(tickerEntity)
+                .number(10)
+                .build()
+        );
+
+        int sellQuantity = 5;
+        float sellPrice = 150.0f;
+
+        PortfolioDto.sellRequestDto sellRequestDto = PortfolioDto.sellRequestDto.builder()
+                .ticker(tickerEntity.getTicker())
+                .quantity(sellQuantity)
+                .price(sellPrice)
+                .isBuy(false)
+                .build();
+
+        portfolioService.sellStock(portfolio.getPfId(), sellRequestDto);
+
+        Portfolio updatedPortfolio = portfolioRepository.findById(portfolio.getPfId()).orElseThrow();
+        assertEquals(1000.0f, updatedPortfolio.getCurrentCash(), 0.01);
     }
 }
