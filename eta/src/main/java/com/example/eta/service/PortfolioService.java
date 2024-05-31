@@ -352,6 +352,7 @@ public class PortfolioService {
                 .orElseThrow(() -> new IllegalArgumentException("PortfolioTicker not found"));
     }
 
+    @Transactional
     public void updatePortfolioName(Integer pfId, String newName) {
         Portfolio portfolio = portfolioRepository.findById(pfId).get();
         portfolio.setName(newName);
