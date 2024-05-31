@@ -58,6 +58,10 @@ export const filteringNumber = (value) => {
   return value.replace(/[^0-9]/g, "");
 };
 
+export const removeSpecialChars = (text) => {
+  return text.replace(/[^a-zA-Z0-9 가-힣]/g, "");
+};
+
 export const colorScale = [
   "hsl(348, 100%, 80%)", // 파스텔 핑크,
   "hsl(207, 94%, 80%)", // 파스텔 블루,

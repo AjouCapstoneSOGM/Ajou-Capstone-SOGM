@@ -177,7 +177,7 @@ const Signup = ({ navigation }) => {
             value={username}
             placeholder="이름"
             onChangeText={setUsername}
-            placeholderTextColor="grey"
+            placeholderTextColor="gray"
           ></TextInput>
         </View>
         <View style={styles.verifyInputContainer}>
@@ -186,7 +186,7 @@ const Signup = ({ navigation }) => {
             value={useremail}
             onChangeText={setUseremail}
             placeholder="이메일"
-            placeholderTextColor="grey"
+            placeholderTextColor="gray"
           />
           <TouchableOpacity
             style={styles.verifyButton}

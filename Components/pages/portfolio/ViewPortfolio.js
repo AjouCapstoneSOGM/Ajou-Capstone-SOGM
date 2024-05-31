@@ -1,11 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  TouchableOpacity,
-  StyleSheet,
-  Dimensions,
-  TextInput,
-} from "react-native";
+import { View, TouchableOpacity, StyleSheet, TextInput } from "react-native";
 import { usePortfolio } from "../../utils/PortfolioContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Icon, Button } from "@rneui/base";
@@ -19,6 +13,7 @@ import Loading from "../../utils/Loading";
 import { useAuth } from "../../utils/AuthContext";
 import { width, height } from "../../utils/utils";
 import ModalComponent from "../../utils/Modal";
+import { removeSpecialChars } from "../../utils/utils";
 
 const PortfolioList = ({ navigation }) => {
   const { portfolios, loadData, portLoading } = usePortfolio();
@@ -31,6 +26,10 @@ const PortfolioList = ({ navigation }) => {
     if (portfolios[selectedIndex])
       setChangedName(portfolios[selectedIndex].name);
   }, [selectedIndex]);
+
+  const handleChangedName = (value) => {
+    if (value.length < 20) setChangedName(removeSpecialChars(value));
+  };
 
   const portfolioExist = () => {
     if (portLoading) return false;
@@ -241,7 +240,7 @@ const PortfolioList = ({ navigation }) => {
                 placeholder={portfolios[selectedIndex].name}
                 placeholderTextColor={"#888"}
                 value={changedName}
-                onChangeText={setChangedName}
+                onChangeText={(value) => handleChangedName(value)}
               />
             </View>
             <Button
@@ -276,7 +275,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   portfolio: {
-    height: height * 180,
+    height: height * 170,
     backgroundColor: "#333",
     borderRadius: 30,
     paddingVertical: height * 15,
