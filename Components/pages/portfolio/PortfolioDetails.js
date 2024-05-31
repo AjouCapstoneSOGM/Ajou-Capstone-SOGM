@@ -17,6 +17,7 @@ import PortfolioPieChart from "../../utils/PortfolioPieChart";
 import { Button, Divider, Icon, Overlay } from "@rneui/base";
 import { width, height, filteringNumber, colorScale } from "../../utils/utils";
 import StockInfo from "./StockInfo";
+import Loading from "../../utils/Loading";
 
 const PortfolioDetails = ({ route, navigation }) => {
   const stocksLength = 10;
@@ -31,6 +32,7 @@ const PortfolioDetails = ({ route, navigation }) => {
     riskValue: 0,
     auto: true,
   });
+  const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState(null);
   const [alertExist, setAlertExist] = useState(false);
   const [infoVisible, setInfoVisible] = useState(false);
@@ -190,9 +192,11 @@ const PortfolioDetails = ({ route, navigation }) => {
               riskValue: currentPortfolio.riskValue,
               auto: currentPortfolio.auto,
             });
+            setLoading(false);
           }
         } catch (error) {
           console.log("Detail loadData error: ", error);
+          setLoading(false);
         }
       };
 
@@ -200,6 +204,9 @@ const PortfolioDetails = ({ route, navigation }) => {
     }, [portfolios])
   );
 
+  if (loading) {
+    return <Loading />;
+  }
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.outline}>

@@ -14,7 +14,10 @@ const StockInfo = ({ isVisible, onToggle, ticker }) => {
     name: "",
     ticker: "",
     ROE: 0,
+    ROA: 0,
     PER: 0,
+    PBR: 0,
+    month12: 0,
   });
 
   const toggleInfoModal = () => {
@@ -108,7 +111,7 @@ const StockInfo = ({ isVisible, onToggle, ticker }) => {
               </AppText>
             </View>
             <View style={styles.stockColumn}>
-              <AppText style={styles.infoText}>ROE</AppText>
+              <AppText style={styles.infoText}>ROA</AppText>
               <AppText style={styles.infoText}>{info.roa}</AppText>
               <AppText style={styles.infoText}>
                 {info.roaRank} / {info.total}
@@ -122,10 +125,19 @@ const StockInfo = ({ isVisible, onToggle, ticker }) => {
               </AppText>
             </View>
             <View style={styles.stockColumn}>
-              <AppText style={styles.infoText}>PER</AppText>
+              <AppText style={styles.infoText}>PBR</AppText>
               <AppText style={styles.infoText}>{info.pbr}</AppText>
               <AppText style={styles.infoText}>
                 {info.pbrRank} / {info.total}
+              </AppText>
+            </View>
+            <View style={styles.stockColumn}>
+              <AppText style={[styles.infoText, { fontSize: 14 }]}>
+                1년 수익률
+              </AppText>
+              <AppText style={styles.infoText}>{info.twelveMonthRet}%</AppText>
+              <AppText style={styles.infoText}>
+                {info.twelveMonthRetRank} / {info.total}
               </AppText>
             </View>
             <AppText style={styles.text}></AppText>

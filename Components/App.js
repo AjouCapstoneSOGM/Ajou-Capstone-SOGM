@@ -1,6 +1,7 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import * as Font from "expo-font";
+import { LogBox } from "react-native";
 
 import Login from "./pages/login/login";
 import SocialLogin from "./pages/login/sociallogin";
@@ -71,6 +72,7 @@ export default function App() {
       fontFamily: "pretendard",
     },
   };
+  LogBox.ignoreAllLogs();
 
   setCustomText(customTextProps);
   return (

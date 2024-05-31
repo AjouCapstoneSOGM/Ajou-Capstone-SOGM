@@ -57,7 +57,6 @@ const AutoPage4 = ({ amount, riskLevel, interest, step }) => {
             },
             body: JSON.stringify({
               country: "KOR",
-              name: "테스트",
               sector: [interest],
               asset: amount,
               riskValue: riskLevel,
