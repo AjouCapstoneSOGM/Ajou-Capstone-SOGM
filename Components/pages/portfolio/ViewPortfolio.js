@@ -92,7 +92,7 @@ const PortfolioList = ({ navigation }) => {
           {portfolios[selectedIndex] && (
             <PortfolioPieChart
               data={portfolios[selectedIndex].detail}
-              size={width * 0.9}
+              size={width * 1}
             />
           )}
         </View>

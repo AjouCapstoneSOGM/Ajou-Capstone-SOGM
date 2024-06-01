@@ -5,7 +5,7 @@ import urls from "../../../utils/urls";
 import Loading from "../../../utils/Loading";
 import AppText from "../../../utils/AppText";
 import PortfolioPieChart from "../../../utils/PortfolioPieChart";
-import { colorScale } from "../../../utils/utils";
+import { colorScale, width, height } from "../../../utils/utils";
 import { Icon } from "@rneui/base";
 
 const ManualPage3 = ({ stockList }) => {
@@ -85,7 +85,7 @@ const ManualPage3 = ({ stockList }) => {
               })),
             }}
             selectedId={selectedId}
-            size={1}
+            size={1 * width}
           />
         </View>
         <ScrollView style={styles.labelContainer}>
