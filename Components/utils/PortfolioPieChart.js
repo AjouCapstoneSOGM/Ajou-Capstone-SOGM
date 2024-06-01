@@ -40,8 +40,8 @@ const PortfolioPieChart = ({ data, selectedId, size }) => {
         index === selectedId ? 80 * size : 105 * size
       }
       width={width * 250 * size}
-      height={height * 250 * size}
-      radius={140 * size}
+      height={width * 250 * size}
+      radius={width * 120 * 0.65}
       labels={() => {}}
       animate={{
         duration: 300,

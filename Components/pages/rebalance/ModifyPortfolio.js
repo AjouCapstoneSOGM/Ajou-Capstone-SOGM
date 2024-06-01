@@ -203,12 +203,12 @@ const ModifyPortfolio = ({ route, navigation }) => {
           <PortfolioPieChart
             data={portfolio.detail}
             selectedId={selectedId}
-            size={width * 0.5}
+            size={width * 0.6}
           />
           <PortfolioPieChart
             data={calculateAfter().detail}
             selectedId={selectedId}
-            size={width * 0.5}
+            size={width * 0.6}
           />
         </View>
       </View>

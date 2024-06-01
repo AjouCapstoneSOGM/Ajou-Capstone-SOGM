@@ -21,7 +21,30 @@ const Settings = ({ navigation }) => {
       </View>
       <ScrollView style={styles.settingList}>
         <TouchableOpacity style={styles.settingItem}>
-          <AppText style={{ color: "#f0f0f0", fontSize: 20 }}>테스트</AppText>
+          <AppText style={{ color: "#f0f0f0", fontSize: 20 }}>닉네임</AppText>
+        </TouchableOpacity>
+        <Divider />
+        <TouchableOpacity style={styles.settingItem}>
+          <AppText style={{ color: "#f0f0f0", fontSize: 20 }}>이메일</AppText>
+        </TouchableOpacity>
+        <Divider />
+        <TouchableOpacity style={styles.settingItem}>
+          <AppText style={{ color: "#f0f0f0", fontSize: 20 }}>
+            비밀번호변경
+          </AppText>
+        </TouchableOpacity>
+        <Divider />
+        <TouchableOpacity style={styles.settingItem}>
+          <AppText style={{ color: "#f0f0f0", fontSize: 20 }}>가입일자</AppText>
+        </TouchableOpacity>
+        <Divider />
+        <TouchableOpacity style={styles.settingItem}>
+          <AppText style={{ color: "#f0f0f0", fontSize: 20 }}>문의하기</AppText>
+        </TouchableOpacity>
+        <Divider />
+        <Divider />
+        <TouchableOpacity style={styles.settingItem}>
+          <AppText style={{ color: "#f0f0f0", fontSize: 20 }}>로그아웃</AppText>
         </TouchableOpacity>
         <Divider />
       </ScrollView>

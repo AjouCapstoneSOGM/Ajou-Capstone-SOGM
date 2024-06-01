@@ -178,7 +178,7 @@ const AutoPage4 = ({ amount, riskLevel, interest, step }) => {
               })),
             }}
             selectedId={selectedId}
-            size={width * 0.55}
+            size={width * 0.6}
           />
         </View>
         <View>
@@ -188,10 +188,12 @@ const AutoPage4 = ({ amount, riskLevel, interest, step }) => {
             다음과 같은 비율로 종목이 구성돼요
           </AppText>
         </View>
-        <View style={[styles.column, { paddingLeft: 20 }]}>
+        <View style={[styles.column, { paddingLeft: width * 40 }]}>
           <AppText style={styles.columnName}>종목</AppText>
           <AppText style={styles.columnNumber}>수량</AppText>
-          <AppText style={styles.columnPrice}>1주 당 금액</AppText>
+          <AppText style={[styles.columnPrice, { marginLeft: width * 5 }]}>
+            1주 당 금액
+          </AppText>
         </View>
         <ScrollView>
           {initRebalance.rebalancings.map((stock, index) => (
@@ -244,7 +246,7 @@ const AutoPage4 = ({ amount, riskLevel, interest, step }) => {
             <AppText
               style={{ color: "#f0f0f0", fontSize: 20, fontWeight: "bold" }}
             >
-              이후에도 저희가 알림을 통해 지속적으로 포트폴리오 관리를
+              이후에도 ETA가 알림을 통해 지속적으로 포트폴리오 관리를
               도와드릴게요!
             </AppText>
           </ScrollView>
