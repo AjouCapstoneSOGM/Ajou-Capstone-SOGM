@@ -25,6 +25,8 @@ def test_make_portfolio_success():
                 "192440.KQ",
                 "039420.KQ",
                 "029460.KS",
+                "261240.KS",
+                "411060.KS",
             ],
             "safe_asset_ratio": 0.1,
             "initial_cash": 1000000,
@@ -33,12 +35,13 @@ def test_make_portfolio_success():
     assert response.status_code == 200
     data = response.json()
     assert "int_asset_num" in data
-    assert len(data["int_asset_num"]) == 10
+    assert len(data["int_asset_num"]) == 12
 
     assert "cash_hold" in data
     assert data["cash_hold"] > 0
 
     assert "total_ratio_final" in data
+    assert len(data["total_ratio_final"]) == 13
 
     assert "final_returns" in data
     assert "final_vol" in data
@@ -74,6 +77,8 @@ def test_make_portfolio_cash_under_million():
                 "192440.KQ",
                 "039420.KQ",
                 "029460.KS",
+                "261240.KS",
+                "411060.KS",
             ],
             "safe_asset_ratio": 0.1,
             "initial_cash": 0,
