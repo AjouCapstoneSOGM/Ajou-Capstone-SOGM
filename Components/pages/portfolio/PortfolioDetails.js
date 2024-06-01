@@ -578,7 +578,8 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   outlineDetail: {
-    marginTop: 10,
+    marginTop: height * 5,
+    marginBottom: height * 5,
     flexDirection: "row",
   },
   outlineDetailBox: {
@@ -607,10 +608,11 @@ const styles = StyleSheet.create({
   chartContainer: {
     flex: 2.5,
     backgroundColor: "#f0f0f0",
-    alignItems: "center", // 자식 요소를 수평 중앙 정렬
-    justifyContent: "center", // 자식 요소를 수직 중앙 정렬
-    padding: height * -10,
-    marginTop: height * 0,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: height * 0,
+    marginTop: height * -5,
+    marginBottom: height * -10,
   },
   centerText: {
     fontSize: 20,

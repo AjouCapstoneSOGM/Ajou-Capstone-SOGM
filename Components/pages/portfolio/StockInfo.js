@@ -6,10 +6,12 @@ import { getUsertoken } from "../../utils/localStorageUtils";
 import Loading from "../../utils/Loading";
 import AppText from "../../utils/AppText";
 import ModalComponent from "../../utils/Modal";
+import { width, height } from "../../utils/utils";
 
 const StockInfo = ({ isVisible, onToggle, ticker }) => {
   const [loading, setLoading] = useState(true);
   const [infoVisible, setInfoVisible] = useState(false);
+  const [infoContent, setInfoContent] = useState("");
   const [info, setInfo] = useState({
     name: "default",
     ticker: "000000",
@@ -20,7 +22,8 @@ const StockInfo = ({ isVisible, onToggle, ticker }) => {
     month12: 0,
   });
 
-  const toggleInfoModal = () => {
+  const toggleInfoModal = (content) => {
+    setInfoContent(content);
     setInfoVisible(!infoVisible);
   };
 
@@ -64,7 +67,9 @@ const StockInfo = ({ isVisible, onToggle, ticker }) => {
         <React.Fragment>
           <View style={styles.title}>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <AppText style={{ color: "#888", fontSize: 20 }}>
+              <AppText
+                style={{ color: "#888", fontSize: 20, marginHorizontal: 10 }}
+              >
                 종목 정보
               </AppText>
               <Button
@@ -75,7 +80,7 @@ const StockInfo = ({ isVisible, onToggle, ticker }) => {
                   name: "questioncircleo",
                   type: "antdesign",
                   color: "#888",
-                  size: 20,
+                  size: width * 20,
                 }}
               />
             </View>
@@ -92,9 +97,24 @@ const StockInfo = ({ isVisible, onToggle, ticker }) => {
             <View style={styles.stockColumn}>
               <AppText style={styles.columnText}>가치지표</AppText>
               <AppText style={styles.columnText}>수치</AppText>
-              <AppText style={styles.columnText}>순위</AppText>
+              <AppText style={styles.columnText}>섹터 내 순위</AppText>
             </View>
             <View style={styles.stockColumn}>
+              <Button
+                containerStyle={styles.stockinfoButton}
+                type="clear"
+                onPress={() =>
+                  toggleInfoModal(
+                    "ROE는 'Return on Equity'의 줄임말이에요.\n이 지표는 기업이 주주들에게 얼마나 많은 돈을 벌어다주는지를 보여주는 거에요.\nROE가 높을수록 기업이 주주들에게 더 많은 수익을 만들어내는 것이기 때문에 ROE가 높을수록 좋은 회사에요."
+                  )
+                }
+                icon={{
+                  name: "questioncircleo",
+                  type: "antdesign",
+                  color: "#888",
+                  size: width * 20,
+                }}
+              />
               <AppText style={styles.infoText}>ROE</AppText>
               <AppText style={styles.infoText}>{info.roe}</AppText>
               <AppText style={styles.infoText}>
@@ -102,6 +122,21 @@ const StockInfo = ({ isVisible, onToggle, ticker }) => {
               </AppText>
             </View>
             <View style={styles.stockColumn}>
+              <Button
+                containerStyle={styles.stockinfoButton}
+                type="clear"
+                onPress={() =>
+                  toggleInfoModal(
+                    "ROA는 'Return on Assets'의 줄임말이에요.\n이 지표는 기업이 자산을 얼마나 효율적으로 활용해서 이익을 내는지를 보여주는 거에요. \nROA가 높을수록 기업이 자산을 잘 활용해서 더 많은 이익을 내는 것이기 때문에 ROA가 높을수록 좋은 회사에요."
+                  )
+                }
+                icon={{
+                  name: "questioncircleo",
+                  type: "antdesign",
+                  color: "#888",
+                  size: width * 20,
+                }}
+              />
               <AppText style={styles.infoText}>ROA</AppText>
               <AppText style={styles.infoText}>{info.roa}</AppText>
               <AppText style={styles.infoText}>
@@ -109,6 +144,21 @@ const StockInfo = ({ isVisible, onToggle, ticker }) => {
               </AppText>
             </View>
             <View style={styles.stockColumn}>
+              <Button
+                containerStyle={styles.stockinfoButton}
+                type="clear"
+                onPress={() =>
+                  toggleInfoModal(
+                    "PER는 'Price to Earnings Ratio'의 줄임말이에요.\n이 지표는 주가가 기업의 이익에 비해 얼마나 높은지를 보여주는 거에요. \nPER가 낮을수록 투자자들이 그 주식을 더 저렴하게 사는 것이기 때문에 PER가 낮을수록 좋은 회사에요."
+                  )
+                }
+                icon={{
+                  name: "questioncircleo",
+                  type: "antdesign",
+                  color: "#888",
+                  size: width * 20,
+                }}
+              />
               <AppText style={styles.infoText}>PER</AppText>
               <AppText style={styles.infoText}>{info.per}</AppText>
               <AppText style={styles.infoText}>
@@ -116,6 +166,21 @@ const StockInfo = ({ isVisible, onToggle, ticker }) => {
               </AppText>
             </View>
             <View style={styles.stockColumn}>
+              <Button
+                containerStyle={styles.stockinfoButton}
+                type="clear"
+                onPress={() =>
+                  toggleInfoModal(
+                    "PBR는 'Price to Book Ratio'의 줄임말이에요.\n이 지표는 주가가 기업의 순자산에 비해 얼마나 높은지를 보여주는 거에요. \nPBR가 낮을수록 주가가 기업의 자산 가치에 비해 저평가된 것이기 때문에 PBR가 낮을수록 좋은 회사에요."
+                  )
+                }
+                icon={{
+                  name: "questioncircleo",
+                  type: "antdesign",
+                  color: "#888",
+                  size: width * 20,
+                }}
+              />
               <AppText style={styles.infoText}>PBR</AppText>
               <AppText style={styles.infoText}>{info.pbr}</AppText>
               <AppText style={styles.infoText}>
@@ -123,8 +188,23 @@ const StockInfo = ({ isVisible, onToggle, ticker }) => {
               </AppText>
             </View>
             <View style={styles.stockColumn}>
-              <AppText style={[styles.infoText, { fontSize: 12 }]}>
-                1년 전 대비 주가
+              <Button
+                containerStyle={styles.stockinfoButton}
+                type="clear"
+                onPress={() =>
+                  toggleInfoModal(
+                    "지난 1년 대비 주가의 변화 정도를 나타내는 지표입니다. 이 지표는 주가가 지난 1년 동안 얼마나 올랐거나 내렸는지를 보여줘요."
+                  )
+                }
+                icon={{
+                  name: "questioncircleo",
+                  type: "antdesign",
+                  color: "#888",
+                  size: width * 20,
+                }}
+              />
+              <AppText style={[styles.infoText, { fontSize: 14 }]}>
+                1년 수익률
               </AppText>
               <AppText style={styles.infoText}>{info.twelveMonthRet}%</AppText>
               <AppText style={styles.infoText}>
@@ -133,6 +213,32 @@ const StockInfo = ({ isVisible, onToggle, ticker }) => {
             </View>
             <AppText style={styles.text}></AppText>
           </View>
+          {infoVisible && (
+            <Overlay
+              isVisible={infoVisible}
+              onBackdropPress={() => setInfoVisible(false)}
+              overlayStyle={{ backgroundColor: "transparent", elevation: 0 }}
+            >
+              <View style={styles.overlayContent}>
+                <View style={styles.closeButton}>
+                  <Button
+                    containerStyle={{ padding: width * -10 }}
+                    type="clear"
+                    onPress={() => setInfoVisible(false)}
+                    icon={{
+                      name: "close",
+                      type: "ionicons",
+                      color: "#fff",
+                      size: 30,
+                    }}
+                  />
+                </View>
+                <AppText style={{ fontSize: 14, color: "#fff" }}>
+                  {infoContent}
+                </AppText>
+              </View>
+            </Overlay>
+          )}
         </React.Fragment>
       )}
     </ModalComponent>
@@ -144,6 +250,12 @@ const styles = StyleSheet.create({
     width: "90%",
     borderRadius: 10,
     backgroundColor: "#333",
+  },
+  overlayContent: {
+    backgroundColor: "#333",
+    color: "#fff",
+    padding: 20,
+    borderRadius: 10,
   },
   title: {
     position: "absolute",
@@ -157,7 +269,21 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "blue",
   },
-  infoButton: {},
+  infoButton: {
+    marginHorizontal: width * -20,
+    padding: 0,
+  },
+  stockinfoButton: {
+    marginHorizontal: width * -25,
+    marginVertical: height * -10,
+    padding: 0,
+  },
+  closeButton: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    padding: 10,
+  },
   text: {
     fontSize: 20,
     color: "#f0f0f0",
