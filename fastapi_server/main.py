@@ -1,12 +1,13 @@
-from fastapi import FastAPI, Response, status
+from fastapi import FastAPI, status, HTTPException
 from fastapi.responses import JSONResponse
-from config import Settings
-from model import PortfolioInfo, TickerList, Ticker, PortfolioFinal
+from utils.config import Settings
+from utils.model import PortfolioInfo, TickerList, Ticker, PortfolioFinal
 from starlette.middleware.cors import CORSMiddleware
-from make_portfolio import MakePortrolio
-from current_price import fetch_all_prices
-from get_news_summary import News
-from gpt import Chatbot
+from make_portfolio.make_portfolio import MakePortrolio
+from current_price.current_price import fetch_all_prices
+from news_summary.get_news_summary import News
+from news_summary.gpt import Chatbot
+import uvicorn
 
 settings = Settings()  # 설정 인스턴스 생성
 app = FastAPI()
@@ -22,6 +23,16 @@ app.add_middleware(
 
 @app.post("/makePortfolio/")
 async def makePortfolio(portfolio_info: PortfolioInfo, response_model=PortfolioFinal):
+    if len(portfolio_info.tickers) < 10:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="less than 10 tickers"
+        )
+
+    if portfolio_info.initial_cash < 1000000:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="less than million cash"
+        )
+
     portfolio = MakePortrolio()
     result = portfolio.make_portfolio(
         portfolio_info.tickers,
@@ -33,6 +44,11 @@ async def makePortfolio(portfolio_info: PortfolioInfo, response_model=PortfolioF
 
 @app.post("/currentPrice/")
 async def get_current_prices(tickers: TickerList):
+    if len(tickers.tickers) == 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="no tickers"
+        )
+
     prices = await fetch_all_prices(tickers.tickers)
     return {"prices": prices}
 
@@ -44,13 +60,13 @@ async def get_News(ticker: Ticker):
     headlines = await news.get_company_news(ticker.ticker)
 
     if len(headlines) == 0:
-        return Response(status_code=status.HTTP_204_NO_CONTENT)
+        return JSONResponse(
+            status_code=status.HTTP_204_NO_CONTENT, content={"detail": "no news"}
+        )
 
     summary = await chatbot.summary("".join(headlines), ticker.ticker)
-    # sections = summary.strip().split("## ")[1:]
-    # summary_json = []
-    # for section in sections:
-    #     title, _, content = section.partition("\n")
-    #     summary_json.append({"title": title.strip(), "content": content.strip()})
-
     return {"summary": summary}
+
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
