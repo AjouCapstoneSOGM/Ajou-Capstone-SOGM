@@ -8,7 +8,9 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
+    env:
+      ETA_OPENAI_KEY: ${{ secrets.ETA_OPENAI_KEY }}
 
     strategy:
       matrix:
