@@ -53,7 +53,7 @@ def ratio_re(
 ):
     print(average_price)
     total_invest_money = total_current_invest
-    new_asset_num = (total_invest_money * initial_ratio / current_price).astype(int)
+    new_asset_num = (total_invest_money * initial_ratio / current_price)
     new_asset_num, cash_hold = optimize_investment(
         new_asset_num, current_price, total_invest_money, initial_ratio, num_safe
     )
