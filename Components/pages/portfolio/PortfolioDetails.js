@@ -628,7 +628,8 @@ const styles = StyleSheet.create({
     alignItems: "stretch", // 내용을 가로 방향으로 중앙 정렬
     backgroundColor: "#333",
     borderRadius: 20,
-    padding: 15,
+    paddingHorizontal: 15,
+    paddingTop: 15,
     marginBottom: 10,
   },
   companyInfo: {
@@ -645,13 +646,14 @@ const styles = StyleSheet.create({
   utilContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
-    padding: 5,
-    marginTop: 10,
+    alignItems: "cet",
+    margin: 10,
   },
   utilButton: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    paddingVertical: 10,
   },
   itemText: {
     fontSize: 14,
