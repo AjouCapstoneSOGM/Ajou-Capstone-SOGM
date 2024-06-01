@@ -8,13 +8,25 @@ import { SearchBar } from "@rneui/themed";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { width, height } from "../utils/utils";
-import InfoModal from "../utils/InfoModal";
+import { FlatList } from "react-native-gesture-handler";
+import { useSearch } from "../utils/SearchStock.js";
+import StockInfo from "./portfolio/StockInfo.js";
+import ModalComponent from "../utils/Modal.js";
 
 const Home = ({ navigation }) => {
+  const { query, setQuery, suggestions } = useSearch();
   const [FGI, setFGI] = useState(55);
-  const [search, setSearch] = useState("");
   const [isVisible, setIsVisible] = useState(false);
-  const [FGIinfo, setFGIinfo] = useState(55);
+  const [stockInfoVisible, setStockInfoVisible] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(null);
+
+  const toggleStockModal = () => {
+    setStockInfoVisible(!stockInfoVisible);
+  };
+
+  const handleSelectedIndex = (index) => {
+    setSelectedIndex(index);
+  };
 
   const news = [
     {
@@ -49,10 +61,6 @@ const Home = ({ navigation }) => {
     },
   ];
 
-  const updateSearch = (search) => {
-    setSearch(search);
-  };
-
   const toggleModal = () => {
     setIsVisible(!isVisible);
   };
@@ -60,14 +68,53 @@ const Home = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <HeaderComponent />
-      <View style={styles.searchBarContainer}>
-        <SearchBar
-          placeholder="주식종목 검색"
-          onChangeText={updateSearch}
-          value={search}
-          containerStyle={styles.searchContainer}
-          inputContainerStyle={styles.searchInputContainer}
-        ></SearchBar>
+      <SearchBar
+        placeholder="주식종목 검색"
+        onChangeText={setQuery}
+        value={query}
+        containerStyle={styles.searchContainer}
+        inputContainerStyle={styles.searchInputContainer}
+      />
+      <View style={{ zIndex: 1 }}>
+        <FlatList
+          style={styles.searchResult}
+          data={suggestions.slice(0, 5)}
+          keyExtractor={(item) => item.ticker}
+          renderItem={({ item, index }) => (
+            <View key={index} style={styles.suggestion}>
+              <View style={{ flexDirection: "row" }}>
+                <AppText style={{ color: "#f0f0f0" }}>
+                  {item.name}
+                  {"  "}
+                </AppText>
+                <AppText style={{ fontSize: 13, color: "#888" }}>
+                  {item.exchange}
+                </AppText>
+              </View>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                }}
+              >
+                <AppText style={{ color: "#888" }}>{item.ticker}</AppText>
+                <Button
+                  buttonStyle={styles.infoButton}
+                  type="clear"
+                  onPress={() => {
+                    handleSelectedIndex(index);
+                    toggleStockModal();
+                  }}
+                  icon={{
+                    name: "infocirlceo",
+                    type: "antdesign",
+                    color: "#f0f0f0",
+                  }}
+                />
+              </View>
+            </View>
+          )}
+        />
       </View>
       <ScrollView style={styles.mainTheme}>
         <View style={styles.FGIContainer}>
@@ -82,9 +129,6 @@ const Home = ({ navigation }) => {
               type="clear"
               onPress={() => {
                 toggleModal();
-                setFGIinfo(
-                  `CNN에서 제공하는 공포탐욕지수(Fear & Greed Index)는 주식시장의 투자 심리를 나타내는 지표입니다.\n\n0~25: "극심한 공포" 구간, 좋은 매수 기회로 여겨집니다.\n25~50: "공포" 구간, 좋은 매수 기회로 여겨집니다.\n50~75: "탐욕" 구간, 주의가 필요합니다.\n75~100: "극심한 탐욕" 구간, 매도 시점을 고려해볼 수 있습니다. `
-                );
               }}
               icon={{
                 name: "questioncircleo",
@@ -126,9 +170,18 @@ const Home = ({ navigation }) => {
       <View style={{ height: height * 30 }} />
       {/* footer 높이 만큼 증가 */}
       <FooterComponent />
-      <InfoModal isVisible={isVisible} onToggle={toggleModal}>
-        {FGIinfo}
-      </InfoModal>
+      <ModalComponent isVisible={isVisible} onToggle={toggleModal}>
+        <AppText
+          style={{ fontSize: 16, marginBottom: 20, color: "#f0f0f0" }}
+        >{`CNN에서 제공하는 공포탐욕지수(Fear & Greed Index)는 주식시장의 투자 심리를 나타내는 지표입니다.\n\n0~25: "극심한 공포" 구간, 좋은 매수 기회로 여겨집니다.\n25~50: "공포" 구간, 좋은 매수 기회로 여겨집니다.\n50~75: "탐욕" 구간, 주의가 필요합니다.\n75~100: "극심한 탐욕" 구간, 매도 시점을 고려해볼 수 있습니다. `}</AppText>
+      </ModalComponent>
+      {suggestions[selectedIndex] && (
+        <StockInfo
+          isVisible={stockInfoVisible}
+          onToggle={toggleStockModal}
+          ticker={suggestions[selectedIndex].ticker}
+        />
+      )}
     </SafeAreaView>
   );
 };
@@ -139,26 +192,42 @@ const styles = StyleSheet.create({
     backgroundColor: "#f0f0f0",
   },
   searchBarContainer: {
-    height: height * 80,
     backgroundColor: "#f0f0f0",
     paddingVertical: height * 20,
     paddingHorizontal: width * 15,
+    zIndex: 2,
   },
   searchContainer: {
-    borderRadius: 30,
+    backgroundColor: "#333",
     borderBottomColor: "transparent",
     borderTopColor: "transparent",
     padding: width * 5,
-    paddingRight: 50,
     height: height * 50,
   },
   searchInputContainer: {
     backgroundColor: "#f0f0f0",
-    borderRadius: 30,
     height: height * 40,
+  },
+  searchResult: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+  },
+  suggestion: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#434343",
+    backgroundColor: "#333",
+  },
+  infoButton: {
+    marginRight: -5,
   },
   mainTheme: {
     backgroundColor: "#333",
+    zIndex: 0,
   },
   FGIContainer: {
     paddingHorizontal: width * 20,
