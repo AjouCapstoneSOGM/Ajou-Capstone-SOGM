@@ -8,32 +8,12 @@ import AutoPage2 from "./AutoPage2";
 import AutoPage3 from "./AutoPage3";
 import AutoPage4 from "./AutoPage4";
 
-const AutoPortfolio = ({ step, setDisabled }) => {
+const AutoPortfolio = () => {
   const [amount, setAmount] = useState("");
   const [riskLevel, setRiskLevel] = useState("");
   const [interest, setInterest] = useState("");
   const [sector, setSector] = useState("");
-
-  useEffect(() => {
-    if (step === 1) {
-      if (amount < 1000000) setDisabled(true);
-      else setDisabled(false);
-    }
-  }, [step, amount]);
-
-  useEffect(() => {
-    if (step === 2) {
-      if (riskLevel < 1) setDisabled(true);
-      else setDisabled(false);
-    }
-  }, [step, riskLevel]);
-
-  useEffect(() => {
-    if (step === 3) {
-      if (interest === "") setDisabled(true);
-      else setDisabled(false);
-    }
-  }, [step, interest]);
+  const [step, setStep] = useState(1);
 
   const fetchSector = async () => {
     try {
@@ -61,12 +41,28 @@ const AutoPortfolio = ({ step, setDisabled }) => {
   const renderAutoStep = () => {
     switch (step) {
       case 1:
-        return <AutoPage1 amount={amount} setAmount={setAmount} />;
+        return (
+          <AutoPage1
+            step={step}
+            setStep={setStep}
+            amount={amount}
+            setAmount={setAmount}
+          />
+        );
       case 2:
-        return <AutoPage2 riskLevel={riskLevel} setRiskLevel={setRiskLevel} />;
+        return (
+          <AutoPage2
+            step={step}
+            setStep={setStep}
+            riskLevel={riskLevel}
+            setRiskLevel={setRiskLevel}
+          />
+        );
       case 3:
         return (
           <AutoPage3
+            step={step}
+            setStep={setStep}
             sector={sector}
             interest={interest}
             setInterest={setInterest}
@@ -75,37 +71,41 @@ const AutoPortfolio = ({ step, setDisabled }) => {
       case 4:
         return (
           <AutoPage4
+            step={step}
+            setStep={setStep}
             amount={amount}
             riskLevel={riskLevel}
             interest={interest}
-            step={step}
           />
         );
       case 5:
         return (
           <AutoPage4
+            step={step}
+            setStep={setStep}
             amount={amount}
             riskLevel={riskLevel}
             interest={interest}
-            step={step}
           />
         );
       case 6:
         return (
           <AutoPage4
+            step={step}
+            setStep={setStep}
             amount={amount}
             riskLevel={riskLevel}
             interest={interest}
-            step={step}
           />
         );
       case 7:
         return (
           <AutoPage4
+            step={step}
+            setStep={setStep}
             amount={amount}
             riskLevel={riskLevel}
             interest={interest}
-            step={step}
           />
         );
     }

@@ -192,7 +192,7 @@ const PortfolioDetails = ({ route, navigation }) => {
             auto: currentPortfolio.auto,
           });
           setLoading(false);
-        }
+        } else setLoading(false);
       } catch (error) {
         console.log("Detail loadData error: ", error);
         setLoading(false);
@@ -409,7 +409,9 @@ const PortfolioDetails = ({ route, navigation }) => {
                         원
                       </AppText>
                       <AppText style={{ color: "#f0f0f0" }}>
-                        <AppText style={{ fontSize: 12 }}>평단가 </AppText>
+                        <AppText style={{ fontSize: 11, color: "#aaa" }}>
+                          평균 구매가{" "}
+                        </AppText>
                         <AppText>{item.averageCost.toLocaleString()}원</AppText>
                       </AppText>
                     </View>

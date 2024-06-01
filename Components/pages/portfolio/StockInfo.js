@@ -123,8 +123,8 @@ const StockInfo = ({ isVisible, onToggle, ticker }) => {
               </AppText>
             </View>
             <View style={styles.stockColumn}>
-              <AppText style={[styles.infoText, { fontSize: 14 }]}>
-                1년 수익률
+              <AppText style={[styles.infoText, { fontSize: 12 }]}>
+                1년 전 대비 주가
               </AppText>
               <AppText style={styles.infoText}>{info.twelveMonthRet}%</AppText>
               <AppText style={styles.infoText}>
