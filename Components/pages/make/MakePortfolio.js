@@ -5,26 +5,16 @@ import ManualPortfolio from "./manual/ManualPortfolio.js";
 import AppText from "../../utils/AppText.js";
 import { Button, Divider, Icon } from "@rneui/base";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { usePortfolio } from "../../utils/PortfolioContext.js";
 import { width, height } from "../../utils/utils";
 
 const MakePortfolio = ({ navigation }) => {
   const [step, setStep] = useState(0);
   const [path, setPath] = useState("");
   const [disabled, setDisabled] = useState(true);
-  const { loadData } = usePortfolio();
 
   const handleNextStep = () => {
     setStep(step + 1);
   };
-
-  useEffect(() => {
-    if ((path === "manual" && step === 4) || (path === "auto" && step === 8)) {
-      loadData();
-      navigation.popToTop();
-      navigation.navigate("ViewPortfolio");
-    }
-  }, [step]);
 
   useEffect(() => {
     if (path) setDisabled(false);
@@ -102,22 +92,18 @@ const MakePortfolio = ({ navigation }) => {
             </TouchableOpacity>
             <Divider style={{ marginVertical: 20 }} />
           </View>
+          <View style={styles.nextButtonContainer}>
+            <Button
+              buttonStyle={styles.nextButton}
+              title="다음"
+              onPress={handleNextStep}
+              disabled={disabled}
+            />
+          </View>
         </View>
       )}
-      {step >= 1 && path === "auto" && (
-        <AutoPortfolio step={step} setDisabled={setDisabled} />
-      )}
-      {step >= 1 && path === "manual" && (
-        <ManualPortfolio step={step} setDisabled={setDisabled} />
-      )}
-      <View style={styles.nextButtonContainer}>
-        <Button
-          buttonStyle={styles.nextButton}
-          title="다음"
-          onPress={handleNextStep}
-          disabled={disabled}
-        />
-      </View>
+      {step >= 1 && path === "auto" && <AutoPortfolio />}
+      {step >= 1 && path === "manual" && <ManualPortfolio />}
     </SafeAreaView>
   );
 };

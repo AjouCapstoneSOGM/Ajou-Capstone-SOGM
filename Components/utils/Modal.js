@@ -1,9 +1,8 @@
 import { Button, Overlay } from "@rneui/base";
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import AppText from "./AppText";
 
-const InfoModal = ({ isVisible, onToggle, children }) => {
+const ModalComponent = ({ isVisible, onToggle, children }) => {
   return (
     <Overlay
       isVisible={isVisible}
@@ -16,9 +15,7 @@ const InfoModal = ({ isVisible, onToggle, children }) => {
         type="clear"
         icon={{ name: "close", type: "antdesign", color: "#f0f0f0" }}
       />
-      <View style={styles.content}>
-        <AppText style={styles.text}>{children}</AppText>
-      </View>
+      <View style={styles.content}>{children}</View>
     </Overlay>
   );
 };
@@ -46,4 +43,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default InfoModal;
+export default ModalComponent;

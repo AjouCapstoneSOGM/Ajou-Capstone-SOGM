@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { View, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
 
 import AppText from "../../../utils/AppText";
-import { Icon } from "@rneui/base";
+import { Button, Icon } from "@rneui/base";
+import { height } from "../../../utils/utils";
 
-const AutoPage3 = ({ sector, interest, setInterest }) => {
+const AutoPage3 = ({ step, setStep, sector, interest, setInterest }) => {
+  const [disabled, setDisabled] = useState(true);
   const icons = [
     ["bank", "material-community"], // 금융
     ["cellphone-message", "material-community"], // 커뮤니케이션 서비스
@@ -18,6 +20,15 @@ const AutoPage3 = ({ sector, interest, setInterest }) => {
     ["texture", "material-community"], // 소재
     ["shopping", "material-community"], // 경기관련소비재
   ];
+
+  const handleNextStep = () => {
+    setStep(step + 1);
+  };
+
+  useEffect(() => {
+    if (interest === "") setDisabled(true);
+    else setDisabled(false);
+  }, [interest]);
 
   return (
     <View style={styles.container}>
@@ -55,6 +66,14 @@ const AutoPage3 = ({ sector, interest, setInterest }) => {
           ))}
         </ScrollView>
       </View>
+      <View style={styles.nextButtonContainer}>
+        <Button
+          buttonStyle={styles.nextButton}
+          title="다음"
+          onPress={handleNextStep}
+          disabled={disabled}
+        />
+      </View>
     </View>
   );
 };
@@ -85,6 +104,16 @@ const styles = StyleSheet.create({
     marginTop: 7,
     borderBottomColor: "#434343",
     borderBottomWidth: 1,
+  },
+  nextButton: {
+    backgroundColor: "#6262e8",
+    borderRadius: 10,
+    height: height * 50,
+  },
+  nextButtonContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: height * 5,
+    backgroundColor: "#333",
   },
 });
 export default AutoPage3;

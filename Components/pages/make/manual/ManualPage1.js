@@ -1,15 +1,21 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/AntDesign";
-import AppText from "../../../utils/AppText";
 import { Button, SearchBar } from "@rneui/base";
+import AppText from "../../../utils/AppText";
 import { useSearch } from "../../../utils/SearchStock";
 import StockInfo from "../../portfolio/StockInfo";
+import { height } from "../../../utils/utils";
 
-const ManualPage1 = ({ stockList, setStockList }) => {
+const ManualPage1 = ({ step, setStep, stockList, setStockList }) => {
   const { query, setQuery, suggestions } = useSearch();
+  const [disabled, setDisabled] = useState(true);
   const [stockInfoVisible, setStockInfoVisible] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(null);
+
+  const handleNextStep = () => {
+    setStep(step + 1);
+  };
 
   const toggleStockModal = () => {
     setStockInfoVisible(!stockInfoVisible);
@@ -31,6 +37,11 @@ const ManualPage1 = ({ stockList, setStockList }) => {
       }
     });
   };
+
+  useEffect(() => {
+    if (stockList.length === 0) setDisabled(true);
+    else setDisabled(false);
+  }, [stockList]);
 
   return (
     <View style={styles.container}>
@@ -98,13 +109,21 @@ const ManualPage1 = ({ stockList, setStockList }) => {
             ))}
         </ScrollView>
       </View>
-      {selectedIndex !== null && (
+      {suggestions[selectedIndex] && (
         <StockInfo
           isVisible={stockInfoVisible}
           onToggle={toggleStockModal}
           ticker={suggestions[selectedIndex].ticker}
         />
       )}
+      <View style={styles.nextButtonContainer}>
+        <Button
+          buttonStyle={styles.nextButton}
+          title="다음"
+          onPress={handleNextStep}
+          disabled={disabled}
+        />
+      </View>
     </View>
   );
 };
@@ -161,6 +180,16 @@ const styles = StyleSheet.create({
   },
   infoButton: {
     marginRight: -5,
+  },
+  nextButton: {
+    backgroundColor: "#6262e8",
+    borderRadius: 10,
+    height: height * 50,
+  },
+  nextButtonContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: height * 5,
+    backgroundColor: "#333",
   },
 });
 export default ManualPage1;

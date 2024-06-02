@@ -30,17 +30,18 @@ public class PortfolioService {
     private final ApiClientFastApi apiClientFastApi;
 
     /**
-     * 포트폴리오의 종목별 비중을 계산하고, 포트폴리오의 총자산(현금+보유종목)을 반환합니다.
+     * 포트폴리오의 종목별 자산량을 계산하고, 포트폴리오의 총자산(현금+보유종목)을 반환합니다.
      *
      * <p> {@code averagePriceUpdated} 가 {@code true}이면 평단가를 기준으로 비중을 계산하고, {@code false}이면 가장 최근의 종가를 기준으로 비중을 계산힙니다.
      *
      * <p> 평단가를 기준으로 비중을 계산하는 경우는 리밸런싱 알림을 반영할 때, 종가를 기준으로 비중을 계산하는 경우는 주기적으로 포트폴리오의 비중을 업데이트할 때입니다.
      *
-     * <p> {@code currentAmountForTicker}에 종목별로 비중 값이 담깁니다.
+     * <p> {@code currentAmountForTicker}에 종목별 자산량이 담깁니다.
      */
-    public float calculateProportionAndReturnTotalAmount(Portfolio portfolio, boolean averagePriceUpdated, Map<PortfolioTicker, Float> currentAmountForTicker) {
+    public float calculateAmount(Portfolio portfolio, boolean averagePriceUpdated, Map<PortfolioTicker, Float> currentAmountForTicker) {
         float totalAmount = portfolio.getCurrentCash();
         for (PortfolioTicker portfolioTicker : portfolio.getPortfolioTickers()) {
+            System.out.println(portfolioTicker.getTicker().getName());
             float number = portfolioTicker.getNumber();
             float price = averagePriceUpdated ? portfolioTicker.getAveragePrice() :
                     priceRepository.findLatestPriceByTicker(portfolioTicker.getTicker().getTicker())
@@ -150,6 +151,10 @@ public class PortfolioService {
         }
 
         portfolioRepository.save(portfolio);
+    }
+
+    public String getPortfolioNameById(Integer pfId) {
+        return portfolioRepository.findById(pfId).get().getName();
     }
 
     public void deletePortfolio(Integer pfId) {
@@ -352,5 +357,11 @@ public class PortfolioService {
                 .orElseThrow(() -> new IllegalArgumentException("PortfolioTicker not found"));
     }
 
+    @Transactional
+    public void updatePortfolioName(Integer pfId, String newName) {
+        Portfolio portfolio = portfolioRepository.findById(pfId).get();
+        portfolio.setName(newName);
+        portfolioRepository.save(portfolio);
+    }
 }
 

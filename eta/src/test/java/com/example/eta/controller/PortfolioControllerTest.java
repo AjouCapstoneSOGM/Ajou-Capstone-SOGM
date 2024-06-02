@@ -48,11 +48,11 @@ public class PortfolioControllerTest {
     @Transactional
     public void testPortfolioAuthorization() throws Exception {
         // 회원가입, 로그인 후 토큰 반환
-        String authorizationHeader = signUpLogin(mockMvc, signupInfoRepository);
+        String authorizationHeader = signUpLogin("suprlux09@ajou.ac.kr", mockMvc, signupInfoRepository);
 
         // 다른 유저로 포트폴리오 생성
         User user = userRepository.save(new User().builder()
-                .email("james001@foo.bar")
+                .email("suprlux09@gmail.com")
                 .isVerified(false)
                 .password("password!")
                 .name("James")

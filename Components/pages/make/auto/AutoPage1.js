@@ -1,10 +1,16 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, TextInput, TouchableOpacity, StyleSheet } from "react-native";
 import AppText from "../../../utils/AppText";
-import { filteringNumber } from "../../../utils/utils";
+import { filteringNumber, height } from "../../../utils/utils";
+import { Button } from "@rneui/base";
 
-const AutoPage1 = ({ amount, setAmount }) => {
+const AutoPage1 = ({ step, setStep, amount, setAmount }) => {
+  const [disabled, setDisabled] = useState(true);
   const isAmountEnough = () => amount >= 1000000;
+
+  const handleNextStep = () => {
+    setStep(step + 1);
+  };
 
   const handleAmount = (value) => {
     const filteredValue = filteringNumber(value);
@@ -14,6 +20,11 @@ const AutoPage1 = ({ amount, setAmount }) => {
   const addValuetoAmount = (value) => {
     setAmount((prevAmount) => Number(prevAmount) + value);
   };
+
+  useEffect(() => {
+    if (amount < 1000000) setDisabled(true);
+    else setDisabled(false);
+  }, [amount]);
 
   return (
     <View style={styles.container}>
@@ -57,6 +68,14 @@ const AutoPage1 = ({ amount, setAmount }) => {
           </AppText>
         )}
       </View>
+      <View style={styles.nextButtonContainer}>
+        <Button
+          buttonStyle={styles.nextButton}
+          title="다음"
+          onPress={handleNextStep}
+          disabled={disabled}
+        />
+      </View>
     </View>
   );
 };
@@ -66,7 +85,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contentsContainer: {
-    height: "100%",
+    flex: 1,
     backgroundColor: "#333",
     paddingHorizontal: 20,
     paddingVertical: 40,
@@ -107,11 +126,15 @@ const styles = StyleSheet.create({
     marginTop: 20,
     color: "#ff5858",
   },
+  nextButton: {
+    backgroundColor: "#6262e8",
+    borderRadius: 10,
+    height: height * 50,
+  },
   nextButtonContainer: {
-    position: "absolute",
-    bottom: 20,
-    left: 20,
-    right: 20,
+    paddingHorizontal: 20,
+    paddingBottom: height * 5,
+    backgroundColor: "#333",
   },
 });
 
