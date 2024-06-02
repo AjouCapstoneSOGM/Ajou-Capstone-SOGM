@@ -48,16 +48,12 @@ public class AuthControllerTest {
 
     @Autowired
     private UserService userService;
-
     @Autowired
     private TokenRepository tokenRepository;
-
     @Autowired
     private SignupInfoService signupInfoService;
-
     @Autowired
     private SignupInfoRepository signupInfoRepository;
-
     @Autowired
     private MockMvc mockMvc;
 
@@ -144,14 +140,14 @@ public class AuthControllerTest {
     @Transactional
     public void testSignUp() throws Exception {
         signupInfoRepository.save(SignupInfo.builder()
-                .email("james@domain.com")
+                .email("suprlux09@ajou.ac.kr")
                 .code("000000")
                 .isVerified(true)
                 .codeExpires(LocalDateTime.now().plusMinutes(5))
                 .signupToken("abcdefgh12345678")
                 .build());
 
-        UserDto.InfoDto InfoDto = new UserDto.InfoDto("James", "james@domain.com", "abcdefgh12345678", "password!");
+        UserDto.InfoDto InfoDto = new UserDto.InfoDto("James", "suprlux09@ajou.ac.kr", "abcdefgh12345678", "password!");
         MockHttpServletResponse response = mockMvc.perform(post("/api/auth/signup")
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(InfoDto)))
@@ -168,20 +164,20 @@ public class AuthControllerTest {
     @Transactional
     public void testLogin() throws Exception {
         signupInfoRepository.save(SignupInfo.builder()
-                .email("james@domain.com")
+                .email("suprlux09@ajou.ac.kr")
                 .code("000000")
                 .isVerified(true)
                 .codeExpires(LocalDateTime.now().plusMinutes(5))
                 .signupToken("abcdefgh12345678")
                 .build());
 
-        UserDto.InfoDto InfoDto = new UserDto.InfoDto("James", "james@domain.com", "abcdefgh12345678", "password!");
+        UserDto.InfoDto InfoDto = new UserDto.InfoDto("James", "suprlux09@ajou.ac.kr", "abcdefgh12345678", "password!");
         mockMvc.perform(post("/api/auth/signup")
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(InfoDto)))
                 .andDo(print());
 
-        UserDto.LoginDto loginDto = new UserDto.LoginDto("james@domain.com", "password!", "expoPushToken");
+        UserDto.LoginDto loginDto = new UserDto.LoginDto("suprlux09@ajou.ac.kr", "password!", "expoPushToken");
         MockHttpServletResponse response = mockMvc.perform(post("/api/auth/login")
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(loginDto)))
@@ -191,7 +187,7 @@ public class AuthControllerTest {
                 .andReturn().getResponse();
 
         assertTrue(JsonPath.parse(response.getContentAsString()).read("$.name").equals("James"));
-        tokenRepository.findById(userService.findByEmail("james@domain.com").getUserId())
+        tokenRepository.findById(userService.findByEmail("suprlux09@ajou.ac.kr").getUserId())
                 .ifPresent(token -> assertNotNull(token.getExpoPushToken()));
     }
 
@@ -200,14 +196,13 @@ public class AuthControllerTest {
     @Transactional
     public void testLogout() throws Exception {
         // 회원가입, 로그인 후 토큰 반환
-        String authorizationHeader = signUpLogin(mockMvc, signupInfoRepository);
-        System.out.println(authorizationHeader);
+        String authorizationHeader = signUpLogin("suprlux09@ajou.ac.kr", mockMvc, signupInfoRepository);
 
         mockMvc.perform(post("/api/auth/logout")
                 .header("Authorization", authorizationHeader))
                 .andDo(print()).andExpect(status().isOk());
 
-        User user = userService.findByEmail("james@domain.com");
-        assertTrue(tokenRepository.findById(user.getUserId()).isEmpty());
+        User user = userService.findByEmail("suprlux09@ajou.ac.kr");
+        assertFalse(tokenRepository.existsById(user.getUserId()));
     }
 }

@@ -96,4 +96,10 @@ public class PortfolioController {
                 .build();
         return ResponseEntity.ok(responseData);
     }
+
+    @PutMapping("/{port_id}")
+    public ResponseEntity<Void> updatePortfolioName(@PathVariable("port_id") Integer pfId, @RequestBody Map<String, String> requestBody) {
+        portfolioService.updatePortfolioName(pfId, requestBody.get("name"));
+        return ResponseEntity.ok().build();
+    }
 }
