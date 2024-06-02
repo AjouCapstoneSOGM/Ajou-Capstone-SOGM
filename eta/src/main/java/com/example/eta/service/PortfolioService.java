@@ -186,7 +186,7 @@ public class PortfolioService {
     public int createManualPortfolio(User user,PortfolioDto.CreateManualRequestDto request) {
         String name = request.getName();
         if (name == null) {
-            name = user.getName() + "의 자동 포트폴리오 " + (user.getPortfolios().size() + 1);
+            name = user.getName() + "의 수동 포트폴리오 " + (user.getPortfolios().size() + 1);
         }
 
         float totalAsset = 0;
@@ -362,6 +362,10 @@ public class PortfolioService {
         Portfolio portfolio = portfolioRepository.findById(pfId).get();
         portfolio.setName(newName);
         portfolioRepository.save(portfolio);
+    }
+
+    public Portfolio findOne(Integer pfId) {
+        return portfolioRepository.findById(pfId).get();
     }
 }
 

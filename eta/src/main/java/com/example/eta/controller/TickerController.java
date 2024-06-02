@@ -27,7 +27,7 @@ public class TickerController {
         return ResponseEntity.ok(tickerDetailDto);
     }
     @GetMapping("/{ticker}/news")
-    public ResponseEntity<NewsDto> getNews(@PathVariable String ticker) {
+    public ResponseEntity<NewsDto> getNews(@PathVariable("ticker") String ticker) {
         NewsDto newsDto = newsService.getNews(ticker);
         if (newsDto != null) {
             return ResponseEntity.ok(newsDto);

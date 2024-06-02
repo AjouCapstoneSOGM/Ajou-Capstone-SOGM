@@ -136,13 +136,15 @@ public class RebalancingService {
 
         if (isInitial) {
             portfolio.setInitCash(portfolio.getCurrentCash());
+            portfolio.setCreatedDate(LocalDateTime.now());
         }
 
         // 리밸런싱 알림 삭제
         rebalancingRepository.delete(rebalancingRepository.findById(rnId).get());
 
-        // 포트폴리오 정보를 업데이트
-        portfolio.setCreatedDate(LocalDateTime.now());
+        // 현재 비중 계산
+        portfolioScheduler.updateProportion(portfolio);
+
         portfolioRepository.save(portfolio);
         return true;
     }
