@@ -97,13 +97,24 @@
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-semibold mb-4">User</h2>
                 <div class="flex items-center gap-2">
-                    <input type="text" placeholder="Search..." class="px-4 py-1 border rounded-md">
-                    <button class="px-4 py-1 bg-blue-600 text-white rounded-md">Search</button>
+                    <input id="searchInput" type="text" placeholder="Search..." class="px-4 py-1 border rounded-md">
+                    <div class="flex gap-2">
+                        <label>
+                            <input type="radio" name="searchType" value="id" checked>
+                            ID
+                        </label>
+                        <label>
+                            <input type="radio" name="searchType" value="name">
+                            Name
+                        </label>
+                    </div>
+                    <button class="px-4 py-1 bg-blue-600 text-white rounded-md" onclick="search()">Search</button>
                 </div>
             </div>
                 <table class="w-full bg-white rounded-md shadow-md overflow-hidden">
                     <thead class="bg-gray-50">
                     <tr>
+                        <th class="px-4 py-2 text-left text-gray-500">UserId</th>
                         <th class="px-4 py-2 text-left text-gray-500">Name</th>
                         <th class="px-4 py-2 text-left text-gray-500">Email</th>
                         <th class="px-4 py-2 text-left text-gray-500">CreatedDate</th>
@@ -112,11 +123,12 @@
                     </thead>
                     <tbody>
                     <tr th:each="user : ${users}">
+                        <td class="border-t px-4 py-2" th:text="${user.userId}"></td>
                         <td class="border-t px-4 py-2" th:text="${user.name}"></td>
                         <td class="border-t px-4 py-2" th:text="${user.email}"></td>
                         <td class="border-t px-4 py-2" th:text="${user.createdDate}"></td>
                         <td class="border-t px-4 py-2">
-                            <button class="px-2 py-1 bg-blue-500 text-white rounded-md">활성화</button>
+<!--                            <button class="px-2 py-1 bg-blue-500 text-white rounded-md">활성화</button>-->
                             <button class="px-2 py-1 bg-red-500 text-white rounded-md">비활성</button>
                         </td>
                     </tr>
@@ -134,6 +146,16 @@
             const sidebar = document.querySelector('.lg\\:block');
             sidebar.classList.toggle('hidden');
         });
+        function search() {
+            const query = document.getElementById('searchInput').value;
+            const searchType = document.querySelector('input[name="searchType"]:checked').value;
+
+            if (query) {
+                window.location.href = `/users/search/${searchType}/${query}`;
+            } else {
+                alert('Please enter a search term');
+            }
+        }
     </script>
 </body>
 </html>
