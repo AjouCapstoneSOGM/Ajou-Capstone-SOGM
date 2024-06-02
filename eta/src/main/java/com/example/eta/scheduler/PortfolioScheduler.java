@@ -18,8 +18,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 @Component
 @RequiredArgsConstructor
@@ -48,7 +50,7 @@ public class PortfolioScheduler {
     @Transactional
     public void updateProportion(Portfolio portfolio) {
         Map<PortfolioTicker, Float> currentAmountForTicker = new HashMap<>();
-        float totalAmount = portfolioService.calculateProportionAndReturnTotalAmount(portfolio, false, currentAmountForTicker);
+        float totalAmount = portfolioService.calculateAmount(portfolio, false, currentAmountForTicker);
 
         for (PortfolioTicker portfolioTicker : currentAmountForTicker.keySet()) {
             float currentProportion = currentAmountForTicker.get(portfolioTicker).floatValue() / totalAmount;
@@ -67,16 +69,19 @@ public class PortfolioScheduler {
 
     @Transactional
     public int createProportionRebalancing(Portfolio portfolio) {
-        // 현재 총자산 계산하고, 각 종목별 비중에 따라 목표 보유량(총 가격) 계산
+        // 현재 총자산 계산하고, 각 종목별 비중에 따라 목표 보유 개수 계산
         Map<PortfolioTicker, Float> currentAmountForTicker = new HashMap<>();
-        Map<PortfolioTicker, Float> targetAmountForTicker = new HashMap<>();
-        float totalAmount = portfolioService.calculateProportionAndReturnTotalAmount(portfolio, false, currentAmountForTicker);
-
+        Map<PortfolioTicker, Float> newAssetNum = new HashMap<>();
+        float totalCurrentInvest = portfolioService.calculateAmount(portfolio, false, currentAmountForTicker);
 
         for (PortfolioTicker portfolioTicker : portfolio.getPortfolioTickers()) {
-            float targetAmount = totalAmount * portfolioTicker.getInitProportion();
-            targetAmountForTicker.put(portfolioTicker, targetAmount);
+            float close = priceRepository.findLatestPriceByTicker(portfolioTicker.getTicker().getTicker())
+                    .get().getClose().floatValue();
+            newAssetNum.put(portfolioTicker, (totalCurrentInvest * portfolioTicker.getInitProportion() / close));
         }
+
+        // Optimize
+        Map<PortfolioTicker, Integer> optimizedAssetNum = optimizeInvestment(newAssetNum);
 
         // 매도, 매수 알림 생성
         Rebalancing rebalancing = Rebalancing.builder()
@@ -88,12 +93,12 @@ public class PortfolioScheduler {
         for (PortfolioTicker portfolioTicker : portfolio.getPortfolioTickers()) {
             float close = priceRepository.findLatestPriceByTicker(portfolioTicker.getTicker().getTicker())
                     .get().getClose().floatValue();
-            float targetAmount = targetAmountForTicker.get(portfolioTicker);
-            float currentAmount = currentAmountForTicker.get(portfolioTicker);
-            float diff = targetAmount - currentAmount;
+            int newAssetNumForTicker = optimizedAssetNum.get(portfolioTicker);
+            int currentAssetNumForTicker = portfolioTicker.getNumber();
+            int diff = newAssetNumForTicker - currentAssetNumForTicker;
             if (diff > 0) {
                 // 매수
-                int numToBuy = (int) (diff / close);
+                int numToBuy = diff;
                 if (numToBuy == 0) continue;
                 RebalancingTicker rebalancingTicker = rebalancingTickerRepository.save(RebalancingTicker.builder()
                         .rebalancing(rebalancing)
@@ -105,8 +110,7 @@ public class PortfolioScheduler {
                 rebalancing.getRebalancingTickers().add(rebalancingTicker);
             } else if (diff < 0) {
                 // 매도
-                diff = -diff;
-                int numToSell = (int) (diff / close);
+                int numToSell = -diff;
                 if (numToSell == 0) continue;
                 RebalancingTicker rebalancingTicker = rebalancingTickerRepository.save(RebalancingTicker.builder()
                         .rebalancing(rebalancing)
@@ -119,6 +123,80 @@ public class PortfolioScheduler {
             }
         }
         return rebalancing.getRnId();
+    }
+
+    private Map<PortfolioTicker, Integer> optimizeInvestment(Map<PortfolioTicker, Float> initAssetNum) {
+        int MAX_ITERATION = 100;
+        Map<PortfolioTicker, Integer> assetNumResult = new HashMap<>();
+
+        // initAssetNum의 값들을 출력하기
+        for (PortfolioTicker portfolioTicker : initAssetNum.keySet()) {
+            logger.info("initAssetNum: " + portfolioTicker.getTicker().getTicker() + " " + initAssetNum.get(portfolioTicker));
+        }
+
+        // 안전자산 제외한 종목들에 대해 주식 수 계산하기
+        Map<PortfolioTicker, Float> initAssetNumWithoutSafe = new HashMap<>();
+        Map<PortfolioTicker, Integer> initAssetNumWithoufSafeOld = new HashMap<>();
+        Map<PortfolioTicker, Integer> initAssetNumSafe = new HashMap<>(); // 안전자산 종목 주식 수(나중에 합쳐서 결과로 반환)
+        for (PortfolioTicker portfolioTicker : initAssetNum.keySet()) {
+            if (portfolioTicker.getTicker().getEquity().equals("안전자산")) {
+                initAssetNumSafe.put(portfolioTicker, (int) Math.floor(initAssetNum.get(portfolioTicker)));
+            } else {
+                initAssetNumWithoutSafe.put(portfolioTicker, initAssetNum.get(portfolioTicker));
+                initAssetNumWithoufSafeOld.put(portfolioTicker, (int) Math.floor(initAssetNum.get(portfolioTicker)));
+            }
+        }
+
+        // 소수 부분, 소수 부분 총합 계산
+        float cash = 0.0f;
+        Map<PortfolioTicker, Float> decimalPart = new HashMap<>();
+        for (PortfolioTicker portfolioTicker : initAssetNumWithoutSafe.keySet()) {
+            float num = initAssetNumWithoutSafe.get(portfolioTicker);
+            decimalPart.put(portfolioTicker, num - (int) num);
+            cash += num;
+        }
+
+        for (int i = 0; i < MAX_ITERATION; i++) {
+            // 배분할 현금을 최초 비중별로 나누고, 주식 수 정수부분, 소수부분 계산
+            Map<PortfolioTicker, Integer> assetNumInt = new HashMap<>();
+            Map<PortfolioTicker, Float> remainingDecimals = new HashMap<>();
+            for (PortfolioTicker portfolioTicker : initAssetNumWithoutSafe.keySet()) {
+                float close = priceRepository.findLatestPriceByTicker(portfolioTicker.getTicker().getTicker())
+                        .get().getClose().floatValue();
+                float initProportion = portfolioTicker.getInitProportion();
+                assetNumInt.put(portfolioTicker, (int)(cash * initProportion / close));
+                remainingDecimals.put(portfolioTicker, cash * initProportion / close - (int)((cash * initProportion) / close));
+            }
+
+            // 정수부분만큼 기존 주식 수에 더함
+            for (PortfolioTicker portfolioTicker : assetNumInt.keySet()) {
+                assetNumInt.put(portfolioTicker, assetNumInt.get(portfolioTicker) + initAssetNumWithoufSafeOld.get(portfolioTicker));
+            }
+
+            float newCash = 0.0f;
+            for (PortfolioTicker portfolioTicker : remainingDecimals.keySet()) {
+                float close = priceRepository.findLatestPriceByTicker(portfolioTicker.getTicker().getTicker())
+                        .get().getClose().floatValue();
+                cash += remainingDecimals.get(portfolioTicker) * close;
+            }
+
+            // 갱신된 주식 수가 변화가 없거나 더 이상의 금액 배분이 불가능한 경우 종료
+            if(assetNumInt.values().stream().reduce(0, Integer::sum) == initAssetNumWithoufSafeOld.values().stream().reduce(0, Integer::sum)
+                || Math.abs(cash - newCash) / newCash < 0.001 || cash == newCash || newCash == 0.0) {
+                assetNumResult.putAll(assetNumInt);
+                assetNumResult.putAll(initAssetNumSafe);
+                break;
+            }
+            initAssetNumWithoufSafeOld = assetNumInt;
+            cash = newCash;
+        }
+
+        // assetNumResult의 값을 출력하기
+        for (PortfolioTicker portfolioTicker : assetNumResult.keySet()) {
+            logger.info("assetNumResult: " + portfolioTicker.getTicker().getTicker() + " " + assetNumResult.get(portfolioTicker));
+        }
+
+        return assetNumResult;
     }
 
     public void sendRebalancingPushNotification(String to, Portfolio portfolio, int rnId) {
