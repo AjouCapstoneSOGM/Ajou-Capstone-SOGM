@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
 import AppText from "../../../utils/AppText";
 import { VictoryPie, VictoryLabel } from "victory-native";
-import { Icon } from "@rneui/base";
+import { Button, Icon } from "@rneui/base";
 import { width, height } from "../../../utils/utils";
 
-const AutoPage2 = ({ riskLevel, setRiskLevel }) => {
+const AutoPage2 = ({ step, setStep, riskLevel, setRiskLevel }) => {
+  const [disabled, setDisabled] = useState(true);
+
   const riskText = ["안정투자형", "위험중립형", "적극투자형"];
   const riskColor = ["#93ff93", "#ffbf44", "#ff5858"];
   const infoText = [
@@ -27,6 +29,15 @@ const AutoPage2 = ({ riskLevel, setRiskLevel }) => {
   ];
   const stock = [70, 80, 90];
   const safe = [30, 20, 10];
+
+  const handleNextStep = () => {
+    setStep(step + 1);
+  };
+
+  useEffect(() => {
+    if (riskLevel > 0) setDisabled(false);
+    else setDisabled(true);
+  }, [riskLevel]);
 
   return (
     <View style={styles.container}>
@@ -104,6 +115,14 @@ const AutoPage2 = ({ riskLevel, setRiskLevel }) => {
           )}
         </ScrollView>
       </View>
+      <View style={styles.nextButtonContainer}>
+        <Button
+          buttonStyle={styles.nextButton}
+          title="다음"
+          onPress={handleNextStep}
+          disabled={disabled}
+        />
+      </View>
     </View>
   );
 };
@@ -158,6 +177,16 @@ const styles = StyleSheet.create({
   chartContainer: {
     marginTop: height * -35,
     alignItems: "center",
+  },
+  nextButton: {
+    backgroundColor: "#6262e8",
+    borderRadius: 10,
+    height: height * 50,
+  },
+  nextButtonContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: height * 5,
+    backgroundColor: "#333",
   },
 });
 

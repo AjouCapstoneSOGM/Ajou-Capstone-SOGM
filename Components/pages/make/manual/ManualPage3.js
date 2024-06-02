@@ -7,16 +7,35 @@ import AppText from "../../../utils/AppText";
 import PortfolioPieChart from "../../../utils/PortfolioPieChart";
 import { colorScale, width, height } from "../../../utils/utils";
 import { Icon } from "@rneui/base";
+import { Button } from "react-native-elements";
+import { CommonActions, useNavigation } from "@react-navigation/native";
+import { usePortfolio } from "../../../utils/PortfolioContext";
 
 const ManualPage3 = ({ stockList }) => {
+  const navigation = useNavigation();
+  const { loadData } = usePortfolio();
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState();
+  const [pfId, setPfId] = useState("");
 
   const handleSelectedId = (index) => {
     if (selectedId === index) setSelectedId(null);
     else setSelectedId(index);
   };
 
+  const gotoDetailPage = async () => {
+    await loadData();
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 2,
+        routes: [
+          { name: "Home" },
+          { name: "ViewPortfolio" },
+          { name: "PortfolioDetails", params: { id: pfId } },
+        ],
+      })
+    );
+  };
   useEffect(() => {
     const fetchManualInfo = async () => {
       try {
@@ -41,6 +60,8 @@ const ManualPage3 = ({ stockList }) => {
           }
         );
         if (response.ok) {
+          const data = await response.json();
+          setPfId(data.id);
           setLoading(false);
         } else {
           console.error("Error occured");
@@ -115,6 +136,13 @@ const ManualPage3 = ({ stockList }) => {
             ))}
         </ScrollView>
       </View>
+      <View style={styles.nextButtonContainer}>
+        <Button
+          buttonStyle={styles.nextButton}
+          title="상세 정보로 이동"
+          onPress={gotoDetailPage}
+        />
+      </View>
     </View>
   );
 };
@@ -170,5 +198,15 @@ const styles = StyleSheet.create({
     color: "#f0f0f0",
     textAlign: "center",
     fontSize: 15,
+  },
+  nextButton: {
+    backgroundColor: "#6262e8",
+    borderRadius: 10,
+    height: height * 50,
+  },
+  nextButtonContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: height * 5,
+    backgroundColor: "#333",
   },
 });

@@ -192,7 +192,7 @@ const PortfolioDetails = ({ route, navigation }) => {
             auto: currentPortfolio.auto,
           });
           setLoading(false);
-        }
+        } else setLoading(false);
       } catch (error) {
         console.log("Detail loadData error: ", error);
         setLoading(false);
@@ -409,7 +409,9 @@ const PortfolioDetails = ({ route, navigation }) => {
                         원
                       </AppText>
                       <AppText style={{ color: "#f0f0f0" }}>
-                        <AppText style={{ fontSize: 12 }}>평단가 </AppText>
+                        <AppText style={{ fontSize: 11, color: "#aaa" }}>
+                          평균 구매가{" "}
+                        </AppText>
                         <AppText>{item.averageCost.toLocaleString()}원</AppText>
                       </AppText>
                     </View>
@@ -626,7 +628,8 @@ const styles = StyleSheet.create({
     alignItems: "stretch", // 내용을 가로 방향으로 중앙 정렬
     backgroundColor: "#333",
     borderRadius: 20,
-    padding: 15,
+    paddingHorizontal: 15,
+    paddingTop: 15,
     marginBottom: 10,
   },
   companyInfo: {
@@ -643,13 +646,14 @@ const styles = StyleSheet.create({
   utilContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
-    padding: 5,
-    marginTop: 10,
+    alignItems: "cet",
+    margin: 10,
   },
   utilButton: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    paddingVertical: 10,
   },
   itemText: {
     fontSize: 14,

@@ -22,8 +22,7 @@ const StockInfo = ({ isVisible, onToggle, ticker }) => {
     month12: 0,
   });
 
-  const toggleInfoModal = (content) => {
-    setInfoContent(content);
+  const toggleInfoModal = () => {
     setInfoVisible(!infoVisible);
   };
 
@@ -72,17 +71,6 @@ const StockInfo = ({ isVisible, onToggle, ticker }) => {
               >
                 종목 정보
               </AppText>
-              <Button
-                containerStyle={styles.infoButton}
-                type="clear"
-                onPress={() => toggleInfoModal()}
-                icon={{
-                  name: "questioncircleo",
-                  type: "antdesign",
-                  color: "#888",
-                  size: width * 20,
-                }}
-              />
             </View>
           </View>
           <View style={styles.content}>
@@ -103,11 +91,12 @@ const StockInfo = ({ isVisible, onToggle, ticker }) => {
               <Button
                 containerStyle={styles.stockinfoButton}
                 type="clear"
-                onPress={() =>
-                  toggleInfoModal(
+                onPress={() => {
+                  setInfoContent(
                     "ROE는 'Return on Equity'의 줄임말이에요.\n이 지표는 기업이 주주들에게 얼마나 많은 돈을 벌어다주는지를 보여주는 거에요.\nROE가 높을수록 기업이 주주들에게 더 많은 수익을 만들어내는 것이기 때문에 ROE가 높을수록 좋은 회사에요."
-                  )
-                }
+                  );
+                  toggleInfoModal();
+                }}
                 icon={{
                   name: "questioncircleo",
                   type: "antdesign",
@@ -125,11 +114,12 @@ const StockInfo = ({ isVisible, onToggle, ticker }) => {
               <Button
                 containerStyle={styles.stockinfoButton}
                 type="clear"
-                onPress={() =>
-                  toggleInfoModal(
+                onPress={() => {
+                  setInfoContent(
                     "ROA는 'Return on Assets'의 줄임말이에요.\n이 지표는 기업이 자산을 얼마나 효율적으로 활용해서 이익을 내는지를 보여주는 거에요. \nROA가 높을수록 기업이 자산을 잘 활용해서 더 많은 이익을 내는 것이기 때문에 ROA가 높을수록 좋은 회사에요."
-                  )
-                }
+                  );
+                  toggleInfoModal();
+                }}
                 icon={{
                   name: "questioncircleo",
                   type: "antdesign",
@@ -147,11 +137,12 @@ const StockInfo = ({ isVisible, onToggle, ticker }) => {
               <Button
                 containerStyle={styles.stockinfoButton}
                 type="clear"
-                onPress={() =>
-                  toggleInfoModal(
+                onPress={() => {
+                  setInfoContent(
                     "PER는 'Price to Earnings Ratio'의 줄임말이에요.\n이 지표는 주가가 기업의 이익에 비해 얼마나 높은지를 보여주는 거에요. \nPER가 낮을수록 투자자들이 그 주식을 더 저렴하게 사는 것이기 때문에 PER가 낮을수록 좋은 회사에요."
-                  )
-                }
+                  );
+                  toggleInfoModal();
+                }}
                 icon={{
                   name: "questioncircleo",
                   type: "antdesign",
@@ -169,11 +160,12 @@ const StockInfo = ({ isVisible, onToggle, ticker }) => {
               <Button
                 containerStyle={styles.stockinfoButton}
                 type="clear"
-                onPress={() =>
-                  toggleInfoModal(
+                onPress={() => {
+                  setInfoContent(
                     "PBR는 'Price to Book Ratio'의 줄임말이에요.\n이 지표는 주가가 기업의 순자산에 비해 얼마나 높은지를 보여주는 거에요. \nPBR가 낮을수록 주가가 기업의 자산 가치에 비해 저평가된 것이기 때문에 PBR가 낮을수록 좋은 회사에요."
-                  )
-                }
+                  );
+                  toggleInfoModal();
+                }}
                 icon={{
                   name: "questioncircleo",
                   type: "antdesign",
@@ -191,11 +183,12 @@ const StockInfo = ({ isVisible, onToggle, ticker }) => {
               <Button
                 containerStyle={styles.stockinfoButton}
                 type="clear"
-                onPress={() =>
-                  toggleInfoModal(
+                onPress={() => {
+                  setInfoContent(
                     "지난 1년 대비 주가의 변화 정도를 나타내는 지표입니다. 이 지표는 주가가 지난 1년 동안 얼마나 올랐거나 내렸는지를 보여줘요."
-                  )
-                }
+                  );
+                  toggleInfoModal();
+                }}
                 icon={{
                   name: "questioncircleo",
                   type: "antdesign",
@@ -214,30 +207,11 @@ const StockInfo = ({ isVisible, onToggle, ticker }) => {
             <AppText style={styles.text}></AppText>
           </View>
           {infoVisible && (
-            <Overlay
-              isVisible={infoVisible}
-              onBackdropPress={() => setInfoVisible(false)}
-              overlayStyle={{ backgroundColor: "transparent", elevation: 0 }}
-            >
-              <View style={styles.overlayContent}>
-                <View style={styles.closeButton}>
-                  <Button
-                    containerStyle={{ padding: width * -10 }}
-                    type="clear"
-                    onPress={() => setInfoVisible(false)}
-                    icon={{
-                      name: "close",
-                      type: "ionicons",
-                      color: "#fff",
-                      size: 30,
-                    }}
-                  />
-                </View>
-                <AppText style={{ fontSize: 14, color: "#fff" }}>
-                  {infoContent}
-                </AppText>
-              </View>
-            </Overlay>
+            <ModalComponent isVisible={infoVisible} onToggle={toggleInfoModal}>
+              <AppText style={{ fontSize: 14, color: "#fff" }}>
+                {infoContent}
+              </AppText>
+            </ModalComponent>
           )}
         </React.Fragment>
       )}
@@ -265,10 +239,6 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     paddingHorizontal: 10,
   },
-  infoText: {
-    fontSize: 16,
-    color: "blue",
-  },
   infoButton: {
     marginHorizontal: width * -20,
     padding: 0,
@@ -277,6 +247,7 @@ const styles = StyleSheet.create({
     marginHorizontal: width * -25,
     marginVertical: height * -10,
     padding: 0,
+    zIndex: 1,
   },
   closeButton: {
     position: "absolute",

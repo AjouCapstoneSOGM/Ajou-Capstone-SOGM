@@ -91,7 +91,7 @@ const NewsSummary = ({ route, navigation }) => {
       <View style={styles.newsContainer}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <AppText style={{ color: "#888", fontWeight: "bold" }}>
-            아래 뉴스는 ChatGPT를 통하여 요약되었습니다.{"  "}
+            최근 한 달간의 뉴스가 ChatGPT를 통하여 요약되었습니다.{"  "}
           </AppText>
           <Icon name="robot" type="material-community" color="#888" />
         </View>

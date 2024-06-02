@@ -11,19 +11,25 @@ import urls from "../../../utils/urls";
 import Loading from "../../../utils/Loading";
 import AppText from "../../../utils/AppText";
 import { usePortfolio } from "../../../utils/PortfolioContext";
-import PagerView from "react-native-pager-view";
 import PortfolioPieChart from "../../../utils/PortfolioPieChart";
-import { Icon } from "@rneui/base";
+import { Button, Icon } from "@rneui/base";
 import { colorScale } from "../../../utils/utils";
 import { width, height } from "../../../utils/utils";
+import { CommonActions, useNavigation } from "@react-navigation/native";
 
-const AutoPage4 = ({ amount, riskLevel, interest, step }) => {
-  const { fetchStocksByPortfolioId, fetchRebalanceList } = usePortfolio();
+const AutoPage4 = ({ step, setStep, amount, riskLevel, interest }) => {
+  const navigation = useNavigation();
+  const { fetchStocksByPortfolioId, fetchRebalanceList, loadData } =
+    usePortfolio();
   const [loading, setLoading] = useState(true);
   const [pfId, setPfId] = useState("");
   const [portfolio, setPortfolio] = useState([]);
   const [initRebalance, setInitRebalance] = useState([]);
   const [selectedId, setSelectedId] = useState();
+
+  const handleNextStep = () => {
+    setStep(step + 1);
+  };
 
   const handleSelectedId = (index) => {
     if (selectedId === index) setSelectedId(null);
@@ -77,6 +83,21 @@ const AutoPage4 = ({ amount, riskLevel, interest, step }) => {
 
     if (portfolio.length === 0) fetchAutoInfo();
   }, []);
+
+  const gotoDetailPage = async () => {
+    await loadData();
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 2,
+        routes: [
+          { name: "Home" },
+          { name: "ViewPortfolio" },
+          { name: "PortfolioDetails", params: { id: pfId } },
+        ],
+      })
+    );
+  };
+
   if (loading)
     return (
       <View style={styles.container}>
@@ -228,8 +249,7 @@ const AutoPage4 = ({ amount, riskLevel, interest, step }) => {
             <AppText
               style={{ color: "#ffbf44", fontSize: 20, fontWeight: "bold" }}
             >
-              최초 포트폴리오에 관한 자세한 정보는 리밸런싱 알림의 형태로
-              제공돼요.
+              최초 포트폴리오에 관한 자세한 정보는 알림의 형태로 제공돼요.
             </AppText>
             <View style={styles.imageContainer}>
               <Image
@@ -264,6 +284,13 @@ const AutoPage4 = ({ amount, riskLevel, interest, step }) => {
         {step === 5 && result2()}
         {step === 6 && result3()}
         {step === 7 && result4()}
+      </View>
+      <View style={styles.nextButtonContainer}>
+        <Button
+          buttonStyle={styles.nextButton}
+          title={step === 7 ? "상세 정보로 이동" : "다음"}
+          onPress={() => (step === 7 ? gotoDetailPage() : handleNextStep())}
+        />
       </View>
     </View>
   );
@@ -379,5 +406,15 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 200,
     resizeMode: "contain",
+  },
+  nextButton: {
+    backgroundColor: "#6262e8",
+    borderRadius: 10,
+    height: height * 50,
+  },
+  nextButtonContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: height * 5,
+    backgroundColor: "#333",
   },
 });
