@@ -191,27 +191,44 @@ const ModifyPortfolio = ({ route, navigation }) => {
       </View>
       <View style={styles.chartContainer}>
         <View style={styles.chartTitle}>
-          <AppText style={{ color: "#333", fontSize: 20, fontWeight: "bold" }}>
-            {isPortfolioInit() ? "자산배분" : "리밸런싱"}전
+          <AppText
+            style={{
+              flex: 1,
+              flexcolor: "#333",
+              fontSize: 15,
+              textAlign: "center",
+            }}
+          >
+            {isPortfolioInit() ? "자산배분" : "리밸런싱"} 전
           </AppText>
-          <Icon name="right" type="antdesign" color="#333" />
-          <AppText style={{ color: "#333", fontSize: 20, fontWeight: "bold" }}>
-            {isPortfolioInit() ? "자산배분" : "리밸런싱"}후
+          <AppText
+            style={{
+              flex: 1,
+              color: "#333",
+              fontSize: 15,
+              textAlign: "center",
+            }}
+          >
+            {isPortfolioInit() ? "자산배분" : "리밸런싱"} 후
           </AppText>
         </View>
         <View style={styles.chartContent}>
-          <PortfolioPieChart
-            data={portfolio.detail}
-            selectedId={selectedId}
-            size={width * 0.6}
-            mode={"light"}
-          />
-          <PortfolioPieChart
-            data={calculateAfter().detail}
-            selectedId={selectedId}
-            size={width * 0.6}
-            mode={"light"}
-          />
+          <View style={styles.chartBox1}>
+            <PortfolioPieChart
+              data={portfolio.detail}
+              selectedId={selectedId}
+              size={width * 0.5}
+              mode={"light"}
+            />
+          </View>
+          <View style={styles.chartBox2}>
+            <PortfolioPieChart
+              data={calculateAfter().detail}
+              selectedId={selectedId}
+              size={width * 0.5}
+              mode={"light"}
+            />
+          </View>
         </View>
       </View>
       <View style={styles.headerContainer}>
@@ -339,7 +356,6 @@ const styles = StyleSheet.create({
   chartTitle: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingHorizontal: width * 45,
     alignItems: "center",
   },
   chartContent: {
@@ -347,6 +363,14 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     alignItems: "center",
     padding: 0,
+  },
+  chartBox1: {
+    flex: 1,
+    alignItems: "center",
+  },
+  chartBox2: {
+    flex: 1,
+    alignItems: "center",
   },
   rebalanceList: {
     backgroundColor: "#333",

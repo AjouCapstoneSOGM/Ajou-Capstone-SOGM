@@ -5,9 +5,11 @@ import AppText from "./AppText";
 import { useAuth } from "./AuthContext";
 import { useNavigation } from "@react-navigation/native";
 import { height, width } from "./utils";
+import { usePortfolio } from "./PortfolioContext";
 
 const HeaderComponent = () => {
   const { isLoggedIn, userName } = useAuth();
+  const { rebalances } = usePortfolio();
   const navigation = useNavigation();
 
   return (
@@ -37,7 +39,11 @@ const HeaderComponent = () => {
             onPress={() => {
               navigation.navigate("AlertList");
             }}
-            icon={{ name: "bell-fill", type: "octicon", color: "#333" }}
+            icon={{
+              name: "bell-fill",
+              type: "octicon",
+              color: rebalances.length > 0 ? "#fedf3e" : "#333",
+            }}
           />
         )}
         <Button

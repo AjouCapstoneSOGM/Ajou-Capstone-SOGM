@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
-import { Button, Icon } from "@rneui/base";
+import { Button, Divider, Icon } from "@rneui/base";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 import AppText from "../../utils/AppText.js";
@@ -76,10 +76,16 @@ const AlertList = ({ route, navigation }) => {
                   </AppText>
                 </View>
                 <AppText style={styles.alertContent}>
-                  테스트용 포트폴리오 1 에서 {buyCount}개의 매수, {sellCount}
+                  {item.portfolioName} 에서 {buyCount}개의 매수, {sellCount}
                   개의 매도 알림이 생성되었어요
                 </AppText>
+                <View style={styles.moveButton}>
+                  <AppText style={{ color: "#999" }}>
+                    확인하러 가기 &gt;
+                  </AppText>
+                </View>
               </TouchableOpacity>
+              <Divider style={{ marginVertical: 10 }} />
             </View>
           );
         })}
@@ -118,7 +124,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#f0f0f0",
     marginLeft: 10,
-    paddingBottom: 20,
+  },
+  moveButton: {
+    backgroundColor: "#333",
+    borderRadius: 10,
+    alignItems: "flex-end",
   },
 });
 export default AlertList;

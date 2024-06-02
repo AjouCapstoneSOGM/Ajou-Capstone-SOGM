@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import AppText from "../utils/AppText.js";
-import { Button, Divider } from "@rneui/base";
+import { Button, Divider, Icon } from "@rneui/base";
 import HeaderComponent from "../utils/Header.js";
 import FooterComponent from "../utils/Footer.js";
 import { SearchBar } from "@rneui/themed";
@@ -125,7 +125,7 @@ const Home = ({ navigation }) => {
               공포탐욕지수
             </AppText>
             <Button
-              buttonStyle={{ marginHorizontal: -10 }}
+              containerStyle={{ marginHorizontal: -10 }}
               type="clear"
               onPress={() => {
                 toggleModal();
@@ -139,18 +139,40 @@ const Home = ({ navigation }) => {
           </View>
 
           <View style={styles.FGIContent}>
-            <AppText style={{ fontSize: 20 }}>
+            <AppText style={{ fontSize: 15 }}>
               <AppText style={{ fontSize: 25, fontWeight: "bold" }}>
                 {FGI}{" "}
               </AppText>
               <AppText>/ 100</AppText>
             </AppText>
-            <LinearGradient
-              colors={["#ff5c5c", "#93ff93"]} // 빨간색에서 초록색으로 변하는 그라데이션
-              start={{ x: 0, y: 0 }} // 그라데이션 시작 위치
-              end={{ x: 1, y: 0 }} // 그라데이션 종료 위치
-              style={styles.FGIBar}
-            />
+            <View style={styles.FGIBarContainer}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                }}
+              >
+                <AppText style={{ fontWeight: "bold", fontSize: 18 }}>
+                  😱
+                </AppText>
+                <AppText style={{ fontWeight: "bold", fontSize: 18 }}>
+                  🤑
+                </AppText>
+              </View>
+              <Icon
+                type="antdesign"
+                name="caretdown"
+                color="#333"
+                style={{ alignSelf: "flex-start", left: `${FGI - 3}%` }}
+                size={20}
+              />
+              <LinearGradient
+                colors={["#5878ff", "#ff5858"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.FGIBar}
+              />
+            </View>
           </View>
         </View>
         <View style={styles.newsContainer}>
@@ -172,8 +194,42 @@ const Home = ({ navigation }) => {
       <FooterComponent />
       <ModalComponent isVisible={isVisible} onToggle={toggleModal}>
         <AppText
-          style={{ fontSize: 16, marginBottom: 20, color: "#f0f0f0" }}
-        >{`CNN에서 제공하는 공포탐욕지수(Fear & Greed Index)는 주식시장의 투자 심리를 나타내는 지표입니다.\n\n0~25: "극심한 공포" 구간, 좋은 매수 기회로 여겨집니다.\n25~50: "공포" 구간, 좋은 매수 기회로 여겨집니다.\n50~75: "탐욕" 구간, 주의가 필요합니다.\n75~100: "극심한 탐욕" 구간, 매도 시점을 고려해볼 수 있습니다. `}</AppText>
+          style={{ fontSize: 13, marginBottom: 20, color: "#f0f0f0" }}
+        >{`공포탐욕지수는 금융 시장의 투자자 감정을 나타내는 지표로, 0에서 100까지의 값을 가집니다.\n\n'공포'는 낮은 값으로, 시장 참여자들이 불안감을 느끼고 주식을 팔아치우는 상황을 나타냅니다. 😱\n\n'탐욕'은 높은 값으로, 투자자들이 주식을 많이 사려고 하여 주가가 오르는 상황을 나타냅니다. 🤑`}</AppText>
+        <Divider style={{ marginVertical: 10 }} />
+        <View style={styles.FGIInfoColumn}>
+          <AppText style={[styles.FGIPart, { color: "#5878ff" }]}>
+            0~25{" "}
+          </AppText>
+          <AppText style={styles.FGIInfo}>
+            시장이 과도하게 두려워하는 상태로, 주식 매수의 좋은 기회일 수
+            있습니다.
+          </AppText>
+        </View>
+        <View style={styles.FGIInfoColumn}>
+          <AppText style={[styles.FGIPart, { color: "#956cc3" }]}>
+            25~50{" "}
+          </AppText>
+          <AppText style={styles.FGIInfo}>
+            불안감이 약간 존재하며 매수 기회일 수 있습니다.
+          </AppText>
+        </View>
+        <View style={styles.FGIInfoColumn}>
+          <AppText style={[styles.FGIPart, { color: "#ce618a" }]}>
+            50~75{" "}
+          </AppText>
+          <AppText style={styles.FGIInfo}>
+            시장 참여자들이 욕심을 내기 시작하며, 주의해야 할 시점입니다.
+          </AppText>
+        </View>
+        <View style={styles.FGIInfoColumn}>
+          <AppText style={[styles.FGIPart, { color: "#ff5858" }]}>
+            75~100{" "}
+          </AppText>
+          <AppText style={styles.FGIInfo}>
+            시장이 매우 욕심이 많은 상태로, 매도 시점을 고려할 때입니다.
+          </AppText>
+        </View>
       </ModalComponent>
       {suggestions[selectedIndex] && (
         <StockInfo
@@ -245,11 +301,27 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     borderRadius: 10,
   },
+  FGIBarContainer: {
+    width: "80%",
+  },
   FGIBar: {
     height: 15,
-    width: "80%",
     borderRadius: 10,
-    marginTop: 20,
+  },
+  FGIInfoColumn: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 5,
+  },
+  FGIPart: {
+    width: "20%",
+    color: "#aaa",
+    fontSize: 12,
+  },
+  FGIInfo: {
+    width: "80%",
+    color: "#f0f0f0",
+    fontSize: 12,
   },
   newsContainer: {
     paddingHorizontal: width * 10,
