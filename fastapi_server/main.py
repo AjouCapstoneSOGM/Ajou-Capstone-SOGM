@@ -7,7 +7,7 @@ from make_portfolio.make_portfolio import MakePortrolio
 from current_price.current_price import fetch_all_prices
 from news_summary.get_news_summary import News
 from news_summary.gpt import Chatbot
-from fear_greed.fear_greed import get_yesterday_fear_and_greed
+from fear_greed.fear_greed import get_fear_and_greed
 import uvicorn
 
 settings = Settings()  # 설정 인스턴스 생성
@@ -71,7 +71,7 @@ async def get_News(ticker: Ticker):
 
 @app.get("/fearGreed/")
 async def get_News():
-    fear_greed = get_yesterday_fear_and_greed()
+    fear_greed = get_fear_and_greed()
     return {"fear_greed": fear_greed}
 
 
