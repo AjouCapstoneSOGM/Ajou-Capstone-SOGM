@@ -152,6 +152,10 @@ public class PortfolioService {
         portfolioRepository.save(portfolio);
     }
 
+    public String getPortfolioNameById(Integer pfId) {
+        return portfolioRepository.findById(pfId).get().getName();
+    }
+
     public void deletePortfolio(Integer pfId) {
         portfolioRepository.deleteById(pfId);
     }
