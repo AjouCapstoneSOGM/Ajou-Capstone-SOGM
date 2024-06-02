@@ -19,24 +19,24 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class ControllerTestUtils {
 
-    public static String signUpLogin(MockMvc mockMvc, SignupInfoRepository signupInfoRepository) throws Exception {
+    public static String signUpLogin(String email, MockMvc mockMvc, SignupInfoRepository signupInfoRepository) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
 
         signupInfoRepository.save(SignupInfo.builder()
-                .email("james@domain.com")
+                .email(email)
                 .code("000000")
                 .isVerified(true)
                 .codeExpires(LocalDateTime.now().plusMinutes(5))
                 .signupToken("abcdefgh12345678")
                 .build());
 
-        UserDto.InfoDto InfoDto = new UserDto.InfoDto("James", "james@domain.com", "abcdefgh12345678", "password!");
+        UserDto.InfoDto InfoDto = new UserDto.InfoDto("James", email, "abcdefgh12345678", "password!");
         mockMvc.perform(post("/api/auth/signup")
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(InfoDto)))
                 .andDo(print());
 
-        UserDto.LoginDto loginDto = new UserDto.LoginDto("james@domain.com", "password!", "fcmToken");
+        UserDto.LoginDto loginDto = new UserDto.LoginDto(email, "password!", "fcmToken");
         MockHttpServletResponse loginResponse = mockMvc.perform(post("/api/auth/login")
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(loginDto)))
@@ -49,7 +49,7 @@ public class ControllerTestUtils {
     }
 
     public static Map<String, String> getRequestBodyForCodeValidation(SignupInfoService signupInfoService) {
-        String email = "test@asdf.com";
+        String email = "suprlux09@ajou.ac.kr";
         String code = signupInfoService.generateCode();
 
         Map<String, String> requestBody = new HashMap<>();
