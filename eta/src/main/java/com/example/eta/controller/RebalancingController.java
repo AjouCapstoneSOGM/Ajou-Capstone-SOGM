@@ -1,8 +1,12 @@
 package com.example.eta.controller;
 
 import com.example.eta.dto.RebalancingDto;
+import com.example.eta.entity.Portfolio;
+import com.example.eta.entity.User;
+import com.example.eta.scheduler.PortfolioScheduler;
 import com.example.eta.service.PortfolioService;
 import com.example.eta.service.RebalancingService;
+import com.example.eta.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +19,7 @@ import java.util.Map;
 @AllArgsConstructor
 @RequestMapping("api/rebalancing")
 public class RebalancingController {
+    private final PortfolioScheduler portfolioScheduler;
     private final RebalancingService rebalancingService;
     private final PortfolioService portfolioService;
 
@@ -51,6 +56,8 @@ public class RebalancingController {
     public ResponseEntity<?> executeRebalancing(@PathVariable("port_id") Integer pfId) {
         int rnId = rebalancingService.executeRebalancingAndGetNotificationId(pfId);
         if (rnId > 0) {
+            Portfolio portfolio = portfolioService.findOne(pfId);
+            portfolioScheduler.sendRebalancingPushNotification(portfolio.getUser().getToken().getExpoPushToken(), portfolio, rnId);
             Map<String, Integer> response = new HashMap<>();
             response.put("rnId", rnId);
             return ResponseEntity.ok(response);
