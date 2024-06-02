@@ -363,5 +363,9 @@ public class PortfolioService {
         portfolio.setName(newName);
         portfolioRepository.save(portfolio);
     }
+
+    public Portfolio findOne(Integer pfId) {
+        return portfolioRepository.findById(pfId).get();
+    }
 }
 

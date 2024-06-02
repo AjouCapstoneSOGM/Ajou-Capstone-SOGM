@@ -19,7 +19,7 @@ import java.util.Map;
 
 /**
  * 푸시 알림 동작 확인을 위한 임시 컨트롤러
- *
+ * TODO: 삭제 예정
  */
 @RestController
 @AllArgsConstructor
