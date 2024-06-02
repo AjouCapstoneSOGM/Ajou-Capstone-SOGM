@@ -27,14 +27,13 @@ public class TickerController {
             case "id":
                 tickerRepository.findById(query).ifPresent(ticker -> model.addAttribute("tickers", ticker));
                 break;
-//            case "name":
-//                model.addAttribute("tickers", tickerRepository.findByNameContaining(query));
-//                break;
-//            case "sectorId":
-//                model.addAttribute("tickers", tickerRepository.findBySectorId(Integer.parseInt(query)));
-//                break;
+            case "name":
+                model.addAttribute("tickers", tickerRepository.findAllByNameContaining(query));
+                break;
+            case "sector":
+                model.addAttribute("tickers", tickerRepository.findAllBySectorName(query));
+                break;
             default:
-                model.addAttribute("tickers", tickerRepository.findAll());
         }
         return "Ticker";
     }
