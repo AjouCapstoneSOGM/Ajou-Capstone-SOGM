@@ -278,17 +278,8 @@ const PortfolioDetails = ({ route, navigation }) => {
           cash={portfolio}
           selectedId={selectedId}
           size={width * 0.6}
+          mode={"light"}
         />
-        {selectedId !== null && (
-          <View style={{ position: "absolute", alignItems: "center" }}>
-            <AppText style={[styles.centerText, { fontWeight: "bold" }]}>{`${
-              (getStockRate(selectedId).toFixed(3) * 1000) / 10 // 소숫점 계산 오류 방지를 위함
-            }%`}</AppText>
-            <AppText style={[styles.centerText, { fontSize: 12 }]}>
-              {portfolio.stocks[selectedId].companyName}
-            </AppText>
-          </View>
-        )}
         {!portfolio.auto && (
           <TouchableOpacity
             style={styles.floatingButton}
@@ -474,7 +465,7 @@ const PortfolioDetails = ({ route, navigation }) => {
               style={{
                 position: "absolute",
                 top: 0,
-                color: "#f0f0f0",
+                color: "#888",
                 fontSize: 20,
                 fontWeight: "bold",
               }}
@@ -612,7 +603,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: height * 0,
     marginTop: height * -5,
-    marginBottom: height * -10,
   },
   centerText: {
     fontSize: 20,
@@ -676,7 +666,7 @@ const styles = StyleSheet.create({
     shadowRadius: 2, // for iOS shadow
   },
   content: {
-    paddingTop: 40,
+    paddingTop: 20,
     paddingHorizontal: 10,
   },
   contentsItem: {
