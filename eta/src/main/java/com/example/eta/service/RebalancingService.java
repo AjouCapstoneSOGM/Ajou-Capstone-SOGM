@@ -123,7 +123,7 @@ public class RebalancingService {
         // 초기 포트폴리오일 경우 초기 비중도 초기화
         boolean isInitial = portfolio.getCreatedDate() == null ? true : false;
         Map<PortfolioTicker, Float> currentAmountForTicker = new HashMap<>();
-        float totalAmount = portfolioService.calculateProportionAndReturnTotalAmount(portfolio, true, currentAmountForTicker);
+        float totalAmount = portfolioService.calculateAmount(portfolio, true, currentAmountForTicker);
 
         for (PortfolioTicker portfolioTicker : currentAmountForTicker.keySet()) {
             float currentProportion = currentAmountForTicker.get(portfolioTicker).floatValue() / totalAmount;

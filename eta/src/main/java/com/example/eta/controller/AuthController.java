@@ -9,6 +9,7 @@ import com.example.eta.entity.SignupInfo;
 import com.example.eta.entity.User;
 import com.example.eta.auth.enums.RoleType;
 import com.example.eta.exception.signup.EmailAlreadyExistsException;
+import com.example.eta.service.MailService;
 import com.example.eta.service.SignupInfoService;
 import com.example.eta.service.TokenService;
 import com.example.eta.service.UserService;
@@ -47,6 +48,7 @@ public class AuthController {
     private final UserService userService;
     private final TokenService tokenService;
     private final SignupInfoService signupInfoService;
+    private final MailService mailService;
     private final ApiClientSocial apiClientSocial;
     private final JwtTokenProvider jwtTokenProvider;
 
@@ -86,7 +88,6 @@ public class AuthController {
         String email = request.get("email");
         String code = signupInfoService.generateCode();
         signupInfoService.addUnverifiedEmailInfo(email, code);
-        signupInfoService.sendVerificationEmail(email, code);
         return ResponseEntity.ok().build();
     }
 
@@ -172,6 +173,14 @@ public class AuthController {
     public ResponseEntity<Void> logout(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         User user = userService.findByEmail(userPrincipal.getEmail());
         tokenService.deleteToken(user);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<Void> resetPassword(@RequestBody Map<String, String> requestBody) throws Exception {
+        String email = requestBody.get("email");
+        String tmpPassword = signupInfoService.generateSignupToken();
+        userService.resetPassword(email, tmpPassword);
         return ResponseEntity.ok().build();
     }
 }

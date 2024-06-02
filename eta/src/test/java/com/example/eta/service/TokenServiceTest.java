@@ -29,7 +29,7 @@ public class TokenServiceTest {
     @Transactional
     public void testSaveFcmToken() {
         User user = userRepository.save(User.builder()
-                .email("james001@foo.bar")
+                .email("suprlux09@ajou.ac.kr")
                 .isVerified(false)
                 .password("password!")
                 .name("James")
@@ -49,7 +49,7 @@ public class TokenServiceTest {
     @Transactional
     public void testDeleteFcmToken() {
         User user = userRepository.save(User.builder()
-                .email("james001@foo.bar")
+                .email("suprlux09@ajou.ac.kr")
                 .isVerified(false)
                 .password("password!")
                 .name("James")

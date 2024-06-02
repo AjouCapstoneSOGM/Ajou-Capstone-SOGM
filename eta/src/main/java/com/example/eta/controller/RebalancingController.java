@@ -1,6 +1,7 @@
 package com.example.eta.controller;
 
 import com.example.eta.dto.RebalancingDto;
+import com.example.eta.service.PortfolioService;
 import com.example.eta.service.RebalancingService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import java.util.Map;
 @RequestMapping("api/rebalancing")
 public class RebalancingController {
     private final RebalancingService rebalancingService;
+    private final PortfolioService portfolioService;
 
     @PostMapping("/{port_id}/{rn_id}")
     public ResponseEntity<String> applyRebalancing(@PathVariable("port_id") Integer pfId, @PathVariable("rn_id") Integer rnId, @RequestBody RebalancingDto.RebalancingApplyListDto rebalancingApplyListDto) {
@@ -32,8 +34,9 @@ public class RebalancingController {
     }
 
     @GetMapping("/{port_id}")
-    public ResponseEntity<Map<String, List<RebalancingDto.RebalancingListDto>>> getAllRebalancing(@PathVariable("port_id") Integer pfId) {
-        Map<String, List<RebalancingDto.RebalancingListDto>> response = new HashMap<>();
+    public ResponseEntity<Map<String, Object>> getAllRebalancing(@PathVariable("port_id") Integer pfId) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("portfolioName", portfolioService.getPortfolioNameById(pfId));
         response.put("rebalancing", rebalancingService.getAllRebalancingsByPortfolioId(pfId));
         return ResponseEntity.ok(response);
     }
