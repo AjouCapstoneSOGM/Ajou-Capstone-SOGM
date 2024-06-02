@@ -23,7 +23,7 @@ const Login = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
 
   const { login } = useAuth();
-  const { loadData } = usePortfolio();
+  const { loadData, portLoading } = usePortfolio();
   const { expoPushToken } = usePushNotifications();
 
   const fetchLoginInfo = async () => {
@@ -59,16 +59,16 @@ const Login = ({ navigation }) => {
     setLoading(true);
     navigation.navigate("SocialLogin");
 
-    const unsubscribe = navigation.addListener("focus", () => {
+    const unsubscribe = navigation.addListener("focus", async () => {
       login();
-      loadData();
+      await loadData();
       setLoading(false);
       navigation.goBack();
       unsubscribe();
     });
   };
 
-  if (loading) return <Loading />;
+  if (portLoading) return <Loading />;
   return (
     <View style={styles.container}>
       <View style={styles.textWrapper}>

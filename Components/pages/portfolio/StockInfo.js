@@ -85,7 +85,7 @@ const StockInfo = ({ isVisible, onToggle, ticker }) => {
             <View style={styles.stockColumn}>
               <AppText style={styles.columnText}>가치지표</AppText>
               <AppText style={styles.columnText}>수치</AppText>
-              <AppText style={styles.columnText}>섹터 내 순위</AppText>
+              <AppText style={styles.columnText}>분야 내 순위</AppText>
             </View>
             <View style={styles.stockColumn}>
               <Button

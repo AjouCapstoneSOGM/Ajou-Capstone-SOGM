@@ -18,6 +18,7 @@ import { width, height, filteringNumber, colorScale } from "../../utils/utils";
 import StockInfo from "./StockInfo";
 import Loading from "../../utils/Loading";
 import ModalComponent from "../../utils/Modal";
+import NotificationBubble from "../../utils/Notification";
 
 const PortfolioDetails = ({ route, navigation }) => {
   const stocksLength = 10;
@@ -40,6 +41,11 @@ const PortfolioDetails = ({ route, navigation }) => {
   const [modifyQuantity, setModifyQuantity] = useState(0);
   const [modifyPrice, setModifyPrice] = useState(0);
   const [modifyBuy, setModifyBuy] = useState(true);
+  const [initVisible, setInitVisible] = useState(false);
+
+  const handleInitVisible = () => {
+    setInitVisible(!initVisible);
+  };
 
   const toggleInfoModal = () => {
     setInfoVisible(!infoVisible);
@@ -180,6 +186,12 @@ const PortfolioDetails = ({ route, navigation }) => {
     const loadPortfolio = async () => {
       try {
         const currentPortfolio = getPortfolioById(route.params.id);
+        if (
+          currentPortfolio.detail.currentCash ==
+          currentPortfolio.detail.initialAsset
+        )
+          setInitVisible(true);
+
         if (currentPortfolio) {
           await getAlertExists(currentPortfolio.id);
           setPortfolio({
@@ -210,7 +222,12 @@ const PortfolioDetails = ({ route, navigation }) => {
       <View style={styles.outline}>
         <View style={styles.outlineHeader}>
           <AppText style={{ fontSize: 17, color: "#f0f0f0" }}>총 자산</AppText>
-          <View style={{ flexDirection: "row" }}>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <NotificationBubble
+              message={"알림을 확인해주세요"}
+              visible={initVisible}
+              onClose={handleInitVisible}
+            ></NotificationBubble>
             <Button
               type="clear"
               onPress={() => {

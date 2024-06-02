@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { View, TouchableOpacity, StyleSheet, TextInput } from "react-native";
 import { usePortfolio } from "../../utils/PortfolioContext";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -21,11 +21,7 @@ const PortfolioList = ({ navigation }) => {
   const [nameModalVisible, setNameModalVisible] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [changedName, setChangedName] = useState("");
-
-  useEffect(() => {
-    if (portfolios[selectedIndex])
-      setChangedName(portfolios[selectedIndex].name);
-  }, [selectedIndex]);
+  const pagerRef = useRef(null);
 
   const handleChangedName = (value) => {
     if (value.length < 20) setChangedName(removeSpecialChars(value));
@@ -67,9 +63,23 @@ const PortfolioList = ({ navigation }) => {
     setSelectedIndex(e.nativeEvent.position);
   };
 
+  const handlePageNext = () => {
+    setSelectedIndex(selectedIndex + 1);
+    pagerRef.current?.setPage(selectedIndex + 1);
+  };
+  const handlePagePrev = () => {
+    setSelectedIndex(selectedIndex - 1);
+    pagerRef.current?.setPage(selectedIndex - 1);
+  };
+
   const reloadData = async () => {
     await loadData();
   };
+
+  useEffect(() => {
+    if (portfolios[selectedIndex])
+      setChangedName(portfolios[selectedIndex]?.name);
+  }, [selectedIndex]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -89,13 +99,41 @@ const PortfolioList = ({ navigation }) => {
       </View>
       {portfolioExist() && (
         <View style={styles.chartContainer}>
-          {portfolios[selectedIndex] && (
-            <PortfolioPieChart
-              data={portfolios[selectedIndex].detail}
-              size={width * 1}
-              mode={"light"}
-            />
-          )}
+          <Button
+            containerStyle={{ zIndex: 1 }}
+            type="clear"
+            onPress={() => {
+              handlePagePrev();
+            }}
+            icon={{
+              name: "caretleft",
+              type: "antdesign",
+              color: "#333",
+              size: 30,
+            }}
+            disabled={selectedIndex == 0}
+            disabledStyle={{ opacity: 0 }}
+          />
+          <PortfolioPieChart
+            data={portfolios[selectedIndex]?.detail}
+            size={width * 0.9}
+            mode={"light"}
+          />
+          <Button
+            containerStyle={{ zIndex: 1 }}
+            type="clear"
+            onPress={() => {
+              handlePageNext();
+            }}
+            icon={{
+              name: "caretright",
+              type: "antdesign",
+              color: "#333",
+              size: 30,
+            }}
+            disabled={selectedIndex == portfolios?.length - 1}
+            disabledStyle={{ opacity: 0 }}
+          />
         </View>
       )}
       {portfolioExist() && (
@@ -114,6 +152,7 @@ const PortfolioList = ({ navigation }) => {
             style={styles.listContainer}
             initialPage={0}
             onPageSelected={handlePageChange}
+            ref={pagerRef}
           >
             {portfolios.map((portfolio, index) => {
               const roi = getTotalROI(portfolio.detail);
@@ -238,7 +277,7 @@ const PortfolioList = ({ navigation }) => {
             <View>
               <TextInput
                 style={styles.nameInput}
-                placeholder={portfolios[selectedIndex].name}
+                placeholder={portfolios[selectedIndex]?.name}
                 placeholderTextColor={"#888"}
                 value={changedName}
                 onChangeText={(value) => handleChangedName(value)}
@@ -294,7 +333,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
   },
   chartContainer: {
+    flexDirection: "row",
     position: "absolute",
+    alignItems: "center",
     alignSelf: "center",
     bottom: height * 110,
   },
