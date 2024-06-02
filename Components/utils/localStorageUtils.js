@@ -29,3 +29,7 @@ export const getUserName = async () => {
 export const removeUsertoken = async () => {
   return await AsyncStorage.removeItem("usertoken");
 };
+
+export const removeUserName = async () => {
+  return await AsyncStorage.removeItem("username");
+};

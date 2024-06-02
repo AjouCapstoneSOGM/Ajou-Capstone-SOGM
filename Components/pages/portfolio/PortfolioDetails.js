@@ -228,17 +228,20 @@ const PortfolioDetails = ({ route, navigation }) => {
               visible={initVisible}
               onClose={handleInitVisible}
             ></NotificationBubble>
-            <Button
-              type="clear"
-              onPress={() => {
-                navigation.navigate("AlertList", { pfId: portfolio.id });
-              }}
-              icon={{
-                name: "bell-fill",
-                type: "octicon",
-                color: alertExist ? "#fedf3e" : "#f0f0f0",
-              }}
-            />
+            <View>
+              <Button
+                type="clear"
+                onPress={() => {
+                  navigation.navigate("AlertList", { pfId: portfolio.id });
+                }}
+                icon={{
+                  name: "bell-fill",
+                  type: "octicon",
+                  color: alertExist ? "#ffa800" : "#f0f0f0",
+                }}
+              />
+              {alertExist && <View style={styles.redDot}></View>}
+            </View>
             <Button
               type="clear"
               onPress={() => {
@@ -718,6 +721,15 @@ const styles = StyleSheet.create({
     backgroundColor: "#6262e8",
     borderRadius: 10,
     height: 40,
+  },
+  redDot: {
+    position: "absolute",
+    right: "30%",
+    top: "10%",
+    height: 7,
+    width: 7,
+    backgroundColor: "red",
+    borderRadius: 30,
   },
 });
 export default PortfolioDetails;

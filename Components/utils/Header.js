@@ -34,17 +34,20 @@ const HeaderComponent = () => {
       )}
       <View style={styles.buttonContainer}>
         {isLoggedIn && (
-          <Button
-            type="clear"
-            onPress={() => {
-              navigation.navigate("AlertList");
-            }}
-            icon={{
-              name: "bell-fill",
-              type: "octicon",
-              color: rebalances.length > 0 ? "#fedf3e" : "#333",
-            }}
-          />
+          <View>
+            <Button
+              type="clear"
+              onPress={() => {
+                navigation.navigate("AlertList");
+              }}
+              icon={{
+                name: "bell-fill",
+                type: "octicon",
+                color: rebalances.length > 0 ? "#ffa800" : "#333",
+              }}
+            />
+            {rebalances.length > 0 && <View style={styles.redDot}></View>}
+          </View>
         )}
         <Button
           type="clear"
@@ -75,6 +78,15 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: "row",
+  },
+  redDot: {
+    position: "absolute",
+    right: "30%",
+    top: "10%",
+    height: 7,
+    width: 7,
+    backgroundColor: "red",
+    borderRadius: 30,
   },
 });
 
