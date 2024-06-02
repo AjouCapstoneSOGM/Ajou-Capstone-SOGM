@@ -10,7 +10,9 @@ from selenium.webdriver.support import expected_conditions as EC
 def get_yesterday_fear_and_greed():
     # headless 모드로 설정
     options = webdriver.ChromeOptions()
-    options.add_argument("--headless")
+    options.addArguments("--no-sandbox");
+    options.addArguments("--disable-dev-shm-usage");
+    options.addArguments("--headless");
 
     # 드라이버 초기화
     driver = webdriver.Chrome(
