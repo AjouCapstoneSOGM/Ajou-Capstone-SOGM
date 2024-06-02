@@ -7,6 +7,7 @@ from make_portfolio.make_portfolio import MakePortrolio
 from current_price.current_price import fetch_all_prices
 from news_summary.get_news_summary import News
 from news_summary.gpt import Chatbot
+from fear_greed.feer_greed import get_yesterday_fear_and_greed
 import uvicorn
 
 settings = Settings()  # 설정 인스턴스 생성
@@ -66,6 +67,12 @@ async def get_News(ticker: Ticker):
 
     summary = await chatbot.summary("".join(headlines), ticker.ticker)
     return {"summary": summary}
+
+
+@app.get("/fearGreed/")
+async def get_News():
+    fear_greed = get_yesterday_fear_and_greed()
+    return {"fear_greed": fear_greed}
 
 
 if __name__ == "__main__":
