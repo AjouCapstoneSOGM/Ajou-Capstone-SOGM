@@ -30,7 +30,7 @@ public class NewsService {
 
         if (optionalNews.isPresent() && optionalNews.get().getDate().isAfter(LocalDateTime.now().minus(24, ChronoUnit.HOURS))) {
             News news = optionalNews.get();
-            return new NewsDto(news.getSummary());
+            return new NewsDto(news.getDate(), news.getSummary());
         } else {
             Mono<ResponseEntity<NewsDto>> responseEntityMono = apiClientFastApi.getNewsFromFastApi(ticker);
 
@@ -52,7 +52,7 @@ public class NewsService {
                     news.setSummary(newsDto.getSummary());
                     newsRepository.save(news);
 
-                    return newsDto;
+                    return new NewsDto(news.getDate(), news.getSummary());
                 }
             }
             return null;
