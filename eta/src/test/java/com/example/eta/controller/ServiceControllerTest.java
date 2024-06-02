@@ -40,7 +40,7 @@ public class ServiceControllerTest {
     @Transactional
     public void testGetAllSectors() throws Exception {
         // given 회원가입, 로그인 후 jwt토큰 획득
-        String authorizationHeader = signUpLogin(mockMvc, signupInfoRepository);
+        String authorizationHeader = signUpLogin("james@domain.com", mockMvc, signupInfoRepository);
 
         // when, then
         MockHttpServletResponse getAllSectorsResponse = mockMvc.perform(get("/api/sector/list")

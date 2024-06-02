@@ -19,11 +19,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class ControllerTestUtils {
 
-    public static String signUpLogin(MockMvc mockMvc, SignupInfoRepository signupInfoRepository) throws Exception {
+    public static String signUpLogin(String email, MockMvc mockMvc, SignupInfoRepository signupInfoRepository) throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
 
         signupInfoRepository.save(SignupInfo.builder()
-                .email("james@domain.com")
+                .email(email)
                 .code("000000")
                 .isVerified(true)
                 .codeExpires(LocalDateTime.now().plusMinutes(5))

@@ -200,14 +200,13 @@ public class AuthControllerTest {
     @Transactional
     public void testLogout() throws Exception {
         // 회원가입, 로그인 후 토큰 반환
-        String authorizationHeader = signUpLogin(mockMvc, signupInfoRepository);
-        System.out.println(authorizationHeader);
+        String authorizationHeader = signUpLogin("james@domain.com", mockMvc, signupInfoRepository);
 
         mockMvc.perform(post("/api/auth/logout")
                 .header("Authorization", authorizationHeader))
                 .andDo(print()).andExpect(status().isOk());
 
         User user = userService.findByEmail("james@domain.com");
-        assertTrue(tokenRepository.findById(user.getUserId()).isEmpty());
+        assertFalse(tokenRepository.existsById(user.getUserId()));
     }
 }
