@@ -204,11 +204,13 @@ const ModifyPortfolio = ({ route, navigation }) => {
             data={portfolio.detail}
             selectedId={selectedId}
             size={width * 0.6}
+            mode={"light"}
           />
           <PortfolioPieChart
             data={calculateAfter().detail}
             selectedId={selectedId}
             size={width * 0.6}
+            mode={"light"}
           />
         </View>
       </View>
@@ -227,7 +229,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
               onPress={() => {
                 toggleModal();
                 setInfo(
-                  `표시되는 한 주당 금액은 포트폴리오 비중 계산에 사용한 전날 종가 금액을 나타냅니다.\n\n만일 표시된 금액이 실제로 매수/매도하려는 금액과 다를 경우엔 알맞게 수정해주세요.`
+                  `표시되는 한 주당 금액은 포트폴리오 계산에 사용한 전날 마감 금액을 나타냅니다.\n\n만일 표시된 금액이 실제로 매수/매도하려는 금액과 다를 경우엔 알맞게 수정해주세요.`
                 );
               }}
               icon={{
@@ -421,11 +423,11 @@ const styles = StyleSheet.create({
   nextButton: {
     backgroundColor: "#6262e8",
     borderRadius: 10,
-    height: 50,
+    height: height * 50,
   },
   nextButtonContainer: {
-    paddingBottom: 20,
     paddingHorizontal: 20,
+    paddingBottom: height * 5,
     backgroundColor: "#333",
   },
 });

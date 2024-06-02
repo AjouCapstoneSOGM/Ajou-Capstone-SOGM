@@ -93,6 +93,7 @@ const PortfolioList = ({ navigation }) => {
             <PortfolioPieChart
               data={portfolios[selectedIndex].detail}
               size={width * 1}
+              mode={"light"}
             />
           )}
         </View>

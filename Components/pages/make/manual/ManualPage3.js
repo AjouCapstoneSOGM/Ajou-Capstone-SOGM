@@ -106,7 +106,8 @@ const ManualPage3 = ({ stockList }) => {
               })),
             }}
             selectedId={selectedId}
-            size={1 * width}
+            size={0.6 * width}
+            mode={"dark"}
           />
         </View>
         <ScrollView style={styles.labelContainer}>
@@ -171,6 +172,7 @@ const styles = StyleSheet.create({
   },
   chartContainer: {
     alignItems: "center",
+    marginVertical: 20 * height,
   },
   labelItemContent: {
     flexDirection: "row",
