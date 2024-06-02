@@ -8,7 +8,7 @@ export const useSearch = () => {
   const [suggestions, setSuggestions] = useState([]);
 
   const fetchSuggestions = async (query) => {
-    if (!query) {
+    if (query.length < 2) {
       setSuggestions([]);
       return;
     }

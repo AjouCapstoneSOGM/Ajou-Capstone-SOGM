@@ -18,7 +18,9 @@ const FooterComponent = () => {
           title="내 정보"
           type="clear"
           onPress={() => {
-            isLoggedIn ? {} : navigation.navigate("Login");
+            isLoggedIn
+              ? navigation.navigate("MyPage")
+              : navigation.navigate("Login");
           }}
           icon={{ name: "user", type: "font-awesome", color: "#f0f0f0" }}
         />

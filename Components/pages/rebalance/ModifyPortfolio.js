@@ -6,15 +6,22 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Divider, Icon } from "@rneui/base";
 import { usePortfolio } from "../../utils/PortfolioContext";
-import { width, height, deepCopy, filteringNumber } from "../../utils/utils";
+import {
+  width,
+  height,
+  deepCopy,
+  filteringNumber,
+  colorScale,
+} from "../../utils/utils";
 import PortfolioPieChart from "../../utils/PortfolioPieChart";
 import AppText from "../../utils/AppText";
 import Loading from "../../utils/Loading";
-import InfoModal from "../../utils/InfoModal";
+import ModalComponent from "../../utils/Modal";
 
 const ModifyPortfolio = ({ route, navigation }) => {
   const { pfId, rnId, rebalancing } = route.params;
@@ -55,6 +62,9 @@ const ModifyPortfolio = ({ route, navigation }) => {
 
   useFocusEffect(
     useCallback(() => {
+      rebalancing.forEach((item) => {
+        (item.buyPrice = item.price), (item.buyQuantity = item.quantity);
+      });
       setRebalances(rebalancing);
       setPortfolio(getPortfolioById(pfId));
       setLoading(false);
@@ -102,8 +112,8 @@ const ModifyPortfolio = ({ route, navigation }) => {
     const updated = reblances.map((stock) => {
       return {
         isBuy: stock.isBuy,
-        quantity: Number(stock.quantity),
-        price: parseFloat(stock.price),
+        quantity: Number(stock.buyQuantity),
+        price: parseFloat(stock.buyPrice),
         ticker: stock.ticker,
       };
     });
@@ -113,7 +123,15 @@ const ModifyPortfolio = ({ route, navigation }) => {
 
   const handleChangePrices = (index, value) => {
     const newRebalances = [...rebalances];
-    if (value <= 9999999) newRebalances[index].price = filteringNumber(value);
+    if (value <= 9999999)
+      newRebalances[index].buyPrice = filteringNumber(value);
+    setRebalances(newRebalances);
+  };
+
+  const handleChangeQuantity = (index, value) => {
+    const newRebalances = [...rebalances];
+    if (value <= 9999 || value >= 0)
+      newRebalances[index].buyQuantity = filteringNumber(value);
     setRebalances(newRebalances);
   };
 
@@ -123,15 +141,24 @@ const ModifyPortfolio = ({ route, navigation }) => {
     await fetchModify(rebalanceData, pfId, rnId);
     await loadData();
     setLoading(false);
-    navigation.dispatch(
-      CommonActions.reset({
-        index: 1,
-        routes: [
-          { name: "ViewPortfolio" },
-          { name: "PortfolioDetails", params: { id: pfId } },
-        ],
-      })
-    );
+    Alert.alert("반영 완료", "반영이 완료되었습니다.", [
+      {
+        text: "확인",
+        onPress: () => {
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 2,
+              routes: [
+                { name: "Home" },
+                { name: "ViewPortfolio" },
+                { name: "PortfolioDetails", params: { id: pfId } },
+              ],
+            })
+          );
+        },
+        style: "cancel",
+      },
+    ]);
   };
 
   if (loading) return <Loading />;
@@ -176,12 +203,12 @@ const ModifyPortfolio = ({ route, navigation }) => {
           <PortfolioPieChart
             data={portfolio.detail}
             selectedId={selectedId}
-            size={width * 0.5}
+            size={width * 0.6}
           />
           <PortfolioPieChart
             data={calculateAfter().detail}
             selectedId={selectedId}
-            size={width * 0.5}
+            size={width * 0.6}
           />
         </View>
       </View>
@@ -213,6 +240,14 @@ const ModifyPortfolio = ({ route, navigation }) => {
         </View>
         <Divider />
         <View style={styles.column}>
+          <Icon
+            name="checkcircle"
+            type="antdesign"
+            color="#333"
+            size={15}
+            style={{ marginRight: 5 }}
+          />
+          {/*열 맞추기용*/}
           <AppText style={styles.columnName}>기업명</AppText>
           <AppText style={styles.columnNumber}>수량</AppText>
           <AppText style={styles.columnPrice}>한 주당 금액</AppText>
@@ -227,16 +262,28 @@ const ModifyPortfolio = ({ route, navigation }) => {
                 style={styles.rebalanceItemContent}
                 onPress={() => handleSelectedId(item.ticker)}
               >
+                <Icon
+                  name="checkcircle"
+                  type="antdesign"
+                  color={colorScale[index]}
+                  size={15}
+                  style={{ marginRight: 5 }}
+                />
                 <AppText style={styles.itemName}>{item.name}</AppText>
-                <AppText style={styles.itemNumber}>
-                  {item.quantity * (item.isBuy ? 1 : -1)}주
-                </AppText>
+                <TextInput
+                  style={styles.itemNumber}
+                  value={(item.buyQuantity * (item.isBuy ? 1 : -1)).toString()}
+                  onChangeText={(text) => handleChangeQuantity(index, text)}
+                  placeholder={item.quantity.toString()}
+                  placeholderTextColor="#777"
+                  keyboardType="number-pad"
+                />
                 <TextInput
                   style={styles.itemPrice}
-                  value={item.price.toString()}
+                  value={item.buyPrice.toString()}
                   onChangeText={(text) => handleChangePrices(index, text)}
                   placeholder={item.price.toString()}
-                  placeholderTextColor="#bbb"
+                  placeholderTextColor="#777"
                   keyboardType="number-pad"
                 />
                 <AppText
@@ -260,9 +307,11 @@ const ModifyPortfolio = ({ route, navigation }) => {
           onPress={() => handleModify()}
         />
       </View>
-      <InfoModal isVisible={isVisible} onToggle={toggleModal}>
-        {info}
-      </InfoModal>
+      <ModalComponent isVisible={isVisible} onToggle={toggleModal}>
+        <AppText style={{ fontSize: 16, marginBottom: 20, color: "#f0f0f0" }}>
+          {info}
+        </AppText>
+      </ModalComponent>
     </SafeAreaView>
   );
 };

@@ -18,6 +18,7 @@
         }
       ]
     ],
+    "userInterfaceStyle": "automatic",
     "extra": {
       "eas": {
         "projectId": "ce6ad48d-d4d9-4edb-a805-42523d361e8b"

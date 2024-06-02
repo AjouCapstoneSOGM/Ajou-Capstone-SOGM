@@ -1,7 +1,10 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import * as Font from "expo-font";
+import { LogBox } from "react-native";
 
+import Settings from "./pages/Settings.js";
+import MyPage from "./pages/MyPage.js";
 import Login from "./pages/login/login";
 import SocialLogin from "./pages/login/sociallogin";
 import Signup from "./pages/login/signup";
@@ -31,6 +34,8 @@ function ScreenStack() {
       }}
       initialRouteName="Home"
     >
+      <Stack.Screen name="MyPage" component={MyPage} />
+      <Stack.Screen name="Settings" component={Settings} />
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="SocialLogin" component={SocialLogin} />
       <Stack.Screen name="Signup" component={Signup} />
@@ -71,6 +76,7 @@ export default function App() {
       fontFamily: "pretendard",
     },
   };
+  LogBox.ignoreAllLogs();
 
   setCustomText(customTextProps);
   return (

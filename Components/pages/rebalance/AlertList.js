@@ -1,11 +1,12 @@
 import React, { useCallback, useState } from "react";
 import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
-import { Button, Divider, Icon } from "@rneui/base";
+import { Button, Icon } from "@rneui/base";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 import AppText from "../../utils/AppText.js";
 import { usePortfolio } from "../../utils/PortfolioContext.js";
 import { useFocusEffect } from "@react-navigation/native";
+import { timeAgo } from "../../utils/utils.js";
 
 const AlertList = ({ route, navigation }) => {
   const { rebalances } = usePortfolio();
@@ -71,7 +72,7 @@ const AlertList = ({ route, navigation }) => {
                     </AppText>
                   </AppText>
                   <AppText style={{ fontSize: 13, color: "#808080" }}>
-                    {item.createdDate}
+                    {timeAgo(item.createdDate)}
                   </AppText>
                 </View>
                 <AppText style={styles.alertContent}>

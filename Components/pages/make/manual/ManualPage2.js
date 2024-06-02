@@ -1,13 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { View, TextInput, StyleSheet, ScrollView } from "react-native";
 import AppText from "../../../utils/AppText";
-import { filteringNumber } from "../../../utils/utils";
+import { filteringNumber, height } from "../../../utils/utils";
 import GetCurrentPrice from "../../../utils/GetCurrentPrice";
 import { Button } from "@rneui/base";
 import Loading from "../../../utils/Loading";
 
-const ManualPage2 = ({ stockList, setStockList }) => {
+const ManualPage2 = ({ step, setStep, stockList, setStockList }) => {
   const [loading, setLoading] = useState(true);
+  const [disabled, setDisabled] = useState(true);
+
+  const handleNextStep = () => {
+    setStep(step + 1);
+  };
 
   const mergeDataAndSet = (stocks, logs) => {
     const mergedData = stocks.map((stock) => {
@@ -21,6 +26,14 @@ const ManualPage2 = ({ stockList, setStockList }) => {
     });
     return mergedData;
   };
+
+  useEffect(() => {
+    const result = stockList.filter(
+      (stock) => stock.currentPrice === 0 || stock.quantity === 0
+    );
+    if (result.length) setDisabled(true);
+    else setDisabled(false);
+  }, [stockList]);
 
   const handleQuantityChange = (newQuantity, index) => {
     if (Number(newQuantity) < 0) newQuantity = "0";
@@ -142,6 +155,17 @@ const ManualPage2 = ({ stockList, setStockList }) => {
             ))}
         </ScrollView>
       </View>
+      <View style={styles.nextButtonContainer}>
+        <AppText style={{ paddingBottom: 10, color: "#999", fontSize: 13 }}>
+          입력되어있는 가격은 실시간 기준입니다.
+        </AppText>
+        <Button
+          buttonStyle={styles.nextButton}
+          title="다음"
+          onPress={handleNextStep}
+          disabled={disabled}
+        />
+      </View>
     </View>
   );
 };
@@ -192,6 +216,16 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#888",
     width: 60,
+  },
+  nextButton: {
+    backgroundColor: "#6262e8",
+    borderRadius: 10,
+    height: height * 50,
+  },
+  nextButtonContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: height * 5,
+    backgroundColor: "#333",
   },
 });
 
