@@ -18,7 +18,7 @@ def get_yesterday_fear_and_greed():
     )
 
     # 페이지 로드를 최대 10초간 기다림
-    driver.implicitly_wait(10)
+    driver.implicitly_wait(60)
 
     # 페이지 방문
     driver.get(url="https://edition.cnn.com/markets/fear-and-greed")
