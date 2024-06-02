@@ -45,4 +45,11 @@ public class UserInfoController {
         userService.updatePassword(email, requestBody.get("password"));
         return ResponseEntity.ok().build();
     }
+
+    @DeleteMapping
+    public ResponseEntity<Void> deleteUserInfo(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        User user = userService.findByEmail(userPrincipal.getEmail());
+        userService.deleteUser(user);
+        return ResponseEntity.ok().build();
+    }
 }

@@ -68,4 +68,9 @@ public class UserService {
 
         user.setPassword(passwordEncoder.encode(password));
     }
+
+    @Transactional
+    public void deleteUser(User user) {
+        userRepository.delete(user);
+    }
 }

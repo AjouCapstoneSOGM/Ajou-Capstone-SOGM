@@ -41,7 +41,7 @@ public class PortfolioServiceTest {
     public void testCreateInitAutoPortfolio() throws Exception {
         // given 유저 생성
         User user = userRepository.save(new User().builder()
-                .email("james001@foo.bar")
+                .email("suprlux09@ajou.ac.kr")
                 .isVerified(false)
                 .password("password!")
                 .name("James")
@@ -71,7 +71,7 @@ public class PortfolioServiceTest {
     @Transactional
     public void testInitializeAutoPortfolio() throws Exception {
         User user = userRepository.save(new User().builder()
-                .email("james001@foo.bar")
+                .email("suprlux09@ajou.ac.kr")
                 .isVerified(false)
                 .password("password!")
                 .name("James")
@@ -115,7 +115,7 @@ public class PortfolioServiceTest {
     @Transactional
     void testSellStock_ManualPortfolio_CashNotUpdated() {
         User user = userRepository.save(new User().builder()
-                .email("james001@foo.bar")
+                .email("suprlux09@ajou.ac.kr")
                 .isVerified(false)
                 .password("password!")
                 .name("James")
@@ -165,7 +165,7 @@ public class PortfolioServiceTest {
     @Transactional
     public void testUpdatePortfolioName() {
         User user = userRepository.save(new User().builder()
-                .email("james001@foo.bar")
+                .email("suprlux09@ajou.ac.kr")
                 .isVerified(false)
                 .password("password!")
                 .name("James")

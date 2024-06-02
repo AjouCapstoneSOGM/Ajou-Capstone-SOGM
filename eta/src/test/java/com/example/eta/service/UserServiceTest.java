@@ -43,7 +43,7 @@ public class UserServiceTest {
     @DisplayName("비밀번호 초기화 테스트")
     public void testResetPassword() throws Exception{
         User user = userRepository.save(User.builder()
-                .email("james@domain.com")
+                .email("suprlux09@ajou.ac.kr")
                 .isVerified(false)
                 .password("password!")
                 .name("James")
@@ -54,7 +54,7 @@ public class UserServiceTest {
         String tmpPassword = signupInfoService.generateSignupToken();
         userService.resetPassword(user.getEmail(), tmpPassword);
 
-        UserDto.LoginDto loginDto = new UserDto.LoginDto("james@domain.com", tmpPassword, "expoPushToken");
+        UserDto.LoginDto loginDto = new UserDto.LoginDto("suprlux09@ajou.ac.kr", tmpPassword, "expoPushToken");
         mockMvc.perform(post("/api/auth/login")
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(loginDto)))

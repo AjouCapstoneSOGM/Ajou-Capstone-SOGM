@@ -41,6 +41,7 @@ public class PortfolioService {
     public float calculateAmount(Portfolio portfolio, boolean averagePriceUpdated, Map<PortfolioTicker, Float> currentAmountForTicker) {
         float totalAmount = portfolio.getCurrentCash();
         for (PortfolioTicker portfolioTicker : portfolio.getPortfolioTickers()) {
+            System.out.println(portfolioTicker.getTicker().getName());
             float number = portfolioTicker.getNumber();
             float price = averagePriceUpdated ? portfolioTicker.getAveragePrice() :
                     priceRepository.findLatestPriceByTicker(portfolioTicker.getTicker().getTicker())
