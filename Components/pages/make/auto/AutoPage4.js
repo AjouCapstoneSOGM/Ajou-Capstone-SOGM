@@ -29,6 +29,7 @@ const AutoPage4 = ({ step, setStep, amount, riskLevel, interest }) => {
   const [selectedId, setSelectedId] = useState();
   const [infoContent, setInfoContent] = useState("");
   const [infoVisible, setInfoVisible] = useState(false);
+  const [isAscending, setIsAscending] = useState(true);
 
   const toggleInfoModal = () => {
     setInfoVisible(!infoVisible);
@@ -43,13 +44,34 @@ const AutoPage4 = ({ step, setStep, amount, riskLevel, interest }) => {
     else setSelectedId(index);
   };
 
+  const handleSort = (prop) => {
+    setIsAscending(!isAscending);
+
+    if (prop === "name") {
+      setInitRebalance(
+        [...initRebalance].sort((a, b) => {
+          return isAscending
+            ? b.name.localeCompare(a.name)
+            : a.name.localeCompare(b.name);
+        })
+      );
+    } else {
+      setInitRebalance(
+        [...initRebalance].sort((a, b) => {
+          const sortFactor = isAscending ? 1 : -1;
+          return (a[prop] - b[prop]) * sortFactor;
+        })
+      );
+    }
+  };
+
   useEffect(() => {
     if (pfId) {
       const loadPortfolio = async () => {
         const portfolio = await fetchStocksByPortfolioId(pfId);
         const rebalance = await fetchRebalanceList(pfId);
         setPortfolio(portfolio);
-        setInitRebalance(rebalance[0]);
+        setInitRebalance(rebalance[0].rebalancings);
         setLoading(false);
       };
       loadPortfolio();
@@ -240,7 +262,7 @@ const AutoPage4 = ({ step, setStep, amount, riskLevel, interest }) => {
           <PortfolioPieChart
             data={{
               currentCash: 0,
-              stocks: initRebalance.rebalancings.map((stock) => ({
+              stocks: initRebalance.map((stock) => ({
                 companyName: stock.name,
                 quantity: stock.quantity,
                 currentPrice: stock.price,
@@ -258,15 +280,65 @@ const AutoPage4 = ({ step, setStep, amount, riskLevel, interest }) => {
             다음과 같은 비율로 종목이 구성돼요
           </AppText>
         </View>
-        <View style={[styles.column, { paddingLeft: width * 40 }]}>
-          <AppText style={styles.columnName}>종목</AppText>
-          <AppText style={styles.columnNumber}>수량</AppText>
-          <AppText style={[styles.columnPrice, { marginLeft: width * 5 }]}>
-            1주 당 금액
-          </AppText>
+        <View style={styles.column}>
+          <Icon
+            name="checkcircle"
+            type="antdesign"
+            color="#333"
+            size={15}
+            style={{ marginRight: 5 }}
+          />
+          <Button
+            title="기업명"
+            type="clear"
+            containerStyle={styles.columnName}
+            titleStyle={{ color: "#808080", fontSize: 12 }}
+            onPress={() => {
+              handleSort("name");
+            }}
+            icon={{
+              type: "antdesign",
+              name: "caretdown",
+              color: "#808080",
+              size: 11,
+            }}
+            iconPosition="right"
+          />
+          <Button
+            title="수량"
+            type="clear"
+            containerStyle={styles.columnNumber}
+            titleStyle={{ color: "#808080", fontSize: 12 }}
+            onPress={() => {
+              handleSort("quantity");
+            }}
+            icon={{
+              type: "antdesign",
+              name: "caretdown",
+              color: "#808080",
+              size: 11,
+            }}
+            iconPosition="right"
+          />
+          <Button
+            title="한 주당 금액"
+            type="clear"
+            containerStyle={styles.columnPrice}
+            titleStyle={{ color: "#808080", fontSize: 12 }}
+            onPress={() => {
+              handleSort("price");
+            }}
+            icon={{
+              type: "antdesign",
+              name: "caretdown",
+              color: "#808080",
+              size: 11,
+            }}
+            iconPosition="right"
+          />
         </View>
         <ScrollView>
-          {initRebalance.rebalancings.map((stock, index) => (
+          {initRebalance.map((stock, index) => (
             <TouchableOpacity
               key={index}
               style={styles.labelItemContent}
