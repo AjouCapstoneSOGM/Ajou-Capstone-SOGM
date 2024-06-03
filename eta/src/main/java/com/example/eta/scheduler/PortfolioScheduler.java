@@ -5,6 +5,7 @@ import com.example.eta.entity.Portfolio;
 import com.example.eta.entity.PortfolioTicker;
 import com.example.eta.entity.Rebalancing;
 import com.example.eta.entity.RebalancingTicker;
+import com.example.eta.exception.FailToSendPushNotificationException;
 import com.example.eta.repository.PortfolioRepository;
 import com.example.eta.repository.PriceRepository;
 import com.example.eta.repository.RebalancingRepository;
@@ -36,14 +37,19 @@ public class PortfolioScheduler {
 
     private Logger logger = LoggerFactory.getLogger(PortfolioScheduler.class);
 
-    @Scheduled(cron = "0 10 1 * * 1-5")
+    @Scheduled(cron = "0 0 0 * * 1-5")
     @Transactional
     public void doProportionRebalancing() {
         for (Portfolio portfolio : portfolioRepository.findAllByIsAutoIsTrue()) {
             updateProportion(portfolio);
             if (isProportionRebalancingNeeded(portfolio)) {
                 int rnId = createProportionRebalancing(portfolio);
-                sendRebalancingPushNotification(portfolio.getUser().getToken().getExpoPushToken(), portfolio, rnId);
+                try {
+                    sendRebalancingPushNotification(portfolio.getUser().getToken().getExpoPushToken(), portfolio, rnId);
+                }
+                catch (FailToSendPushNotificationException e) {
+                    logger.error("Failed to send push notification to " + portfolio.getUser().getEmail());
+                }
             }
         }
     }
