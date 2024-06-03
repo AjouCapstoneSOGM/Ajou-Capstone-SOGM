@@ -90,7 +90,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
       setRebalances(
         [...rebalances].sort((a, b) => {
           const sortFactor = isAscending ? 1 : -1;
-          return (a[prop] - b[prop]) * sortFactor;
+          return (Number(a[prop]) - Number(b[prop])) * sortFactor;
         })
       );
     }
@@ -104,10 +104,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
         item.buyPrice = item.price;
         item.buyQuantity = item.quantity;
         item.rateDiff = (
-          (item.buyPrice *
-            (item.buyQuantity * (item.isBuy ? 1 : -1) -
-              getCurrentQuantity(item.ticker)) *
-            100) /
+          (item.buyPrice * item.buyQuantity * (item.isBuy ? 1 : -1) * 100) /
           totalPrice
         ).toFixed(2);
       });
@@ -364,14 +361,31 @@ const ModifyPortfolio = ({ route, navigation }) => {
                   style={{ marginRight: 5 }}
                 />
                 <AppText style={styles.itemName}>{item.name}</AppText>
-                <TextInput
-                  style={styles.itemNumber}
-                  value={(item.buyQuantity * (item.isBuy ? 1 : -1)).toString()}
-                  onChangeText={(text) => handleChangeQuantity(index, text)}
-                  placeholder={item.quantity.toString()}
-                  placeholderTextColor="#777"
-                  keyboardType="number-pad"
-                />
+                <View
+                  style={{
+                    flexDirection: "row",
+                    flex: 1,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <TextInput
+                    style={styles.itemNumber}
+                    value={item.buyQuantity.toString()}
+                    onChangeText={(text) => handleChangeQuantity(index, text)}
+                    placeholder={item.quantity.toString()}
+                    placeholderTextColor="#777"
+                    keyboardType="number-pad"
+                  />
+                  <AppText
+                    style={{
+                      color: item.isBuy ? "#ff5858" : "#5878ff",
+                      fontSize: 11,
+                    }}
+                  >
+                    {item.isBuy ? " 매수" : " 매도"}
+                  </AppText>
+                </View>
                 <TextInput
                   style={styles.itemPrice}
                   value={item.buyPrice.toString()}
@@ -502,7 +516,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   itemNumber: {
-    flex: 1,
     fontSize: 14,
     color: "#f0f0f0",
     textAlign: "center",

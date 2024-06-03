@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import {
+  getUsertoken,
   getUserName,
   removeUserName,
   removeUsertoken,
@@ -17,6 +18,17 @@ export const AuthProvider = ({ children }) => {
     await removeUserName();
     await removeUsertoken();
   };
+  
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      const token = await getUsertoken();
+    if (token) {
+      setIsLoggedIn(true);
+    }
+  };
+
+  checkLoginStatus();
+}, []);
 
   useEffect(() => {
     const loadData = async () => {

@@ -122,7 +122,7 @@ const Signup = ({ navigation }) => {
     if (isValueValid()) {
       const response = await fetchSignupInfo();
       if (response.status == 409) {
-        //Alert.alert("이미 가입된 이메일입니다.")
+        Alert.alert("이미 가입된 이메일입니다.")
       } else if (response.status == 404) {
         Alert.alert("이메일 인증을 진행해 주세요.");
       } else if (response.status == 403) {
