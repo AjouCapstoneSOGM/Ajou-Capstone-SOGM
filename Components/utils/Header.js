@@ -33,6 +33,13 @@ const HeaderComponent = () => {
         />
       )}
       <View style={styles.buttonContainer}>
+        <Button
+          type="clear"
+          onPress={() => {
+            navigation.navigate("Information");
+          }}
+          icon={{ name: "open-book", type: "entypo", color: "#333" }}
+        />
         {isLoggedIn && (
           <View>
             <Button

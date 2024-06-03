@@ -4,6 +4,7 @@ import * as Font from "expo-font";
 import { LogBox } from "react-native";
 
 import Settings from "./pages/Settings.js";
+import Information from "./pages/Information.js";
 import MyPage from "./pages/MyPage.js";
 import Login from "./pages/login/login";
 import SocialLogin from "./pages/login/sociallogin";
@@ -35,6 +36,7 @@ function ScreenStack() {
       initialRouteName="Home"
     >
       <Stack.Screen name="MyPage" component={MyPage} />
+      <Stack.Screen name="Information" component={Information} />
       <Stack.Screen name="Settings" component={Settings} />
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="SocialLogin" component={SocialLogin} />
