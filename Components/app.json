@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "platforms": ["ios", "android", "web"],
     "android": {
-      "package": "com.sogm.eta",
+      "package": "com.sogm.pushalarmtest",
       "googleServicesFile": "./google-services.json"
     },
     "plugins": [
@@ -21,9 +21,9 @@
     "userInterfaceStyle": "automatic",
     "extra": {
       "eas": {
-        "projectId": "ce6ad48d-d4d9-4edb-a805-42523d361e8b"
+        "projectId": "f3f90f52-c78a-4e7e-a7b0-ac053ff5dd0c"
       }
     },
-    "owner": "ysw2"
+    "owner": "leeyongsoo"
   }
 }
