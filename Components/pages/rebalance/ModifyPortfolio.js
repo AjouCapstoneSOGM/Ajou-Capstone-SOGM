@@ -104,10 +104,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
         item.buyPrice = item.price;
         item.buyQuantity = item.quantity;
         item.rateDiff = (
-          (item.buyPrice *
-            (item.buyQuantity * (item.isBuy ? 1 : -1) -
-              getCurrentQuantity(item.ticker)) *
-            100) /
+          (item.buyPrice * item.buyQuantity * (item.isBuy ? 1 : -1) * 100) /
           totalPrice
         ).toFixed(2);
       });
