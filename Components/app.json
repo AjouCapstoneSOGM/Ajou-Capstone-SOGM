@@ -2,7 +2,7 @@
   "expo": {
     "name": "eta",
     "slug": "components",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "platforms": ["ios", "android", "web"],
     "android": {
       "package": "com.sogm.pushalarmtest",
