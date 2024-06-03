@@ -86,7 +86,7 @@
                             <path d="M16 13H8"></path>
                             <path d="M16 17H8"></path>
                         </svg>
-                        Sector and Ticker
+                        Sector
                     </a>
                 </nav>
             </div>
@@ -94,22 +94,18 @@
     </div>
 
     <div>
-        <h2 class="text-xl font-semibold mb-4">Sector-Ticker</h2>
+        <h2 class="text-xl font-semibold mb-4">Sector</h2>
         <table class="w-full bg-white rounded-md shadow-md overflow-hidden">
             <thead class="bg-gray-50">
             <tr>
                 <th class="px-4 py-2 text-left text-gray-500">SectorId</th>
                 <th class="px-4 py-2 text-left text-gray-500">name</th>
-                <th class="px-4 py-2 text-left text-gray-500">티커 조회</th>
-                <th class="px-4 py-2 text-left text-gray-500">수정하기</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="sector : ${sectors}">
                 <td class="border-t px-4 py-2" th:text="${sector.sectorId}"></td>
                 <td class="border-t px-4 py-2" th:text="${sector.sectorName}"></td>
-                <td class="border-t px-4 py-2" th:text="티커조회"></td>
-                <td class="border-t px-4 py-2" th:text="수정"></td>
             </tr>
             </tbody>
         </table>

@@ -86,7 +86,7 @@
                             <path d="M16 13H8"></path>
                             <path d="M16 17H8"></path>
                         </svg>
-                        Sector and Ticker
+                        Sector
                     </a>
                 </nav>
             </div>
@@ -131,9 +131,7 @@
                 <td class="border-t px-4 py-2" th:text="${ticker.sector.sectorName}"></td>
                 <td class="border-t px-4 py-2" th:text="상세보기"></td>
                 <td class="border-t px-4 py-2">
-                    <form onsubmit="deleteTicker(event,${ticker.ticker})">
-                        <button type="submit" class="px-2 py-1 bg-red-500 text-white rounded-md">Delete</button>
-                    </form>
+                    <button class="px-2 py-1 bg-red-500 text-white rounded-md" th:attr="data-ticker-id=${ticker.ticker}" onclick="deleteTicker(this)">Delete</button>
                 </td>
             </tr>
             </tbody>
@@ -141,16 +139,21 @@
     </div>
 </div>
 <script>
-    document.getElementById('toggle-notifications').addEventListener('click', function () {
-        alert('Notifications toggled!');
-    });
+    // document.getElementById('toggle-notifications').addEventListener('click', function () {
+    //     alert('Notifications toggled!');
+    // });
+    //
+    // // Toggle the sidebar for small screens
+    // document.querySelector('a.lg\\:hidden').addEventListener('click', function () {
+    //     const sidebar = document.querySelector('.lg\\:block');
+    //     sidebar.classList.toggle('hidden');
+    // });
 
-    // Toggle the sidebar for small screens
-    document.querySelector('a.lg\\:hidden').addEventListener('click', function () {
-        const sidebar = document.querySelector('.lg\\:block');
-        sidebar.classList.toggle('hidden');
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            search();
+        }
     });
-
     function search() {
         const query = document.getElementById('searchInput').value;
         const searchType = document.querySelector('input[name="searchType"]:checked').value;
@@ -158,13 +161,13 @@
         if (query) {
             window.location.href = `/ticker/search/${searchType}/${query}`;
         } else {
-            alert('Please enter a search term');
+            window.location.href = '/ticker';
         }
     }
-    function deleteTicker(event,ticker) {
-        event.preventDefault(); // 기본 폼 제출 동작을 막습니다.
-
-        if (confirm("Are you sure you want to delete this Ticker?")) {
+    function deleteTicker(button) {
+        const ticker = button.getAttribute('data-ticker-id');
+        if (confirm("Are you sure you want to delete this ticker?")) {
+            alert(`${ticker}`)
             fetch(`/ticker/${ticker}`, {
                 method: 'DELETE',
                 headers: {
@@ -173,7 +176,7 @@
             }).then(response => {
                 if (response.ok) {
                     // 삭제 성공 시 페이지를 새로고침합니다.
-                    alert('ticker deleted successfully');
+                    alert('Ticker deleted successfully');
                     location.reload();
                 } else {
                     alert('Failed to delete ticker');

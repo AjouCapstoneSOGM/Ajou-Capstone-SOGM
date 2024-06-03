@@ -89,7 +89,7 @@
                                 <path d="M16 13H8"></path>
                                 <path d="M16 17H8"></path>
                             </svg>
-                            Sector and Ticker
+                            Sector
                         </a>
                     </nav>
                 </div>
@@ -140,14 +140,19 @@
         </div>
     </div>
     <script>
-        document.getElementById('toggle-notifications').addEventListener('click', function () {
-            alert('Notifications toggled!');
-        });
-
-        // Toggle the sidebar for small screens
-        document.querySelector('a.lg\\:hidden').addEventListener('click', function () {
-            const sidebar = document.querySelector('.lg\\:block');
-            sidebar.classList.toggle('hidden');
+        // document.getElementById('toggle-notifications').addEventListener('click', function () {
+        //     alert('Notifications toggled!');
+        // });
+        //
+        // // Toggle the sidebar for small screens
+        // document.querySelector('a.lg\\:hidden').addEventListener('click', function () {
+        //     const sidebar = document.querySelector('.lg\\:block');
+        //     sidebar.classList.toggle('hidden');
+        // });
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                search();
+            }
         });
         function search() {
             const query = document.getElementById('searchInput').value;
@@ -156,7 +161,7 @@
             if (query) {
                 window.location.href = `/users/search/${searchType}/${query}`;
             } else {
-                alert('Please enter a search term');
+                window.location.href = '/users';
             }
         }
         function goToDetail(userId) {

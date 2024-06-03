@@ -88,7 +88,7 @@
               <path d="M16 13H8"></path>
               <path d="M16 17H8"></path>
             </svg>
-            Sector and Ticker
+            Sector
           </a>
         </nav>
       </div>
@@ -153,6 +153,11 @@
   //   }
 //  });
 
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+      search();
+    }
+  });
   function search() {
     const query = document.getElementById('searchInput').value;
     const searchType = document.querySelector('input[name="searchType"]:checked').value;
@@ -160,9 +165,10 @@
     if (query) {
       window.location.href = `/portfolio-list/search/${searchType}/${query}`;
     } else {
-      alert('Only ID search is implemented in this example');
+      window.location.href = '/portfolio-list';
     }
   }
+
   function deletePortfolio(PfId) {
     if (confirm("Are you sure you want to delete this portfolio?")) {
 

@@ -18,4 +18,6 @@ public interface TickerRepository extends JpaRepository<Ticker, String> {
 
     @Query("SELECT t FROM Ticker t WHERE t.sector.sectorName = :sectorName")
     List<Ticker> findAllBySectorName(@Param("sectorName") String sectorName);
+
+    void deleteByTicker(String ticker);
 }
