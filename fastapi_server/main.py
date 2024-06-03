@@ -70,9 +70,18 @@ async def get_News(ticker: Ticker):
 
 
 @app.get("/fearGreed/")
-async def get_News():
+async def get_fear_greed():
     fear_greed = get_fear_and_greed()
     return {"fear_greed": fear_greed}
+
+
+@app.get("/currentNews/")
+async def get_current_news():
+    news = News()
+    result = news.get_recent_news()
+
+    print(result)
+    return result
 
 
 if __name__ == "__main__":
