@@ -13,6 +13,7 @@ import { useSearch } from "../utils/SearchStock.js";
 import StockInfo from "./portfolio/StockInfo.js";
 import ModalComponent from "../utils/Modal.js";
 import urls from "../utils/urls.js";
+import Loading from "../utils/Loading.js";
 
 const Home = ({ navigation }) => {
   const { query, setQuery, suggestions } = useSearch();
@@ -20,6 +21,8 @@ const Home = ({ navigation }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [stockInfoVisible, setStockInfoVisible] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(null);
+  const [currentNews, setCurrentNews] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const toggleStockModal = () => {
     setStockInfoVisible(!stockInfoVisible);
@@ -37,6 +40,21 @@ const Home = ({ navigation }) => {
       if (response.ok) {
         const data = await response.json();
         return data.fear_greed;
+      }
+    } catch (error) {
+      console.log(error);
+      return 0;
+    }
+  };
+
+  const fetchNews = async () => {
+    try {
+      const response = await fetch(`${urls.fastapiUrl}/currentNews`, {
+        method: "GET",
+      });
+      if (response.ok) {
+        const data = await response.json();
+        return data;
       }
     } catch (error) {
       console.log(error);
@@ -84,11 +102,21 @@ const Home = ({ navigation }) => {
   useEffect(() => {
     const loadData = async () => {
       const fgi = await fetchFGI();
+      const currentNews = await fetchNews();
+      const listData = Object.keys(currentNews.title).map((key) => ({
+        id: key,
+        title: currentNews.title[key],
+        press: currentNews.press[key],
+        date: currentNews.wdate[key],
+      }));
       setFGI(fgi);
+      setCurrentNews(listData);
+      setLoading(false);
     };
     loadData();
   }, []);
 
+  if (loading) return <Loading />;
   return (
     <SafeAreaView style={styles.container}>
       <HeaderComponent />
@@ -201,19 +229,27 @@ const Home = ({ navigation }) => {
         </View>
         <View style={styles.newsContainer}>
           <AppText style={styles.newsHeader}>실시간 뉴스</AppText>
-          {news.map((newsItem, index) => (
-            <TouchableOpacity key={index}>
-              <AppText style={styles.newsTitle}>{newsItem.title}</AppText>
-              <AppText style={{ color: "#7d7d7d", fontSize: 13 }}>
-                <AppText>{newsItem.source} </AppText>
-                <AppText>{newsItem.date}</AppText>
-              </AppText>
-              <Divider style={{ marginVertical: 15 }} />
-            </TouchableOpacity>
-          ))}
+          <FlatList
+            data={currentNews.slice(0, 10)}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <React.Fragment>
+                <View style={styles.newsItem}>
+                  <AppText style={styles.newsTitle}>{item.title}</AppText>
+                  <View
+                    style={{ flexDirection: "row", justifyContent: "flex-end" }}
+                  >
+                    <AppText style={styles.newsDetail}>{item.press} </AppText>
+                    <AppText style={styles.newsDetail}>{item.date}</AppText>
+                  </View>
+                </View>
+                <Divider />
+              </React.Fragment>
+            )}
+          />
         </View>
       </ScrollView>
-      <View style={{ height: height * 30 }} />
+      <View style={{ height: height * 60 }} />
       {/* footer 높이 만큼 증가 */}
       <FooterComponent />
       <ModalComponent isVisible={isVisible} onToggle={toggleModal}>
@@ -345,6 +381,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: width * 10,
     paddingVertical: height * 15,
   },
+  newsItem: {
+    height: 80,
+    justifyContent: "space-between",
+    paddingVertical: 10,
+  },
   newsHeader: {
     fontSize: 20,
     fontWeight: "bold",
@@ -352,9 +393,12 @@ const styles = StyleSheet.create({
     marginBottom: height * 15,
   },
   newsTitle: {
-    fontSize: 18,
+    fontSize: 15,
     color: "#f0f0f0",
-    marginBottom: height * 10,
+  },
+  newsDetail: {
+    fontSize: 13,
+    color: "#777",
   },
 });
 export default Home;
