@@ -58,10 +58,11 @@ const Settings = ({ navigation }) => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
+        body: JSON.stringify({
+          password: password,
+        }),
       });
       if (response.ok) {
-        const data = await response.json();
-        console.log(data);
         return { result: "success" };
       } else {
         throw new Error();
@@ -70,7 +71,7 @@ const Settings = ({ navigation }) => {
       console.log(error);
       return { result: "fail" };
     }
-  };
+  };  
 
   const fetchUserInfo = async () => {
     try {
@@ -163,6 +164,36 @@ const Settings = ({ navigation }) => {
       ]);
     }
   };
+
+  const handleChangedPassword = async () => {
+    const result = await fetchChangePw();
+    if (result.result === "success") {
+      Alert.alert(
+        "비밀번호 변경 완료",
+        "비밀번호 변경이 완료되었습니다. 정보 재설정을 위해 로그아웃 됩니다.",
+        [
+          {
+            text: "확인",
+            onPress: async () => {
+              await logout();
+              navigation.popToTop();
+            },
+            style: "cancel",
+          },
+        ]
+      );
+    } else {
+      Alert.alert("비밀번호 변경 실패", "비밀번호 변경에 실패하였습니다.", [
+        {
+          text: "확인",
+          onPress: () => {},
+          style: "cancel",
+        },
+      ]);
+    }
+  };
+
+  
   const handleUserDelete = async () => {
     const result = await fetchUserDelete();
     if (result.result === "success") {
@@ -356,7 +387,7 @@ const Settings = ({ navigation }) => {
         <Button
           buttonStyle={styles.submitButton}
           title="변경"
-          onPress={async () => {}}
+          onPress={handleChangedPassword}
           disabled={!pwValid}
         />
       </ModalComponent>

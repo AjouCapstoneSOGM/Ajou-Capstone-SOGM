@@ -19,8 +19,8 @@ import { usePushNotifications } from "../../utils/PushNotificationContext.js";
 import { width, height } from "../../utils/utils";
 
 const Login = ({ navigation }) => {
-  const [useremail, setUseremail] = useState("test@test.com"); //
-  const [password, setPassword] = useState("1234"); //
+  const [useremail, setUseremail] = useState(""); //
+  const [password, setPassword] = useState(""); //
 
   const { login } = useAuth();
   const { loadData, portLoading } = usePortfolio();
