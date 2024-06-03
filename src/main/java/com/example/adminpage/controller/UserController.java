@@ -23,16 +23,18 @@ public class UserController {
     }
     @GetMapping("/search/{searchType}/{query}")
     public String search(@PathVariable("searchType") String searchType, @PathVariable("query") String query, Model model) {
-        System.out.println("Search Type: " + searchType);
-        System.out.println("Query: " + query);
         switch (searchType) {
             case "id":
-                userRepository.findByUserId(Integer.valueOf(query)).ifPresent(user -> model.addAttribute("users", List.of(user)));
+//                model.addAttribute("users", userRepository.findAllByUserId(Integer.parseInt(query)));
+                userRepository.findAllByUserId(Integer.parseInt(query)).ifPresent(user -> model.addAttribute("users", user));
+                System.out.println("UserController.user"+model);
+                break;
             case "name":
                 model.addAttribute("users", userRepository.findAllByNameContaining(query));
                 break;
             default:
         }
-        return "users";
+        System.out.println("UserController.user*******"+model);
+        return "Users";
     }
 }

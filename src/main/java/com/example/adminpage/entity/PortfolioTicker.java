@@ -31,10 +31,10 @@ public class PortfolioTicker {
     @Column(name = "average_price", nullable = false)
     private Float averagePrice;
 
-    @Column(name = "init_proportion", nullable = false)
+    @Column(name = "init_proportion")
     private Float initProportion;
 
-    @Column(name = "current_proportion", nullable = false)
+    @Column(name = "current_proportion")
     private Float currentProportion;
 
     public void updateNumber(Integer number) {

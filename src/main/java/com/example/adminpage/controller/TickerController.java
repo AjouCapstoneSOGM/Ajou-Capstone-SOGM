@@ -3,8 +3,10 @@ package com.example.adminpage.controller;
 import com.example.adminpage.entity.Ticker;
 import com.example.adminpage.repository.TickerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,5 +38,10 @@ public class TickerController {
             default:
         }
         return "Ticker";
+    }
+    @DeleteMapping("/{ticker}")
+    public ResponseEntity<Void> deleteTicker(@PathVariable("ticker") String ticker) {
+        tickerRepository.deleteById(ticker);
+        return ResponseEntity.ok().build();
     }
 }

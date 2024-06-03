@@ -21,6 +21,9 @@
             background-color: #ffffff;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
+        tr.clickable {
+            cursor: pointer;
+        }
     </style>
 </head>
 <body class="min-h-screen bg-gray-100 dark:bg-gray-900">
@@ -122,14 +125,14 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="user : ${users}">
+                    <tr th:each="user : ${users}" class="clickable" onclick="goToDetail([[${user.userId}]])">
                         <td class="border-t px-4 py-2" th:text="${user.userId}"></td>
                         <td class="border-t px-4 py-2" th:text="${user.name}"></td>
                         <td class="border-t px-4 py-2" th:text="${user.email}"></td>
                         <td class="border-t px-4 py-2" th:text="${user.createdDate}"></td>
                         <td class="border-t px-4 py-2">
-<!--                            <button class="px-2 py-1 bg-blue-500 text-white rounded-md">활성화</button>-->
-                            <button class="px-2 py-1 bg-red-500 text-white rounded-md">비활성</button>
+                            <button class="px-2 py-1 bg-blue-500 text-white rounded-md">활성화</button>
+<!--                            <button class="px-2 py-1 bg-red-500 text-white rounded-md">비활성</button>-->
                         </td>
                     </tr>
                     </tbody>
@@ -155,6 +158,9 @@
             } else {
                 alert('Please enter a search term');
             }
+        }
+        function goToDetail(userId) {
+            window.location.href = '/user/' + userId;
         }
     </script>
 </body>
