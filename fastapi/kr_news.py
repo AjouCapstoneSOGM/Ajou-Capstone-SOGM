@@ -4,6 +4,7 @@ import pandas as pd
 from datetime import datetime
 from datetime import timedelta
 from tqdm import tqdm
+from urllib.parse import urlparse, parse_qs
 
 
 class get_kr_news:
@@ -35,7 +36,25 @@ class get_kr_news:
             wdates += html.select("dl > dd.articleSummary > span.wdate")
             title_list = [i["title"] for i in titles]
             title_list = [s.replace("\xa0", "") for s in title_list]
+            href_list = [i["href"] for i in titles]
 
+            for i, href in enumerate(href_list):
+                parsed_url = urlparse(href)
+                query_params = parse_qs(parsed_url.query)
+
+                # 필요한 정보 추출
+                article_id = query_params.get("article_id", [None])[0]
+                office_id = query_params.get("office_id", [None])[0]
+
+                # 첫 번째 링크 형식으로 재구성
+                if article_id and office_id:
+                    href_list[i] = (
+                        f"https://n.news.naver.com/mnews/article/{office_id}/{article_id}"
+                    )
+                else:
+                    href_list[i] = "Invalid URL or missing parameters"
+
+            print(href_list)
             # 요약 리스트 생성
             # summary_list = [s.text.strip() for s in summaries]
 
@@ -46,16 +65,19 @@ class get_kr_news:
             wdate_list = [s.text.strip() for s in wdates]
 
         news_list = pd.DataFrame(
-            {"title": title_list, "press": press_list, "wdate": wdate_list}
+            {
+                "title": title_list,
+                "press": press_list,
+                "wdate": wdate_list,
+                "href": href_list,
+            }
         )
 
         word_to_delete = "코스피|코스닥|\\?"
         mask = news_list["title"].str.contains(word_to_delete, case=False)
         news_list = news_list[~mask]
         news_list.reset_index(drop=True, inplace=True)
-        news_list_json = news_list.to_json(orient="records", force_ascii=False)
-
-        return news_list_json
+        return news_list
 
     def get_news_title_from_page(self, page, start_date, end_date, ticker):
         url = f"https://finance.naver.com/item/news.naver?code={ticker}&page={page}"
@@ -150,11 +172,11 @@ class get_kr_news:
         return df
 
 
-# get = get_kr_news()
-# today = datetime.today()
-# # portfolio는 현재 보유중인 티커목록
-# df = get.get_recent_news()
-# print(df)
+get = get_kr_news()
+today = datetime.today()
+# portfolio는 현재 보유중인 티커목록
+df = get.get_recent_news()
+print(df)
 # # period = today - timedelta(days=7)
 # # start_date = period.strftime("%Y-%m-%d")  # Example start date
 # # end_date = today.strftime("%Y-%m-%d")  # Example end date
