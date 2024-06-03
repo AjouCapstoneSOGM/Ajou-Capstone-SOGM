@@ -120,14 +120,14 @@ const Signup = ({ navigation }) => {
 
   const handleSignUp = async () => {
     if (isValueValid()) {
-      const respone = await fetchSignupInfo();
-      if (respone == 409) {
+      const response = await fetchSignupInfo();
+      if (response.status == 409) {
         //Alert.alert("이미 가입된 이메일입니다.")
-      } else if (respone == 404) {
+      } else if (response.status == 404) {
         Alert.alert("이메일 인증을 진행해 주세요.");
-      } else if (respone == 403) {
+      } else if (response.status == 403) {
         Alert.alert("인증번호가 잘못되었습니다.");
-      } else if (respone == 200) {
+      } else if (response.status == 200) {
         Alert.alert("회원가입 완료", "회원가입이 완료되었습니다.", [
           {
             text: "확인",
@@ -175,7 +175,7 @@ const Signup = ({ navigation }) => {
           <TextInput
             style={styles.inputBox}
             value={username}
-            placeholder="이름"
+            placeholder="닉네임"
             onChangeText={setUsername}
             placeholderTextColor="gray"
           ></TextInput>
@@ -189,6 +189,7 @@ const Signup = ({ navigation }) => {
             placeholderTextColor="gray"
           />
           <TouchableOpacity
+            activeOpacity={1}
             style={styles.verifyButton}
             onPress={sendVerificationCode}
           >
@@ -209,7 +210,11 @@ const Signup = ({ navigation }) => {
             placeholderTextColor="grey"
             keyboardType="number-pad"
           ></TextInput>
-          <TouchableOpacity style={styles.verifyButton} onPress={verifyCode}>
+          <TouchableOpacity
+            activeOpacity={1}
+            style={styles.verifyButton}
+            onPress={verifyCode}
+          >
             <AppText style={styles.verifybuttonText}>인증번호 확인</AppText>
           </TouchableOpacity>
         </View>
