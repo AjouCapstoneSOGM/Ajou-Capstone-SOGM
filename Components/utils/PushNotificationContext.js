@@ -1,13 +1,9 @@
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import { Platform } from "react-native";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
+
+import { setRebalanceAlarm } from "./localStorageUtils";
 
 const PushNotificationContext = createContext(null);
 
@@ -26,6 +22,8 @@ export const PushNotificationProvider = ({ children }) => {
   const responseListener = useRef();
 
   useEffect(() => {
+    setRebalanceAlarm('denied');
+    
     registerForPushNotificationsAsync().then((token) =>
       setExpoPushToken(token)
     );
@@ -73,6 +71,7 @@ async function registerForPushNotificationsAsync() {
     const { status: existingStatus } =
       await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
+    setRebalanceAlarm(existingStatus);
     if (existingStatus !== "granted") {
       const { status } = await Notifications.requestPermissionsAsync();
       finalStatus = status;

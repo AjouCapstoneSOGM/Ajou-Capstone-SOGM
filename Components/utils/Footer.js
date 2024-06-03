@@ -4,10 +4,17 @@ import { Button } from "@rneui/themed";
 import { useNavigation } from "@react-navigation/native";
 import { useAuth } from "./AuthContext";
 import { height, width } from "./utils";
+import { usePortfolio } from "./PortfolioContext";
 
 const FooterComponent = () => {
   const navigation = useNavigation();
   const { isLoggedIn } = useAuth();
+  const { portfolios } = usePortfolio();
+
+  const isPortfolioExist = () => {
+    if (portfolios?.length > 0) return true;
+    else return false;
+  };
 
   return (
     <View style={styles.footer}>
@@ -45,7 +52,9 @@ const FooterComponent = () => {
           type="clear"
           onPress={() => {
             isLoggedIn
-              ? navigation.navigate("ViewPortfolio")
+              ? isPortfolioExist()
+                ? navigation.navigate("ViewPortfolio")
+                : navigation.navigate("MakePortfolio")
               : navigation.navigate("Login");
           }}
           icon={{ name: "piechart", type: "antdesign", color: "#f0f0f0" }}

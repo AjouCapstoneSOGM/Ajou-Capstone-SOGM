@@ -18,6 +18,7 @@ import { width, height, filteringNumber, colorScale } from "../../utils/utils";
 import StockInfo from "./StockInfo";
 import Loading from "../../utils/Loading";
 import ModalComponent from "../../utils/Modal";
+import NotificationBubble from "../../utils/Notification";
 
 const PortfolioDetails = ({ route, navigation }) => {
   const stocksLength = 10;
@@ -40,6 +41,11 @@ const PortfolioDetails = ({ route, navigation }) => {
   const [modifyQuantity, setModifyQuantity] = useState(0);
   const [modifyPrice, setModifyPrice] = useState(0);
   const [modifyBuy, setModifyBuy] = useState(true);
+  const [initVisible, setInitVisible] = useState(false);
+
+  const handleInitVisible = () => {
+    setInitVisible(!initVisible);
+  };
 
   const toggleInfoModal = () => {
     setInfoVisible(!infoVisible);
@@ -180,6 +186,12 @@ const PortfolioDetails = ({ route, navigation }) => {
     const loadPortfolio = async () => {
       try {
         const currentPortfolio = getPortfolioById(route.params.id);
+        if (
+          currentPortfolio.detail.currentCash ==
+          currentPortfolio.detail.initialAsset
+        )
+          setInitVisible(true);
+
         if (currentPortfolio) {
           await getAlertExists(currentPortfolio.id);
           setPortfolio({
@@ -210,18 +222,26 @@ const PortfolioDetails = ({ route, navigation }) => {
       <View style={styles.outline}>
         <View style={styles.outlineHeader}>
           <AppText style={{ fontSize: 17, color: "#f0f0f0" }}>총 자산</AppText>
-          <View style={{ flexDirection: "row" }}>
-            <Button
-              type="clear"
-              onPress={() => {
-                navigation.navigate("AlertList", { pfId: portfolio.id });
-              }}
-              icon={{
-                name: "bell-fill",
-                type: "octicon",
-                color: alertExist ? "#fedf3e" : "#f0f0f0",
-              }}
-            />
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <NotificationBubble
+              message={"알림을 확인해주세요"}
+              visible={initVisible}
+              onClose={handleInitVisible}
+            ></NotificationBubble>
+            <View>
+              <Button
+                type="clear"
+                onPress={() => {
+                  navigation.navigate("AlertList", { pfId: portfolio.id });
+                }}
+                icon={{
+                  name: "bell-fill",
+                  type: "octicon",
+                  color: alertExist ? "#ffa800" : "#f0f0f0",
+                }}
+              />
+              {alertExist && <View style={styles.redDot}></View>}
+            </View>
             <Button
               type="clear"
               onPress={() => {
@@ -278,17 +298,8 @@ const PortfolioDetails = ({ route, navigation }) => {
           cash={portfolio}
           selectedId={selectedId}
           size={width * 0.6}
+          mode={"light"}
         />
-        {selectedId !== null && (
-          <View style={{ position: "absolute", alignItems: "center" }}>
-            <AppText style={[styles.centerText, { fontWeight: "bold" }]}>{`${
-              (getStockRate(selectedId).toFixed(3) * 1000) / 10 // 소숫점 계산 오류 방지를 위함
-            }%`}</AppText>
-            <AppText style={[styles.centerText, { fontSize: 12 }]}>
-              {portfolio.stocks[selectedId].companyName}
-            </AppText>
-          </View>
-        )}
         {!portfolio.auto && (
           <TouchableOpacity
             style={styles.floatingButton}
@@ -474,7 +485,7 @@ const PortfolioDetails = ({ route, navigation }) => {
               style={{
                 position: "absolute",
                 top: 0,
-                color: "#f0f0f0",
+                color: "#888",
                 fontSize: 20,
                 fontWeight: "bold",
               }}
@@ -612,7 +623,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: height * 0,
     marginTop: height * -5,
-    marginBottom: height * -10,
   },
   centerText: {
     fontSize: 20,
@@ -676,7 +686,7 @@ const styles = StyleSheet.create({
     shadowRadius: 2, // for iOS shadow
   },
   content: {
-    paddingTop: 40,
+    paddingTop: 20,
     paddingHorizontal: 10,
   },
   contentsItem: {
@@ -711,6 +721,15 @@ const styles = StyleSheet.create({
     backgroundColor: "#6262e8",
     borderRadius: 10,
     height: 40,
+  },
+  redDot: {
+    position: "absolute",
+    right: "30%",
+    top: "10%",
+    height: 7,
+    width: 7,
+    backgroundColor: "red",
+    borderRadius: 30,
   },
 });
 export default PortfolioDetails;

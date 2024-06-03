@@ -29,3 +29,20 @@ export const getUserName = async () => {
 export const removeUsertoken = async () => {
   return await AsyncStorage.removeItem("usertoken");
 };
+
+export const removeUserName = async () => {
+  return await AsyncStorage.removeItem("username");
+};
+
+export const setRebalanceAlarm = async (isRebalanceAlarm) => {
+  try {
+    await AsyncStorage.setItem("isRebalanceAlarm", isRebalanceAlarm);
+    console.log("isRebalanceAlarm saved successfully");
+  } catch (e) {
+    console.log("isRebalanceAlarm saved error : Asynce Storage");
+  }
+};
+
+export const getRebalanceAlarm = async () => {
+  return await AsyncStorage.getItem("isRebalanceAlarm");
+};

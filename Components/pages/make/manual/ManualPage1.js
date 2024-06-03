@@ -5,7 +5,7 @@ import { Button, SearchBar } from "@rneui/base";
 import AppText from "../../../utils/AppText";
 import { useSearch } from "../../../utils/SearchStock";
 import StockInfo from "../../portfolio/StockInfo";
-import { height } from "../../../utils/utils";
+import { height, width } from "../../../utils/utils";
 
 const ManualPage1 = ({ step, setStep, stockList, setStockList }) => {
   const { query, setQuery, suggestions } = useSearch();
@@ -45,15 +45,18 @@ const ManualPage1 = ({ step, setStep, stockList, setStockList }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.searchBarContainer}>
-        <SearchBar
-          placeholder="종목 이름, 티커로 검색"
-          onChangeText={setQuery}
-          value={query}
-          containerStyle={styles.searchContainer}
-          inputContainerStyle={styles.searchInputContainer}
-        />
+      <View style={styles.textContainer}>
+        <AppText style={styles.titleText}>
+          추가하실 종목을 모두 선택해주세요
+        </AppText>
       </View>
+      <SearchBar
+        placeholder="종목 이름, 티커로 검색"
+        onChangeText={setQuery}
+        value={query}
+        containerStyle={styles.searchContainer}
+        inputContainerStyle={styles.searchInputContainer}
+      />
       <View style={styles.itemContainer}>
         <View style={styles.selectedContainer}>
           {stockList.map((item, index) => (
@@ -132,25 +135,30 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "stretch",
   },
+  textContainer: {
+    paddingHorizontal: 10,
+    paddingBottom: 20,
+  },
+  titleText: {
+    fontSize: 30,
+    fontWeight: "bold",
+    color: "#333",
+  },
   searchBarContainer: {
     height: 90,
-    marginTop: -70,
     paddingVertical: 20,
     paddingHorizontal: 20,
   },
   searchContainer: {
     backgroundColor: "#333",
-    borderRadius: 30,
     borderBottomColor: "transparent",
     borderTopColor: "transparent",
-    padding: 4,
-    paddingRight: 50,
-    height: 50,
+    padding: width * 5,
+    height: height * 50,
   },
   searchInputContainer: {
     backgroundColor: "#f0f0f0",
-    borderRadius: 30,
-    height: 40,
+    height: height * 40,
   },
   selectedContainer: {
     paddingVertical: 5,

@@ -36,43 +36,47 @@ const ManualPage3 = ({ stockList }) => {
       })
     );
   };
-  useEffect(() => {
-    const fetchManualInfo = async () => {
-      try {
-        const token = await getUsertoken();
-        const response = await fetch(
-          `${urls.springUrl}/api/portfolio/create/manual`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              country: "KOR",
-              stocks: stockList.map((stock) => ({
-                ticker: stock.ticker,
-                isBuy: true,
-                quantity: stock.quantity,
-                price: stock.currentPrice,
-              })),
-            }),
-          }
-        );
-        if (response.ok) {
-          const data = await response.json();
-          setPfId(data.id);
-          setLoading(false);
-        } else {
-          console.error("Error occured");
-          setLoading(false);
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    };
 
+  const fetchManualInfo = async () => {
+    try {
+      const token = await getUsertoken();
+      const response = await fetch(
+        `${urls.springUrl}/api/portfolio/create/manual`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            country: "KOR",
+            stocks: stockList.map((stock) => ({
+              ticker: stock.ticker,
+              isBuy: true,
+              quantity: stock.quantity,
+              price: stock.currentPrice,
+            })),
+          }),
+        }
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setPfId(data.id);
+        setLoading(false);
+      } else {
+        console.error("Error occured");
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
     fetchManualInfo();
+    stockList.sort(
+      (a, b) => b.currentPrice * b.quantity - a.currentPrice * a.quantity
+    );
   }, [stockList]);
 
   if (loading)
@@ -106,7 +110,8 @@ const ManualPage3 = ({ stockList }) => {
               })),
             }}
             selectedId={selectedId}
-            size={1 * width}
+            size={0.6 * width}
+            mode={"dark"}
           />
         </View>
         <ScrollView style={styles.labelContainer}>
@@ -171,6 +176,7 @@ const styles = StyleSheet.create({
   },
   chartContainer: {
     alignItems: "center",
+    marginVertical: 20 * height,
   },
   labelItemContent: {
     flexDirection: "row",

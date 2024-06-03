@@ -85,7 +85,7 @@ const StockInfo = ({ isVisible, onToggle, ticker }) => {
             <View style={styles.stockColumn}>
               <AppText style={styles.columnText}>가치지표</AppText>
               <AppText style={styles.columnText}>수치</AppText>
-              <AppText style={styles.columnText}>섹터 내 순위</AppText>
+              <AppText style={styles.columnText}>분야 내 순위</AppText>
             </View>
             <View style={styles.stockColumn}>
               <Button
@@ -105,7 +105,9 @@ const StockInfo = ({ isVisible, onToggle, ticker }) => {
                 }}
               />
               <AppText style={styles.infoText}>ROE</AppText>
-              <AppText style={styles.infoText}>{info.roe}</AppText>
+              <AppText style={styles.infoText}>
+                {info.roe == -9900 ? "X" : info.roe}
+              </AppText>
               <AppText style={styles.infoText}>
                 {info.roeRank} / {info.total}
               </AppText>
@@ -128,7 +130,10 @@ const StockInfo = ({ isVisible, onToggle, ticker }) => {
                 }}
               />
               <AppText style={styles.infoText}>ROA</AppText>
-              <AppText style={styles.infoText}>{info.roa}</AppText>
+              <AppText style={styles.infoText}>
+                {" "}
+                {info.roa == -9900 ? "X" : info.roa}
+              </AppText>
               <AppText style={styles.infoText}>
                 {info.roaRank} / {info.total}
               </AppText>
@@ -151,7 +156,10 @@ const StockInfo = ({ isVisible, onToggle, ticker }) => {
                 }}
               />
               <AppText style={styles.infoText}>PER</AppText>
-              <AppText style={styles.infoText}>{info.per}</AppText>
+              <AppText style={styles.infoText}>
+                {" "}
+                {info.per == -99 ? "X" : info.per}
+              </AppText>
               <AppText style={styles.infoText}>
                 {info.perRank} / {info.total}
               </AppText>
@@ -208,7 +216,7 @@ const StockInfo = ({ isVisible, onToggle, ticker }) => {
           </View>
           {infoVisible && (
             <ModalComponent isVisible={infoVisible} onToggle={toggleInfoModal}>
-              <AppText style={{ fontSize: 14, color: "#fff" }}>
+              <AppText style={{ fontSize: 13, color: "#fff" }}>
                 {infoContent}
               </AppText>
             </ModalComponent>

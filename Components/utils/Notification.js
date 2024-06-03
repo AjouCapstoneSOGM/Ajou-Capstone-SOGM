@@ -1,11 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Animated,
-  TouchableOpacity,
-} from "react-native";
+import { StyleSheet, Animated, TouchableOpacity } from "react-native";
 import AppText from "./AppText";
 import Icon from "react-native-vector-icons/AntDesign";
 
@@ -35,31 +29,29 @@ const NotificationBubble = ({ message, visible, onClose }) => {
       <Animated.View style={[styles.container, { opacity }]}>
         <AppText style={styles.text}>{message}</AppText>
       </Animated.View>
-      <Icon name="caretright" size={25} color="rgba(0, 0, 0, 0.7)" />
+      <Icon name="caretright" size={25} color="rgba(98, 98, 232, 0.7)" />
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   overlay: {
+    zIndex: 1,
     flexDirection: "row",
-    position: "absolute",
-    top: 10,
-    left: 20,
-    right: 0,
     justifyContent: "center",
     alignItems: "center",
   },
   container: {
-    backgroundColor: "rgba(0, 0, 0, 0.7)",
-    padding: 15,
+    backgroundColor: "rgba(98, 98, 232, 0.7)",
+    paddingHorizontal: 15,
+    paddingVertical: 10,
     borderRadius: 25,
     justifyContent: "center",
     alignItems: "center",
   },
   text: {
-    color: "white",
-    fontSize: 16,
+    color: "#f0f0f0",
+    fontSize: 13,
   },
 });
 

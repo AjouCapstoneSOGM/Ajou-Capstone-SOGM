@@ -123,7 +123,7 @@ const ManualPage2 = ({ step, setStep, stockList, setStockList }) => {
                     }}
                   />
                   <TextInput
-                    value={String(item.quantity)}
+                    value={String(item.quantity ? item.quantity : 0)}
                     onChangeText={(value) => handleQuantityChange(value, index)}
                     style={styles.inputQuantity}
                     keyboardType="numeric"
@@ -146,7 +146,7 @@ const ManualPage2 = ({ step, setStep, stockList, setStockList }) => {
                   />
                 </View>
                 <TextInput
-                  value={String(item.currentPrice)}
+                  value={String(item.currentPrice ? item.currentPrice : 0)}
                   onChangeText={(value) => handlePriceChange(value, index)}
                   style={styles.inputPrice}
                   keyboardType="numeric"

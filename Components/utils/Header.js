@@ -5,9 +5,11 @@ import AppText from "./AppText";
 import { useAuth } from "./AuthContext";
 import { useNavigation } from "@react-navigation/native";
 import { height, width } from "./utils";
+import { usePortfolio } from "./PortfolioContext";
 
 const HeaderComponent = () => {
   const { isLoggedIn, userName } = useAuth();
+  const { rebalances } = usePortfolio();
   const navigation = useNavigation();
 
   return (
@@ -31,14 +33,28 @@ const HeaderComponent = () => {
         />
       )}
       <View style={styles.buttonContainer}>
+        <Button
+          type="clear"
+          onPress={() => {
+            navigation.navigate("Information");
+          }}
+          icon={{ name: "open-book", type: "entypo", color: "#333" }}
+        />
         {isLoggedIn && (
-          <Button
-            type="clear"
-            onPress={() => {
-              navigation.navigate("AlertList");
-            }}
-            icon={{ name: "bell-fill", type: "octicon", color: "#333" }}
-          />
+          <View>
+            <Button
+              type="clear"
+              onPress={() => {
+                navigation.navigate("AlertList");
+              }}
+              icon={{
+                name: "bell-fill",
+                type: "octicon",
+                color: rebalances.length > 0 ? "#ffa800" : "#333",
+              }}
+            />
+            {rebalances.length > 0 && <View style={styles.redDot}></View>}
+          </View>
         )}
         <Button
           type="clear"
@@ -69,6 +85,15 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: "row",
+  },
+  redDot: {
+    position: "absolute",
+    right: "30%",
+    top: "10%",
+    height: 7,
+    width: 7,
+    backgroundColor: "red",
+    borderRadius: 30,
   },
 });
 

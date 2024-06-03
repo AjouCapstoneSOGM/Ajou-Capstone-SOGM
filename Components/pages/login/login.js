@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   Image,
   TextInput,
+  Alert,
 } from "react-native";
 import { Divider } from "react-native-elements";
 
@@ -20,15 +21,13 @@ import { width, height } from "../../utils/utils";
 const Login = ({ navigation }) => {
   const [useremail, setUseremail] = useState(""); //
   const [password, setPassword] = useState(""); //
-  const [loading, setLoading] = useState(false);
 
   const { login } = useAuth();
-  const { loadData } = usePortfolio();
+  const { loadData, portLoading } = usePortfolio();
   const { expoPushToken } = usePushNotifications();
 
   const fetchLoginInfo = async () => {
     try {
-      setLoading(true);
       const response = await fetch(`${urls.springUrl}/api/auth/login`, {
         method: "POST",
         headers: {
@@ -46,8 +45,9 @@ const Login = ({ navigation }) => {
         await setUserName(data.name);
         login();
         await loadData();
-        setLoading(false);
-        navigation.goBack();
+        return { result: "success" };
+      } else {
+        return { result: "fail" };
       }
     } catch (error) {
       console.error("Error:", error);
@@ -56,19 +56,31 @@ const Login = ({ navigation }) => {
   };
 
   const handleSocialLogin = () => {
-    setLoading(true);
     navigation.navigate("SocialLogin");
 
-    const unsubscribe = navigation.addListener("focus", () => {
+    const unsubscribe = navigation.addListener("focus", async () => {
       login();
-      loadData();
-      setLoading(false);
+      await loadData();
       navigation.goBack();
       unsubscribe();
     });
   };
 
-  if (loading) return <Loading />;
+  const handleLogin = async () => {
+    const result = await fetchLoginInfo();
+    if (result.result == "success") {
+      navigation.popToTop();
+    } else if (result.result == "fail") {
+      Alert.alert("로그인 실패", "로그인 정보를 확인해주세요.", [
+        {
+          text: "확인",
+          onPress: () => {},
+          style: "cancel",
+        },
+      ]);
+    }
+  };
+  if (portLoading) return <Loading />;
   return (
     <View style={styles.container}>
       <View style={styles.textWrapper}>
@@ -101,15 +113,12 @@ const Login = ({ navigation }) => {
         ></TextInput>
       </View>
       <View style={styles.loginButtonContainer}>
-        <TouchableOpacity onPress={fetchLoginInfo} style={styles.loginButton}>
+        <TouchableOpacity onPress={handleLogin} style={styles.loginButton}>
           <AppText style={styles.buttonText}>로그인</AppText>
         </TouchableOpacity>
       </View>
       <View style={styles.buttonWrapper}>
-        <TouchableOpacity
-          onPress={fetchLoginInfo}
-          style={styles.passwordButton}
-        >
+        <TouchableOpacity onPress={() => {}} style={styles.passwordButton}>
           <AppText style={styles.buttonText}>비밀번호 찾기</AppText>
         </TouchableOpacity>
         <View style={styles.dividerWrapper}>

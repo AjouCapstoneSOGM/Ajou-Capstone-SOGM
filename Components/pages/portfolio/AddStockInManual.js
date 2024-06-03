@@ -56,14 +56,6 @@ const AddStockInManual = ({ route, navigation }) => {
     <SafeAreaView style={styles.container}>
       <Divider style={styles.topDivider} />
       {renderManualStep()}
-      <View style={styles.nextButtonContainer}>
-        <Button
-          buttonStyle={styles.nextButton}
-          title="다음"
-          onPress={handleNextStep}
-          disabled={disabled}
-        />
-      </View>
     </SafeAreaView>
   );
 };
