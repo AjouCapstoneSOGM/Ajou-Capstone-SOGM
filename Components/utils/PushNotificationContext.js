@@ -56,7 +56,7 @@ export const PushNotificationProvider = ({ children }) => {
 export const usePushNotifications = () => useContext(PushNotificationContext);
 
 async function registerForPushNotificationsAsync() {
-  let token;
+  let token = "emptyExpoToken";
 
   if (Platform.OS === "android") {
     await Notifications.setNotificationChannelAsync("default", {
