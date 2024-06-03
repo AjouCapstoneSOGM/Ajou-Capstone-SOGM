@@ -41,11 +41,21 @@ const AddStockInManual = ({ route, navigation }) => {
     switch (step) {
       case 1:
         return (
-          <ManualPage1 stockList={stockList} setStockList={setStockList} />
+          <ManualPage1
+            step={step}
+            setStep={setStep}
+            stockList={stockList}
+            setStockList={setStockList}
+          />
         );
       case 2:
         return (
-          <ManualPage2 stockList={stockList} setStockList={setStockList} />
+          <ManualPage2
+            step={step}
+            setStep={setStep}
+            stockList={stockList}
+            setStockList={setStockList}
+          />
         );
       case 3:
         return <ManualAddPage3 stockList={stockList} pfId={pfId} />;
