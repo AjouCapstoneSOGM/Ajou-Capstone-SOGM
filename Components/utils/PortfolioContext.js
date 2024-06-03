@@ -8,18 +8,18 @@ const PortfolioContext = createContext();
 
 export const PortfolioProvider = ({ children }) => {
   const [portfolios, setPortfolios] = useState([]);
-  const [portLoading, setPortLoading] = useState(true);
+  const [portLoading, setPortLoading] = useState(false);
   const [rebalances, setRebalances] = useState([]);
 
   const removePortfolios = () => {
     setPortfolios([]);
   };
 
-  const fetchRebalanceList = async (portfolioId) => {
+  const fetchRebalanceList = async (pfId) => {
     try {
       const token = await getUsertoken();
       const response = await fetch(
-        `${urls.springUrl}/api/rebalancing/${portfolioId}`,
+        `${urls.springUrl}/api/rebalancing/${pfId}`,
         {
           method: "GET",
           headers: {
@@ -29,10 +29,14 @@ export const PortfolioProvider = ({ children }) => {
       );
       if (response.ok) {
         const data = await response.json();
-        data.rebalancing.forEach((item) => {
-          item.pfId = portfolioId;
-        });
-        return data.rebalancing;
+        if (data.rebalancing.length > 0) {
+          data.rebalancing.forEach((item) => {
+            item.pfId = pfId;
+            item.portfolioName = data.portfolioName;
+          });
+          return data.rebalancing.flat();
+        }
+        return [];
       }
     } catch (error) {
       console.error(error);
@@ -224,6 +228,9 @@ export const PortfolioProvider = ({ children }) => {
     });
 
     const rebalancesList = await fetchAllRebalances(portfolioIds);
+    rebalancesList.sort(
+      (a, b) => new Date(b.createdDate) - new Date(a.createdDate)
+    );
     setRebalances(rebalancesList);
     setPortfolios(portfolioList);
     setPortLoading(false);

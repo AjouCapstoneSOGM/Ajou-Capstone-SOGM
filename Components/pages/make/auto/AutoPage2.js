@@ -106,14 +106,15 @@ const AutoPage2 = ({ step, setStep, riskLevel, setRiskLevel }) => {
                 <AppText style={styles.infoText}>
                   {infoText[riskLevel - 1][2]}
                 </AppText>
-                <AppText style={styles.safeinfoText}>안전자산이란?</AppText>
-                <AppText style={styles.safeinfoText}>
-                  주식과 움직임이 반대인 달러와 금으로 구성되어 있습니다.
-                </AppText>
               </View>
             </>
           )}
         </ScrollView>
+        <AppText style={styles.safeinfoText}>안전자산이란?</AppText>
+        <AppText style={styles.safeinfoText}>
+          시장이 불안정해도 가치가 잘 보존되는 경향이 있는 자산을 뜻해요. 주로
+          금, 달러와 같은 종목으로 구성돼요.
+        </AppText>
       </View>
       <View style={styles.nextButtonContainer}>
         <Button
@@ -133,8 +134,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#f0f0f0",
   },
   safeinfoText: {
-    fontSize: 13,
-    color: "#c0c0c0",
+    fontSize: 11,
+    marginBottom: 3,
+    color: "#999",
   },
   contentsContainer: {
     flex: 1,
@@ -171,11 +173,11 @@ const styles = StyleSheet.create({
   infoText: {
     fontSize: 13,
     textAlign: "left",
-    marginBottom: 8,
-    color: "#f0f0f0",
+    marginBottom: 10,
+    color: "#ccc",
   },
   chartContainer: {
-    marginTop: height * -35,
+    marginTop: height * -10,
     alignItems: "center",
   },
   nextButton: {

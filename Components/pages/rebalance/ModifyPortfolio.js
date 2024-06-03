@@ -24,14 +24,14 @@ import Loading from "../../utils/Loading";
 import ModalComponent from "../../utils/Modal";
 
 const ModifyPortfolio = ({ route, navigation }) => {
-  const { pfId, rnId, rebalancing } = route.params;
-  const { getPortfolioById, fetchModify, loadData } = usePortfolio();
+  const { pfId, rnId, rebalancing, portfolio } = route.params;
+  const { fetchModify, loadData } = usePortfolio();
   const [selectedId, setSelectedId] = useState();
   const [loading, setLoading] = useState(true);
-  const [portfolio, setPortfolio] = useState([]);
   const [rebalances, setRebalances] = useState([]);
   const [isVisible, setIsVisible] = useState(false);
   const [info, setInfo] = useState("");
+  const [isAscending, setIsAscending] = useState(true);
 
   const toggleModal = () => {
     setIsVisible(!isVisible);
@@ -43,6 +43,21 @@ const ModifyPortfolio = ({ route, navigation }) => {
         return true;
       else return false;
     }
+  };
+
+  const getTotalPrice = () => {
+    const totalPrice = portfolio.detail.stocks.reduce(
+      (acc, cur) => acc + cur.currentPrice * cur.quantity,
+      0
+    );
+    return totalPrice + portfolio.detail.currentCash;
+  };
+
+  const getCurrentQuantity = (ticker) => {
+    const stock = portfolio.detail.stocks.filter(
+      (item) => item.ticker == ticker
+    )[0];
+    return stock.quantity;
   };
 
   const calculateAfter = () => {
@@ -60,47 +75,47 @@ const ModifyPortfolio = ({ route, navigation }) => {
     }
   };
 
+  const handleSort = (prop) => {
+    setIsAscending(!isAscending);
+
+    if (prop === "name") {
+      setRebalances(
+        [...rebalances].sort((a, b) => {
+          return isAscending
+            ? b.name.localeCompare(a.name)
+            : a.name.localeCompare(b.name);
+        })
+      );
+    } else {
+      setRebalances(
+        [...rebalances].sort((a, b) => {
+          const sortFactor = isAscending ? 1 : -1;
+          return (a[prop] - b[prop]) * sortFactor;
+        })
+      );
+    }
+  };
+
   useFocusEffect(
     useCallback(() => {
-      rebalancing.forEach((item) => {
-        (item.buyPrice = item.price), (item.buyQuantity = item.quantity);
+      const totalPrice = getTotalPrice(portfolio);
+      rebalancing.forEach((item, index) => {
+        item.index = index;
+        item.buyPrice = item.price;
+        item.buyQuantity = item.quantity;
+        item.rateDiff = (
+          (item.buyPrice *
+            (item.buyQuantity * (item.isBuy ? 1 : -1) -
+              getCurrentQuantity(item.ticker)) *
+            100) /
+          totalPrice
+        ).toFixed(2);
       });
       setRebalances(rebalancing);
-      setPortfolio(getPortfolioById(pfId));
       setLoading(false);
     }, [])
   );
 
-  const getTotalValue = () => {
-    const totalPortfolioValue =
-      portfolio.detail.stocks.reduce((acc, stock) => {
-        return acc + stock.currentPrice * stock.quantity;
-      }, 0) + portfolio.detail.currentCash;
-    return totalPortfolioValue;
-  };
-
-  const calculateRate = (stocks) => {
-    const result = stocks.map((stock) => {
-      const marketValue = stock.currentPrice * stock.quantity;
-      const rate = marketValue / getTotalValue();
-      return {
-        companyName: stock.companyName,
-        ticker: stock.ticker,
-        rate: (rate * 100).toFixed(3), // 퍼센트로 표현
-      };
-    });
-    return result;
-  };
-
-  const getRateDiff = (ticker) => {
-    const afterPortfolio = calculateAfter();
-    const stockRate = calculateRate(portfolio.detail.stocks);
-    const afterStockRate = calculateRate(afterPortfolio.detail.stocks);
-    const beforeRate = stockRate.filter((stock) => stock.ticker === ticker);
-    const afterRate = afterStockRate.filter((stock) => stock.ticker === ticker);
-
-    return (afterRate[0].rate - beforeRate[0].rate).toFixed(2);
-  };
   const handleSelectedId = (ticker) => {
     const index = portfolio.detail.stocks.findIndex(
       (item) => item.ticker === ticker
@@ -191,25 +206,44 @@ const ModifyPortfolio = ({ route, navigation }) => {
       </View>
       <View style={styles.chartContainer}>
         <View style={styles.chartTitle}>
-          <AppText style={{ color: "#333", fontSize: 20, fontWeight: "bold" }}>
-            {isPortfolioInit() ? "자산배분" : "리밸런싱"}전
+          <AppText
+            style={{
+              flex: 1,
+              flexcolor: "#333",
+              fontSize: 15,
+              textAlign: "center",
+            }}
+          >
+            {isPortfolioInit() ? "자산배분" : "리밸런싱"} 전
           </AppText>
-          <Icon name="right" type="antdesign" color="#333" />
-          <AppText style={{ color: "#333", fontSize: 20, fontWeight: "bold" }}>
-            {isPortfolioInit() ? "자산배분" : "리밸런싱"}후
+          <AppText
+            style={{
+              flex: 1,
+              color: "#333",
+              fontSize: 15,
+              textAlign: "center",
+            }}
+          >
+            {isPortfolioInit() ? "자산배분" : "리밸런싱"} 후
           </AppText>
         </View>
         <View style={styles.chartContent}>
-          <PortfolioPieChart
-            data={portfolio.detail}
-            selectedId={selectedId}
-            size={width * 0.6}
-          />
-          <PortfolioPieChart
-            data={calculateAfter().detail}
-            selectedId={selectedId}
-            size={width * 0.6}
-          />
+          <View style={styles.chartBox1}>
+            <PortfolioPieChart
+              data={portfolio.detail}
+              selectedId={selectedId}
+              size={width * 0.5}
+              mode={"light"}
+            />
+          </View>
+          <View style={styles.chartBox2}>
+            <PortfolioPieChart
+              data={calculateAfter().detail}
+              selectedId={selectedId}
+              size={width * 0.5}
+              mode={"light"}
+            />
+          </View>
         </View>
       </View>
       <View style={styles.headerContainer}>
@@ -227,7 +261,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
               onPress={() => {
                 toggleModal();
                 setInfo(
-                  `표시되는 한 주당 금액은 포트폴리오 비중 계산에 사용한 전날 종가 금액을 나타냅니다.\n\n만일 표시된 금액이 실제로 매수/매도하려는 금액과 다를 경우엔 알맞게 수정해주세요.`
+                  `표시되는 한 주당 금액은 포트폴리오 계산에 사용한 전날 마감 금액을 나타냅니다.\n\n만일 표시된 금액이 실제로 매수/매도하려는 금액과 다를 경우엔 알맞게 수정해주세요.`
                 );
               }}
               icon={{
@@ -248,10 +282,70 @@ const ModifyPortfolio = ({ route, navigation }) => {
             style={{ marginRight: 5 }}
           />
           {/*열 맞추기용*/}
-          <AppText style={styles.columnName}>기업명</AppText>
-          <AppText style={styles.columnNumber}>수량</AppText>
-          <AppText style={styles.columnPrice}>한 주당 금액</AppText>
-          <AppText style={styles.columnRateDiff}>비중 변화</AppText>
+          <Button
+            title="기업명"
+            type="clear"
+            containerStyle={styles.columnName}
+            titleStyle={{ color: "#808080", fontSize: 12 }}
+            onPress={() => {
+              handleSort("name");
+            }}
+            icon={{
+              type: "antdesign",
+              name: "caretdown",
+              color: "#808080",
+              size: 11,
+            }}
+            iconPosition="right"
+          />
+          <Button
+            title="수량"
+            type="clear"
+            containerStyle={styles.columnNumber}
+            titleStyle={{ color: "#808080", fontSize: 12 }}
+            onPress={() => {
+              handleSort("quantity");
+            }}
+            icon={{
+              type: "antdesign",
+              name: "caretdown",
+              color: "#808080",
+              size: 11,
+            }}
+            iconPosition="right"
+          />
+          <Button
+            title="한 주당 금액"
+            type="clear"
+            containerStyle={styles.columnPrice}
+            titleStyle={{ color: "#808080", fontSize: 12 }}
+            onPress={() => {
+              handleSort("price");
+            }}
+            icon={{
+              type: "antdesign",
+              name: "caretdown",
+              color: "#808080",
+              size: 11,
+            }}
+            iconPosition="right"
+          />
+          <Button
+            title="비중 변화"
+            type="clear"
+            containerStyle={styles.columnRateDiff}
+            titleStyle={{ color: "#808080", fontSize: 12 }}
+            onPress={() => {
+              handleSort("rateDiff");
+            }}
+            icon={{
+              type: "antdesign",
+              name: "caretdown",
+              color: "#808080",
+              size: 11,
+            }}
+            iconPosition="right"
+          />
         </View>
       </View>
       <View style={{ flex: 2 }}>
@@ -265,7 +359,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
                 <Icon
                   name="checkcircle"
                   type="antdesign"
-                  color={colorScale[index]}
+                  color={colorScale[item.index]}
                   size={15}
                   style={{ marginRight: 5 }}
                 />
@@ -293,7 +387,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
                   ]}
                 >
                   {item.isBuy ? "+" : ""}
-                  {getRateDiff(item.ticker)}%
+                  {item.rateDiff}%
                 </AppText>
               </TouchableOpacity>
             </View>
@@ -308,7 +402,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
         />
       </View>
       <ModalComponent isVisible={isVisible} onToggle={toggleModal}>
-        <AppText style={{ fontSize: 16, marginBottom: 20, color: "#f0f0f0" }}>
+        <AppText style={{ fontSize: 13, marginBottom: 20, color: "#f0f0f0" }}>
           {info}
         </AppText>
       </ModalComponent>
@@ -337,7 +431,6 @@ const styles = StyleSheet.create({
   chartTitle: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingHorizontal: width * 45,
     alignItems: "center",
   },
   chartContent: {
@@ -345,6 +438,14 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     alignItems: "center",
     padding: 0,
+  },
+  chartBox1: {
+    flex: 1,
+    alignItems: "center",
+  },
+  chartBox2: {
+    flex: 1,
+    alignItems: "center",
   },
   rebalanceList: {
     backgroundColor: "#333",
@@ -367,7 +468,6 @@ const styles = StyleSheet.create({
   },
   columnName: {
     flex: 1.3,
-    color: "#808080",
     textAlign: "center",
   },
   columnNumber: {
@@ -421,11 +521,11 @@ const styles = StyleSheet.create({
   nextButton: {
     backgroundColor: "#6262e8",
     borderRadius: 10,
-    height: 50,
+    height: height * 50,
   },
   nextButtonContainer: {
-    paddingBottom: 20,
     paddingHorizontal: 20,
+    paddingBottom: height * 5,
     backgroundColor: "#333",
   },
 });

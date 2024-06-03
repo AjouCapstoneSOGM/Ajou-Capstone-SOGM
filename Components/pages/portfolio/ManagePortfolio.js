@@ -25,7 +25,7 @@ const ManagementPage = ({ route, navigation }) => {
       {
         text: "삭제",
         onPress: async () => {
-          handleDelete();
+          await handleDelete();
         },
         style: "destructive", // iOS에서만 적용되는 스타일 옵션
       },
