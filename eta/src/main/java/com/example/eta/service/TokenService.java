@@ -6,6 +6,7 @@ import com.example.eta.repository.TokenRepository;
 import com.example.eta.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +29,7 @@ public class TokenService {
             );
     }
 
+    @Transactional
     public void deleteToken(User user) {
         tokenRepository.deleteById(user.getUserId());
         user.setToken(null);
