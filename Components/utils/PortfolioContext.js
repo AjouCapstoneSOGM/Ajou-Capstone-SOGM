@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState } from "react";
 import urls from "./urls";
 import GetCurrentPrice from "./GetCurrentPrice";
-import { useAuth } from "./AuthContext";
 import { getUsertoken } from "./localStorageUtils";
 
 const PortfolioContext = createContext();
@@ -40,6 +39,35 @@ export const PortfolioProvider = ({ children }) => {
       }
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const fetchChangePortName = async (pfId, name) => {
+    try {
+      const token = await getUsertoken();
+      const response = await fetch(`${urls.springUrl}/api/portfolio/${pfId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: name,
+        }),
+      });
+      if (response.ok) {
+        portfolios.forEach((item) => {
+          if (item.id === pfId) {
+            item.name = name;
+          }
+        });
+        return { result: "success" };
+      } else {
+        return { result: "fail" };
+      }
+    } catch (error) {
+      console.error(error);
+      return { result: "fail" };
     }
   };
 
@@ -249,6 +277,7 @@ export const PortfolioProvider = ({ children }) => {
         fetchStocksByPortfolioId,
         fetchCurrentPrice,
         fetchRebalanceList,
+        fetchChangePortName,
         loadData,
         portLoading,
       }}

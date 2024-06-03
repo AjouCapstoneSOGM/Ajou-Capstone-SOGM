@@ -1,5 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import { View, TouchableOpacity, StyleSheet, TextInput } from "react-native";
+import {
+  View,
+  TouchableOpacity,
+  StyleSheet,
+  TextInput,
+  Alert,
+} from "react-native";
 import { usePortfolio } from "../../utils/PortfolioContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Icon, Button } from "@rneui/base";
@@ -16,7 +22,8 @@ import ModalComponent from "../../utils/Modal";
 import { removeSpecialChars } from "../../utils/utils";
 
 const PortfolioList = ({ navigation }) => {
-  const { portfolios, loadData, portLoading } = usePortfolio();
+  const { portfolios, loadData, portLoading, fetchChangePortName } =
+    usePortfolio();
   const { userName } = useAuth();
   const [nameModalVisible, setNameModalVisible] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -27,6 +34,31 @@ const PortfolioList = ({ navigation }) => {
     if (value.length < 20) setChangedName(removeSpecialChars(value));
   };
 
+  const handleFetchChangedName = async () => {
+    const result = await fetchChangePortName(
+      portfolios[selectedIndex].id,
+      changedName
+    );
+    if (result.result === "success") {
+      Alert.alert("수정 완료", "수정이 완료되었습니다.", [
+        {
+          text: "확인",
+          onPress: () => {},
+          style: "cancel",
+        },
+      ]);
+      setNameModalVisible(false);
+    } else {
+      Alert.alert("수정 실패", "수정에 실패했습니다.", [
+        {
+          text: "확인",
+          onPress: () => {},
+          style: "cancel",
+        },
+      ]);
+      setNameModalVisible(false);
+    }
+  };
   const portfolioExist = () => {
     if (portLoading) return false;
     if (portfolios.length > 0) return true;
@@ -287,7 +319,9 @@ const PortfolioList = ({ navigation }) => {
               buttonStyle={styles.submitButton}
               title="반영"
               disabled={changedName === ""}
-              onPress={async () => {}}
+              onPress={async () => {
+                await handleFetchChangedName();
+              }}
             />
           </React.Fragment>
         </ModalComponent>

@@ -435,9 +435,12 @@ const PortfolioDetails = ({ route, navigation }) => {
                       >
                         {Number(item.quantity).toLocaleString()} 주
                       </AppText>
-                      <AppText style={{ color: colorScale[index] }}>{`${
-                        (getStockRate(index).toFixed(3) * 1000) / 10 // 소숫점 계산 오류 방지를 위함
-                      }%`}</AppText>
+                      {/* <AppText style={{ color: colorScale[index] }}>
+                        비중{" "}
+                        {`${
+                          (getStockRate(index).toFixed(3) * 1000) / 10 // 소숫점 계산 오류 방지를 위함
+                        }%`}
+                      </AppText> */}
                     </View>
                   </View>
                   {selectedId === index && item.equity === "보통주" && (
