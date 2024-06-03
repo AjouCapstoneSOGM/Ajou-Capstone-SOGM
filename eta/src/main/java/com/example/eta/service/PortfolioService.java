@@ -32,22 +32,24 @@ public class PortfolioService {
     /**
      * 포트폴리오의 종목별 자산량을 계산하고, 포트폴리오의 총자산(현금+보유종목)을 반환합니다.
      *
-     * <p> {@code averagePriceUpdated} 가 {@code true}이면 평단가를 기준으로 비중을 계산하고, {@code false}이면 가장 최근의 종가를 기준으로 비중을 계산힙니다.
+     * <p> {@code averagePriceUpdated} 가 {@code true}이면 평단가를 기준으로 자산량을 계산하고, {@code false}이면 가장 최근의 종가를 기준으로 자산량을 계산힙니다.
      *
-     * <p> 평단가를 기준으로 비중을 계산하는 경우는 리밸런싱 알림을 반영할 때, 종가를 기준으로 비중을 계산하는 경우는 주기적으로 포트폴리오의 비중을 업데이트할 때입니다.
+     * <p> 평단가를 기준으로 계산하는 경우: 리밸런싱 반영 후 또는 매수/매도 이후 현재 비중을 계산하기 위해
      *
-     * <p> {@code currentAmountForTicker}에 종목별 자산량이 담깁니다.
+     * <p> 종가를 기준으로 계산하는 경우: 포트폴리오의 주기적 비중 업데이트 시
+     *
+     * <p> {@code currentAmountForTicker}에 종목별 자산량이 담깁니다. 종목별 자산량이 필요하지 않은 경우 {@code null}을 전달합니다.
      */
     public float calculateAmount(Portfolio portfolio, boolean averagePriceUpdated, Map<PortfolioTicker, Float> currentAmountForTicker) {
         float totalAmount = portfolio.getCurrentCash();
         for (PortfolioTicker portfolioTicker : portfolio.getPortfolioTickers()) {
-            System.out.println(portfolioTicker.getTicker().getName());
             float number = portfolioTicker.getNumber();
             float price = averagePriceUpdated ? portfolioTicker.getAveragePrice() :
                     priceRepository.findLatestPriceByTicker(portfolioTicker.getTicker().getTicker())
                             .get().getClose().floatValue();
             totalAmount += price * number;
-            currentAmountForTicker.put(portfolioTicker, price * number);
+            if (currentAmountForTicker != null)
+                currentAmountForTicker.put(portfolioTicker, price * number);
         }
         return totalAmount;
     }
@@ -182,6 +184,7 @@ public class PortfolioService {
                 .portfolioPerformances(portfolioPerformances)
                 .build();
     }
+
     @Transactional
     public int createManualPortfolio(User user,PortfolioDto.CreateManualRequestDto request) {
         String name = request.getName();
@@ -193,6 +196,7 @@ public class PortfolioService {
         for (PortfolioDto.StockDetailDto stock : request.getStocks()) {
             totalAsset = totalAsset + (stock.getQuantity() * stock.getPrice());
         }
+
         // 포트폴리오 생성
         Portfolio portfolio = new Portfolio().builder()
                 .user(user)
@@ -228,8 +232,6 @@ public class PortfolioService {
                     .recordDate(LocalDateTime.now())
                     .build());
         }
-
-
 
         return portfolio.getPfId();
     }
@@ -273,11 +275,6 @@ public class PortfolioService {
                         .isBuy(buyRequestDto.getIsBuy())
                         .recordDate(LocalDateTime.now())
                         .build());
-                // 총 매수 비용 계산
-//                float totalCost = buyRequestDto.getQuantity() * buyRequestDto.getPrice();
-//                float newCurrentCash = portfolio.getCurrentCash() - totalCost;
-//                portfolio.updateCurrentCash(newCurrentCash);
-//                portfolioRepository.save(portfolio);
                 return;
             }
         }
@@ -300,9 +297,10 @@ public class PortfolioService {
                 .recordDate(LocalDateTime.now())
                 .build());
 
-//        float totalCost = buyRequestDto.getQuantity() * buyRequestDto.getPrice();
-//        float newCurrentCash = portfolio.getCurrentCash() - totalCost;
-//        portfolio.updateCurrentCash(newCurrentCash);
+        // 포트폴리오 초기 자산 업데이트
+        float asset = calculateAmount(portfolio, true, null);
+        portfolio.setInitAsset(asset);
+
         portfolioRepository.save(portfolio);
     }
 
@@ -343,6 +341,11 @@ public class PortfolioService {
         } else {
             portfolioTickerRepository.save(portfolioTicker);
         }
+
+        // 포트폴리오 초기 자산 업데이트
+        float asset = calculateAmount(portfolio, true, null);
+        portfolio.setInitAsset(asset);
+
         portfolioRepository.save(portfolio);
     }
 
