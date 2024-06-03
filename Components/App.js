@@ -8,6 +8,7 @@ import MyPage from "./pages/MyPage.js";
 import Login from "./pages/login/login";
 import SocialLogin from "./pages/login/sociallogin";
 import Signup from "./pages/login/signup";
+import ResetPW from "./pages/login/resetpw";
 import Home from "./pages/Home";
 import NewsSummary from "./pages/NewsSummary";
 import AlertList from "./pages/rebalance/AlertList";
@@ -39,6 +40,7 @@ function ScreenStack() {
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="SocialLogin" component={SocialLogin} />
       <Stack.Screen name="Signup" component={Signup} />
+      <Stack.Screen name="ResetPW" component={ResetPW} />
       <Stack.Screen name="Home" component={Home} />
       <Stack.Screen name="AlertList" component={AlertList} />
       <Stack.Screen name="ViewPortfolio" component={ViewPortfolio} />
