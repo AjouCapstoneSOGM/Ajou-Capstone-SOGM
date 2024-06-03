@@ -216,7 +216,7 @@ const StockInfo = ({ isVisible, onToggle, ticker }) => {
           </View>
           {infoVisible && (
             <ModalComponent isVisible={infoVisible} onToggle={toggleInfoModal}>
-              <AppText style={{ fontSize: 14, color: "#fff" }}>
+              <AppText style={{ fontSize: 13, color: "#fff" }}>
                 {infoContent}
               </AppText>
             </ModalComponent>

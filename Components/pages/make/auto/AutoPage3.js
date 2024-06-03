@@ -3,7 +3,7 @@ import { View, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
 
 import AppText from "../../../utils/AppText";
 import { Button, Icon } from "@rneui/base";
-import { height } from "../../../utils/utils";
+import { height, width } from "../../../utils/utils";
 
 const AutoPage3 = ({ step, setStep, sector, interest, setInterest }) => {
   const [disabled, setDisabled] = useState(true);
@@ -65,6 +65,9 @@ const AutoPage3 = ({ step, setStep, sector, interest, setInterest }) => {
             </TouchableOpacity>
           ))}
         </ScrollView>
+        <AppText style={styles.safeinfoText}>
+          특정 분야와 수익률과는 알려진 직접적인 관계가 없어요.
+        </AppText>
       </View>
       <View style={styles.nextButtonContainer}>
         <Button
@@ -93,9 +96,10 @@ const styles = StyleSheet.create({
   },
   sectorContainer: {
     flex: 1,
+    alignItems: "stretch",
     backgroundColor: "#333",
-    paddingHorizontal: 20,
-    paddingVertical: 20,
+    paddingHorizontal: width * 15,
+    paddingTop: height * 5,
   },
   sectorContent: {
     flexDirection: "row",
@@ -114,6 +118,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: height * 5,
     backgroundColor: "#333",
+  },
+  safeinfoText: {
+    fontSize: 11,
+    marginBottom: 3,
+    color: "#999",
   },
 });
 export default AutoPage3;

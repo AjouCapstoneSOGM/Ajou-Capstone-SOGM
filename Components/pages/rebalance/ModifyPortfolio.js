@@ -402,7 +402,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
         />
       </View>
       <ModalComponent isVisible={isVisible} onToggle={toggleModal}>
-        <AppText style={{ fontSize: 16, marginBottom: 20, color: "#f0f0f0" }}>
+        <AppText style={{ fontSize: 13, marginBottom: 20, color: "#f0f0f0" }}>
           {info}
         </AppText>
       </ModalComponent>

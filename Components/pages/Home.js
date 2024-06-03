@@ -16,7 +16,7 @@ import urls from "../utils/urls.js";
 
 const Home = ({ navigation }) => {
   const { query, setQuery, suggestions } = useSearch();
-  const [FGI, setFGI] = useState(55);
+  const [FGI, setFGI] = useState(50);
   const [isVisible, setIsVisible] = useState(false);
   const [stockInfoVisible, setStockInfoVisible] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(null);
@@ -270,12 +270,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "stretch",
     backgroundColor: "#f0f0f0",
-  },
-  searchBarContainer: {
-    backgroundColor: "#f0f0f0",
-    paddingVertical: height * 20,
-    paddingHorizontal: width * 15,
-    zIndex: 2,
   },
   searchContainer: {
     backgroundColor: "#333",

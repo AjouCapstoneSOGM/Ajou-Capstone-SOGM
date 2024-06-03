@@ -591,7 +591,7 @@ const styles = StyleSheet.create({
   },
   infoText: {
     color: "#f0f0f0",
-    fontSize: 14,
+    fontSize: 13,
     lineHeight: 20,
     marginBottom: 10,
   },
