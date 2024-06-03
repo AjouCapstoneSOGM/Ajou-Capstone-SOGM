@@ -46,6 +46,7 @@ public class Portfolio {
     private Boolean isAuto;
 
     @Column(nullable = false)
+    @Setter
     private float initAsset;
 
     @Column(nullable = false)
