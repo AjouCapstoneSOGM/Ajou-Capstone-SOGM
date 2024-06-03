@@ -15,11 +15,13 @@ class News:
     def get_recent_news(self):
         today = datetime.today().strftime("%Y%m%d")
         links = f"""https://finance.naver.com/news/news_list.naver?mode=LSS2D&section_id=101&section_id2=258&date={today}&page="""
-        urls = [links + str(i) for i in range(1, 41)]
+        urls = [links + str(i) for i in range(1, 2)]
 
         # Lists to store titles and summaries
         titles = []
         summaries = []
+        presses = []
+        wdates = []
 
         # Fetching data and creating BeautifulSoup objects
         for url in urls:
@@ -31,15 +33,29 @@ class News:
                 "dl > dt.articleSubject > a"
             )
             summaries += html.select("dl > dd.articleSummary")
+            presses += html.select("dl > dd.articleSummary > span.press")
+            wdates += html.select("dl > dd.articleSummary > span.wdate")
             title_list = [i["title"] for i in titles]
             title_list = [s.replace("\xa0", "") for s in title_list]
-            for i in range(len(summaries)):
-                span_elements = summaries[i].find_all("span")
-                for span_element in span_elements:
-                    span_element.decompose()
-            summary_list = [i.text for i in summaries]
-            summary_list = [s.strip("\n, \t") for s in summary_list]
-        news_list = pd.DataFrame({"title": title_list, "summary": summary_list})
+
+            # 요약 리스트 생성
+            # summary_list = [s.text.strip() for s in summaries]
+
+            # 언론사 리스트 생성
+            press_list = [s.text.strip() for s in presses]
+
+            # 날짜 리스트 생성
+            wdate_list = [s.text.strip() for s in wdates]
+
+        news_list = pd.DataFrame(
+            {"title": title_list, "press": press_list, "wdate": wdate_list}
+        )
+
+        word_to_delete = "코스피|코스닥|\\?"
+        mask = news_list["title"].str.contains(word_to_delete, case=False)
+        news_list = news_list[~mask]
+        news_list.reset_index(drop=True, inplace=True)
+        
         return news_list
 
     async def get_news_title_from_page(self, page, start_date, end_date, ticker):
