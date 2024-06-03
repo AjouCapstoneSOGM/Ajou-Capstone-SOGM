@@ -118,7 +118,7 @@ const Login = ({ navigation }) => {
         </TouchableOpacity>
       </View>
       <View style={styles.buttonWrapper}>
-        <TouchableOpacity onPress={() => {}} style={styles.passwordButton}>
+        <TouchableOpacity onPress={() => navigation.navigate("ResetPW")} style={styles.passwordButton}>
           <AppText style={styles.buttonText}>비밀번호 찾기</AppText>
         </TouchableOpacity>
         <View style={styles.dividerWrapper}>
