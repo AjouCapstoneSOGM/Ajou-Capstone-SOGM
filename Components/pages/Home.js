@@ -271,12 +271,6 @@ const styles = StyleSheet.create({
     alignItems: "stretch",
     backgroundColor: "#f0f0f0",
   },
-  searchBarContainer: {
-    backgroundColor: "#f0f0f0",
-    paddingVertical: height * 20,
-    paddingHorizontal: width * 15,
-    zIndex: 2,
-  },
   searchContainer: {
     backgroundColor: "#333",
     borderBottomColor: "transparent",

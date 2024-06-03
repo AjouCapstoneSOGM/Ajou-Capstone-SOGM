@@ -248,7 +248,7 @@ const Settings = ({ navigation }) => {
         <View style={styles.settingItem}>
           <AppText style={{ alignItems: "center" }}>
             <AppText style={{ color: "#f0f0f0", fontSize: 18 }}>
-              {userInfo?.socialType == "KAKAO" ? "개인일련번호" : "이메일"}
+              {userInfo?.socialType == "KAKAO" ? "소셜ID" : "이메일"}
               {"  "}
             </AppText>
             <AppText style={{ color: "#999", fontSize: 15 }}>
