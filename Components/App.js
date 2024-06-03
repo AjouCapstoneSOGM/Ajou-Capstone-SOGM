@@ -1,7 +1,7 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import * as Font from "expo-font";
-import { LogBox } from "react-native";
+import { LogBox, StatusBar } from "react-native";
 
 import Settings from "./pages/Settings.js";
 import Information from "./pages/Information.js";
@@ -87,6 +87,7 @@ export default function App() {
         <PushNotificationProvider>
           <SafeAreaProvider>
             <NavigationContainer>
+              <StatusBar style="auto" />
               <ScreenStack />
             </NavigationContainer>
           </SafeAreaProvider>

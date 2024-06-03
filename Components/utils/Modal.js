@@ -30,11 +30,6 @@ const styles = StyleSheet.create({
     paddingTop: 40,
     paddingHorizontal: 10,
   },
-  text: {
-    fontSize: 16,
-    marginBottom: 20,
-    color: "#f0f0f0",
-  },
   closeButton: {
     marginHorizontal: -5,
     position: "absolute",

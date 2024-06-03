@@ -16,7 +16,7 @@ import urls from "../utils/urls.js";
 
 const Home = ({ navigation }) => {
   const { query, setQuery, suggestions } = useSearch();
-  const [FGI, setFGI] = useState(55);
+  const [FGI, setFGI] = useState(50);
   const [isVisible, setIsVisible] = useState(false);
   const [stockInfoVisible, setStockInfoVisible] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(null);
