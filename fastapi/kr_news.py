@@ -172,11 +172,11 @@ class get_kr_news:
         return df
 
 
-get = get_kr_news()
-today = datetime.today()
-# portfolio는 현재 보유중인 티커목록
-df = get.get_recent_news()
-print(df)
+# get = get_kr_news()
+# today = datetime.today()
+# # portfolio는 현재 보유중인 티커목록
+# df = get.get_recent_news()
+# print(df)
 # # period = today - timedelta(days=7)
 # # start_date = period.strftime("%Y-%m-%d")  # Example start date
 # # end_date = today.strftime("%Y-%m-%d")  # Example end date
