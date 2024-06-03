@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
+    <title>ETA-ADMIN</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
     <style>
         .hidden-lg { display: none; }
@@ -130,9 +130,9 @@
                 <td class="border-t px-4 py-2" th:text="${ticker.name}"></td>
                 <td class="border-t px-4 py-2" th:text="${ticker.sector.sectorName}"></td>
                 <td class="border-t px-4 py-2" th:text="상세보기"></td>
-                <td class="border-t px-4 py-2">
-                    <button class="px-2 py-1 bg-red-500 text-white rounded-md" th:attr="data-ticker-id=${ticker.ticker}" onclick="deleteTicker(this)">Delete</button>
-                </td>
+<!--                <td class="border-t px-4 py-2">-->
+<!--                    <button class="px-2 py-1 bg-red-500 text-white rounded-md" th:attr="data-ticker-id=${ticker.ticker}" onclick="deleteTicker(this)">Delete</button>-->
+<!--                </td>-->
             </tr>
             </tbody>
         </table>
