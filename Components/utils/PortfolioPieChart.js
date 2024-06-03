@@ -23,24 +23,29 @@ const PortfolioPieChart = ({ data, selectedId, size, mode }) => {
   ];
 
   useEffect(() => {
-    const total =
-      data.stocks.reduce(
-        (acc, cur) => acc + cur.currentPrice * cur.quantity,
-        0
-      ) + data.currentCash;
-    const chartData = data.stocks.map((stock) => ({
-      x: stock.companyName,
-      y: stock.currentPrice * stock.quantity,
-      rate:
-        (total > 0
-          ? (((stock.currentPrice * stock.quantity) / total) * 100).toFixed(2)
-          : 0) + "%",
-    }));
-    chartData.push({ x: "현금", y: data.currentCash });
-    while (chartData.length < 13) {
-      chartData.push({ x: "dummy", y: 0, rate: 0 });
+    if (typeof data === "object") {
+      const total =
+        data?.stocks.reduce(
+          (acc, cur) => acc + cur.currentPrice * cur.quantity,
+          0
+        ) + data?.currentCash;
+      const chartData =
+        data?.stocks.map((stock) => ({
+          x: stock.companyName,
+          y: stock.currentPrice * stock.quantity,
+          rate:
+            (total > 0
+              ? (((stock.currentPrice * stock.quantity) / total) * 100).toFixed(
+                  2
+                )
+              : 0) + "%",
+        })) || [];
+      chartData?.push({ x: "현금", y: data.currentCash });
+      while (chartData.length < 13) {
+        chartData.push({ x: "dummy", y: 0, rate: 0 });
+      }
+      setChartData(chartData);
     }
-    setChartData(chartData);
   }, [data]);
 
   return (

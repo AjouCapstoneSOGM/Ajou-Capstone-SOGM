@@ -9,7 +9,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { timeAgo } from "../../utils/utils.js";
 
 const AlertList = ({ route, navigation }) => {
-  const { rebalances } = usePortfolio();
+  const { rebalances, getPortfolioById } = usePortfolio();
   const [rebalanceList, setRebalanceList] = useState([]);
 
   const getIsBuyCount = (stocks) => {
@@ -50,11 +50,12 @@ const AlertList = ({ route, navigation }) => {
             <View key={index}>
               <TouchableOpacity
                 style={styles.alertContainer}
-                onPress={() => {
+                onPress={async () => {
                   navigation.navigate("ModifyPortfolio", {
                     pfId: item.pfId,
                     rnId: item.rnId,
                     rebalancing: item.rebalancings,
+                    portfolio: await getPortfolioById(item.pfId),
                   });
                 }}
               >

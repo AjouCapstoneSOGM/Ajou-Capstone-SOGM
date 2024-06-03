@@ -105,7 +105,9 @@ const StockInfo = ({ isVisible, onToggle, ticker }) => {
                 }}
               />
               <AppText style={styles.infoText}>ROE</AppText>
-              <AppText style={styles.infoText}>{info.roe}</AppText>
+              <AppText style={styles.infoText}>
+                {info.roe == -9900 ? "X" : info.roe}
+              </AppText>
               <AppText style={styles.infoText}>
                 {info.roeRank} / {info.total}
               </AppText>
@@ -128,7 +130,10 @@ const StockInfo = ({ isVisible, onToggle, ticker }) => {
                 }}
               />
               <AppText style={styles.infoText}>ROA</AppText>
-              <AppText style={styles.infoText}>{info.roa}</AppText>
+              <AppText style={styles.infoText}>
+                {" "}
+                {info.roa == -9900 ? "X" : info.roa}
+              </AppText>
               <AppText style={styles.infoText}>
                 {info.roaRank} / {info.total}
               </AppText>
@@ -151,7 +156,10 @@ const StockInfo = ({ isVisible, onToggle, ticker }) => {
                 }}
               />
               <AppText style={styles.infoText}>PER</AppText>
-              <AppText style={styles.infoText}>{info.per}</AppText>
+              <AppText style={styles.infoText}>
+                {" "}
+                {info.per == -99 ? "X" : info.per}
+              </AppText>
               <AppText style={styles.infoText}>
                 {info.perRank} / {info.total}
               </AppText>

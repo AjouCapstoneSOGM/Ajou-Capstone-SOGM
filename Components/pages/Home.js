@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import AppText from "../utils/AppText.js";
 import { Button, Divider, Icon } from "@rneui/base";
@@ -12,6 +12,7 @@ import { FlatList } from "react-native-gesture-handler";
 import { useSearch } from "../utils/SearchStock.js";
 import StockInfo from "./portfolio/StockInfo.js";
 import ModalComponent from "../utils/Modal.js";
+import urls from "../utils/urls.js";
 
 const Home = ({ navigation }) => {
   const { query, setQuery, suggestions } = useSearch();
@@ -26,6 +27,21 @@ const Home = ({ navigation }) => {
 
   const handleSelectedIndex = (index) => {
     setSelectedIndex(index);
+  };
+
+  const fetchFGI = async () => {
+    try {
+      const response = await fetch(`${urls.fastapiUrl}/fearGreed`, {
+        method: "GET",
+      });
+      if (response.ok) {
+        const data = await response.json();
+        return data.fear_greed;
+      }
+    } catch (error) {
+      console.log(error);
+      return 0;
+    }
   };
 
   const news = [
@@ -64,6 +80,14 @@ const Home = ({ navigation }) => {
   const toggleModal = () => {
     setIsVisible(!isVisible);
   };
+
+  useEffect(() => {
+    const loadData = async () => {
+      const fgi = await fetchFGI();
+      setFGI(fgi);
+    };
+    loadData();
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
