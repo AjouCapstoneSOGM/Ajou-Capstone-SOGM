@@ -122,7 +122,7 @@ const Signup = ({ navigation }) => {
     if (isValueValid()) {
       const response = await fetchSignupInfo();
       if (response.status == 409) {
-        //Alert.alert("이미 가입된 이메일입니다.")
+        Alert.alert("이미 가입된 이메일입니다.")
       } else if (response.status == 404) {
         Alert.alert("이메일 인증을 진행해 주세요.");
       } else if (response.status == 403) {
@@ -264,13 +264,14 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "stretch",
-    backgroundColor: "#fff",
+    backgroundColor: "#333",
   },
   HomeText: {
     paddingBottom: height * 15,
     fontSize: 40,
     textAlign: "center",
-    color: "#333",
+    fontWeight: "bold",
+    color: "#fff",
   },
   allContainer: { alignItems: "stretch", padding: 10, paddingBottom: 10 },
   inputContainer: {
@@ -312,10 +313,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   disabled: {
-    backgroundColor: "#ddd",
+    backgroundColor: "#aaa",
   },
   buttonText: {
     color: "white",
+    fontWeight: "bold",
     fontSize: 17,
   },
   verifyInputBox: {
@@ -335,10 +337,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
-  },
-  buttonText: {
-    color: "white",
-    fontWeight: "bold",
   },
   verifybuttonText: {
     color: "white",

@@ -111,37 +111,32 @@ const Home = () => {
           data={suggestions.slice(0, 5)}
           keyExtractor={(item) => item.ticker}
           renderItem={({ item, index }) => (
-            <View key={index} style={styles.suggestion}>
-              <View style={{ flexDirection: "row" }}>
-                <AppText style={{ color: "#f0f0f0" }}>
-                  {item.name}
-                  {"  "}
-                </AppText>
-                <AppText style={{ fontSize: 13, color: "#888" }}>
-                  {item.exchange}
-                </AppText>
-              </View>
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
+            <View key={index} style={{backgroundColor: "#333"}}>
+              <TouchableOpacity 
+                style={styles.suggestion}
+                onPress={() => {
+                  handleSelectedIndex(index);
+                  toggleStockModal();
                 }}
               >
-                <AppText style={{ color: "#888" }}>{item.ticker}</AppText>
-                <Button
-                  buttonStyle={styles.infoButton}
-                  type="clear"
-                  onPress={() => {
-                    handleSelectedIndex(index);
-                    toggleStockModal();
+                <View style={{ flexDirection: "row" }}>
+                  <AppText style={{ color: "#f0f0f0" }}>
+                    {item.name}
+                    {"  "}
+                  </AppText>
+                  <AppText style={{ fontSize: 13, color: "#888" }}>
+                    {item.exchange}
+                  </AppText>
+                </View>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
                   }}
-                  icon={{
-                    name: "infocirlceo",
-                    type: "antdesign",
-                    color: "#f0f0f0",
-                  }}
-                />
-              </View>
+                >
+                  <AppText style={{ color: "#888" }}>{item.ticker}</AppText>
+                </View>
+              </TouchableOpacity>
             </View>
           )}
         />
@@ -319,6 +314,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    marginTop: -2,
+    paddingVertical: 15,
     paddingHorizontal: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#434343",

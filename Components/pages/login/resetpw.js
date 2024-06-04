@@ -57,17 +57,18 @@ const ResetPW = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <AppText style={styles.HomeText}>비밀번호 찾기</AppText>
-      <View style={styles.allContainer}>
-        <View style={styles.verifyInputContainer}>
-          <TextInput
-            style={styles.verifyInputBox}
-            value={useremail}
-            onChangeText={setUseremail}
-            placeholder="이메일"
-            placeholderTextColor="gray"
-          />
-        </View>
+      <View style={styles.textWrapper}>
+        <AppText style={styles.largeText}>비밀번호 초기화</AppText>
+        <AppText style={styles.smallText}>비밀번호 초기화 이메일 발송</AppText>
+      </View>
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.inputBox}
+          value={useremail}
+          onChangeText={setUseremail}
+          placeholder="이메일"
+          placeholderTextColor="gray"
+        />
       </View>
 
       <View style={styles.buttonContainer}>
@@ -75,7 +76,7 @@ const ResetPW = ({ navigation }) => {
           onPress={handleResetPassword}
           style={[styles.button]}
         >
-          <AppText style={styles.buttonText}>초기화</AppText>
+          <AppText style={styles.buttonText}>비밀번호 초기화</AppText>
         </TouchableOpacity>
       </View>
     </View>
@@ -89,15 +90,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "stretch",
-    backgroundColor: "#fff",
+    backgroundColor: "#333",
   },
-  HomeText: {
-    paddingBottom: height * 15,
-    fontSize: 40,
-    textAlign: "center",
-    color: "#333",
+  textWrapper: {
+    alignItems: "center",
+    paddingVertical: 20,
   },
-  allContainer: { alignItems: "stretch", padding: 10, paddingBottom: 10 },
   inputContainer: {
     alignItems: "stretch",
     padding: 5,
@@ -123,10 +121,9 @@ const styles = StyleSheet.create({
   inputBox: {
     backgroundColor: "#eee",
     padding: 10,
-    height: height * 50,
-    marginVertical: 0,
-    paddingHorizontal: 10,
-    borderRadius: 20,
+    marginVertical: height * 5,
+    marginHorizontal: 10,
+    borderRadius: 40,
   },
   button: {
     backgroundColor: "#6495ED",
@@ -136,37 +133,21 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: "center",
   },
-  disabled: {
-    backgroundColor: "#ddd",
-  },
   buttonText: {
     color: "white",
     fontSize: 17,
+    fontWeight: "bold",
   },
-  verifyInputBox: {
-    flex: 1,
-    width: width * 10,
-    height: height * 50,
-    borderWidth: 0,
-    borderRadius: 20,
-    paddingHorizontal: 10,
-    marginRight: -20,
-    backgroundColor: "#eee",
-  },
-  verifyButton: {
-    width: width * 100,
-    height: height * 50,
-    backgroundColor: "#6495ED",
-    borderRadius: 10,
-    alignItems: "center",
+  largeText: {
+    fontSize: 35,
     justifyContent: "center",
-  },
-  buttonText: {
-    color: "white",
     fontWeight: "bold",
+    color: "#6495ed",
+    paddingVertical: 25,
   },
-  verifybuttonText: {
+  smallText: {
+    fontSize: 15,
+    justifyContent: "center",
     color: "white",
-    fontWeight: "bold",
   },
 });
