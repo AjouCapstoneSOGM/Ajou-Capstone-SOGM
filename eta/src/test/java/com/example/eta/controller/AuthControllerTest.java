@@ -197,12 +197,13 @@ public class AuthControllerTest {
     public void testLogout() throws Exception {
         // 회원가입, 로그인 후 토큰 반환
         String authorizationHeader = signUpLogin("suprlux09@ajou.ac.kr", mockMvc, signupInfoRepository);
+        User user = userService.findByEmail("suprlux09@ajou.ac.kr");
+        assertTrue(tokenRepository.existsById(user.getUserId()));
 
         mockMvc.perform(post("/api/auth/logout")
                 .header("Authorization", authorizationHeader))
                 .andDo(print()).andExpect(status().isOk());
 
-        User user = userService.findByEmail("suprlux09@ajou.ac.kr");
         assertFalse(tokenRepository.existsById(user.getUserId()));
     }
 }
