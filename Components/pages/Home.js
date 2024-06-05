@@ -14,9 +14,11 @@ import StockInfo from "./portfolio/StockInfo.js";
 import ModalComponent from "../utils/Modal.js";
 import urls from "../utils/urls.js";
 import Loading from "../utils/Loading.js";
+import { usePortfolio } from "../utils/PortfolioContext.js";
 
 const Home = () => {
   const { query, setQuery, suggestions } = useSearch();
+  const { portLoading } = usePortfolio();
   const [FGI, setFGI] = useState(50);
   const [isVisible, setIsVisible] = useState(false);
   const [stockInfoVisible, setStockInfoVisible] = useState(false);
@@ -86,15 +88,16 @@ const Home = () => {
   };
 
   useEffect(() => {
-    const loadData = async () => {
+    const loadHomeData = async () => {
+      setLoading(true);
       await handleFetchFGI();
       await handleFetchNews();
       setLoading(false);
     };
-    loadData();
+    loadHomeData();
   }, []);
 
-  if (loading) return <Loading />;
+  if (loading || portLoading) return <Loading />;
   return (
     <SafeAreaView style={styles.container}>
       <HeaderComponent />
@@ -111,8 +114,8 @@ const Home = () => {
           data={suggestions.slice(0, 5)}
           keyExtractor={(item) => item.ticker}
           renderItem={({ item, index }) => (
-            <View key={index} style={{backgroundColor: "#333"}}>
-              <TouchableOpacity 
+            <View key={index} style={{ backgroundColor: "#333" }}>
+              <TouchableOpacity
                 style={styles.suggestion}
                 onPress={() => {
                   handleSelectedIndex(index);
@@ -211,29 +214,24 @@ const Home = () => {
             />
           </View>
           {newsLoading && <Loading />}
-          {!newsLoading && (
-            <FlatList
-              data={currentNews.slice(0, 10)}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <React.Fragment>
-                  <View style={styles.newsItem}>
-                    <AppText style={styles.newsTitle}>{item.title}</AppText>
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        justifyContent: "flex-end",
-                      }}
-                    >
-                      <AppText style={styles.newsDetail}>{item.press} </AppText>
-                      <AppText style={styles.newsDetail}>{item.date}</AppText>
-                    </View>
+          {!newsLoading &&
+            currentNews.slice(0, 10).map((item) => (
+              <React.Fragment>
+                <View style={styles.newsItem}>
+                  <AppText style={styles.newsTitle}>{item.title}</AppText>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "flex-end",
+                    }}
+                  >
+                    <AppText style={styles.newsDetail}>{item.press} </AppText>
+                    <AppText style={styles.newsDetail}>{item.date}</AppText>
                   </View>
-                  <Divider />
-                </React.Fragment>
-              )}
-            />
-          )}
+                </View>
+                <Divider />
+              </React.Fragment>
+            ))}
         </View>
       </ScrollView>
       <View style={{ height: height * 60 }} />

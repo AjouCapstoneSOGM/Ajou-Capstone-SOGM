@@ -22,9 +22,17 @@ const MakePortfolio = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Divider style={styles.topDivider} />
       {step === 0 && (
         <View style={{ flex: 1 }}>
+          <Button
+            containerStyle={styles.goBackButton}
+            type="clear"
+            onPress={() => {
+              navigation.goBack();
+            }}
+            icon={{ name: "left", type: "antdesign", color: "#333" }}
+          />
+          <Divider style={styles.topDivider} />
           <View style={styles.textContainer}>
             <AppText style={{ fontSize: 30, fontWeight: "bold" }}>
               어떤 포트폴리오를 생성하실건가요?
@@ -113,8 +121,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f0f0f0",
   },
+  goBackButton: {
+    alignSelf: "flex-start",
+    marginTop: 5,
+  },
   topDivider: {
-    marginVertical: 70,
+    marginVertical: 50,
     borderWidth: 4,
     borderColor: "#bbb",
   },

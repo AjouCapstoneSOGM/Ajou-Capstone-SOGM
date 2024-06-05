@@ -41,11 +41,6 @@ const PortfolioDetails = ({ route, navigation }) => {
   const [modifyQuantity, setModifyQuantity] = useState(0);
   const [modifyPrice, setModifyPrice] = useState(0);
   const [modifyBuy, setModifyBuy] = useState(true);
-  const [initVisible, setInitVisible] = useState(false);
-
-  const handleInitVisible = () => {
-    setInitVisible(!initVisible);
-  };
 
   const toggleInfoModal = () => {
     setInfoVisible(!infoVisible);
@@ -84,6 +79,7 @@ const PortfolioDetails = ({ route, navigation }) => {
       console.error(error);
     }
   };
+
   const resetModifyData = () => {
     setModifyBuy(true);
     setModifyPrice(0);
@@ -150,6 +146,7 @@ const PortfolioDetails = ({ route, navigation }) => {
 
     return totalROI;
   };
+
   const getStockRate = (id) => {
     const stockRate =
       (portfolio.stocks[id].quantity * portfolio.stocks[id].currentPrice) /
@@ -166,6 +163,7 @@ const PortfolioDetails = ({ route, navigation }) => {
     return totalPrice + portfolio.currentCash;
   };
 
+  console.log(portfolio);
   const getPortfolioROI = () => {
     const benefit = getTotalPrice() - portfolio.initialAsset;
     const roi = ((benefit / portfolio.initialAsset) * 100).toFixed(2);
@@ -186,12 +184,6 @@ const PortfolioDetails = ({ route, navigation }) => {
     const loadPortfolio = async () => {
       try {
         const currentPortfolio = getPortfolioById(route.params.id);
-        if (
-          currentPortfolio.detail.currentCash ==
-          currentPortfolio.detail.initialAsset
-        )
-          setInitVisible(true);
-
         if (currentPortfolio) {
           await getAlertExists(currentPortfolio.id);
           setPortfolio({
@@ -221,13 +213,15 @@ const PortfolioDetails = ({ route, navigation }) => {
     <SafeAreaView style={styles.container}>
       <View style={styles.outline}>
         <View style={styles.outlineHeader}>
-          <AppText style={{ fontSize: 17, color: "#f0f0f0" }}>총 자산</AppText>
+          <Button
+            containerStyle={{ marginLeft: -10 }}
+            type="clear"
+            onPress={() => {
+              navigation.goBack();
+            }}
+            icon={{ name: "left", type: "antdesign", color: "#f0f0f0" }}
+          />
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <NotificationBubble
-              message={"알림을 확인해주세요"}
-              visible={initVisible}
-              onClose={handleInitVisible}
-            ></NotificationBubble>
             <View>
               <Button
                 type="clear"
@@ -255,6 +249,7 @@ const PortfolioDetails = ({ route, navigation }) => {
             />
           </View>
         </View>
+        <AppText style={{ fontSize: 17, color: "#f0f0f0" }}>총 자산</AppText>
         <AppText style={{ fontSize: 25, color: "#f0f0f0", fontWeight: "bold" }}>
           {getTotalPrice().toLocaleString()} 원
         </AppText>
@@ -584,12 +579,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#333",
   },
   outline: {
-    padding: width * 10,
+    paddingHorizontal: width * 10,
+    paddingVertical: width * 5,
     backgroundColor: "#333",
   },
   outlineHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
+    alignItems: "center",
   },
   outlineDetail: {
     marginTop: height * 5,

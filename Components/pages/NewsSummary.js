@@ -49,7 +49,7 @@ const NewsSummary = ({ route, navigation }) => {
     return false;
   };
   useEffect(() => {
-    const loadData = async () => {
+    const loadNewsData = async () => {
       try {
         const result = await fetchNewsSummary(ticker);
         if (result.length > 0) {
@@ -68,7 +68,7 @@ const NewsSummary = ({ route, navigation }) => {
         console.error("Data load error: ", error);
       }
     };
-    loadData();
+    loadNewsData();
   }, []);
   if (loading) {
     return <Loading />;
