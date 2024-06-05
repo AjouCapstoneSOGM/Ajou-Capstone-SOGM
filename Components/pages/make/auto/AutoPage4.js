@@ -76,6 +76,14 @@ const AutoPage4 = ({ step, setStep, amount, riskLevel, interest }) => {
     else setSelectedId(index);
   };
 
+  const getRemainCash = () => {
+    const initialAsset = portfolio?.initialAsset;
+    const totalPrice = initRebalance?.reduce(
+      (acc, cur) => acc + Number(cur.price) * Number(cur.quantity),
+      0
+    );
+    return initialAsset - totalPrice;
+  };
   const isChecked = (index) => {
     const currentIndex = checkList.indexOf(index);
     if (currentIndex === -1) return false;
@@ -121,6 +129,7 @@ const AutoPage4 = ({ step, setStep, amount, riskLevel, interest }) => {
     await fetchModify(rebalanceData, pfId, rnId);
     await loadData();
   };
+
   useEffect(() => {
     if (pfId) {
       const loadPortfolio = async () => {
@@ -436,6 +445,12 @@ const AutoPage4 = ({ step, setStep, amount, riskLevel, interest }) => {
             </TouchableOpacity>
           ))}
         </ScrollView>
+        <View style={styles.cashContainer}>
+          <AppText style={{ color: "#ccc" }}>남은 현금</AppText>
+          <AppText style={{ color: "#ccc" }}>
+            {getRemainCash().toLocaleString()}원
+          </AppText>
+        </View>
         <AppText style={{ paddingBottom: 10, color: "#999", fontSize: 13 }}>
           입력되어있는 가격은 실시간 기준입니다. 만약 다를 경우 수정해주세요.
         </AppText>
@@ -549,7 +564,7 @@ const AutoPage4 = ({ step, setStep, amount, riskLevel, interest }) => {
     <View style={styles.container}>
       <View style={styles.textContainer}>
         <AppText style={styles.titleText}>
-          정보를 토대로 계산하여 선별된 종목들이에요.
+          정보를 토대로 저평가된 주식을 선별했어요.
         </AppText>
       </View>
       <View style={styles.contentsContainer}>
@@ -566,7 +581,7 @@ const AutoPage4 = ({ step, setStep, amount, riskLevel, interest }) => {
             handleModify();
             gotoDetailPage();
           }}
-          disabled={checkList.length < 12}
+          disabled={checkList.length < 12 || getRemainCash() < 0}
         />
       </View>
       <ModalComponent isVisible={infoVisible} onToggle={toggleInfoModal}>
@@ -718,6 +733,13 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 20,
     marginBottom: 10,
+  },
+  cashContainer: {
+    flexDirection: "row",
+    paddingVertical: 10,
+    justifyContent: "space-between",
+    borderBottomColor: "#434343",
+    borderBottomWidth: 1,
   },
   safeinfoText: {
     fontSize: 11,
