@@ -1292,10 +1292,10 @@ class back_test_main:
         return portfolioBacktesting
 
 
-sector_id = "G20"
-invest_money = 5000000
-safe_asset = 0.3
+# sector_id = "G20"
+# invest_money = 5000000
+# safe_asset = 0.3
 
-back_test = back_test_main()
-portfolioBacktesting = back_test.run(sector_id, invest_money, safe_asset)
-print(portfolioBacktesting)
+# back_test = back_test_main()
+# portfolioBacktesting = back_test.run(sector_id, invest_money, safe_asset)
+# print(portfolioBacktesting)
