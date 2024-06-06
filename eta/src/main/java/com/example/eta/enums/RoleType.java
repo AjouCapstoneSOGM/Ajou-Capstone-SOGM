@@ -1,4 +1,4 @@
-package com.example.eta.auth.enums;
+package com.example.eta.enums;
 
 import lombok.Getter;
 

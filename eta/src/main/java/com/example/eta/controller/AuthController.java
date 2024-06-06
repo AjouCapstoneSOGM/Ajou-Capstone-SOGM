@@ -2,12 +2,12 @@ package com.example.eta.controller;
 
 import com.example.eta.api.ApiClientSocial;
 import com.example.eta.auth.entity.UserPrincipal;
-import com.example.eta.auth.enums.SocialType;
+import com.example.eta.enums.SocialType;
 import com.example.eta.auth.jwt.JwtTokenProvider;
 import com.example.eta.dto.UserDto;
 import com.example.eta.entity.SignupInfo;
 import com.example.eta.entity.User;
-import com.example.eta.auth.enums.RoleType;
+import com.example.eta.enums.RoleType;
 import com.example.eta.exception.signup.EmailAlreadyExistsException;
 import com.example.eta.service.MailService;
 import com.example.eta.service.SignupInfoService;
@@ -56,7 +56,6 @@ public class AuthController {
     public ResponseEntity<Object> authorize(@RequestBody UserDto.LoginDto loginDto) {
 
         // TODO: 예외 처리(소셜 계정, 비밀번호 제한)
-
         User user = userService.findByEmail(loginDto.getEmail());
 
         UsernamePasswordAuthenticationToken authenticationToken =
