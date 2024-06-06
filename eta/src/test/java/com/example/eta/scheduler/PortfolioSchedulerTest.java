@@ -1,7 +1,7 @@
 package com.example.eta.scheduler;
 
 import com.example.eta.entity.*;
-import com.example.eta.auth.enums.RoleType;
+import com.example.eta.enums.RoleType;
 import com.example.eta.repository.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
