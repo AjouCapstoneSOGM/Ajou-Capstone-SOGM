@@ -1,5 +1,6 @@
 package com.example.adminpage.controller;
 
+import com.example.adminpage.repository.PortfolioRepository;
 import com.example.adminpage.repository.UserRepository;
 import com.example.adminpage.service.UserService;
 import com.example.adminpage.util.Utility;
@@ -21,6 +22,8 @@ public class UserController {
     private UserService userService;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private PortfolioRepository portfolioRepository;
 
     @GetMapping
     public String getUsers(Model model) {
@@ -28,12 +31,18 @@ public class UserController {
         return "Users";
     }
 
+    @GetMapping("/{userId}")
+    public String getUser(@PathVariable("userId") int userId, Model model) {
+        model.addAttribute("user", userRepository.getReferenceById(userId));
+        model.addAttribute("portfolios", portfolioRepository.findAllByUserId(userId));
+        return "UserDetail";
+    }
+
     @GetMapping("/search/{searchType}/{query}")
     public String search(@PathVariable("searchType") String searchType, @PathVariable("query") String query, Model model) {
         switch (searchType) {
-            case "id":
-//                model.addAttribute("users", userRepository.findAllByUserId(Integer.parseInt(query)));
-                userRepository.findAllByUserId(Integer.parseInt(query)).ifPresent(user -> model.addAttribute("users", user));
+            case "email":
+                model.addAttribute("users", userRepository.findAllByEmailContaining(query));
                 System.out.println("UserController.user"+model);
                 break;
             case "name":

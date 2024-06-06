@@ -8,6 +8,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -28,11 +30,13 @@ public class UserService {
     public void enableUser(int userId) {
         User user = userRepository.getReferenceById(userId);
         user.setEnabled(true);
+        user.setModifiedDate(LocalDateTime.now());
     }
 
     @Transactional
     public void disableUser(int userId) {
         User user = userRepository.getReferenceById(userId);
         user.setEnabled(false);
+        user.setModifiedDate(LocalDateTime.now());
     }
 }

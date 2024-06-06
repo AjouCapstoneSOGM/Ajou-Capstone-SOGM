@@ -103,8 +103,8 @@
                     <input id="searchInput" type="text" placeholder="Search..." class="px-4 py-1 border rounded-md">
                     <div class="flex gap-2">
                         <label>
-                            <input type="radio" name="searchType" value="id" checked>
-                            ID
+                            <input type="radio" name="searchType" value="email" checked>
+                            Email/소셜 ID
                         </label>
                         <label>
                             <input type="radio" name="searchType" value="name">
@@ -120,7 +120,7 @@
             <table class="w-full bg-white rounded-md shadow-md overflow-hidden">
                 <thead class="bg-gray-50">
                 <tr>
-                    <th class="px-4 py-2 text-left text-gray-500">UserId</th>
+                    <th class="px-4 py-2 text-left text-gray-500">User Id</th>
                     <th class="px-4 py-2 text-left text-gray-500">Email/소셜 ID</th>
                     <th class="px-4 py-2 text-left text-gray-500">닉네임</th>
                     <th class="px-4 py-2 text-left text-gray-500">계정 생성일</th>
@@ -131,7 +131,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="user : ${users}" class="clickable" onclick="goToDetail([[${user.userId}]])">
+                <tr th:each="user : ${users}" th:onclick="'javascript:goToDetail(\'' + ${user.userId} + '\');'" class="clickable" >
                     <td class="border-t px-4 py-2" th:text="${user.userId}"></td>
                     <td class="border-t px-4 py-2" th:text="${user.email}"></td>
                     <td class="border-t px-4 py-2" th:text="${user.name}"></td>
@@ -184,7 +184,7 @@
             }
         }
         function goToDetail(userId) {
-            window.location.href = '/user/' + userId;
+            window.location.href = '/users/' + userId;
         }
 
         setTimeout(function() {

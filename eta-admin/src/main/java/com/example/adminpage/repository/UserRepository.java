@@ -14,6 +14,8 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
 
+    @Query("SELECT t FROM User t WHERE t.email LIKE %:email%")
+    List<User> findAllByEmailContaining(@Param("email") String email);
     @Query("SELECT t FROM User t WHERE t.name LIKE %:name%")
     List<User> findAllByNameContaining(@Param("name") String name);
     @Query("SELECT p FROM User p WHERE p.userId = :userId")
