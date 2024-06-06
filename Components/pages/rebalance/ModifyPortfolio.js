@@ -37,14 +37,6 @@ const ModifyPortfolio = ({ route, navigation }) => {
     setIsVisible(!isVisible);
   };
 
-  const isPortfolioInit = () => {
-    if (portfolio) {
-      if (portfolio.detail.currentCash === portfolio.detail.initialAsset)
-        return true;
-      else return false;
-    }
-  };
-
   const getTotalPrice = () => {
     const totalPrice = portfolio.detail.stocks.reduce(
       (acc, cur) => acc + cur.currentPrice * cur.quantity,
@@ -149,6 +141,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
 
   const handleModify = async () => {
     const rebalanceData = updateKey([...rebalances]);
+    console.log(pfId, rnId);
     setLoading(true);
     await fetchModify(rebalanceData, pfId, rnId);
     await loadData();
@@ -180,8 +173,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
         <AppText
           style={{ flex: 1, fontSize: 25, fontWeight: "bold", color: "#333" }}
         >
-          {isPortfolioInit() ? "최초 매수를" : "리밸런싱을"} 해야하는 종목{" "}
-          {rebalances.length}개가 있어요
+          리밸런싱을 해야하는 종목 {rebalances.length}개가 있어요
         </AppText>
         <Button
           buttonStyle={{ marginHorizontal: width * 10 }}
@@ -189,9 +181,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
           onPress={() => {
             toggleModal();
             setInfo(
-              isPortfolioInit()
-                ? "포트폴리오 생성 직후에는 종목을 직접 반영해야 해요.\n\n하단의 종목 리스트를 확인하여 직접 주식을 매수해주세요."
-                : "리밸런싱(Rebalancing)이란?\n\n리밸런싱은 투자 포트폴리오의 자산 비율을 조정하는 과정입니다.\n주식, 채권, 현금 등 다양한 자산이 포함된 포트폴리오에서 각 자산의 비율이 시장 변동에 따라 원래의 목표 비율에서 벗어나게 되면, 이를 다시 조정하여 원래의 비율로 되돌리는 것이 리밸런싱입니다.\n\n\n리밸런싱 방법\n\n1. 현재 포트폴리오의 자산 비율을 확인합니다.\n2. 목표 비율과 비교하여 초과 또는 부족한 자산을 파악합니다.\n3. 초과 자산을 매도하고 부족 자산을 매수하여 목표 비율로 조정합니다."
+              "리밸런싱(Rebalancing)이란?\n\n리밸런싱은 투자 포트폴리오의 자산 비율을 조정하는 과정입니다.\n주식, 채권, 현금 등 다양한 자산이 포함된 포트폴리오에서 각 자산의 비율이 시장 변동에 따라 원래의 목표 비율에서 벗어나게 되면, 이를 다시 조정하여 원래의 비율로 되돌리는 것이 리밸런싱입니다.\n\n\n리밸런싱 방법\n\n1. 현재 포트폴리오의 자산 비율을 확인합니다.\n2. 목표 비율과 비교하여 초과 또는 부족한 자산을 파악합니다.\n3. 초과 자산을 매도하고 부족 자산을 매수하여 목표 비율로 조정합니다."
             );
           }}
           icon={{
@@ -211,7 +201,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
               textAlign: "center",
             }}
           >
-            {isPortfolioInit() ? "자산배분" : "리밸런싱"} 전
+            리밸런싱 전
           </AppText>
           <AppText
             style={{
@@ -221,7 +211,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
               textAlign: "center",
             }}
           >
-            {isPortfolioInit() ? "자산배분" : "리밸런싱"} 후
+            리밸런싱 후
           </AppText>
         </View>
         <View style={styles.chartContent}>

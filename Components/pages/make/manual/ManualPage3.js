@@ -114,6 +114,63 @@ const ManualPage3 = ({ stockList }) => {
             mode={"dark"}
           />
         </View>
+        <View style={styles.column}>
+          <Icon
+            name="checkcircle"
+            type="antdesign"
+            color="#333"
+            size={15}
+            style={{ marginRight: 5 }}
+          />
+          <Button
+            title="기업명"
+            type="clear"
+            containerStyle={styles.columnName}
+            titleStyle={{ color: "#808080", fontSize: 12 }}
+            onPress={() => {
+              handleSort("name");
+            }}
+            icon={{
+              type: "antdesign",
+              name: "caretdown",
+              color: "#808080",
+              size: 11,
+            }}
+            iconPosition="right"
+          />
+          <Button
+            title="수량"
+            type="clear"
+            containerStyle={styles.columnNumber}
+            titleStyle={{ color: "#808080", fontSize: 12 }}
+            onPress={() => {
+              handleSort("quantity");
+            }}
+            icon={{
+              type: "antdesign",
+              name: "caretdown",
+              color: "#808080",
+              size: 11,
+            }}
+            iconPosition="right"
+          />
+          <Button
+            title="한 주당 금액"
+            type="clear"
+            containerStyle={styles.columnPrice}
+            titleStyle={{ color: "#808080", fontSize: 12 }}
+            onPress={() => {
+              handleSort("price");
+            }}
+            icon={{
+              type: "antdesign",
+              name: "caretdown",
+              color: "#808080",
+              size: 11,
+            }}
+            iconPosition="right"
+          />
+        </View>
         <ScrollView style={styles.labelContainer}>
           {stockList &&
             stockList.map((stock, index) => (
@@ -185,12 +242,32 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     marginHorizontal: 5,
   },
+  column: {
+    flexDirection: "row",
+    marginBottom: height * 5,
+    alignItems: "center",
+  },
+  columnName: {
+    flex: 1.5,
+    color: "#808080",
+    textAlign: "center",
+  },
+  columnNumber: {
+    flex: 1,
+    color: "#808080",
+    textAlign: "center",
+  },
+  columnPrice: {
+    flex: 1,
+    color: "#808080",
+    textAlign: "center",
+  },
   itemName: {
     flex: 1.5,
     color: "#f0f0f0",
     marginRight: 10,
     fontWeight: "bold",
-    textAlign: "left",
+    textAlign: "center",
     fontSize: 15,
   },
   itemNumber: {

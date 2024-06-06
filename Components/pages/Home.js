@@ -14,15 +14,18 @@ import StockInfo from "./portfolio/StockInfo.js";
 import ModalComponent from "../utils/Modal.js";
 import urls from "../utils/urls.js";
 import Loading from "../utils/Loading.js";
+import { usePortfolio } from "../utils/PortfolioContext.js";
 
-const Home = ({ navigation }) => {
+const Home = () => {
   const { query, setQuery, suggestions } = useSearch();
+  const { portLoading } = usePortfolio();
   const [FGI, setFGI] = useState(50);
   const [isVisible, setIsVisible] = useState(false);
   const [stockInfoVisible, setStockInfoVisible] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [currentNews, setCurrentNews] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [newsLoading, setNewsLoading] = useState(false);
 
   const toggleStockModal = () => {
     setStockInfoVisible(!stockInfoVisible);
@@ -48,60 +51,18 @@ const Home = ({ navigation }) => {
   };
 
   const fetchNews = async () => {
-    try {
-      const response = await fetch(`${urls.fastapiUrl}/currentNews`, {
-        method: "GET",
-      });
-      if (response.ok) {
-        const data = await response.json();
-        return data;
-      }
-    } catch (error) {
-      console.log(error);
-      return 0;
+    const response = await fetch(`${urls.fastapiUrl}/currentNews`, {
+      method: "GET",
+    });
+    if (response.ok) {
+      const data = await response.json();
+      return data;
     }
   };
 
-  const news = [
-    {
-      title: "아스트라제네카, 2030년까지 800억달러 매출 목표",
-      source: "이데일리",
-      date: "2024-05-24",
-    },
-    {
-      title: "아스트라제네카, 2030년까지 800억달러 매출 목표",
-      source: "이데일리",
-      date: "2024-05-24",
-    },
-    {
-      title: "아스트라제네카, 2030년까지 800억달러 매출 목표",
-      source: "이데일리",
-      date: "2024-05-24",
-    },
-    {
-      title: "아스트라제네카, 2030년까지 800억달러 매출 목표",
-      source: "이데일리",
-      date: "2024-05-24",
-    },
-    {
-      title: "아스트라제네카, 2030년까지 800억달러 매출 목표",
-      source: "이데일리",
-      date: "2024-05-24",
-    },
-    {
-      title: "아스트라제네카, 2030년까지 800억달러 매출 목표",
-      source: "이데일리",
-      date: "2024-05-24",
-    },
-  ];
-
-  const toggleModal = () => {
-    setIsVisible(!isVisible);
-  };
-
-  useEffect(() => {
-    const loadData = async () => {
-      const fgi = await fetchFGI();
+  const handleFetchNews = async () => {
+    try {
+      setNewsLoading(true);
       const currentNews = await fetchNews();
       const listData = Object.keys(currentNews.title).map((key) => ({
         id: key,
@@ -109,14 +70,34 @@ const Home = ({ navigation }) => {
         press: currentNews.press[key],
         date: currentNews.wdate[key],
       }));
-      setFGI(fgi);
       setCurrentNews(listData);
+      setNewsLoading(false);
+    } catch (error) {
+      setCurrentNews(false);
+      console.error(error);
+    }
+  };
+
+  const handleFetchFGI = async () => {
+    const fgi = await fetchFGI();
+    setFGI(fgi);
+  };
+
+  const toggleModal = () => {
+    setIsVisible(!isVisible);
+  };
+
+  useEffect(() => {
+    const loadHomeData = async () => {
+      setLoading(true);
+      await handleFetchFGI();
+      await handleFetchNews();
       setLoading(false);
     };
-    loadData();
+    loadHomeData();
   }, []);
 
-  if (loading) return <Loading />;
+  if (loading || portLoading) return <Loading />;
   return (
     <SafeAreaView style={styles.container}>
       <HeaderComponent />
@@ -133,8 +114,8 @@ const Home = ({ navigation }) => {
           data={suggestions.slice(0, 5)}
           keyExtractor={(item) => item.ticker}
           renderItem={({ item, index }) => (
-            <View key={index} style={{backgroundColor: "#333"}}>
-              <TouchableOpacity 
+            <View key={index} style={{ backgroundColor: "#333" }}>
+              <TouchableOpacity
                 style={styles.suggestion}
                 onPress={() => {
                   handleSelectedIndex(index);
@@ -223,16 +204,26 @@ const Home = ({ navigation }) => {
           </View>
         </View>
         <View style={styles.newsContainer}>
-          <AppText style={styles.newsHeader}>실시간 뉴스</AppText>
-          <FlatList
-            data={currentNews.slice(0, 10)}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
+          <View style={styles.newsHeaderContainr}>
+            <AppText style={styles.newsHeader}>실시간 뉴스</AppText>
+            <Button
+              style={styles.newsReload}
+              type="clear"
+              icon={{ type: "antdesign", name: "reload1", color: "#f0f0f0" }}
+              onPress={handleFetchNews}
+            />
+          </View>
+          {newsLoading && <Loading />}
+          {!newsLoading &&
+            currentNews.slice(0, 10).map((item) => (
               <React.Fragment>
                 <View style={styles.newsItem}>
                   <AppText style={styles.newsTitle}>{item.title}</AppText>
                   <View
-                    style={{ flexDirection: "row", justifyContent: "flex-end" }}
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "flex-end",
+                    }}
                   >
                     <AppText style={styles.newsDetail}>{item.press} </AppText>
                     <AppText style={styles.newsDetail}>{item.date}</AppText>
@@ -240,8 +231,7 @@ const Home = ({ navigation }) => {
                 </View>
                 <Divider />
               </React.Fragment>
-            )}
-          />
+            ))}
         </View>
       </ScrollView>
       <View style={{ height: height * 60 }} />
@@ -374,6 +364,12 @@ const styles = StyleSheet.create({
     color: "#f0f0f0",
     fontSize: 12,
   },
+  newsHeaderContainr: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+  },
   newsContainer: {
     paddingHorizontal: width * 10,
     paddingVertical: height * 15,
@@ -387,7 +383,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     color: "#f0f0f0",
-    marginBottom: height * 15,
   },
   newsTitle: {
     fontSize: 15,
