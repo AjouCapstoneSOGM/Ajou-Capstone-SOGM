@@ -14,4 +14,7 @@ public interface PortfolioRepository extends JpaRepository<Portfolio, Integer> {
     @Query("SELECT p FROM Portfolio p WHERE p.user.userId = :userId")
     List<Portfolio> findAllByUserId(@Param("userId") int userId);
 
+    @Query("SELECT p.riskValue, COUNT(p.pfId) FROM Portfolio p GROUP BY p.riskValue")
+    List<Object[]> countPortfoliosByRiskValue();
+
 }

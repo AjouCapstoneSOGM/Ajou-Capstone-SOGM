@@ -3,6 +3,7 @@ package com.example.adminpage.controller;
 import com.example.adminpage.repository.PortfolioSectorRepository;
 import com.example.adminpage.repository.UserRepository;
 import com.example.adminpage.service.PortfolioSectorService;
+import com.example.adminpage.service.PortfolioService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,14 +22,20 @@ public class HomeController {
 
     @Autowired
     PortfolioSectorService portfolioSectorService;
+    @Autowired
+    PortfolioService portfolioService;
     @RequestMapping("/")
     public String Home(Model model) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, Long> countPortfolioBySector = portfolioSectorService.getPortfoliosCountBySector();
         String countPortfolioBySectorJson = objectMapper.writeValueAsString(countPortfolioBySector);
 
+        Map<Integer, Long> countPortfolioByRiskValue = portfolioService.getPortfoliosCountByRiskValue();
+        String countPortfolioByRiskValueJson = objectMapper.writeValueAsString(countPortfolioByRiskValue);
+
         model.addAttribute("totalUsers", userRepository.count());
         model.addAttribute("countPortfolioBySectorJson", countPortfolioBySectorJson);
+        model.addAttribute("countPortfolioByRiskValueJson", countPortfolioByRiskValueJson);
         return "home";
     }
 
