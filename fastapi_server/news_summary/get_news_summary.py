@@ -79,7 +79,6 @@ class News:
         mask = news_list["title"].str.contains(word_to_delete, case=False)
         news_list = news_list[~mask]
         news_list.reset_index(drop=True, inplace=True)
-        
 
         return news_list
 
@@ -149,7 +148,7 @@ class News:
         max_articles = 50  # 최대 기사 수 설정
         while len(unique_titles) < max_articles:
             # Call the function for the current page
-            titles, dates = await self.get_news_title_from_page(
+            titles, dates = self.get_news_title_from_page(
                 page, start_date, end_date, ticker
             )
             # If there are no more articles or start_date has passed, stop iterating
