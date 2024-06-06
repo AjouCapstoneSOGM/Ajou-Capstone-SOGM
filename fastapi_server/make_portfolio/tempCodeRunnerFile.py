@@ -1,1 +1,0 @@
-total_current_invest
