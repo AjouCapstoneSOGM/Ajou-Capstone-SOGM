@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ETA-ADMIN</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .hidden-lg { display: none; }
         @media (max-width: 1024px) {
@@ -95,15 +96,11 @@
     <div class="flex-1 main-content">
         <div class="flex justify-between items-center mb-4">
             <h1 class="text-2xl font-semibold">Dashboard</h1>
-<!--            <div class="flex items-center gap-2">-->
-<!--                <input type="text" placeholder="Search..." class="px-4 py-2 border rounded-md">-->
-<!--                <button class="px-4 py-2 bg-blue-600 text-white rounded-md">Add New</button>-->
-<!--            </div>-->
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             <div class="card">
                 <h2 class="text-lg font-medium">Total Users</h2>
-                <p class="text-2xl font-bold"> </p>
+                <p class="text-2xl font-bold">[[${totalUsers}]]</p>
             </div>
             <div class="card">
                 <h2 class="text-lg font-medium">Active Users</h2>
@@ -117,6 +114,10 @@
                 <h2 class="text-lg font-medium">Total Revenue</h2>
                 <p class="text-2xl font-bold">$</p>
             </div>
+        </div>
+        <div class="card">
+            <h2 class="text-lg font-medium mb-4">User Statistics</h2>
+            <canvas id="userChart"></canvas>
         </div>
         <div>
             <h2 class="text-xl font-semibold mb-4">Recent Users</h2>
@@ -163,16 +164,68 @@
     </div>
 </div>
 
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const data = /*[[${countPortfolioBySectorJson}]]*/ '{}';
+    const parsedData = JSON.parse(data);
+    const values = Object.values(parsedData);
+    console.log(values);
+    /*]]>*/
+</script>
+
 <script>
-    document.getElementById('toggle-notifications').addEventListener('click', function () {
-        alert('Notifications toggled!');
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('userChart').getContext('2d');
+        const userChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['금융', '커뮤니케이션서비스', '산업재', '필수소비재', '유틸리티', '기타', '에너지', '건강관리,', 'IT','소재', '경기관련소비재'],
+                datasets: [{
+                    label: '섹터별 자동 포트폴리오 수',
+                    data: values,
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)',
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(201, 203, 207, 0.2)',
+                        'rgba(255, 205, 86, 0.2)',
+                        'rgba(99, 255, 132, 0.2)',
+                        'rgba(255, 159, 64, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(75, 192, 192, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(201, 203, 207, 1)',
+                        'rgba(255, 205, 86, 1)',
+                        'rgba(99, 255, 132, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(75, 192, 192, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
     });
 
-    // Toggle the sidebar for small screens
-    document.querySelector('a.lg\\:hidden').addEventListener('click', function () {
-        const sidebar = document.querySelector('.lg\\:block');
-        sidebar.classList.toggle('hidden');
-    });
 </script>
 </body>
 </html>
