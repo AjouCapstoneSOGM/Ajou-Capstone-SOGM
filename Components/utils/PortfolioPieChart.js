@@ -1,10 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { VictoryPie } from "victory-native";
+import { VictoryLegend, VictoryPie } from "victory-native";
 import { height, width } from "./utils";
 import AppText from "./AppText";
 import { StyleSheet, View } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
 
-const PortfolioPieChart = ({ data, selectedId, size, mode }) => {
+const PortfolioPieChart = ({
+  data,
+  selectedId,
+  size,
+  mode,
+  animate = true,
+}) => {
   const [chartData, setChartData] = useState([]);
   const colorScale = [
     "hsl(348, 100%, 80%)", // 파스텔 핑크,
@@ -49,53 +56,92 @@ const PortfolioPieChart = ({ data, selectedId, size, mode }) => {
   }, [data]);
 
   return (
-    <View>
-      <VictoryPie
-        data={chartData}
-        colorScale={colorScale}
-        innerRadius={({ index }) =>
-          index === selectedId ? 80 * size : 105 * size
-        }
-        width={width * 250 * size}
-        height={height * 250 * size}
-        radius={width * 120 * size}
-        labels={() => {}}
-        animate={{
-          duration: 300,
-          onLoad: { duration: 300 },
-          onExit: {
+    <View style={styles.victoryContainer}>
+      <View style={styles.chartContainer}>
+        <VictoryPie
+          data={chartData}
+          colorScale={colorScale}
+          innerRadius={({ index }) =>
+            animate && index === selectedId ? 80 * size : 105 * size
+          }
+          width={width * 250 * size}
+          height={height * 250 * size}
+          radius={width * 120 * size}
+          labels={() => {}}
+          animate={{
             duration: 300,
-            before: () => ({ y: 0, label: " " }),
-          },
-          onEnter: {
-            duration: 300,
-            before: () => ({ y: 0, label: " " }),
-          },
-        }}
-      />
-      <View style={styles.chartLabel}>
-        <AppText
-          style={{
-            fontWeight: "bold",
-            fontSize: 15 * height,
-            color: mode === "dark" ? "#f0f0f0" : "#333",
+            onLoad: { duration: 300 },
+            onExit: {
+              duration: 300,
+              before: () => ({ y: 0, label: " " }),
+            },
+            onEnter: {
+              duration: 300,
+              before: () => ({ y: 0, label: " " }),
+            },
           }}
-        >
-          {chartData[selectedId]?.rate}
-        </AppText>
-        <AppText
-          style={{
-            fontSize: 9 * height,
-            color: mode === "dark" ? "#f0f0f0" : "#333",
-          }}
-        >
-          {chartData[selectedId]?.x}
-        </AppText>
+        />
+        <View style={styles.chartLabel}>
+          <AppText
+            style={{
+              fontWeight: "bold",
+              fontSize: 15 * height,
+              color: mode === "dark" ? "#f0f0f0" : "#333",
+            }}
+          >
+            {chartData[selectedId]?.rate}
+          </AppText>
+          <AppText
+            style={{
+              fontSize: 9 * height,
+              color: mode === "dark" ? "#f0f0f0" : "#333",
+            }}
+          >
+            {chartData[selectedId]?.x}
+          </AppText>
+        </View>
+      </View>
+      <View
+        style={[
+          styles.labelContainer,
+          {
+            height: Math.min(
+              height * 250 * size,
+              (height * 450 * size * data?.stocks.length) / 13
+            ),
+          },
+        ]}
+      >
+        <ScrollView>
+          <VictoryLegend
+            x={30 * width}
+            orientation="vertical"
+            data={chartData
+              .slice(0, data?.stocks.length)
+              .map((item, index) => ({
+                name: item.x,
+                symbol: { fill: colorScale[index % colorScale.length] },
+              }))}
+            width={width * 200 * size}
+            height={(height * 450 * size * data?.stocks.length) / 13}
+            style={{
+              labels: {
+                fontFamily: "pretendard",
+                fontSize: 20 * size,
+                fill: mode === "dark" ? "#f0f0f0" : "#333",
+              },
+            }}
+          />
+        </ScrollView>
       </View>
     </View>
   );
 };
 const styles = StyleSheet.create({
+  victoryContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
   chartLabel: {
     position: "absolute",
     top: 0,
@@ -104,6 +150,9 @@ const styles = StyleSheet.create({
     bottom: 0,
     alignItems: "center",
     justifyContent: "center",
+  },
+  labelContainer: {
+    alignItems: "center",
   },
 });
 export default PortfolioPieChart;

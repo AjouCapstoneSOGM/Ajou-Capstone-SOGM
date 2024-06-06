@@ -349,18 +349,18 @@ const PortfolioDetails = ({ route, navigation }) => {
                   ]}
                   onPress={() => handleSelectedId(index)}
                 >
-                  <Divider
-                    color={colorScale[index]}
-                    width={2}
-                    style={{
-                      marginBottom: height * 10,
-                    }}
-                  />
                   <View style={styles.itemInfo}>
                     <View style={styles.companyInfo}>
                       <View
                         style={{ flexDirection: "row", alignItems: "center" }}
                       >
+                        <Icon
+                          name="checkcircle"
+                          type="antdesign"
+                          color={colorScale[index]}
+                          size={15}
+                          style={{ marginRight: 5 }}
+                        />
                         <AppText
                           style={{
                             fontSize: 18,
