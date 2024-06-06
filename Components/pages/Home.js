@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Touchable,
+} from "react-native";
 import AppText from "../utils/AppText.js";
 import { Button, Divider, Icon } from "@rneui/base";
 import HeaderComponent from "../utils/Header.js";
@@ -15,6 +21,7 @@ import ModalComponent from "../utils/Modal.js";
 import urls from "../utils/urls.js";
 import Loading from "../utils/Loading.js";
 import { usePortfolio } from "../utils/PortfolioContext.js";
+import OpenUrl from "../utils/OpenUrl.js";
 
 const Home = () => {
   const { query, setQuery, suggestions } = useSearch();
@@ -69,6 +76,7 @@ const Home = () => {
         title: currentNews.title[key],
         press: currentNews.press[key],
         date: currentNews.wdate[key],
+        href: currentNews.href[key],
       }));
       setCurrentNews(listData);
       setNewsLoading(false);
@@ -217,7 +225,10 @@ const Home = () => {
           {!newsLoading &&
             currentNews.slice(0, 10).map((item) => (
               <React.Fragment>
-                <View style={styles.newsItem}>
+                <TouchableOpacity
+                  onPress={() => OpenUrl(`${item.href}`)}
+                  style={styles.newsItem}
+                >
                   <AppText style={styles.newsTitle}>{item.title}</AppText>
                   <View
                     style={{
@@ -228,7 +239,7 @@ const Home = () => {
                     <AppText style={styles.newsDetail}>{item.press} </AppText>
                     <AppText style={styles.newsDetail}>{item.date}</AppText>
                   </View>
-                </View>
+                </TouchableOpacity>
                 <Divider />
               </React.Fragment>
             ))}
