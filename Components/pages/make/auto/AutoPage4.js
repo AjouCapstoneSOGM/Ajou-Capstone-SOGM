@@ -40,13 +40,10 @@ const AutoPage4 = ({ step, setStep, amount, riskLevel, interest }) => {
 
   const handleCheckList = (index) => {
     setCheckList((prevIndices) => {
-      // 인덱스가 이미 존재하는지 확인
       const currentIndex = prevIndices.indexOf(index);
       if (currentIndex === -1) {
-        // 인덱스가 존재하지 않으면 추가
         return [...prevIndices, index];
       } else {
-        // 인덱스가 존재하면 제거
         return prevIndices.filter((i) => i !== index);
       }
     });
@@ -447,8 +444,16 @@ const AutoPage4 = ({ step, setStep, amount, riskLevel, interest }) => {
         </ScrollView>
         <View style={styles.cashContainer}>
           <AppText style={{ color: "#ccc" }}>남은 현금</AppText>
-          <AppText style={{ color: "#ccc" }}>
-            {getRemainCash().toLocaleString()}원
+          <AppText style={{ color: "#f0f0f0" }}>
+            <AppText
+              style={{
+                fontSize: 20,
+                color: getRemainCash() >= 0 ? "#f0f0f0" : "#ff5858",
+              }}
+            >
+              {getRemainCash().toLocaleString()}
+            </AppText>{" "}
+            원
           </AppText>
         </View>
         <AppText style={{ paddingBottom: 10, color: "#999", fontSize: 13 }}>
@@ -738,6 +743,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingVertical: 10,
     justifyContent: "space-between",
+    alignItems: "flex-end",
     borderBottomColor: "#434343",
     borderBottomWidth: 1,
   },

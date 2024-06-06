@@ -146,11 +146,11 @@ const PortfolioList = ({ navigation }) => {
             disabled={selectedIndex == 0}
             disabledStyle={{ opacity: 0 }}
           />
-          <PortfolioPieChart
+          {/* <PortfolioPieChart
             data={portfolios[selectedIndex]?.detail}
             size={width * 0.9}
             mode={"light"}
-          />
+          /> */}
           <Button
             containerStyle={{ zIndex: 1 }}
             type="clear"

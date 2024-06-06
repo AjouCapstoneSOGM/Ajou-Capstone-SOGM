@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { CommonActions, useFocusEffect } from "@react-navigation/native";
 import {
   View,
@@ -11,13 +11,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Divider, Icon } from "@rneui/base";
 import { usePortfolio } from "../../utils/PortfolioContext";
-import {
-  width,
-  height,
-  deepCopy,
-  filteringNumber,
-  colorScale,
-} from "../../utils/utils";
+import { width, height, deepCopy, filteringNumber } from "../../utils/utils";
 import PortfolioPieChart from "../../utils/PortfolioPieChart";
 import AppText from "../../utils/AppText";
 import Loading from "../../utils/Loading";
@@ -26,12 +20,31 @@ import ModalComponent from "../../utils/Modal";
 const ModifyPortfolio = ({ route, navigation }) => {
   const { pfId, rnId, rebalancing, portfolio } = route.params;
   const { fetchModify, loadData } = usePortfolio();
+  const [portfolioAfter, setPortfolioAfter] = useState([]);
+  const [rebalances, setRebalances] = useState([]);
   const [selectedId, setSelectedId] = useState();
   const [loading, setLoading] = useState(true);
-  const [rebalances, setRebalances] = useState([]);
   const [isVisible, setIsVisible] = useState(false);
   const [info, setInfo] = useState("");
   const [isAscending, setIsAscending] = useState(true);
+  const [checkList, setCheckList] = useState([]);
+
+  const isChecked = (index) => {
+    const currentIndex = checkList.indexOf(index);
+    if (currentIndex === -1) return false;
+    else return true;
+  };
+
+  const handleCheckList = (index) => {
+    setCheckList((prevIndices) => {
+      const currentIndex = prevIndices.indexOf(index);
+      if (currentIndex === -1) {
+        return [...prevIndices, index];
+      } else {
+        return prevIndices.filter((i) => i !== index);
+      }
+    });
+  };
 
   const toggleModal = () => {
     setIsVisible(!isVisible);
@@ -45,26 +58,20 @@ const ModifyPortfolio = ({ route, navigation }) => {
     return totalPrice + portfolio.detail.currentCash;
   };
 
-  const getCurrentQuantity = (ticker) => {
-    const stock = portfolio.detail.stocks.filter(
-      (item) => item.ticker == ticker
-    )[0];
-    return stock.quantity;
-  };
-
   const calculateAfter = () => {
-    if (portfolio) {
-      const afterPortfolio = deepCopy(portfolio);
-      afterPortfolio.detail.stocks.map((stock) => {
-        const order = rebalances.find((order) => order.ticker === stock.ticker);
-        if (order) {
+    const afterPortfolio = deepCopy(portfolio);
+    checkList.forEach((index) => {
+      const order = rebalances[index];
+      afterPortfolio.detail.stocks.forEach((stock) => {
+        if (stock.ticker == order.ticker) {
           stock.quantity += order.quantity * (order.isBuy ? 1 : -1);
           afterPortfolio.detail.currentCash +=
             order.quantity * order.price * (order.isBuy ? -1 : 1);
         }
       });
-      return afterPortfolio;
-    }
+    });
+
+    return afterPortfolio;
   };
 
   const handleSort = (prop) => {
@@ -141,7 +148,6 @@ const ModifyPortfolio = ({ route, navigation }) => {
 
   const handleModify = async () => {
     const rebalanceData = updateKey([...rebalances]);
-    console.log(pfId, rnId);
     setLoading(true);
     await fetchModify(rebalanceData, pfId, rnId);
     await loadData();
@@ -192,43 +198,22 @@ const ModifyPortfolio = ({ route, navigation }) => {
         />
       </View>
       <View style={styles.chartContainer}>
-        <View style={styles.chartTitle}>
-          <AppText
-            style={{
-              flex: 1,
-              flexcolor: "#333",
-              fontSize: 15,
-              textAlign: "center",
-            }}
-          >
-            리밸런싱 전
-          </AppText>
-          <AppText
-            style={{
-              flex: 1,
-              color: "#333",
-              fontSize: 15,
-              textAlign: "center",
-            }}
-          >
-            리밸런싱 후
-          </AppText>
-        </View>
         <View style={styles.chartContent}>
-          <View style={styles.chartBox1}>
+          {/* <View style={styles.chartBox1}>
             <PortfolioPieChart
               data={portfolio.detail}
               selectedId={selectedId}
               size={width * 0.5}
               mode={"light"}
             />
-          </View>
+          </View> */}
           <View style={styles.chartBox2}>
             <PortfolioPieChart
               data={calculateAfter().detail}
               selectedId={selectedId}
-              size={width * 0.5}
+              size={width * 0.6}
               mode={"light"}
+              animate={false}
             />
           </View>
         </View>
@@ -254,7 +239,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
               icon={{
                 name: "questioncircleo",
                 type: "antdesign",
-                color: "#f0f0f0",
+                color: "#aaa",
               }}
             />
           </View>
@@ -341,12 +326,15 @@ const ModifyPortfolio = ({ route, navigation }) => {
             <View key={index} style={styles.rebalanceItem}>
               <TouchableOpacity
                 style={styles.rebalanceItemContent}
-                onPress={() => handleSelectedId(item.ticker)}
+                onPress={() => {
+                  handleSelectedId(item.ticker);
+                  handleCheckList(index);
+                }}
               >
                 <Icon
                   name="checkcircle"
                   type="antdesign"
-                  color={colorScale[item.index]}
+                  color={isChecked(index) ? "#97f697" : "#808080"}
                   size={15}
                   style={{ marginRight: 5 }}
                 />
