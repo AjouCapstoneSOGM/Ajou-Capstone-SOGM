@@ -230,7 +230,6 @@ public class PortfolioService {
                 .initAsset(totalAsset)
                 .initCash(0)
                 .currentCash(0)
-                .riskValue(0)
                 .build();
         portfolioRepository.save(portfolio);
 
@@ -238,12 +237,13 @@ public class PortfolioService {
         // 주식 추가
         for (PortfolioDto.StockDetailDto stock : request.getStocks()) {
             Ticker ticker = tickerRepository.findByTicker(stock.getTicker());
-            PortfolioTicker portfolioTicker = new PortfolioTicker();
-            portfolioTicker.setPortfolio(portfolio);
-            portfolioTicker.setTicker(ticker);
-            portfolioTicker.setNumber(stock.getQuantity());
-            portfolioTicker.setAveragePrice(stock.getPrice());
-            portfolioTickerRepository.save(portfolioTicker);
+            PortfolioTicker portfolioTicker = portfolioTickerRepository.save(PortfolioTicker.builder()
+                    .portfolio(portfolio)
+                    .ticker(ticker)
+                    .number(stock.getQuantity())
+                    .averagePrice(stock.getPrice())
+                    .build());
+            portfolio.getPortfolioTickers().add(portfolioTicker);
 
             //변동 기록 저장
             portfolioRecordRepository.save(PortfolioRecord.builder()
@@ -281,22 +281,12 @@ public class PortfolioService {
                 float newAveragePrice = ((portfolioTicker.getAveragePrice() * existingQuantity) +
                         (buyRequestDto.getPrice() * buyRequestDto.getQuantity())) /
                         (existingQuantity + buyRequestDto.getQuantity());
-                System.out.println((portfolioTicker.getAveragePrice()+" "+ existingQuantity)+"+"+(buyRequestDto.getPrice() * buyRequestDto.getQuantity())+"/"+(portfolioTicker.getNumber()+" "+ buyRequestDto.getQuantity()));
                 portfolioTicker.setAveragePrice(newAveragePrice);
 
                 portfolioRecordRepository.save(PortfolioRecord.builder()
                         .portfolio(portfolio)
                         .ticker(portfolioTicker.getTicker())
                         .number(buyRequestDto.getQuantity())
-                        .price(buyRequestDto.getPrice())
-                        .isBuy(buyRequestDto.getIsBuy())
-                        .recordDate(LocalDateTime.now())
-                        .build());
-
-                portfolioRecordRepository.save(PortfolioRecord.builder()
-                        .portfolio(portfolio)
-                        .ticker(portfolioTicker.getTicker())
-                        .number(newQuantity)
                         .price(buyRequestDto.getPrice())
                         .isBuy(buyRequestDto.getIsBuy())
                         .recordDate(LocalDateTime.now())

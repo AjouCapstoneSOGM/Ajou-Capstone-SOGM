@@ -108,7 +108,9 @@ public class PortfolioDto {
         private int count;
         private List<PortfolioInfoDto> portfolios;
     }
+
     @Data
+    @Builder
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CreateManualRequestDto {
@@ -116,7 +118,9 @@ public class PortfolioDto {
         private String country;
         private List<StockDetailDto> stocks;
     }
+
     @Data
+    @Builder
     @NoArgsConstructor
     @AllArgsConstructor
     public static class StockDetailDto {
