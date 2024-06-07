@@ -1,8 +1,7 @@
 package com.example.eta.entity;
 
-import com.example.eta.auth.enums.RoleType;
-import com.example.eta.auth.enums.SocialType;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.example.eta.enums.RoleType;
+import com.example.eta.enums.SocialType;
 import jakarta.persistence.*;
 import lombok.*;
 

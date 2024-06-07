@@ -5,11 +5,9 @@ import static com.example.eta.controller.utils.ControllerTestUtils.signUpLogin;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import com.example.eta.auth.enums.RoleType;
 import com.example.eta.dto.UserDto;
 import com.example.eta.entity.SignupInfo;
 import com.example.eta.entity.User;
@@ -19,11 +17,9 @@ import com.example.eta.exception.signup.MissingSignupAttemptException;
 import com.example.eta.repository.SignupInfoRepository;
 import com.example.eta.repository.TokenRepository;
 import com.example.eta.service.SignupInfoService;
-import com.example.eta.service.TokenService;
 import com.example.eta.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,7 +33,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.Map;
 
 
@@ -197,12 +192,13 @@ public class AuthControllerTest {
     public void testLogout() throws Exception {
         // 회원가입, 로그인 후 토큰 반환
         String authorizationHeader = signUpLogin("suprlux09@ajou.ac.kr", mockMvc, signupInfoRepository);
+        User user = userService.findByEmail("suprlux09@ajou.ac.kr");
+        assertTrue(tokenRepository.existsById(user.getUserId()));
 
         mockMvc.perform(post("/api/auth/logout")
                 .header("Authorization", authorizationHeader))
                 .andDo(print()).andExpect(status().isOk());
 
-        User user = userService.findByEmail("suprlux09@ajou.ac.kr");
         assertFalse(tokenRepository.existsById(user.getUserId()));
     }
 }

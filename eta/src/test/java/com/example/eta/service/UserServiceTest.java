@@ -1,6 +1,6 @@
 package com.example.eta.service;
 
-import com.example.eta.auth.enums.RoleType;
+import com.example.eta.enums.RoleType;
 import com.example.eta.dto.UserDto;
 import com.example.eta.entity.User;
 import com.example.eta.repository.UserRepository;

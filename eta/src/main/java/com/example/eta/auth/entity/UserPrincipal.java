@@ -1,9 +1,8 @@
 package com.example.eta.auth.entity;
 
 import com.example.eta.entity.User;
-import com.example.eta.auth.enums.RoleType;
-import com.example.eta.auth.enums.SocialType;
-import lombok.AllArgsConstructor;
+import com.example.eta.enums.RoleType;
+import com.example.eta.enums.SocialType;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -14,7 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-import static com.example.eta.auth.enums.RoleType.ROLE_USER;
+import static com.example.eta.enums.RoleType.ROLE_USER;
 
 @Getter
 @Setter
