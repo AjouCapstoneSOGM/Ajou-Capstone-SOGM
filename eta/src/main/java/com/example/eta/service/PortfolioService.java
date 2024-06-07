@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,6 +53,28 @@ public class PortfolioService {
                 currentAmountForTicker.put(portfolioTicker, price * number);
         }
         return totalAmount;
+    }
+
+    /**
+     * 포트폴리오의 비중을 업데이트힙니다.
+     *
+     * <p> {@code averagePriceUpdated} 가 {@code true}이면 평단가를 기준으로 자산량을 계산, {@code false}이면 가장 최근의 종가를 기준으로 자산량을 계산한 후 비중을 계산합니다.
+     *
+     * <p> {@code setInitProportion} 가 {@code true}이면 초기 비중을 현재 비중과 동일하게 설정합니다.
+     */
+    @Transactional
+    public void updateProportion(Portfolio portfolio, boolean averagePriceUpdated, boolean setInitProportion) {
+        Map<PortfolioTicker, Float> currentAmountForTicker = new HashMap<>();
+        float totalAmount = calculateAmount(portfolio, averagePriceUpdated, currentAmountForTicker);
+
+        for (PortfolioTicker portfolioTicker : currentAmountForTicker.keySet()) {
+            float currentProportion = currentAmountForTicker.get(portfolioTicker).floatValue() / totalAmount;
+            portfolioTicker.setCurrentProportion(currentProportion);
+            if (setInitProportion) {
+                portfolioTicker.setInitProportion(currentProportion);
+            }
+            portfolioTickerRepository.save(portfolioTicker);
+        }
     }
 
 
@@ -232,6 +255,9 @@ public class PortfolioService {
                     .recordDate(LocalDateTime.now())
                     .build());
         }
+
+        // 초기 비중, 현재 비중 업데이트
+        updateProportion(portfolio, true, true);
 
         return portfolio.getPfId();
     }
