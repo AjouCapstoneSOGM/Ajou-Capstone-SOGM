@@ -327,6 +327,9 @@ public class PortfolioService {
         float asset = calculateAmount(portfolio, true, null);
         portfolio.setInitAsset(asset);
 
+        // 초기, 현재 비중 업데이트
+        updateProportion(portfolio, true, true);
+
         portfolioRepository.save(portfolio);
     }
 
@@ -372,6 +375,9 @@ public class PortfolioService {
         // 포트폴리오 초기 자산 업데이트
         float asset = calculateAmount(portfolio, true, null);
         portfolio.setInitAsset(asset);
+
+        // 초기, 현재 비중 업데이트
+        updateProportion(portfolio, true, true);
 
         portfolioRepository.save(portfolio);
     }
