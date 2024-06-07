@@ -69,7 +69,7 @@ public class PortfolioController {
     }
 
     @PostMapping("/{port_id}/sell")
-    public ResponseEntity<Void> sellStock(@PathVariable("port_id") Integer pfId, @RequestBody PortfolioDto.sellRequestDto sellRequestDto) {
+    public ResponseEntity<Void> sellStock(@PathVariable("port_id") Integer pfId, @RequestBody PortfolioDto.SellRequestDto sellRequestDto) {
         portfolioService.sellStock(pfId, sellRequestDto);
         return ResponseEntity.ok().build();
     }
