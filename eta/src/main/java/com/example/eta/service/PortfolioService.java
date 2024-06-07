@@ -267,46 +267,30 @@ public class PortfolioService {
         // TODO: 현재 현금으로 매수 가능 여부
         Portfolio portfolio = portfolioRepository.getReferenceById(pfId);
         List<PortfolioTicker> portfolioTickers = portfolio.getPortfolioTickers();
+        Ticker ticker = tickerRepository.findById(buyRequestDto.getTicker()).get();
 
-        // 이미 보유한 종목일 시
-        for (PortfolioTicker portfolioTicker : portfolioTickers) {
-            if (portfolioTicker.getTicker().getTicker().equals(buyRequestDto.getTicker())) {
-                // 현재 수량 계산
-                int existingQuantity = portfolioTicker.getNumber();
-                int newQuantity = existingQuantity + buyRequestDto.getQuantity();
-                portfolioTicker.updateNumber(newQuantity);
-                portfolioTickerRepository.save(portfolioTicker);
-
-                //새 평단가 계산
-                float newAveragePrice = ((portfolioTicker.getAveragePrice() * existingQuantity) +
-                        (buyRequestDto.getPrice() * buyRequestDto.getQuantity())) /
-                        (existingQuantity + buyRequestDto.getQuantity());
-                portfolioTicker.setAveragePrice(newAveragePrice);
-
-                portfolioRecordRepository.save(PortfolioRecord.builder()
+        // 이미 보유한 종목일 시 보유 종목 정보 업데이트, 아닐 시 새로운 종목 추가
+        portfolioTickers.stream().filter(pt -> pt.getTicker().equals(ticker)).findFirst().ifPresentOrElse(
+            pt -> {
+                int existingQuantity = pt.getNumber();
+                pt.updateNumber(existingQuantity + buyRequestDto.getQuantity());
+                pt.setAveragePrice(((pt.getAveragePrice() * existingQuantity) + (buyRequestDto.getPrice() * buyRequestDto.getQuantity())) / (existingQuantity + buyRequestDto.getQuantity()));
+                portfolioTickerRepository.save(pt);
+            },
+            () -> {
+                PortfolioTicker portfolioTicker = portfolioTickerRepository.save(PortfolioTicker.builder()
+                        .ticker(tickerRepository.findById(buyRequestDto.getTicker()).get())
                         .portfolio(portfolio)
-                        .ticker(portfolioTicker.getTicker())
+                        .averagePrice(buyRequestDto.getPrice())
                         .number(buyRequestDto.getQuantity())
-                        .price(buyRequestDto.getPrice())
-                        .isBuy(buyRequestDto.getIsBuy())
-                        .recordDate(LocalDateTime.now())
                         .build());
-                return;
+                portfolio.getPortfolioTickers().add(portfolioTicker);
             }
-        }
-
-        // 새로운 종목일 시
-        PortfolioTicker portfolioTicker = portfolioTickerRepository.save(PortfolioTicker.builder()
-                .ticker(tickerRepository.findById(buyRequestDto.getTicker()).get())
-                .portfolio(portfolio)
-                .averagePrice(buyRequestDto.getPrice())
-                .number(buyRequestDto.getQuantity())
-                .build());
-        portfolio.getPortfolioTickers().add(portfolioTicker);
+        );
 
         portfolioRecordRepository.save(PortfolioRecord.builder()
                 .portfolio(portfolio)
-                .ticker(portfolioTicker.getTicker())
+                .ticker(ticker)
                 .number(buyRequestDto.getQuantity())
                 .price(buyRequestDto.getPrice())
                 .isBuy(buyRequestDto.getIsBuy())
@@ -323,7 +307,8 @@ public class PortfolioService {
         portfolioRepository.save(portfolio);
     }
 
-    public void sellStock(Integer pfId, PortfolioDto.sellRequestDto sellRequestDto) {
+    @Transactional
+    public void sellStock(Integer pfId, PortfolioDto.SellRequestDto sellRequestDto) {
         PortfolioTicker portfolioTicker = findPortfolioTicker(pfId, sellRequestDto.getTicker());
         Portfolio portfolio = portfolioTicker.getPortfolio();
 
@@ -338,10 +323,9 @@ public class PortfolioService {
         int newQuantity = existingQuantity - sellRequestDto.getQuantity();
         portfolioTicker.updateNumber(newQuantity);
 
-        //수동일 경우 현금 보유량 계산하지 않음
-        if ( portfolio.getIsAuto()) {
+        // 수동일 경우 현금 보유량 계산하지 않음
+        if (portfolio.getIsAuto()) {
             float totalCost = sellRequestDto.getQuantity() * sellRequestDto.getPrice();
-
             float newCurrentCash = portfolio.getCurrentCash() + totalCost;
             portfolio.updateCurrentCash(newCurrentCash);
             portfolio.updateCurrentCash(newCurrentCash);
@@ -358,6 +342,7 @@ public class PortfolioService {
 
         if (newQuantity == 0) {
             portfolioTickerRepository.delete(portfolioTicker);
+            portfolio.getPortfolioTickers().remove(portfolioTicker);
         } else {
             portfolioTickerRepository.save(portfolioTicker);
         }
