@@ -36,13 +36,11 @@ public class PortfolioService {
             double currentCash = portfolio.getCurrentCash();
             double currentValue = currentCash;
 
-            // Calculate the current value of the portfolio based on tickers
             for (PortfolioTicker ticker : portfolio.getPortfolioTickers()) {
                 double tickerValue = ticker.getNumber() * ticker.getAveragePrice();
                 currentValue += tickerValue;
             }
 
-            // Calculate the return rate
             double returnRate = (currentValue - initialAsset) / initialAsset * 100;
             returnRates.put(portfolio.getPfId(), returnRate);
         }

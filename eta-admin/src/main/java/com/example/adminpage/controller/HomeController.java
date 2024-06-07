@@ -50,7 +50,6 @@ public class HomeController {
         model.addAttribute("returnRatesJson", returnRatesJson);
         model.addAttribute("averageReturnRate", averageReturnRate);
         model.addAttribute("comparisonResultsJson", comparisonResultsJson);
-        System.out.println("HomeController.Home"+comparisonResultsJson);
 
         return "home";
     }
