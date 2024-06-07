@@ -1,7 +1,5 @@
 package com.example.adminpage.repository;
 
-import com.example.adminpage.entity.Portfolio;
-import com.example.adminpage.entity.Ticker;
 import com.example.adminpage.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -18,4 +16,5 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     List<User> findAllByNameContaining(@Param("name") String name);
     @Query("SELECT p FROM User p WHERE p.userId = :userId")
     Optional<User> findAllByUserId(@Param("userId") int userId);
+    long count();
 }
