@@ -41,7 +41,7 @@ public class PortfolioScheduler {
     @Transactional
     public void doProportionRebalancing() {
         for (Portfolio portfolio : portfolioRepository.findAll()) {
-            portfolioService.updateProportion(portfolio, false, false);
+            portfolioService.updateProportion(portfolio, false);
             if (isProportionRebalancingNeeded(portfolio)) {
                 int rnId = createProportionRebalancing(portfolio);
                 try {

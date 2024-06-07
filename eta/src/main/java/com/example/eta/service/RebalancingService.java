@@ -103,6 +103,7 @@ public class RebalancingService {
                 // 주식 수가 0이 되면 PortfolioTicker 레코드를 삭제
                 if (portfolioTicker.getNumber() == 0) {
                     portfolioTickerRepository.delete(portfolioTicker);
+                    portfolio.getPortfolioTickers().remove(portfolioTicker);
                 } else {
                     portfolioTickerRepository.save(portfolioTicker);
                 }
@@ -119,13 +120,13 @@ public class RebalancingService {
             }
         }
 
-        // 현재 비중 계산
-        // 초기 포트폴리오, 수동 포트폴리오일 경우 초기 비중도 계산
-        boolean setInitProportion = portfolio.getCreatedDate() == null || !portfolio.getIsAuto() ? true : false;
-        portfolioService.updateProportion(portfolio, true, setInitProportion);
-
+        // 수동 포트폴리오일 경우 초기 비중을 현재 비중으로 업데이트함
+        if (!portfolio.getIsAuto()) {
+            portfolioService.updateProportion(portfolio, true);
+        }
         // 초기화되지 않은 자동 포트폴리오의 날짜, 초기 현금 업데이트
-        if (portfolio.getCreatedDate() == null) {
+        else if (portfolio.getCreatedDate() == null) {
+            portfolioService.setInitProportion(portfolio);
             portfolio.setInitCash(portfolio.getCurrentCash());
             portfolio.setCreatedDate(LocalDateTime.now());
         }
@@ -140,7 +141,7 @@ public class RebalancingService {
     public int executeRebalancingAndGetNotificationId(int pfId) {
         Portfolio portfolio = portfolioRepository.findById(pfId).get();
 
-        portfolioService.updateProportion(portfolio, false, false);
+        portfolioService.updateProportion(portfolio, false);
         if (portfolioScheduler.isProportionRebalancingNeeded(portfolio)) {
             return portfolioScheduler.createProportionRebalancing(portfolio);
         } else return -1;
