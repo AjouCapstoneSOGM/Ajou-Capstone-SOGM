@@ -23,6 +23,7 @@ public class PortfolioDto {
     }
 
     @Data
+    @Builder
     @NoArgsConstructor
     @AllArgsConstructor
     public static class BuyRequestDto {
@@ -80,7 +81,7 @@ public class PortfolioDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class sellRequestDto {
+    public static class SellRequestDto {
         private String ticker;
         private Boolean isBuy;
         private int quantity;
