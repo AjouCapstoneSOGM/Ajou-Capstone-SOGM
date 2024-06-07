@@ -40,7 +40,7 @@ public class PortfolioScheduler {
     @Scheduled(cron = "0 0 0 * * 1-5")
     @Transactional
     public void doProportionRebalancing() {
-        for (Portfolio portfolio : portfolioRepository.findAllByIsAutoIsTrue()) {
+        for (Portfolio portfolio : portfolioRepository.findAll()) {
             portfolioService.updateProportion(portfolio, false, false);
             if (isProportionRebalancingNeeded(portfolio)) {
                 int rnId = createProportionRebalancing(portfolio);
