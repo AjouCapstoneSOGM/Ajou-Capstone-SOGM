@@ -67,6 +67,47 @@ public class PortfolioServiceTest {
     }
 
     @Test
+    @DisplayName("수동 포트폴리오 생성")
+    @Transactional
+    public void testCreateManualPortfolio() throws Exception {
+        // given 유저 생성
+        User user = userRepository.save(new User().builder()
+                .email("suprlux09@ajou.ac.kr")
+                .isVerified(false)
+                .password("password!")
+                .name("James")
+                .roleType(RoleType.ROLE_USER)
+                .createdDate(LocalDateTime.now())
+                .enabled(true).build());
+
+        // when 포트폴리오 생성
+        List<PortfolioDto.StockDetailDto> stocks = List.of(
+                PortfolioDto.StockDetailDto.builder().ticker("005930").quantity(10).price(1000).isBuy(true).build(),
+                PortfolioDto.StockDetailDto.builder().ticker("000660").quantity(5).price(50000).isBuy(true).build()
+        );
+
+        PortfolioDto.CreateManualRequestDto createManualRequestDto = PortfolioDto.CreateManualRequestDto.builder()
+                .name("수동 포트폴리오")
+                .country("KOR")
+                .stocks(stocks).build();
+
+        int pfId = portfolioService.createManualPortfolio(user, createManualRequestDto);
+
+        Portfolio portfolio = portfolioRepository.findById(pfId).get();
+        Assertions.assertAll(
+                () -> assertEquals(portfolio.getUser().getUserId(), user.getUserId()),
+                () -> assertEquals(portfolio.getName(), createManualRequestDto.getName()),
+                () -> assertEquals(portfolio.getCountry(), createManualRequestDto.getCountry()),
+                () -> assertEquals(portfolio.getIsAuto(), false),
+                () -> assertEquals(portfolio.getCurrentCash(), 0.0f)
+        );
+        List<PortfolioTicker> portfolioTickers = portfolio.getPortfolioTickers();
+        for (PortfolioTicker portfolioTicker : portfolioTickers) {
+            assertEquals(portfolioTicker.getInitProportion(), portfolioTicker.getCurrentProportion());
+        }
+    }
+
+    @Test
     @DisplayName("자동 포트폴리오 초기화(생성된 결과 반영, 리밸런싱 알림 초기화)")
     @Transactional
     public void testInitializeAutoPortfolio() throws Exception {
