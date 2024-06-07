@@ -1,5 +1,7 @@
 package com.example.adminpage.entity;
 
+import com.example.adminpage.enums.RoleType;
+import com.example.adminpage.enums.SocialType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -39,14 +41,14 @@ public class User {
 
     @Column(nullable = false, length = 30)
     private String name;
-//
-//    @Column(nullable = false)
-//    @Enumerated(EnumType.STRING)
-//    private RoleType roleType;
-//
-//    @Column
-//    @Enumerated(EnumType.STRING)
-//    private SocialType socialType;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private RoleType roleType;
+
+    @Column
+    @Enumerated(EnumType.STRING)
+    private SocialType socialType;
 
     @Column(nullable = false)
     private LocalDateTime createdDate;

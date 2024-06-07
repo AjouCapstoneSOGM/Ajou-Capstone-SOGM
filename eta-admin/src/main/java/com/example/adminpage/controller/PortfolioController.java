@@ -2,26 +2,31 @@ package com.example.adminpage.controller;
 
 
 import com.example.adminpage.entity.Portfolio;
+import com.example.adminpage.entity.User;
 import com.example.adminpage.repository.PortfolioRepository;
 import com.example.adminpage.repository.PortfolioTickerRepository;
 import com.example.adminpage.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
 @Controller
-@RequestMapping("/portfolio-list")
+@RequestMapping("/portfolio")
 public class PortfolioController {
+    @Value("${application.url}")
+    private String baseUrl;
+
     @Autowired
     private PortfolioRepository portfolioRepository;
-
     @Autowired
     private PortfolioTickerRepository portfolioTickerRepository;
 
@@ -47,5 +52,30 @@ public class PortfolioController {
     public ResponseEntity<Void> deletePortfolio(@PathVariable("port_id") Integer pfId) {
         portfolioRepository.deleteById(pfId);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/execute")
+    public String executeRebalancing(@RequestParam("pfId") int pfId, RedirectAttributes redirectAttributes) {
+        User user = portfolioRepository.findById(pfId).get().getUser();
+
+        // Spring Boot 서버의 API를 호출
+        HttpStatusCode statusCode = WebClient.builder().baseUrl(baseUrl).build()
+            .put()
+            .uri("/api/rebalancing/"+pfId+"/execute")
+            .retrieve()
+            .toEntity(Void.class)
+            .block().getStatusCode();
+
+        if (statusCode == HttpStatus.OK) {
+            redirectAttributes.addFlashAttribute("message", "포트폴리오 " + pfId + " 비중 갱신 완료, 리밸런싱 알림이 생성되었습니다.");
+        }
+        else if (statusCode == HttpStatus.NO_CONTENT) {
+            redirectAttributes.addFlashAttribute("message", "포트폴리오 " + pfId + " 비중 갱신 완료, 리밸런싱 대상이 아닙니다.");
+        }
+        else {
+            redirectAttributes.addFlashAttribute("message", "포트폴리오 " + pfId + " 비중 갱신 실패");
+        }
+
+        return "redirect:/users/" + user.getUserId();
     }
 }

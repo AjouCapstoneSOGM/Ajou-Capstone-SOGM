@@ -26,7 +26,7 @@
         }
     </style>
 </head>
-<body class="min-h-screen bg-gray-100 dark:bg-gray-900">
+    <body class="min-h-screen bg-gray-100 dark:bg-gray-900">
     <div class="flex h-screen">
         <div class="hidden border-r bg-gray-100/40 lg:block dark:bg-gray-800/40 w-72">
             <div class="flex h-full flex-col gap-2">
@@ -103,8 +103,8 @@
                     <input id="searchInput" type="text" placeholder="Search..." class="px-4 py-1 border rounded-md">
                     <div class="flex gap-2">
                         <label>
-                            <input type="radio" name="searchType" value="id" checked>
-                            ID
+                            <input type="radio" name="searchType" value="email" checked>
+                            Email/소셜 ID
                         </label>
                         <label>
                             <input type="radio" name="searchType" value="name">
@@ -114,29 +114,48 @@
                     <button class="px-4 py-1 bg-blue-600 text-white rounded-md" onclick="search()">Search</button>
                 </div>
             </div>
-                <table class="w-full bg-white rounded-md shadow-md overflow-hidden">
-                    <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-4 py-2 text-left text-gray-500">UserId</th>
-                        <th class="px-4 py-2 text-left text-gray-500">Name</th>
-                        <th class="px-4 py-2 text-left text-gray-500">Email</th>
-                        <th class="px-4 py-2 text-left text-gray-500">CreatedDate</th>
-                        <th class="px-4 py-2 text-left text-gray-500">계정상태</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="user : ${users}" class="clickable" onclick="goToDetail([[${user.userId}]])">
-                        <td class="border-t px-4 py-2" th:text="${user.userId}"></td>
-                        <td class="border-t px-4 py-2" th:text="${user.name}"></td>
-                        <td class="border-t px-4 py-2" th:text="${user.email}"></td>
-                        <td class="border-t px-4 py-2" th:text="${user.createdDate}"></td>
-                        <td class="border-t px-4 py-2">
-                            <button class="px-2 py-1 bg-blue-500 text-white rounded-md">활성화</button>
-<!--                            <button class="px-2 py-1 bg-red-500 text-white rounded-md">비활성</button>-->
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
+            <div class="alert" th:if="${message}">
+                <span th:text="${message}"></span>
+            </div>
+            <table class="w-full bg-white rounded-md shadow-md overflow-hidden">
+                <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-4 py-2 text-left text-gray-500">User Id</th>
+                    <th class="px-4 py-2 text-left text-gray-500">Email/소셜 ID</th>
+                    <th class="px-4 py-2 text-left text-gray-500">닉네임</th>
+                    <th class="px-4 py-2 text-left text-gray-500">계정 생성일</th>
+                    <th class="px-4 py-2 text-left text-gray-500">계정 수정일</th>
+                    <th class="px-4 py-2 text-left text-gray-500">계정 종류</th>
+                    <th class="px-4 py-2 text-left text-gray-500">계정 상태</th>
+                    <th class="px-4 py-2 text-left text-gray-500"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="user : ${users}" th:onclick="'javascript:goToDetail(\'' + ${user.userId} + '\');'" class="clickable" >
+                    <td class="border-t px-4 py-2" th:text="${user.userId}"></td>
+                    <td class="border-t px-4 py-2" th:text="${user.email}"></td>
+                    <td class="border-t px-4 py-2" th:text="${user.name}"></td>
+                    <td class="border-t px-4 py-2" th:text="${user.createdDate}"></td>
+                    <td class="border-t px-4 py-2" th:text="${user.modifiedDate == null ? '-' : user.modifiedDate}"></td>
+                    <td class="border-t px-4 py-2" th:text="${user.socialType == null ? '일반 계정' : '소셜 계정' + '(' + user.socialType + ')'}"></td>
+                    <td class="border-t px-4 py-2" th:text="${user.enabled ? '활성화' : '비활성화'}"></td>
+                    <td class="border-t px-4 py-2">
+                        <form th:action="@{/users/disable}" method="post">
+                            <input type="hidden" name="userId" th:value="${user.userId}" />
+                            <button th:if="${user.enabled}" class="px-2 py-1 bg-red-500 text-white rounded-md">비활성화</button>
+                        </form>
+                        <form th:action="@{/users/enable}" method="post">
+                            <input type="hidden" name="userId" th:value="${user.userId}" />
+                            <button th:unless="${user.enabled}" class="px-2 py-1 bg-blue-500 text-white rounded-md">활성화</button>
+                        </form>
+                        <form th:action="@{/users/reset-password}" method="post">
+                            <input type="hidden" name="userId" th:value="${user.userId}" />
+                            <button th:if="${user.socialType == null}" class="px-2 py-1 bg-gray-500 text-white rounded-md">비밀번호 초기화</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
         </div>
     </div>
     <script>
@@ -165,8 +184,15 @@
             }
         }
         function goToDetail(userId) {
-            window.location.href = '/user/' + userId;
+            window.location.href = '/users/' + userId;
         }
+
+        setTimeout(function() {
+            document.querySelector('.alert').style.opacity = 0;
+            setTimeout(function() {
+                document.querySelector('.alert').style.display = 'none';
+            }, 1000);
+        }, 3000);
     </script>
 </body>
 </html>
