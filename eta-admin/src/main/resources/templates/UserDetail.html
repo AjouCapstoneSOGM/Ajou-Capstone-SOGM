@@ -147,13 +147,13 @@
                 <td class="border-t px-4 py-2" th:text="${portfolio.pfId}"></td>
                 <td class="border-t px-4 py-2" th:text="${portfolio.name}"></td>
                 <td class="border-t px-4 py-2" th:text="${portfolio.isAuto ? '자동' : '수동'}"></td>
-                <td class="border-t px-4 py-2" th:text="${portfolio.isAuto ? portfolio.portfolioSectors : '-'}"></td>
+                <td class="border-t px-4 py-2" th:text="${portfolio.isAuto ? portfolio.portfolioSectors.get(0).getSector().getSectorName() : '-'}"></td>
                 <td class="border-t px-4 py-2" th:text="${portfolio.isAuto ? portfolio.riskValue : '-'}"></td>
                 <td class="border-t px-4 py-2" th:text="${portfolio.createdDate == null ? '초기화되지 않음' : portfolio.createdDate}"></td>
                 <td class="border-t px-4 py-2">
                     <form th:action="@{/portfolio/execute}" method="post">
                         <input type="hidden" name="pfId" th:value="${portfolio.pfId}">
-                        <button th:if="${portfolio.isAuto}" class="px-2 py-1 bg-green-500 text-white rounded-md">비중 즉시 조정</button>
+                        <button class="px-2 py-1 bg-green-500 text-white rounded-md">비중 즉시 조정</button>
                     </form>
                 </td>
             </tr>
