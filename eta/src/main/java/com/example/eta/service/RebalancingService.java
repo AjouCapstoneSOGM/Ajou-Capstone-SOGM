@@ -103,6 +103,7 @@ public class RebalancingService {
                 // 주식 수가 0이 되면 PortfolioTicker 레코드를 삭제
                 if (portfolioTicker.getNumber() == 0) {
                     portfolioTickerRepository.delete(portfolioTicker);
+                    portfolio.getPortfolioTickers().remove(portfolioTicker);
                 } else {
                     portfolioTickerRepository.save(portfolioTicker);
                 }
