@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import static com.example.eta.auth.enums.RoleType.ROLE_USER;
+import static com.example.eta.enums.RoleType.ROLE_USER;
 
 @Component
 @RequiredArgsConstructor
@@ -63,7 +63,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String requestURI = request.getRequestURI();
 
-        if ((requestURI.startsWith("/api/auth/") || requestURI.startsWith("/docs") || requestURI.startsWith("/api/ticker")) && !requestURI.equals("/api/auth/logout")) {
+        if ((requestURI.startsWith("/api/auth/") || requestURI.startsWith("/docs") || requestURI.startsWith("/api/ticker") || requestURI.endsWith("execute")) && !requestURI.equals("/api/auth/logout")) {
             return true;
         }
 
