@@ -2,11 +2,10 @@ package com.example.eta.controller;
 
 import com.example.eta.entity.Portfolio;
 import com.example.eta.entity.User;
-import com.example.eta.auth.enums.RoleType;
+import com.example.eta.enums.RoleType;
 import com.example.eta.repository.PortfolioRepository;
 import com.example.eta.repository.SignupInfoRepository;
 import com.example.eta.repository.UserRepository;
-import com.example.eta.service.UserService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -27,10 +27,12 @@ const ManualPage1 = ({ step, setStep, stockList, setStockList }) => {
 
   const handleSelectedStocks = (stock) => {
     setStockList((prevSelectedStocks) => {
-      const isSelected = prevSelectedStocks.some((s) => s === stock);
+      const isSelected = prevSelectedStocks.some(
+        (s) => s.ticker === stock.ticker
+      );
       if (isSelected) {
         // 이미 선택된 종목이면 제거
-        return prevSelectedStocks.filter((s) => s !== stock);
+        return prevSelectedStocks.filter((s) => s.ticker !== stock.ticker);
       } else {
         // 선택되지 않은 종목이면 추가
         return [...prevSelectedStocks, stock];

@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.example.eta.dto.PortfolioDto;
 import com.example.eta.entity.*;
-import com.example.eta.auth.enums.RoleType;
+import com.example.eta.enums.RoleType;
 import com.example.eta.repository.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;

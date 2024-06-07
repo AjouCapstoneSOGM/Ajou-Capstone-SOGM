@@ -14,6 +14,7 @@ import { getUsertoken } from "../utils/localStorageUtils";
 import { useAuth } from "../utils/AuthContext";
 import ModalComponent from "../utils/Modal";
 import { TextInput } from "react-native-gesture-handler";
+import FooterComponent from "../utils/Footer";
 
 const Settings = ({ navigation }) => {
   const { logout } = useAuth();
@@ -71,7 +72,7 @@ const Settings = ({ navigation }) => {
       console.log(error);
       return { result: "fail" };
     }
-  };  
+  };
 
   const fetchUserInfo = async () => {
     try {
@@ -84,7 +85,6 @@ const Settings = ({ navigation }) => {
       });
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
         return data;
       } else {
         throw new Error();
@@ -193,7 +193,6 @@ const Settings = ({ navigation }) => {
     }
   };
 
-  
   const handleUserDelete = async () => {
     const result = await fetchUserDelete();
     if (result.result === "success") {
@@ -323,10 +322,6 @@ const Settings = ({ navigation }) => {
             <Divider />
           </React.Fragment>
         )}
-        <TouchableOpacity style={styles.settingItem}>
-          <AppText style={{ color: "#f0f0f0", fontSize: 18 }}>문의하기</AppText>
-        </TouchableOpacity>
-        <Divider />
         <Divider />
         <TouchableOpacity style={styles.settingItem} onPress={handleLogout}>
           <AppText style={{ color: "#f0f0f0", fontSize: 18 }}>로그아웃</AppText>
@@ -337,6 +332,7 @@ const Settings = ({ navigation }) => {
         </TouchableOpacity>
         <Divider />
       </ScrollView>
+      <FooterComponent />
       <ModalComponent
         isVisible={pwModalVisible}
         onToggle={togglePwModalVisible}

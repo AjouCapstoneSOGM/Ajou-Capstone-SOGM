@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import urls from "./urls";
 import GetCurrentPrice from "./GetCurrentPrice";
 import { getUsertoken } from "./localStorageUtils";
+import { useAuth } from "./AuthContext";
 
 const PortfolioContext = createContext();
 
@@ -9,6 +10,7 @@ export const PortfolioProvider = ({ children }) => {
   const [portfolios, setPortfolios] = useState([]);
   const [portLoading, setPortLoading] = useState(false);
   const [rebalances, setRebalances] = useState([]);
+  const { isLoggedIn } = useAuth();
 
   const removePortfolios = () => {
     setPortfolios([]);
@@ -201,6 +203,7 @@ export const PortfolioProvider = ({ children }) => {
 
       if (response.ok) {
         setPortfolios(portfolios.filter((portfolio) => portfolio.id !== id));
+        setRebalances(rebalances.filter((rebalance) => rebalance.pfId !== id));
         setPortLoading(false);
         return true;
       } else {
@@ -263,6 +266,12 @@ export const PortfolioProvider = ({ children }) => {
     setPortfolios(portfolioList);
     setPortLoading(false);
   };
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      loadData();
+    }
+  }, [isLoggedIn]);
 
   return (
     <PortfolioContext.Provider

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { CommonActions, useFocusEffect } from "@react-navigation/native";
 import {
   View,
@@ -11,13 +11,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Divider, Icon } from "@rneui/base";
 import { usePortfolio } from "../../utils/PortfolioContext";
-import {
-  width,
-  height,
-  deepCopy,
-  filteringNumber,
-  colorScale,
-} from "../../utils/utils";
+import { width, height, deepCopy, filteringNumber } from "../../utils/utils";
 import PortfolioPieChart from "../../utils/PortfolioPieChart";
 import AppText from "../../utils/AppText";
 import Loading from "../../utils/Loading";
@@ -26,23 +20,34 @@ import ModalComponent from "../../utils/Modal";
 const ModifyPortfolio = ({ route, navigation }) => {
   const { pfId, rnId, rebalancing, portfolio } = route.params;
   const { fetchModify, loadData } = usePortfolio();
+  const [portfolioAfter, setPortfolioAfter] = useState([]);
+  const [rebalances, setRebalances] = useState([]);
   const [selectedId, setSelectedId] = useState();
   const [loading, setLoading] = useState(true);
-  const [rebalances, setRebalances] = useState([]);
   const [isVisible, setIsVisible] = useState(false);
   const [info, setInfo] = useState("");
   const [isAscending, setIsAscending] = useState(true);
+  const [checkList, setCheckList] = useState([]);
+
+  const isChecked = (index) => {
+    const currentIndex = checkList.indexOf(index);
+    if (currentIndex === -1) return false;
+    else return true;
+  };
+
+  const handleCheckList = (index) => {
+    setCheckList((prevIndices) => {
+      const currentIndex = prevIndices.indexOf(index);
+      if (currentIndex === -1) {
+        return [...prevIndices, index];
+      } else {
+        return prevIndices.filter((i) => i !== index);
+      }
+    });
+  };
 
   const toggleModal = () => {
     setIsVisible(!isVisible);
-  };
-
-  const isPortfolioInit = () => {
-    if (portfolio) {
-      if (portfolio.detail.currentCash === portfolio.detail.initialAsset)
-        return true;
-      else return false;
-    }
   };
 
   const getTotalPrice = () => {
@@ -53,26 +58,20 @@ const ModifyPortfolio = ({ route, navigation }) => {
     return totalPrice + portfolio.detail.currentCash;
   };
 
-  const getCurrentQuantity = (ticker) => {
-    const stock = portfolio.detail.stocks.filter(
-      (item) => item.ticker == ticker
-    )[0];
-    return stock.quantity;
-  };
-
   const calculateAfter = () => {
-    if (portfolio) {
-      const afterPortfolio = deepCopy(portfolio);
-      afterPortfolio.detail.stocks.map((stock) => {
-        const order = rebalances.find((order) => order.ticker === stock.ticker);
-        if (order) {
+    const afterPortfolio = deepCopy(portfolio);
+    checkList.forEach((index) => {
+      const order = rebalances[index];
+      afterPortfolio.detail.stocks.forEach((stock) => {
+        if (stock.ticker == order.ticker) {
           stock.quantity += order.quantity * (order.isBuy ? 1 : -1);
           afterPortfolio.detail.currentCash +=
             order.quantity * order.price * (order.isBuy ? -1 : 1);
         }
       });
-      return afterPortfolio;
-    }
+    });
+
+    return afterPortfolio;
   };
 
   const handleSort = (prop) => {
@@ -180,8 +179,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
         <AppText
           style={{ flex: 1, fontSize: 25, fontWeight: "bold", color: "#333" }}
         >
-          {isPortfolioInit() ? "최초 매수를" : "리밸런싱을"} 해야하는 종목{" "}
-          {rebalances.length}개가 있어요
+          리밸런싱을 해야하는 종목 {rebalances.length}개가 있어요
         </AppText>
         <Button
           buttonStyle={{ marginHorizontal: width * 10 }}
@@ -189,9 +187,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
           onPress={() => {
             toggleModal();
             setInfo(
-              isPortfolioInit()
-                ? "포트폴리오 생성 직후에는 종목을 직접 반영해야 해요.\n\n하단의 종목 리스트를 확인하여 직접 주식을 매수해주세요."
-                : "리밸런싱(Rebalancing)이란?\n\n리밸런싱은 투자 포트폴리오의 자산 비율을 조정하는 과정입니다.\n주식, 채권, 현금 등 다양한 자산이 포함된 포트폴리오에서 각 자산의 비율이 시장 변동에 따라 원래의 목표 비율에서 벗어나게 되면, 이를 다시 조정하여 원래의 비율로 되돌리는 것이 리밸런싱입니다.\n\n\n리밸런싱 방법\n\n1. 현재 포트폴리오의 자산 비율을 확인합니다.\n2. 목표 비율과 비교하여 초과 또는 부족한 자산을 파악합니다.\n3. 초과 자산을 매도하고 부족 자산을 매수하여 목표 비율로 조정합니다."
+              "리밸런싱(Rebalancing)이란?\n\n리밸런싱은 투자 포트폴리오의 자산 비율을 조정하는 과정입니다.\n주식, 채권, 현금 등 다양한 자산이 포함된 포트폴리오에서 각 자산의 비율이 시장 변동에 따라 원래의 목표 비율에서 벗어나게 되면, 이를 다시 조정하여 원래의 비율로 되돌리는 것이 리밸런싱입니다.\n\n\n리밸런싱 방법\n\n1. 현재 포트폴리오의 자산 비율을 확인합니다.\n2. 목표 비율과 비교하여 초과 또는 부족한 자산을 파악합니다.\n3. 초과 자산을 매도하고 부족 자산을 매수하여 목표 비율로 조정합니다."
             );
           }}
           icon={{
@@ -202,43 +198,22 @@ const ModifyPortfolio = ({ route, navigation }) => {
         />
       </View>
       <View style={styles.chartContainer}>
-        <View style={styles.chartTitle}>
-          <AppText
-            style={{
-              flex: 1,
-              flexcolor: "#333",
-              fontSize: 15,
-              textAlign: "center",
-            }}
-          >
-            {isPortfolioInit() ? "자산배분" : "리밸런싱"} 전
-          </AppText>
-          <AppText
-            style={{
-              flex: 1,
-              color: "#333",
-              fontSize: 15,
-              textAlign: "center",
-            }}
-          >
-            {isPortfolioInit() ? "자산배분" : "리밸런싱"} 후
-          </AppText>
-        </View>
         <View style={styles.chartContent}>
-          <View style={styles.chartBox1}>
+          {/* <View style={styles.chartBox1}>
             <PortfolioPieChart
               data={portfolio.detail}
               selectedId={selectedId}
               size={width * 0.5}
               mode={"light"}
             />
-          </View>
+          </View> */}
           <View style={styles.chartBox2}>
             <PortfolioPieChart
               data={calculateAfter().detail}
               selectedId={selectedId}
-              size={width * 0.5}
+              size={width * 0.6}
               mode={"light"}
+              animate={false}
             />
           </View>
         </View>
@@ -264,7 +239,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
               icon={{
                 name: "questioncircleo",
                 type: "antdesign",
-                color: "#f0f0f0",
+                color: "#aaa",
               }}
             />
           </View>
@@ -351,12 +326,15 @@ const ModifyPortfolio = ({ route, navigation }) => {
             <View key={index} style={styles.rebalanceItem}>
               <TouchableOpacity
                 style={styles.rebalanceItemContent}
-                onPress={() => handleSelectedId(item.ticker)}
+                onPress={() => {
+                  handleSelectedId(item.ticker);
+                  handleCheckList(index);
+                }}
               >
                 <Icon
                   name="checkcircle"
                   type="antdesign"
-                  color={colorScale[item.index]}
+                  color={isChecked(index) ? "#97f697" : "#808080"}
                   size={15}
                   style={{ marginRight: 5 }}
                 />

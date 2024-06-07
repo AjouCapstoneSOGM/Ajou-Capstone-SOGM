@@ -79,10 +79,11 @@ class News:
         mask = news_list["title"].str.contains(word_to_delete, case=False)
         news_list = news_list[~mask]
         news_list.reset_index(drop=True, inplace=True)
+        
 
         return news_list
 
-    async def get_news_title_from_page(self, page, start_date, end_date, ticker):
+    def get_news_title_from_page(self, page, start_date, end_date, ticker):
         url = f"https://finance.naver.com/item/news.naver?code={ticker}&page={page}"
 
         response = rq.get(url)

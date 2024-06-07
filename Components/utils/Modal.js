@@ -23,7 +23,7 @@ const ModalComponent = ({ isVisible, onToggle, children }) => {
 const styles = StyleSheet.create({
   overlay: {
     width: "90%",
-    borderRadius: 10,
+    borderRadius: 5,
     backgroundColor: "#333",
   },
   content: {

@@ -80,7 +80,6 @@ async def get_current_news():
     news = News()
     result = news.get_recent_news()
 
-    print(result)
     return result
 
 

@@ -119,31 +119,19 @@ public class RebalancingService {
             }
         }
 
-        // 비중 계산
-        // 초기 포트폴리오일 경우 초기 비중도 초기화
-        boolean isInitial = portfolio.getCreatedDate() == null ? true : false;
-        Map<PortfolioTicker, Float> currentAmountForTicker = new HashMap<>();
-        float totalAmount = portfolioService.calculateAmount(portfolio, true, currentAmountForTicker);
+        // 현재 비중 계산
+        // 초기 포트폴리오, 수동 포트폴리오일 경우 초기 비중도 계산
+        boolean setInitProportion = portfolio.getCreatedDate() == null || !portfolio.getIsAuto() ? true : false;
+        portfolioService.updateProportion(portfolio, true, setInitProportion);
 
-        for (PortfolioTicker portfolioTicker : currentAmountForTicker.keySet()) {
-            float currentProportion = currentAmountForTicker.get(portfolioTicker).floatValue() / totalAmount;
-            portfolioTicker.setCurrentProportion(currentProportion);
-            if (isInitial) {
-                portfolioTicker.setInitProportion(currentProportion);
-            }
-            portfolioTickerRepository.save(portfolioTicker);
-        }
-
-        if (isInitial) {
+        // 초기화되지 않은 자동 포트폴리오의 날짜, 초기 현금 업데이트
+        if (portfolio.getCreatedDate() == null) {
             portfolio.setInitCash(portfolio.getCurrentCash());
             portfolio.setCreatedDate(LocalDateTime.now());
         }
 
         // 리밸런싱 알림 삭제
         rebalancingRepository.delete(rebalancingRepository.findById(rnId).get());
-
-        // 현재 비중 계산
-        portfolioScheduler.updateProportion(portfolio);
 
         portfolioRepository.save(portfolio);
         return true;
@@ -152,7 +140,7 @@ public class RebalancingService {
     public int executeRebalancingAndGetNotificationId(int pfId) {
         Portfolio portfolio = portfolioRepository.findById(pfId).get();
 
-        portfolioScheduler.updateProportion(portfolio);
+        portfolioService.updateProportion(portfolio, false, false);
         if (portfolioScheduler.isProportionRebalancingNeeded(portfolio)) {
             return portfolioScheduler.createProportionRebalancing(portfolio);
         } else return -1;

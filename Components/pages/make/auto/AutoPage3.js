@@ -66,7 +66,7 @@ const AutoPage3 = ({ step, setStep, sector, interest, setInterest }) => {
           ))}
         </ScrollView>
         <AppText style={styles.safeinfoText}>
-          특정 분야와 수익률과는 알려진 직접적인 관계가 없어요.
+          특정 분야와 수익률은 알려진 직접적인 관계가 없어요.
         </AppText>
       </View>
       <View style={styles.nextButtonContainer}>

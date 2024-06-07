@@ -264,13 +264,14 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "stretch",
-    backgroundColor: "#fff",
+    backgroundColor: "#333",
   },
   HomeText: {
     paddingBottom: height * 15,
     fontSize: 40,
     textAlign: "center",
-    color: "#333",
+    fontWeight: "bold",
+    color: "#fff",
   },
   allContainer: { alignItems: "stretch", padding: 10, paddingBottom: 10 },
   inputContainer: {
@@ -312,10 +313,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   disabled: {
-    backgroundColor: "#ddd",
+    backgroundColor: "#aaa",
   },
   buttonText: {
     color: "white",
+    fontWeight: "bold",
     fontSize: 17,
   },
   verifyInputBox: {
@@ -335,10 +337,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
-  },
-  buttonText: {
-    color: "white",
-    fontWeight: "bold",
   },
   verifybuttonText: {
     color: "white",
