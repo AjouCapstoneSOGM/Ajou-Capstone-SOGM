@@ -146,11 +146,11 @@ const PortfolioList = ({ navigation }) => {
             disabled={selectedIndex == 0}
             disabledStyle={{ opacity: 0 }}
           />
-          <PortfolioPieChart
+          {/* <PortfolioPieChart
             data={portfolios[selectedIndex]?.detail}
             size={width * 0.9}
             mode={"light"}
-          />
+          /> */}
           <Button
             containerStyle={{ zIndex: 1 }}
             type="clear"
@@ -171,7 +171,7 @@ const PortfolioList = ({ navigation }) => {
       {portfolioExist() && (
         <React.Fragment>
           <View style={styles.pageIndicator}>
-            {portfolios.map((_, index) => (
+            {Array.from({ length: portfolios.length + 1 }).map((_, index) => (
               <AppText
                 key={index}
                 style={{ marginHorizontal: 2, color: "#333" }}
@@ -276,6 +276,17 @@ const PortfolioList = ({ navigation }) => {
                 </View>
               );
             })}
+            <TouchableOpacity
+              style={[
+                styles.portfolio,
+                { alignItems: "center", justifyContent: "center" },
+              ]}
+              onPress={() => {
+                navigation.navigate("MakePortfolio");
+              }}
+            >
+              <Icon name="plus" type="antdesign" color="#f0f0f0" size={40} />
+            </TouchableOpacity>
           </PagerView>
         </React.Fragment>
       )}

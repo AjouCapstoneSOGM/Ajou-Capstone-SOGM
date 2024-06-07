@@ -59,7 +59,7 @@ export const filteringNumber = (value) => {
 };
 
 export const removeSpecialChars = (text) => {
-  return text.replace(/[^a-zA-Z0-9 가-힣ㄱ-ㅎ]/g, "");
+  return text.replace(/[^a-zA-Z0-9 가-힣ㄱ-ㅎㅏ-ㅣㆍ]/g, "");
 };
 
 export const colorScale = [

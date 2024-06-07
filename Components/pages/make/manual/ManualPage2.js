@@ -3,7 +3,7 @@ import { View, TextInput, StyleSheet, ScrollView } from "react-native";
 import AppText from "../../../utils/AppText";
 import { filteringNumber, height } from "../../../utils/utils";
 import GetCurrentPrice from "../../../utils/GetCurrentPrice";
-import { Button } from "@rneui/base";
+import { Button, Icon } from "@rneui/base";
 import Loading from "../../../utils/Loading";
 
 const ManualPage2 = ({ step, setStep, stockList, setStockList }) => {
@@ -12,6 +12,14 @@ const ManualPage2 = ({ step, setStep, stockList, setStockList }) => {
 
   const handleNextStep = () => {
     setStep(step + 1);
+  };
+
+  const getTotalPrice = () => {
+    const totalPrice = stockList.reduce(
+      (acc, cur) => acc + cur.currentPrice * cur.quantity,
+      0
+    );
+    return isNaN(totalPrice) ? 0 : totalPrice;
   };
 
   const mergeDataAndSet = (stocks, logs) => {
@@ -91,23 +99,30 @@ const ManualPage2 = ({ step, setStep, stockList, setStockList }) => {
         </AppText>
       </View>
       <View style={styles.contentsContainer}>
+        <View style={styles.column}>
+          <AppText style={styles.columnName}>기업명</AppText>
+          <AppText style={styles.columnNumber}>수량</AppText>
+          <AppText style={styles.columnPrice}>한 주당 금액</AppText>
+        </View>
         <ScrollView>
           {stockList &&
             stockList.map((item, index) => (
               <View key={index} style={styles.contentsItem}>
-                <AppText
-                  style={{
-                    color: "#f0f0f0",
-                    fontWeight: "bold",
-                    fontSize: 15,
-                    flex: 1,
-                  }}
-                >
-                  {item.name}
-                </AppText>
+                <View style={{ flex: 1 }}>
+                  <AppText
+                    style={{
+                      color: "#f0f0f0",
+                      fontWeight: "bold",
+                      fontSize: 15,
+                      textAlign: "center",
+                    }}
+                  >
+                    {item.name}
+                  </AppText>
+                </View>
                 <View style={styles.quantityContainer}>
                   <Button
-                    buttonStyle={{ marginHorizontal: -10 }}
+                    containerStyle={{ marginHorizontal: -10 }}
                     type="clear"
                     onPress={() => {
                       handleQuantityChange(
@@ -118,7 +133,7 @@ const ManualPage2 = ({ step, setStep, stockList, setStockList }) => {
                     icon={{
                       name: "minuscircleo",
                       type: "antdesign",
-                      color: "#f0f0f0",
+                      color: "#999",
                       size: 18,
                     }}
                   />
@@ -129,7 +144,7 @@ const ManualPage2 = ({ step, setStep, stockList, setStockList }) => {
                     keyboardType="numeric"
                   />
                   <Button
-                    buttonStyle={{ marginHorizontal: -10 }}
+                    containerStyle={{ marginHorizontal: -10 }}
                     type="clear"
                     onPress={() => {
                       handleQuantityChange(
@@ -140,20 +155,31 @@ const ManualPage2 = ({ step, setStep, stockList, setStockList }) => {
                     icon={{
                       name: "pluscircleo",
                       type: "antdesign",
-                      color: "#f0f0f0",
+                      color: "#999",
                       size: 18,
                     }}
                   />
                 </View>
-                <TextInput
-                  value={String(item.currentPrice ? item.currentPrice : 0)}
-                  onChangeText={(value) => handlePriceChange(value, index)}
-                  style={styles.inputPrice}
-                  keyboardType="numeric"
-                />
+                <View style={styles.priceContainer}>
+                  <TextInput
+                    value={String(item.currentPrice ? item.currentPrice : 0)}
+                    onChangeText={(value) => handlePriceChange(value, index)}
+                    style={styles.inputPrice}
+                    keyboardType="numeric"
+                  />
+                </View>
               </View>
             ))}
         </ScrollView>
+        <View style={styles.totalPriceContainer}>
+          <AppText style={{ color: "#ccc" }}>총 가격</AppText>
+          <AppText style={{ color: "#ccc" }}>
+            <AppText style={{ color: "#f0f0f0", fontSize: 20 }}>
+              {getTotalPrice().toLocaleString()}
+            </AppText>{" "}
+            원
+          </AppText>
+        </View>
       </View>
       <View style={styles.nextButtonContainer}>
         <AppText style={{ paddingBottom: 10, color: "#999", fontSize: 13 }}>
@@ -191,15 +217,35 @@ const styles = StyleSheet.create({
   },
   contentsItem: {
     flexDirection: "row",
-    justifyContent: "space-around",
     alignItems: "center",
-    paddingVertical: 10,
+    paddingVertical: 15,
     borderBottomColor: "#434343",
     borderBottomWidth: 1,
   },
-  quantityContainer: {
-    flex: 1.1,
+  column: {
     flexDirection: "row",
+    marginBottom: height * 5,
+    alignItems: "center",
+  },
+  columnName: {
+    flex: 1,
+    color: "#808080",
+    textAlign: "center",
+  },
+  columnNumber: {
+    flex: 1,
+    color: "#808080",
+    textAlign: "center",
+  },
+  columnPrice: {
+    flex: 1,
+    color: "#808080",
+    textAlign: "center",
+  },
+  quantityContainer: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "center",
   },
   inputQuantity: {
     color: "#f0f0f0",
@@ -209,13 +255,24 @@ const styles = StyleSheet.create({
     width: 40,
     textAlign: "center",
   },
+  priceContainer: {
+    flex: 1,
+    alignItems: "center",
+  },
   inputPrice: {
-    flex: 0.5,
     color: "#f0f0f0",
     fontSize: 16,
     borderBottomWidth: 1,
     borderBottomColor: "#888",
-    width: 60,
+    width: 70,
+  },
+  totalPriceContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-end",
+    borderBottomColor: "#434343",
+    borderBottomWidth: 1,
+    paddingVertical: 10,
   },
   nextButton: {
     backgroundColor: "#6262e8",

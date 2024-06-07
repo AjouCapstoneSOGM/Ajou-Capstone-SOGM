@@ -87,9 +87,9 @@ export default function App() {
     <AuthProvider>
       <PortfolioProvider>
         <PushNotificationProvider>
+          <StatusBar style="light" />
           <SafeAreaProvider>
             <NavigationContainer>
-              <StatusBar style="auto" />
               <ScreenStack />
             </NavigationContainer>
           </SafeAreaProvider>

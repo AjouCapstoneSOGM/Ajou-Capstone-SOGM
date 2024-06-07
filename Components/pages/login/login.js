@@ -23,7 +23,7 @@ const Login = ({ navigation }) => {
   const [password, setPassword] = useState(""); //
 
   const { login } = useAuth();
-  const { loadData, portLoading } = usePortfolio();
+  const { portLoading } = usePortfolio();
   const { expoPushToken } = usePushNotifications();
 
   const fetchLoginInfo = async () => {
@@ -44,7 +44,6 @@ const Login = ({ navigation }) => {
         await setUsertoken(data.token);
         await setUserName(data.name);
         login();
-        await loadData();
         return { result: "success" };
       } else {
         return { result: "fail" };
@@ -60,7 +59,6 @@ const Login = ({ navigation }) => {
 
     const unsubscribe = navigation.addListener("focus", async () => {
       login();
-      await loadData();
       navigation.goBack();
       unsubscribe();
     });
@@ -118,7 +116,10 @@ const Login = ({ navigation }) => {
         </TouchableOpacity>
       </View>
       <View style={styles.buttonWrapper}>
-        <TouchableOpacity onPress={() => navigation.navigate("ResetPW")} style={styles.passwordButton}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("ResetPW")}
+          style={styles.passwordButton}
+        >
           <AppText style={styles.buttonText}>비밀번호 찾기</AppText>
         </TouchableOpacity>
         <View style={styles.dividerWrapper}>
