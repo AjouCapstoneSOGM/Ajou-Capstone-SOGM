@@ -33,9 +33,25 @@ public class HomeController {
         Map<Integer, Long> countPortfolioByRiskValue = portfolioService.getPortfoliosCountByRiskValue();
         String countPortfolioByRiskValueJson = objectMapper.writeValueAsString(countPortfolioByRiskValue);
 
+        Map<Integer, Double> returnRates = portfolioService.calculateReturnRates();
+        double averageReturnRate = portfolioService.calculateAverageReturnRate();
+        String returnRatesJson = objectMapper.writeValueAsString(returnRates);
+
+        // 예금 금리와 비교
+        double depositRate = 3.49;
+        Map<String, Integer> comparisonResults =
+                portfolioService.compareReturnRatesWithDepositRate(depositRate);
+        String comparisonResultsJson = objectMapper.writeValueAsString(comparisonResults);
+
+
         model.addAttribute("totalUsers", userRepository.count());
         model.addAttribute("countPortfolioBySectorJson", countPortfolioBySectorJson);
         model.addAttribute("countPortfolioByRiskValueJson", countPortfolioByRiskValueJson);
+        model.addAttribute("returnRatesJson", returnRatesJson);
+        model.addAttribute("averageReturnRate", averageReturnRate);
+        model.addAttribute("comparisonResultsJson", comparisonResultsJson);
+        System.out.println("HomeController.Home"+comparisonResultsJson);
+
         return "home";
     }
 
