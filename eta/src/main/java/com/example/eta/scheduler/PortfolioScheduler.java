@@ -41,7 +41,7 @@ public class PortfolioScheduler {
     @Transactional
     public void doProportionRebalancing() {
         for (Portfolio portfolio : portfolioRepository.findAllByIsAutoIsTrue()) {
-            updateProportion(portfolio);
+            portfolioService.updateProportion(portfolio, false, false);
             if (isProportionRebalancingNeeded(portfolio)) {
                 int rnId = createProportionRebalancing(portfolio);
                 try {
@@ -51,17 +51,6 @@ public class PortfolioScheduler {
                     logger.error("Failed to send push notification to " + portfolio.getUser().getEmail());
                 }
             }
-        }
-    }
-
-    @Transactional
-    public void updateProportion(Portfolio portfolio) {
-        Map<PortfolioTicker, Float> currentAmountForTicker = new HashMap<>();
-        float totalAmount = portfolioService.calculateAmount(portfolio, false, currentAmountForTicker);
-
-        for (PortfolioTicker portfolioTicker : currentAmountForTicker.keySet()) {
-            float currentProportion = currentAmountForTicker.get(portfolioTicker).floatValue() / totalAmount;
-            portfolioTicker.setCurrentProportion(currentProportion);
         }
     }
 

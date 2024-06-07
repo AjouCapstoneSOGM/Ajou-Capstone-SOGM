@@ -3,6 +3,7 @@ package com.example.eta.scheduler;
 import com.example.eta.entity.*;
 import com.example.eta.enums.RoleType;
 import com.example.eta.repository.*;
+import com.example.eta.service.PortfolioService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -24,28 +25,22 @@ public class PortfolioSchedulerTest {
 
     @Autowired
     private PortfolioScheduler portfolioScheduler;
-
+    @Autowired
+    private PortfolioService portfolioService;
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private PortfolioRepository portfolioRepository;
-
     @Autowired
     private PortfolioSectorRepository portfolioSectorRepository;
-
     @Autowired
     private PortfolioTickerRepository portfolioTickerRepository;
-
     @Autowired
     private SectorRepository sectorRepository;
-
     @Autowired
     private TickerRepository tickerRepository;
-
     @Autowired
     private RebalancingRepository rebalancingRepository;
-
     @Autowired
     private PriceRepository priceRepository;
 
@@ -110,7 +105,7 @@ public class PortfolioSchedulerTest {
     @Transactional
     @DisplayName("스케줄러: 비중 조정 테스트")
     public void testUpdateProportion() {
-        portfolioScheduler.updateProportion(portfolio);
+        portfolioService.updateProportion(portfolio, false, false);
 
         Assertions.assertAll(
             () -> assertNotEquals(0.33f, portfolio.getPortfolioTickers().get(0).getCurrentProportion()),
@@ -122,7 +117,7 @@ public class PortfolioSchedulerTest {
     @Transactional
     @DisplayName("스케줄러: 비중 조정 후 리밸런싱 알림 생성 테스트")
     public void testDoProportionRebalancing() {
-        portfolioScheduler.updateProportion(portfolio);
+        portfolioService.updateProportion(portfolio, false, false);
         portfolioScheduler.createProportionRebalancing(portfolio);
 
         // then 리밸런싱 반영 시, 각 종목 비중이 초기 비중에서 오차 범위 20% 내로 들어오는지 확인
