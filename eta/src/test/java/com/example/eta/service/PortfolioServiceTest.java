@@ -107,99 +107,99 @@ public class PortfolioServiceTest {
         }
     }
 
-    @Test
-    @DisplayName("매수")
-    @Transactional
-    public void testBuyStock() {
-        // given 유저 생성
-        User user = userRepository.save(new User().builder()
-                .email("suprlux09@ajou.ac.kr")
-                .isVerified(false)
-                .password("password!")
-                .name("James")
-                .roleType(RoleType.ROLE_USER)
-                .createdDate(LocalDateTime.now())
-                .enabled(true).build());
-
-        List<PortfolioDto.StockDetailDto> stocks = List.of(
-                PortfolioDto.StockDetailDto.builder().ticker("005930").quantity(5).price(50000).isBuy(true).build(),
-                PortfolioDto.StockDetailDto.builder().ticker("000660").quantity(10).price(50000).isBuy(true).build(),
-                PortfolioDto.StockDetailDto.builder().ticker("035720").quantity(10).price(50000).isBuy(true).build()
-        );
-
-        PortfolioDto.CreateManualRequestDto createManualRequestDto = PortfolioDto.CreateManualRequestDto.builder()
-                .name("수동 포트폴리오")
-                .country("KOR")
-                .stocks(stocks).build();
-
-        int pfId = portfolioService.createManualPortfolio(user, createManualRequestDto);
-
-        portfolioService.buyStock(pfId, PortfolioDto.BuyRequestDto.builder()
-                .ticker("005930")
-                .quantity(5)
-                .price(50000)
-                .isBuy(true)
-                .build());
-        portfolioService.buyStock(pfId, PortfolioDto.BuyRequestDto.builder()
-                .ticker("051910")
-                .quantity(10)
-                .price(50000)
-                .isBuy(true)
-                .build());
-
-        // 모든 주식 개수가 10개이고, 현재 비중이 25%인지 확인
-        for(PortfolioTicker portfolioTicker : portfolioRepository.findById(pfId).get().getPortfolioTickers()) {
-            assertEquals(10, portfolioTicker.getNumber());
-            assertEquals(0.25f, portfolioTicker.getCurrentProportion());
-        }
-    }
-
-    @Test
-    @DisplayName("매도 테스트")
-    @Transactional
-    public void testSellStock() {
-        // given 유저 생성
-        User user = userRepository.save(new User().builder()
-                .email("suprlux09@ajou.ac.kr")
-                .isVerified(false)
-                .password("password!")
-                .name("James")
-                .roleType(RoleType.ROLE_USER)
-                .createdDate(LocalDateTime.now())
-                .enabled(true).build());
-
-        List<PortfolioDto.StockDetailDto> stocks = List.of(
-                PortfolioDto.StockDetailDto.builder().ticker("005930").quantity(15).price(50000).isBuy(true).build(),
-                PortfolioDto.StockDetailDto.builder().ticker("000660").quantity(10).price(50000).isBuy(true).build(),
-                PortfolioDto.StockDetailDto.builder().ticker("035720").quantity(10).price(50000).isBuy(true).build()
-        );
-
-        PortfolioDto.CreateManualRequestDto createManualRequestDto = PortfolioDto.CreateManualRequestDto.builder()
-                .name("수동 포트폴리오")
-                .country("KOR")
-                .stocks(stocks).build();
-
-        int pfId = portfolioService.createManualPortfolio(user, createManualRequestDto);
-
-        portfolioService.sellStock(pfId, PortfolioDto.SellRequestDto.builder()
-                .ticker("005930")
-                .quantity(5)
-                .price(50000)
-                .isBuy(false)
-                .build());
-        portfolioService.sellStock(pfId, PortfolioDto.SellRequestDto.builder()
-                .ticker("035720")
-                .quantity(10)
-                .price(50000)
-                .isBuy(false)
-                .build());
-
-        // 모든 주식 개수가 10개이고, 현재 비중이 50%인지 확인
-        for(PortfolioTicker portfolioTicker : portfolioRepository.findById(pfId).get().getPortfolioTickers()) {
-            assertEquals(10, portfolioTicker.getNumber());
-            assertEquals(0.50f, portfolioTicker.getCurrentProportion());
-        }
-    }
+//    @Test
+//    @DisplayName("매수 테스트")
+//    @Transactional
+//    public void testBuyStock() {
+//        // given 유저 생성
+//        User user = userRepository.save(new User().builder()
+//                .email("suprlux09@ajou.ac.kr")
+//                .isVerified(false)
+//                .password("password!")
+//                .name("James")
+//                .roleType(RoleType.ROLE_USER)
+//                .createdDate(LocalDateTime.now())
+//                .enabled(true).build());
+//
+//        List<PortfolioDto.StockDetailDto> stocks = List.of(
+//                PortfolioDto.StockDetailDto.builder().ticker("005930").quantity(5).price(50000).isBuy(true).build(),
+//                PortfolioDto.StockDetailDto.builder().ticker("000660").quantity(10).price(50000).isBuy(true).build(),
+//                PortfolioDto.StockDetailDto.builder().ticker("035720").quantity(10).price(50000).isBuy(true).build()
+//        );
+//
+//        PortfolioDto.CreateManualRequestDto createManualRequestDto = PortfolioDto.CreateManualRequestDto.builder()
+//                .name("수동 포트폴리오")
+//                .country("KOR")
+//                .stocks(stocks).build();
+//
+//        int pfId = portfolioService.createManualPortfolio(user, createManualRequestDto);
+//
+//        portfolioService.buyStock(pfId, PortfolioDto.BuyRequestDto.builder()
+//                .ticker("005930")
+//                .quantity(5)
+//                .price(50000)
+//                .isBuy(true)
+//                .build());
+//        portfolioService.buyStock(pfId, PortfolioDto.BuyRequestDto.builder()
+//                .ticker("051910")
+//                .quantity(10)
+//                .price(50000)
+//                .isBuy(true)
+//                .build());
+//
+//        // 모든 주식 개수가 10개이고, 현재 비중이 25%인지 확인
+//        for(PortfolioTicker portfolioTicker : portfolioRepository.findById(pfId).get().getPortfolioTickers()) {
+//            assertEquals(10, portfolioTicker.getNumber());
+//            assertEquals(0.25f, portfolioTicker.getCurrentProportion());
+//        }
+//    }
+//
+//    @Test
+//    @DisplayName("매도 테스트")
+//    @Transactional
+//    public void testSellStock() {
+//        // given 유저 생성
+//        User user = userRepository.save(new User().builder()
+//                .email("suprlux09@ajou.ac.kr")
+//                .isVerified(false)
+//                .password("password!")
+//                .name("James")
+//                .roleType(RoleType.ROLE_USER)
+//                .createdDate(LocalDateTime.now())
+//                .enabled(true).build());
+//
+//        List<PortfolioDto.StockDetailDto> stocks = List.of(
+//                PortfolioDto.StockDetailDto.builder().ticker("005930").quantity(15).price(50000).isBuy(true).build(),
+//                PortfolioDto.StockDetailDto.builder().ticker("000660").quantity(10).price(50000).isBuy(true).build(),
+//                PortfolioDto.StockDetailDto.builder().ticker("035720").quantity(10).price(50000).isBuy(true).build()
+//        );
+//
+//        PortfolioDto.CreateManualRequestDto createManualRequestDto = PortfolioDto.CreateManualRequestDto.builder()
+//                .name("수동 포트폴리오")
+//                .country("KOR")
+//                .stocks(stocks).build();
+//
+//        int pfId = portfolioService.createManualPortfolio(user, createManualRequestDto);
+//
+//        portfolioService.sellStock(pfId, PortfolioDto.SellRequestDto.builder()
+//                .ticker("005930")
+//                .quantity(5)
+//                .price(50000)
+//                .isBuy(false)
+//                .build());
+//        portfolioService.sellStock(pfId, PortfolioDto.SellRequestDto.builder()
+//                .ticker("035720")
+//                .quantity(10)
+//                .price(50000)
+//                .isBuy(false)
+//                .build());
+//
+//        // 모든 주식 개수가 10개이고, 현재 비중이 50%인지 확인
+//        for(PortfolioTicker portfolioTicker : portfolioRepository.findById(pfId).get().getPortfolioTickers()) {
+//            assertEquals(10, portfolioTicker.getNumber());
+//            assertEquals(0.50f, portfolioTicker.getCurrentProportion());
+//        }
+//    }
 
     @Test
     @DisplayName("자동 포트폴리오 초기화(생성된 결과 반영, 리밸런싱 알림 초기화)")

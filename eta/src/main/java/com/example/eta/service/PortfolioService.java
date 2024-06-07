@@ -35,10 +35,6 @@ public class PortfolioService {
      *
      * <p> {@code averagePriceUpdated} 가 {@code true}이면 평단가를 기준으로 자산량을 계산하고, {@code false}이면 가장 최근의 종가를 기준으로 자산량을 계산힙니다.
      *
-     * <p> 평단가를 기준으로 계산하는 경우: 리밸런싱 반영 후 또는 매수/매도 이후 현재 비중을 계산하기 위해
-     *
-     * <p> 종가를 기준으로 계산하는 경우: 포트폴리오의 주기적 비중 업데이트 시
-     *
      * <p> {@code currentAmountForTicker}에 종목별 자산량이 담깁니다. 종목별 자산량이 필요하지 않은 경우 {@code null}을 전달합니다.
      */
     public float calculateAmount(Portfolio portfolio, boolean averagePriceUpdated, Map<PortfolioTicker, Float> currentAmountForTicker) {
@@ -56,16 +52,14 @@ public class PortfolioService {
     }
 
     /**
-     * 포트폴리오의 비중을 업데이트힙니다.
-     *
-     * <p> {@code averagePriceUpdated} 가 {@code true}이면 평단가를 기준으로 자산량을 계산, {@code false}이면 가장 최근의 종가를 기준으로 자산량을 계산한 후 비중을 계산합니다.
+     * 포트폴리오의 현재 비중을 업데이트힙니다. 종목의 종가를 기준으로 계산합니다.
      *
      * <p> {@code setInitProportion} 가 {@code true}이면 초기 비중을 현재 비중과 동일하게 설정합니다.
      */
     @Transactional
-    public void updateProportion(Portfolio portfolio, boolean averagePriceUpdated, boolean setInitProportion) {
+    public void updateProportion(Portfolio portfolio, boolean setInitProportion) {
         Map<PortfolioTicker, Float> currentAmountForTicker = new HashMap<>();
-        float totalAmount = calculateAmount(portfolio, averagePriceUpdated, currentAmountForTicker);
+        float totalAmount = calculateAmount(portfolio, false, currentAmountForTicker);
 
         for (PortfolioTicker portfolioTicker : currentAmountForTicker.keySet()) {
             float currentProportion = currentAmountForTicker.get(portfolioTicker).floatValue() / totalAmount;
@@ -73,6 +67,24 @@ public class PortfolioService {
             if (setInitProportion) {
                 portfolioTicker.setInitProportion(currentProportion);
             }
+            portfolioTickerRepository.save(portfolioTicker);
+        }
+    }
+
+    /**
+     * 포트폴리오의 초기 비중과 현재 비중을 평단가를 기준으로 계산하여 설정합니다.
+     *
+     * <p> 자동, 수동 포트폴리오 생성 시 최초 비중을 설정하기 위해 사용합니다.
+     */
+    @Transactional
+    public void setInitProportion(Portfolio portfolio) {
+        Map<PortfolioTicker, Float> currentAmountForTicker = new HashMap<>();
+        float totalAmount = calculateAmount(portfolio, true, currentAmountForTicker);
+
+        for (PortfolioTicker portfolioTicker : currentAmountForTicker.keySet()) {
+            float currentProportion = currentAmountForTicker.get(portfolioTicker).floatValue() / totalAmount;
+            portfolioTicker.setInitProportion(currentProportion);
+            portfolioTicker.setCurrentProportion(currentProportion);
             portfolioTickerRepository.save(portfolioTicker);
         }
     }
@@ -257,7 +269,7 @@ public class PortfolioService {
         }
 
         // 초기 비중, 현재 비중 업데이트
-        updateProportion(portfolio, true, true);
+        setInitProportion(portfolio);
 
         return portfolio.getPfId();
     }
@@ -302,7 +314,7 @@ public class PortfolioService {
         portfolio.setInitAsset(asset);
 
         // 초기, 현재 비중 업데이트
-        updateProportion(portfolio, true, true);
+        updateProportion(portfolio, true);
 
         portfolioRepository.save(portfolio);
     }
@@ -351,7 +363,7 @@ public class PortfolioService {
         portfolio.setInitAsset(asset);
 
         // 초기, 현재 비중 업데이트
-        updateProportion(portfolio, true, true);
+        updateProportion(portfolio, true);
 
         portfolioRepository.save(portfolio);
     }
