@@ -173,3 +173,15 @@ CREATE TABLE `ticker_search` (
     PRIMARY KEY (`ticker`),
     FOREIGN KEY (`ticker`) REFERENCES `ticker` (`ticker`)
 );
+
+CREATE TABLE `question` (
+    `question_id`	int	NOT NULL AUTO_INCREMENT,
+    `title`	varchar(100)	NOT NULL,
+    `content`	text	NOT NULL,
+    `answer`	text	NULL,
+    `created_date`	datetime	NOT NULL,
+    `answered_date`	datetime	NULL,
+    `user_id`	int	NOT NULL,
+    PRIMARY KEY (`question_id`),
+    FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE
+);
