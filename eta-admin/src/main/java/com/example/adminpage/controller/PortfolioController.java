@@ -3,6 +3,7 @@ package com.example.adminpage.controller;
 
 import com.example.adminpage.entity.Portfolio;
 import com.example.adminpage.entity.User;
+import com.example.adminpage.repository.PortfolioRecordRepository;
 import com.example.adminpage.repository.PortfolioRepository;
 import com.example.adminpage.repository.PortfolioTickerRepository;
 import com.example.adminpage.repository.UserRepository;
@@ -28,7 +29,7 @@ public class PortfolioController {
     @Autowired
     private PortfolioRepository portfolioRepository;
     @Autowired
-    private PortfolioTickerRepository portfolioTickerRepository;
+    private PortfolioRecordRepository portfolioRecordRepository;
 
     @GetMapping
     public String getUsers(Model model) {
@@ -47,6 +48,12 @@ public class PortfolioController {
             default:
         }
         return "portfolio";
+    }
+    @GetMapping("/{PfId}")
+    public String getUser(@PathVariable("PfId") int PfId, Model model) {
+        model.addAttribute("portfolio", portfolioRepository.getReferenceById(PfId));
+        model.addAttribute("records", portfolioRecordRepository.findAllByPfId(PfId));
+        return "PortfolioDetail";
     }
     @DeleteMapping("/{port_id}")
     public ResponseEntity<Void> deletePortfolio(@PathVariable("port_id") Integer pfId) {

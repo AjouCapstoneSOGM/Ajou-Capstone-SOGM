@@ -154,48 +154,6 @@
             <p>Higher than Deposit Rate: <span id="higherCount">0</span></p>
             <p>Lower than Deposit Rate: <span id="lowerCount">0</span></p>
         </div>
-        <div>
-            <h2 class="text-xl font-semibold mb-4">Recent Users</h2>
-            <table class="w-full bg-white rounded-md shadow-md overflow-hidden">
-                <thead class="bg-gray-50">
-                <tr>
-                    <th class="px-4 py-2 text-left text-gray-500">Name</th>
-                    <th class="px-4 py-2 text-left text-gray-500">Email</th>
-                    <th class="px-4 py-2 text-left text-gray-500">Role</th>
-                    <th class="px-4 py-2 text-left text-gray-500">Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td class="border-t px-4 py-2"></td>
-                    <td class="border-t px-4 py-2"></td>
-                    <td class="border-t px-4 py-2"></td>
-                    <td class="border-t px-4 py-2">
-<!--                        <button class="px-2 py-1 bg-blue-500 text-white rounded-md"> </button>-->
-<!--                        <button class="px-2 py-1 bg-red-500 text-white rounded-md">Delete</button>-->
-                    </td>
-                </tr>
-<!--                <tr>-->
-<!--                    <td class="border-t px-4 py-2"></td>-->
-<!--                    <td class="border-t px-4 py-2"></td>-->
-<!--                    <td class="border-t px-4 py-2"></td>-->
-<!--                    <td class="border-t px-4 py-2">-->
-<!--&lt;!&ndash;                        <button class="px-2 py-1 bg-blue-500 text-white rounded-md">Edit</button>&ndash;&gt;-->
-<!--&lt;!&ndash;                        <button class="px-2 py-1 bg-red-500 text-white rounded-md">Delete</button>&ndash;&gt;-->
-<!--                    </td>-->
-<!--                </tr>-->
-<!--                <tr>-->
-<!--                    <td class="border-t px-4 py-2"></td>-->
-<!--                    <td class="border-t px-4 py-2"></td>-->
-<!--                    <td class="border-t px-4 py-2"></td>-->
-<!--                    <td class="border-t px-4 py-2">-->
-<!--&lt;!&ndash;                        <button class="px-2 py-1 bg-blue-500 text-white rounded-md">Edit</button>&ndash;&gt;-->
-<!--&lt;!&ndash;                        <button class="px-2 py-1 bg-red-500 text-white rounded-md">Delete</button>&ndash;&gt;-->
-<!--                    </td>-->
-<!--                </tr>-->
-                </tbody>
-            </table>
-        </div>
     </div>
 </div>
 
@@ -207,7 +165,20 @@
 
     const riskData = /*[[${countPortfolioByRiskValueJson}]]*/ '{}';
     const parsedRiskData = JSON.parse(riskData);
-    const riskValues = Object.values(parsedRiskData);
+
+    const riskLabelsMap = {
+        '1': '안전',
+        '2': '중립',
+        '3': '위험'
+    };
+    const riskLabels = [];
+    const riskValues = [];
+    Object.keys(parsedRiskData).forEach(risk => {
+        if (riskLabelsMap[risk]) {
+            riskLabels.push(riskLabelsMap[risk]);
+            riskValues.push(parsedRiskData[risk]);
+        }
+    });
 
     const comparisonResultsData = /*[[${comparisonResultsJson}]]*/ '{}';
     const parsedComparisonResultsData = JSON.parse(comparisonResultsData);
@@ -219,12 +190,31 @@
     const sectorName = sectorParsedReturnsData.map(sector => sector.sectorName);
     const sectorRate = sectorParsedReturnsData.map(sector => sector.averageReturnRate);
 
-    const riskReturnsData = /*[[${riskReturnRatesJson}]]*/ '{}';
-    const riskParsedReturnsData = JSON.parse(riskReturnsData);
-    console.log(riskParsedReturnsData)
-    const riskName = riskParsedReturnsData.map(risk => risk.risk);
-    const riskRate = riskParsedReturnsData.map(risk => risk.averageReturnRate);
-    /*]]>*/
+    const riskReturnsDataMapped = /*[[${riskReturnRatesJson}]]*/ '{}';
+    const parsedRiskReturnsData = JSON.parse(riskReturnsDataMapped);
+
+    const riskLabelsMapping = {
+        '0': '수동',
+        '1': '안전',
+        '2': '중립',
+        '3': '위험'
+    };
+    const desiredOrder = ['수동', '안전', '중립', '위험'];
+    const riskLabelsArray = [];
+    const riskRatesArray = [];
+
+    desiredOrder.forEach(label => {
+        riskLabelsArray.push(label);
+        riskRatesArray.push(0);
+    });
+
+    parsedRiskReturnsData.forEach(risk => {
+        const label = riskLabelsMapping[risk.risk];
+        if (label) {
+            const index = desiredOrder.indexOf(label);
+            riskRatesArray[index] = risk.averageReturnRate;
+        }
+    });
 </script>
 
 <script>
@@ -283,7 +273,7 @@
         const riskChart = new Chart(ctxRisk, {
             type: 'bar',
             data: {
-                labels: ['안전','중립','위험'],
+                labels: riskLabels,
                 datasets: [{
                     label: 'Number of Portfolios by Risk Value',
                     data: riskValues,
@@ -403,10 +393,10 @@
         new Chart(ctxRiskReturns, {
             type: 'bar',
             data: {
-                labels: riskName,
+                labels: riskLabelsArray,
                 datasets: [{
                     label: 'Average Return Rate (%)',
-                    data: riskRate,
+                    data: riskRatesArray,
                     backgroundColor: [
                         'rgba(75, 192, 192, 0.2)',
                         'rgba(54, 162, 235, 0.2)',

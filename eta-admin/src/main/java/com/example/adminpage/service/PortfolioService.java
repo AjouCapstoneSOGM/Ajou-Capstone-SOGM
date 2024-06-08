@@ -86,7 +86,7 @@ public class PortfolioService {
         for (Object[] result : results) {
             Map<String, Object> rate = new HashMap<>();
             rate.put("sectorName", result[0]);
-            rate.put("averageReturnRate", (Double) result[1]-100);
+            rate.put("averageReturnRate", (Double) result[1]);
             sectorReturnRates.add(rate);
         }
 

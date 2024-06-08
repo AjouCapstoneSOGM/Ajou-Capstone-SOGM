@@ -23,6 +23,9 @@
       background-color: #ffffff;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
+    tr.clickable {
+      cursor: pointer;
+    }
   </style>
 </head>
 <body class="min-h-screen bg-gray-100 dark:bg-gray-900">
@@ -123,7 +126,7 @@
         </tr>
       </thead>
       <tbody>
-          <tr th:each="portfolio : ${portfolios}">
+          <tr th:each="portfolio : ${portfolios}" th:onclick="'javascript:goToDetail(\'' + ${portfolio.PfId} + '\');'" class="clickable" >
             <td class="border-t px-4 py-2" th:text="${portfolio.PfId}"></td>
             <td class="border-t px-4 py-2" th:text="${portfolio.user.userId}"></td>
             <td class="border-t px-4 py-2" th:text="${portfolio.name}"></td>
@@ -158,6 +161,9 @@
       search();
     }
   });
+  function goToDetail(PfId) {
+    window.location.href = '/portfolio/' + PfId;
+  }
   function search() {
     const query = document.getElementById('searchInput').value;
     const searchType = document.querySelector('input[name="searchType"]:checked').value;
