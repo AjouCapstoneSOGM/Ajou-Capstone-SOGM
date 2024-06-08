@@ -154,48 +154,6 @@
             <p>Higher than Deposit Rate: <span id="higherCount">0</span></p>
             <p>Lower than Deposit Rate: <span id="lowerCount">0</span></p>
         </div>
-        <div>
-            <h2 class="text-xl font-semibold mb-4">Recent Users</h2>
-            <table class="w-full bg-white rounded-md shadow-md overflow-hidden">
-                <thead class="bg-gray-50">
-                <tr>
-                    <th class="px-4 py-2 text-left text-gray-500">Name</th>
-                    <th class="px-4 py-2 text-left text-gray-500">Email</th>
-                    <th class="px-4 py-2 text-left text-gray-500">Role</th>
-                    <th class="px-4 py-2 text-left text-gray-500">Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td class="border-t px-4 py-2"></td>
-                    <td class="border-t px-4 py-2"></td>
-                    <td class="border-t px-4 py-2"></td>
-                    <td class="border-t px-4 py-2">
-<!--                        <button class="px-2 py-1 bg-blue-500 text-white rounded-md"> </button>-->
-<!--                        <button class="px-2 py-1 bg-red-500 text-white rounded-md">Delete</button>-->
-                    </td>
-                </tr>
-<!--                <tr>-->
-<!--                    <td class="border-t px-4 py-2"></td>-->
-<!--                    <td class="border-t px-4 py-2"></td>-->
-<!--                    <td class="border-t px-4 py-2"></td>-->
-<!--                    <td class="border-t px-4 py-2">-->
-<!--&lt;!&ndash;                        <button class="px-2 py-1 bg-blue-500 text-white rounded-md">Edit</button>&ndash;&gt;-->
-<!--&lt;!&ndash;                        <button class="px-2 py-1 bg-red-500 text-white rounded-md">Delete</button>&ndash;&gt;-->
-<!--                    </td>-->
-<!--                </tr>-->
-<!--                <tr>-->
-<!--                    <td class="border-t px-4 py-2"></td>-->
-<!--                    <td class="border-t px-4 py-2"></td>-->
-<!--                    <td class="border-t px-4 py-2"></td>-->
-<!--                    <td class="border-t px-4 py-2">-->
-<!--&lt;!&ndash;                        <button class="px-2 py-1 bg-blue-500 text-white rounded-md">Edit</button>&ndash;&gt;-->
-<!--&lt;!&ndash;                        <button class="px-2 py-1 bg-red-500 text-white rounded-md">Delete</button>&ndash;&gt;-->
-<!--                    </td>-->
-<!--                </tr>-->
-                </tbody>
-            </table>
-        </div>
     </div>
 </div>
 
@@ -234,7 +192,6 @@
 
     const riskReturnsDataMapped = /*[[${riskReturnRatesJson}]]*/ '{}';
     const parsedRiskReturnsData = JSON.parse(riskReturnsDataMapped);
-    console.log(parsedRiskReturnsData);
 
     const riskLabelsMapping = {
         '0': '수동',
@@ -258,9 +215,6 @@
             riskRatesArray[index] = risk.averageReturnRate;
         }
     });
-
-    console.log(riskLabelsArray); // ['수동', '안전', '중립', '위험']
-    console.log(riskRatesArray); // [50.83916539529167, 65.04863361723785, 55.319990957946786, 16.04214336010604]
 </script>
 
 <script>
