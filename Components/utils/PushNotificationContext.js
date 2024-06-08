@@ -11,7 +11,7 @@ Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
     shouldPlaySound: false,
-    shouldSetBadge: false,
+    shouldSetBadge: true,
   }),
 });
 
@@ -67,7 +67,8 @@ async function registerForPushNotificationsAsync() {
     });
   }
 
-  if (Device.isDevice) {
+  //if (Device.isDevice) {
+  if (true) {
     const { status: existingStatus } =
       await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
@@ -86,7 +87,7 @@ async function registerForPushNotificationsAsync() {
       })
     ).data;
     console.log(token);
-  } else {
+  } else { 
     alert("Must use physical device for Push Notifications");
   }
 

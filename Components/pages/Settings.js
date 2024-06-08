@@ -35,12 +35,13 @@ const Settings = ({ navigation }) => {
       setHasNotificationPermission(false);
       setRebalanceAlarm("denied");
     } else {
-      const { status } = await Notifications.requestPermissionsAsync();
-      setRebalanceAlarm("granted");
-      if (status === "granted") {
+      const notificationStatus = await Notifications.getPermissionsAsync();
+      console.log(notificationStatus)
+      if (notificationStatus.granted) {
+        setRebalanceAlarm("granted");
         setHasNotificationPermission(true);
       } else {
-        Alert.alert("알림", "알림 권한이 거부되었습니다.");
+        Alert.alert("알림", "설정 > 앱 > 알림에서 권한을 허용해 주세요.");
       }
     }
   };
@@ -49,6 +50,7 @@ const Settings = ({ navigation }) => {
     setPushTokenCheck(pushTokenCheck + 1);
     if (pushTokenCheck > 5) {
       Alert.alert("Token", expoPushToken);
+      console.log("Token", expoPushToken);
     }
   };
 
