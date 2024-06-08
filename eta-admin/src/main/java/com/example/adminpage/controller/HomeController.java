@@ -4,6 +4,7 @@ import com.example.adminpage.repository.PortfolioSectorRepository;
 import com.example.adminpage.repository.UserRepository;
 import com.example.adminpage.service.PortfolioSectorService;
 import com.example.adminpage.service.PortfolioService;
+import com.example.adminpage.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,9 @@ public class HomeController {
     PortfolioSectorService portfolioSectorService;
     @Autowired
     PortfolioService portfolioService;
+    @Autowired
+    UserService userService;
+
     @RequestMapping("/")
     public String Home(Model model) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -43,13 +47,25 @@ public class HomeController {
                 portfolioService.compareReturnRatesWithDepositRate(depositRate);
         String comparisonResultsJson = objectMapper.writeValueAsString(comparisonResults);
 
+        List<Map<String, Object>> sectorReturnRates = portfolioService.getSectorReturnRates();
+        String sectorReturnsJson = objectMapper.writeValueAsString(sectorReturnRates);
+
+        List<Map<String, Object>> RiskReturnRates = portfolioService.getRiskPortfolioReturns();
+        String riskReturnsJson = objectMapper.writeValueAsString(RiskReturnRates);
+
+        long socialUserCount = userService.getSocialUserCount();
+        long regularUserCount = userService.getRegularUserCount();
 
         model.addAttribute("totalUsers", userRepository.count());
         model.addAttribute("countPortfolioBySectorJson", countPortfolioBySectorJson);
         model.addAttribute("countPortfolioByRiskValueJson", countPortfolioByRiskValueJson);
         model.addAttribute("returnRatesJson", returnRatesJson);
-        model.addAttribute("averageReturnRate", averageReturnRate);
+        model.addAttribute("averageReturnRate", String.format("%.2f",averageReturnRate*100));
         model.addAttribute("comparisonResultsJson", comparisonResultsJson);
+        model.addAttribute("sectorReturnRatesJson", sectorReturnsJson);
+        model.addAttribute("riskReturnRatesJson", riskReturnsJson);
+        model.addAttribute("socialUserCount", socialUserCount);
+        model.addAttribute("regularUserCount", regularUserCount);
 
         return "home";
     }

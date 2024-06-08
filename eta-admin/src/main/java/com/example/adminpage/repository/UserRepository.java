@@ -20,6 +20,10 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     Optional<User> findAllByUserId(@Param("userId") int userId);
     @Query("SELECT p FROM User p WHERE p.email = :email")
     Optional<Object> findByEmail(String email);
+    @Query("SELECT COUNT(u) FROM User u WHERE u.socialType IS NOT NULL")
+    long countSocialUsers();
+    @Query("SELECT COUNT(u) FROM User u WHERE u.socialType IS NULL")
+    long countRegularUsers();
 
     long count();
 }
