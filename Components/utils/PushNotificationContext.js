@@ -7,22 +7,22 @@ import { setRebalanceAlarm } from "./localStorageUtils";
 
 const PushNotificationContext = createContext(null);
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: false,
-    shouldSetBadge: true,
-  }),
-});
-
 export const PushNotificationProvider = ({ children }) => {
   const [expoPushToken, setExpoPushToken] = useState("emptyExpoToken");
   const [notification, setNotification] = useState(false);
   const notificationListener = useRef();
   const responseListener = useRef();
-
+  
   useEffect(() => {
     setRebalanceAlarm('denied');
+
+    Notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: true,
+        shouldSetBadge: true,
+      }),
+    });
     
     registerForPushNotificationsAsync().then((token) =>
       setExpoPushToken(token)
