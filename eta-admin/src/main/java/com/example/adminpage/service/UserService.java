@@ -39,4 +39,11 @@ public class UserService {
         user.setEnabled(false);
         user.setModifiedDate(LocalDateTime.now());
     }
+    public long getSocialUserCount() {
+        return userRepository.countSocialUsers();
+    }
+
+    public long getRegularUserCount() {
+        return userRepository.countRegularUsers();
+    }
 }

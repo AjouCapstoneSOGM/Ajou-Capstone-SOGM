@@ -73,7 +73,7 @@
                         </svg>
                         Users
                     </a>
-                    <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50" href="/portfolio-list">
+                    <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50" href="/portfolio">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
                             <path d="m7.5 4.27 9 5.15"></path>
                             <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path>
@@ -113,26 +113,36 @@
                 <p class="text-2xl font-bold">[[${totalUsers}]]</p>
             </div>
             <div class="card">
-                <h2 class="text-lg font-medium">Active Users</h2>
-                <p class="text-2xl font-bold"> </p>
+                <h2 class="text-lg font-medium">일반 계정</h2>
+                <p class="text-2xl font-bold">[[${regularUserCount}]] </p>
             </div>
             <div class="card">
-                <h2 class="text-lg font-medium">User's Average return</h2>
+                <h2 class="text-lg font-medium">소셜 계정</h2>
+                <p class="text-2xl font-bold">[[${socialUserCount}]]</p>
+            </div>
+            <div class="card">
+                <h2 class="text-lg font-medium">서비스 평균 수익률</h2>
                 <p class="text-2xl font-bold">[[${averageReturnRate}]]%</p>
-            </div>
-            <div class="card">
-                <h2 class="text-lg font-medium">Total Revenue</h2>
-                <p class="text-2xl font-bold">$</p>
             </div>
         </div>
         <div class="charts-wrapper">
             <div class="card chart-container">
-                <h2 class="text-lg font-medium mb-4">Portfolios by Sector</h2>
+                <h2 class="text-lg font-medium mb-4">섹터별 포트폴리오 현황</h2>
                 <canvas id="sectorChart"></canvas>
             </div>
             <div class="card chart-container">
-                <h2 class="text-lg font-medium mb-4">Portfolios by Risk Value</h2>
+                <h2 class="text-lg font-medium mb-4">위험도별 포트폴리오 현황</h2>
                 <canvas id="riskChart"></canvas>
+            </div>
+        </div>
+        <div class="charts-wrapper">
+            <div class="card chart-container">
+                <h2 class="text-lg font-medium mb-4">섹터별 포트폴리오 수익률 현황</h2>
+                <canvas id="sectorReturnsChart"></canvas>
+            </div>
+            <div class="card chart-container">
+                <h2 class="text-lg font-medium mb-4">위험도별 포트폴리오 수익률 현황</h2>
+                <canvas id="riskReturnsChart"></canvas>
             </div>
         </div>
         <div class="card mt-4">
@@ -203,7 +213,17 @@
     const parsedComparisonResultsData = JSON.parse(comparisonResultsData);
     document.getElementById('higherCount').innerText = parsedComparisonResultsData.higherCount;
     document.getElementById('lowerCount').innerText = parsedComparisonResultsData.lowerCount;
-    console.log(parsedComparisonResultsData);
+
+    const sectorReturnsData = /*[[${sectorReturnRatesJson}]]*/ '{}';
+    const sectorParsedReturnsData = JSON.parse(sectorReturnsData);
+    const sectorName = sectorParsedReturnsData.map(sector => sector.sectorName);
+    const sectorRate = sectorParsedReturnsData.map(sector => sector.averageReturnRate);
+
+    const riskReturnsData = /*[[${riskReturnRatesJson}]]*/ '{}';
+    const riskParsedReturnsData = JSON.parse(riskReturnsData);
+    console.log(riskParsedReturnsData)
+    const riskName = riskParsedReturnsData.map(risk => risk.risk);
+    const riskRate = riskParsedReturnsData.map(risk => risk.averageReturnRate);
     /*]]>*/
 </script>
 
@@ -329,7 +349,105 @@
                 }
             }
         });
+        const ctxSectorReturns = document.getElementById('sectorReturnsChart').getContext('2d');
+        new Chart(ctxSectorReturns, {
+            type: 'bar',
+            data: {
+                labels: sectorName,
+                datasets: [{
+                    label: 'Average Return Rate (%)',
+                    data: sectorRate,
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)',
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(201, 203, 207, 0.2)',
+                        'rgba(255, 205, 86, 0.2)',
+                        'rgba(99, 255, 132, 0.2)',
+                        'rgba(255, 159, 64, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(75, 192, 192, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(201, 203, 207, 1)',
+                        'rgba(255, 205, 86, 1)',
+                        'rgba(99, 255, 132, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(75, 192, 192, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
 
+        const ctxRiskReturns = document.getElementById('riskReturnsChart').getContext('2d');
+        new Chart(ctxRiskReturns, {
+            type: 'bar',
+            data: {
+                labels: riskName,
+                datasets: [{
+                    label: 'Average Return Rate (%)',
+                    data: riskRate,
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)',
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(201, 203, 207, 0.2)',
+                        'rgba(255, 205, 86, 0.2)',
+                        'rgba(99, 255, 132, 0.2)',
+                        'rgba(255, 159, 64, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(75, 192, 192, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(201, 203, 207, 1)',
+                        'rgba(255, 205, 86, 1)',
+                        'rgba(99, 255, 132, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(75, 192, 192, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
     });
 
 </script>

@@ -3,9 +3,11 @@ package com.example.adminpage.service;
 import com.example.adminpage.entity.Portfolio;
 import com.example.adminpage.entity.PortfolioTicker;
 import com.example.adminpage.repository.PortfolioRepository;
+import com.example.adminpage.repository.PortfolioSectorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +17,8 @@ public class PortfolioService {
 
     @Autowired
     private PortfolioRepository portfolioRepository;
+    @Autowired
+    private PortfolioSectorRepository portfolioSectorRepository;
 
     public Map<Integer, Long> getPortfoliosCountByRiskValue() {
         List<Object[]> results = portfolioRepository.countPortfoliosByRiskValue();
@@ -73,5 +77,32 @@ public class PortfolioService {
         comparisonResults.put("lowerCount", lowerCount);
 
         return comparisonResults;
+    }
+
+    public List<Map<String, Object>> getSectorReturnRates() {
+        List<Object[]> results = portfolioSectorRepository.findSectorReturnRates();
+        List<Map<String, Object>> sectorReturnRates = new ArrayList<>();
+
+        for (Object[] result : results) {
+            Map<String, Object> rate = new HashMap<>();
+            rate.put("sectorName", result[0]);
+            rate.put("averageReturnRate", (Double) result[1]-100);
+            sectorReturnRates.add(rate);
+        }
+
+        return sectorReturnRates;
+    }
+
+    public List<Map<String, Object>> getRiskPortfolioReturns(){
+        List<Object[]> results = portfolioSectorRepository.findRiskReturnRates();
+        List<Map<String, Object>> riskReturnRates = new ArrayList<>();
+
+        for (Object[] result : results) {
+            Map<String, Object> rate = new HashMap<>();
+            rate.put("risk", result[0]);
+            rate.put("averageReturnRate", result[1]);
+            riskReturnRates.add(rate);
+        }
+        return riskReturnRates;
     }
 }
