@@ -18,11 +18,10 @@ import { width, height, filteringNumber, colorScale } from "../../utils/utils";
 import StockInfo from "./StockInfo";
 import Loading from "../../utils/Loading";
 import ModalComponent from "../../utils/Modal";
-import NotificationBubble from "../../utils/Notification";
 
 const PortfolioDetails = ({ route, navigation }) => {
   const stocksLength = 10;
-  const { getPortfolioById, portfolios, loadData } = usePortfolio();
+  const { getPortfolioById, portfolios, reloadPortfolio } = usePortfolio();
   const [portfolio, setPortfolio] = useState({
     id: null,
     name: "",
@@ -290,10 +289,10 @@ const PortfolioDetails = ({ route, navigation }) => {
       <View style={styles.chartContainer}>
         <PortfolioPieChart
           data={portfolio}
-          cash={portfolio}
           selectedId={selectedId}
           size={width * 0.6}
           mode={"light"}
+          type={"stock"}
         />
         {!portfolio.auto && (
           <TouchableOpacity
@@ -468,6 +467,7 @@ const PortfolioDetails = ({ route, navigation }) => {
                         onPress={() => {
                           navigation.navigate("NewsSummary", {
                             ticker: item.ticker,
+                            name: item.companyName,
                           });
                         }}
                       >
@@ -572,7 +572,7 @@ const PortfolioDetails = ({ route, navigation }) => {
               onPress={async () => {
                 await fetchModifyStockManual();
                 resetModifyData();
-                await loadData();
+                await reloadPortfolio(route.params.id);
                 toggleInfoModal();
               }}
             />

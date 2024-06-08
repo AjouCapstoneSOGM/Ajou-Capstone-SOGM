@@ -3,7 +3,7 @@ import { View, StyleSheet } from "react-native";
 import ManualPage1 from "../make/manual/ManualPage1";
 import ManualPage2 from "../make/manual/ManualPage2";
 import ManualAddPage3 from "../make/manual/ManualAddPage3";
-import { Button, Divider } from "@rneui/base";
+import { Divider } from "@rneui/base";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { usePortfolio } from "../../utils/PortfolioContext";
 
@@ -12,10 +12,16 @@ const AddStockInManual = ({ route, navigation }) => {
   const [stockList, setStockList] = useState([]);
   const [step, setStep] = useState(1);
   const [disabled, setDisabled] = useState(false);
-  const { loadData } = usePortfolio();
+  const { reloadPortfolio } = usePortfolio();
 
   const handleNextStep = () => {
     setStep(step + 1);
+  };
+
+  const handleMovePage = async () => {
+    await reloadPortfolio(pfId);
+    navigation.popToTop();
+    navigation.navigate("ViewPortfolio");
   };
 
   useEffect(() => {
@@ -31,9 +37,7 @@ const AddStockInManual = ({ route, navigation }) => {
       else setDisabled(false);
     }
     if (step === 4) {
-      loadData();
-      navigation.popToTop();
-      navigation.navigate("ViewPortfolio");
+      handleMovePage();
     }
   }, [step, stockList]);
 

@@ -13,7 +13,7 @@ import { usePortfolio } from "../../../utils/PortfolioContext";
 
 const ManualPage3 = ({ stockList }) => {
   const navigation = useNavigation();
-  const { loadData } = usePortfolio();
+  const { reloadPortfolio } = usePortfolio();
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState();
   const [pfId, setPfId] = useState("");
@@ -24,7 +24,7 @@ const ManualPage3 = ({ stockList }) => {
   };
 
   const gotoDetailPage = async () => {
-    await loadData();
+    await reloadPortfolio(pfId);
     navigation.dispatch(
       CommonActions.reset({
         index: 2,
@@ -112,6 +112,7 @@ const ManualPage3 = ({ stockList }) => {
             selectedId={selectedId}
             size={0.6 * width}
             mode={"dark"}
+            type={"stock"}
           />
         </View>
         <View style={styles.column}>
@@ -155,7 +156,7 @@ const ManualPage3 = ({ stockList }) => {
             iconPosition="right"
           />
           <Button
-            title="한 주당 금액"
+            title="총 금액"
             type="clear"
             containerStyle={styles.columnPrice}
             titleStyle={{ color: "#808080", fontSize: 12 }}
