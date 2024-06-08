@@ -207,7 +207,20 @@
 
     const riskData = /*[[${countPortfolioByRiskValueJson}]]*/ '{}';
     const parsedRiskData = JSON.parse(riskData);
-    const riskValues = Object.values(parsedRiskData);
+
+    const riskLabelsMap = {
+        '1': '안전',
+        '2': '중립',
+        '3': '위험'
+    };
+    const riskLabels = [];
+    const riskValues = [];
+    Object.keys(parsedRiskData).forEach(risk => {
+        if (riskLabelsMap[risk]) {
+            riskLabels.push(riskLabelsMap[risk]);
+            riskValues.push(parsedRiskData[risk]);
+        }
+    });
 
     const comparisonResultsData = /*[[${comparisonResultsJson}]]*/ '{}';
     const parsedComparisonResultsData = JSON.parse(comparisonResultsData);
@@ -219,12 +232,28 @@
     const sectorName = sectorParsedReturnsData.map(sector => sector.sectorName);
     const sectorRate = sectorParsedReturnsData.map(sector => sector.averageReturnRate);
 
-    const riskReturnsData = /*[[${riskReturnRatesJson}]]*/ '{}';
-    const riskParsedReturnsData = JSON.parse(riskReturnsData);
-    console.log(riskParsedReturnsData)
-    const riskName = riskParsedReturnsData.map(risk => risk.risk);
-    const riskRate = riskParsedReturnsData.map(risk => risk.averageReturnRate);
-    /*]]>*/
+    const riskReturnsDataMapped = /*[[${riskReturnRatesJson}]]*/ '{}';
+    const parsedRiskReturnsData = JSON.parse(riskReturnsDataMapped);
+    console.log(parsedRiskReturnsData);
+
+    const riskLabelsMapping = {
+        '0': '수동',
+        '1': '안전',
+        '2': '중립',
+        '3': '위험'
+    };
+    const riskLabelsArray = [];
+    const riskRatesArray = [];
+
+    parsedRiskReturnsData.forEach(risk => {
+        if (riskLabelsMapping[risk.risk]) {
+            riskLabelsArray.push(riskLabelsMapping[risk.risk]);
+            riskRatesArray.push(risk.averageReturnRate);
+        }
+    });
+
+    console.log(riskLabelsArray); // ['수동', '안전', '중립', '위험']
+    console.log(riskRatesArray); // [50.83916539529167, 65.04863361723785, 55.319990957946786, 16.04214336010604]
 </script>
 
 <script>
@@ -283,7 +312,7 @@
         const riskChart = new Chart(ctxRisk, {
             type: 'bar',
             data: {
-                labels: ['안전','중립','위험'],
+                labels: riskLabels,
                 datasets: [{
                     label: 'Number of Portfolios by Risk Value',
                     data: riskValues,
@@ -403,10 +432,10 @@
         new Chart(ctxRiskReturns, {
             type: 'bar',
             data: {
-                labels: riskName,
+                labels: riskLabelsArray,
                 datasets: [{
                     label: 'Average Return Rate (%)',
-                    data: riskRate,
+                    data: riskRatesArray,
                     backgroundColor: [
                         'rgba(75, 192, 192, 0.2)',
                         'rgba(54, 162, 235, 0.2)',
