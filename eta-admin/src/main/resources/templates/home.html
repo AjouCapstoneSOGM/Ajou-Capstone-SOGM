@@ -242,13 +242,20 @@
         '2': '중립',
         '3': '위험'
     };
+    const desiredOrder = ['수동', '안전', '중립', '위험'];
     const riskLabelsArray = [];
     const riskRatesArray = [];
 
+    desiredOrder.forEach(label => {
+        riskLabelsArray.push(label);
+        riskRatesArray.push(0);
+    });
+
     parsedRiskReturnsData.forEach(risk => {
-        if (riskLabelsMapping[risk.risk]) {
-            riskLabelsArray.push(riskLabelsMapping[risk.risk]);
-            riskRatesArray.push(risk.averageReturnRate);
+        const label = riskLabelsMapping[risk.risk];
+        if (label) {
+            const index = desiredOrder.indexOf(label);
+            riskRatesArray[index] = risk.averageReturnRate;
         }
     });
 
