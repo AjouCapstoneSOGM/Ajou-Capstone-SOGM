@@ -17,8 +17,9 @@ const RebalanceRecordList = ({ route, navigation }) => {
   useFocusEffect(
     useCallback(() => {
       if (route.params) {
+        const list = rebalanceRecords.filter((rebalanceRecords) => rebalanceRecords.pfId === route.params.id)
         setrebalanceRecordList(
-          rebalanceRecords.filter((rebalanceRecords) => rebalanceRecords.pfId === route.params.id)
+          list.sort((a, b) => new Date(b.date) - new Date(a.date))
         );
         const name = route.params.stocks.reduce((acc, item) => {
           acc[item.ticker] = item.companyName;
@@ -28,10 +29,8 @@ const RebalanceRecordList = ({ route, navigation }) => {
       } else {
         setrebalanceRecordList(rebalanceRecords);
       }
-      setrebalanceRecordList(
-        rebalanceRecordList.sort((a, b) => new Date(b.date) - new Date(a.date))
-      );
-    setLoading(false);
+      setLoading(false);
+      //console.log("rblist: ", rebalanceRecordList);
     }, [])
   );
 useEffect(() =>{

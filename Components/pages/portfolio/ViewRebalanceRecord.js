@@ -146,7 +146,7 @@ const ViewRebalanceRecord = ({ route, navigation }) => {
               <TouchableOpacity style={styles.rebalanceItemContent}>
                 <View style={styles.itemNameBox}>
                   <AppText style={styles.itemName}>{item.name}</AppText>
-                  <AppText style={styles.itemOnePrice}>{item.price.toLocaleString()}</AppText>
+                  <AppText style={styles.itemOnePrice}>{item.price.toLocaleString()}원</AppText>
                 </View>
                 <AppText style={styles.itemNumber}>{item.number.toLocaleString()}</AppText>
                 <AppText style={styles.itemPrice}>{item.totalPrice.toLocaleString()} 원</AppText>
