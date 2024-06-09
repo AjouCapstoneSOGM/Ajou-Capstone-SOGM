@@ -69,12 +69,19 @@ const PortfolioPieChart = ({
                     ).toFixed(2)
                   : 0) + "%",
             })) || [];
-          stockChartData?.push({ x: "현금", y: data.currentCash });
+          stockChartData?.push({
+            x: "현금",
+            y: data.currentCash,
+            rate:
+              (stockTotal > 0
+                ? ((data.currentCash / stockTotal) * 100).toFixed(2)
+                : 0) + "%",
+          });
           setChartData(stockChartData);
           break;
         case "rate":
           const rateChartData = data?.map((item, index) => ({
-            x: item.name,
+            x: index,
             y: item.rate,
           }));
           setChartData(rateChartData);
@@ -86,20 +93,42 @@ const PortfolioPieChart = ({
 
   return (
     <View style={styles.victoryContainer}>
-      {type == "asdf" && (
+      {type == "rate" && (
         <View style={styles.chartContainer}>
-          <VictoryChart domainPadding={20}>
-            <VictoryAxis dependentAxis tickFormat={(tick) => `${tick}%`} />
+          <VictoryChart
+            domainPadding={10}
+            width={500 * width * size}
+            height={height * 350 * size}
+          >
             <VictoryAxis
-              tickFormat={["Quarter 1", "Quarter 2", "Quarter 3", "Quarter 4"]}
+              dependentAxis
+              tickFormat={(tick) => `${tick}%`}
+              style={{
+                tickLabels: { fontSize: 12 },
+                grid: { stroke: "#ccc" },
+              }}
             />
-            <VictoryBar data={data} x="x" y="y" />
+            <VictoryAxis
+              style={{
+                tickLabels: { fontSize: 8 },
+              }}
+            />
+            <VictoryBar
+              data={chartData}
+              style={{
+                data: {
+                  fill: ({ datum, index }) => colorScale[index],
+                  width: ({ index }) => (index === selectedId ? 30 : 20),
+                },
+              }}
+            />
           </VictoryChart>
         </View>
       )}
       {type != "rate" && (
         <View style={styles.chartContainer}>
           <VictoryPie
+            key={chartData?.length}
             data={chartData}
             colorScale={colorScale}
             innerRadius={({ index }) =>
@@ -134,7 +163,7 @@ const PortfolioPieChart = ({
             <AppText
               style={{
                 fontWeight: "bold",
-                fontSize: 15 * height,
+                fontSize: 20 * height * size,
                 color: mode === "dark" ? "#f0f0f0" : "#333",
               }}
             >
@@ -142,7 +171,7 @@ const PortfolioPieChart = ({
             </AppText>
             <AppText
               style={{
-                fontSize: 9 * height,
+                fontSize: 12 * height * size,
                 color: mode === "dark" ? "#f0f0f0" : "#333",
               }}
             >

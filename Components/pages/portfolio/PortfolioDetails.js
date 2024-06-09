@@ -71,6 +71,7 @@ const PortfolioDetails = ({ route, navigation }) => {
         }
       );
       if (response.ok) {
+        return true;
       } else {
         console.error("Error occured");
       }
@@ -83,6 +84,15 @@ const PortfolioDetails = ({ route, navigation }) => {
     setModifyBuy(true);
     setModifyPrice(0);
     setModifyQuantity(0);
+  };
+
+  const handleModify = async () => {
+    setLoading(true);
+    await fetchModifyStockManual();
+    await reloadPortfolio(route.params.id);
+    resetModifyData();
+    toggleInfoModal();
+    setLoading(false);
   };
 
   const handleQuantityChange = (newQuantity) => {
@@ -289,7 +299,9 @@ const PortfolioDetails = ({ route, navigation }) => {
       <View style={styles.chartContainer}>
         <PortfolioPieChart
           data={portfolio}
-          selectedId={selectedId}
+          selectedId={
+            selectedId !== null ? selectedId : portfolio?.stocks.length
+          }
           size={width * 0.6}
           mode={"light"}
           type={"stock"}
@@ -567,13 +579,10 @@ const PortfolioDetails = ({ route, navigation }) => {
             </View>
             <Button
               buttonStyle={styles.submitButton}
-              title="반영"
+              title="확인"
               disabled={modifyQuantity == 0}
-              onPress={async () => {
-                await fetchModifyStockManual();
-                resetModifyData();
-                await reloadPortfolio(route.params.id);
-                toggleInfoModal();
+              onPress={() => {
+                handleModify();
               }}
             />
           </ModalComponent>

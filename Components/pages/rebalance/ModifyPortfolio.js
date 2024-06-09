@@ -65,7 +65,10 @@ const ModifyPortfolio = ({ route, navigation }) => {
         if (stock.ticker == order.ticker) {
           stock.quantity += order.quantity * (order.isBuy ? 1 : -1);
           afterPortfolio.detail.currentCash +=
-            order.quantity * order.price * (order.isBuy ? -1 : 1);
+            order.quantity *
+            order.price *
+            (order.isBuy ? -1 : 1) *
+            (portfolio.auto ? 1 : 0);
         }
       });
     });
@@ -97,13 +100,11 @@ const ModifyPortfolio = ({ route, navigation }) => {
     useCallback(() => {
       const totalPrice = getTotalPrice(portfolio);
       rebalancing.forEach((item, index) => {
+        const price = item.buyPrice * item.buyQuantity * (item.isBuy ? 1 : -1);
         item.index = index;
         item.buyPrice = item.price;
         item.buyQuantity = item.quantity;
-        item.rateDiff = (
-          (item.buyPrice * item.buyQuantity * (item.isBuy ? 1 : -1) * 100) /
-          totalPrice
-        ).toFixed(2);
+        item.rateDiff = ((price * 100) / (totalPrice - price)).toFixed(2);
       });
       setRebalances(rebalancing);
       setLoading(false);
