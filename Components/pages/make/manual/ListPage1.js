@@ -8,7 +8,7 @@ import { height, width } from "../../../utils/utils";
 import { getUsertoken } from "../../../utils/localStorageUtils";
 import urls from "../../../utils/urls";
 
-const Page1 = ({ step, setStep, interest, setInterest }) => {
+const ListPage1 = ({ step, setStep, interest, setInterest }) => {
   const [disabled, setDisabled] = useState(true);
   const [sector, setSector] = useState("");
   const icons = [
@@ -149,4 +149,4 @@ const styles = StyleSheet.create({
     color: "#999",
   },
 });
-export default Page1;
+export default ListPage1;

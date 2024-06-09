@@ -9,8 +9,8 @@ import ManualAddSelect from "../make/manual/ManualAddSelect";
 import ManualPage1 from "../make/manual/ManualPage1";
 import ManualPage2 from "../make/manual/ManualPage2";
 import ManualAddPage3 from "../make/manual/ManualAddPage3";
-import Page1 from "../make/manual/Page1";
-import Page2 from "../make/manual/Page2";
+import ListPage1 from "../make/manual/ListPage1";
+import ListPage2 from "../make/manual/ListPage2";
 
 const AddStockInManual = ({ route, navigation }) => {
   const pfId = route.params.pfId;
@@ -63,7 +63,7 @@ const AddStockInManual = ({ route, navigation }) => {
         );
       case 2:
         return (
-          <Page1
+          <ListPage1
             step={step}
             setStep={setStep}
             interest={interest}
@@ -72,7 +72,7 @@ const AddStockInManual = ({ route, navigation }) => {
         );
       case 3:
         return (
-          <Page2
+          <ListPage2
             step={step}
             setStep={setStep}
             interest={interest}

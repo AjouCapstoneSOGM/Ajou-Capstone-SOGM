@@ -14,7 +14,7 @@ import { usePortfolio } from "../../../utils/PortfolioContext";
 import { Button, Divider, Icon } from "@rneui/base";
 import { width, height } from "../../../utils/utils";
 
-const Page2 = ({ step, setStep, interest, stockList, setStockList }) => {
+const ListPage2 = ({ step, setStep, interest, stockList, setStockList }) => {
   const {
     fetchStocksByPortfolioId,
     fetchRebalanceList,
@@ -51,13 +51,13 @@ const Page2 = ({ step, setStep, interest, stockList, setStockList }) => {
         const rebalance = await fetchRebalanceList(pfId);
         setPortfolio(portfolio);
         setInitRebalance(rebalance[0].rebalancings);
-
-        console.log(company);
         setLoading(false);
       };
-      loadPortfolio().then(()=> {
-        fetchDelete(pfId);
-      })
+      const loadAndDelete = async () =>{
+        await loadPortfolio();
+        await fetchDelete(pfId);
+      }
+      loadAndDelete();
     }
   }, [pfId]);
   
@@ -165,7 +165,7 @@ const Page2 = ({ step, setStep, interest, stockList, setStockList }) => {
   );
 };
 
-export default Page2;
+export default ListPage2;
 
 const styles = StyleSheet.create({
   container: {
