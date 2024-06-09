@@ -8,17 +8,17 @@ import { usePortfolio } from "../../utils/PortfolioContext.js";
 import { useFocusEffect } from "@react-navigation/native";
 import Loading from "../../utils/Loading";
 
-const RebalanceRecodeList = ({ route, navigation }) => {
-  const { rebalanceRecodes, getPortfolioById } = usePortfolio();
+const RebalanceRecordList = ({ route, navigation }) => {
+  const { rebalanceRecords } = usePortfolio();
   const [loading, setLoading] = useState(true);
-  const [rebalanceRecodeList, setrebalanceRecodeList] = useState([]);
+  const [rebalanceRecordList, setrebalanceRecordList] = useState([]);
   const [tickerName, setTickerName] = useState([]);
 
   useFocusEffect(
     useCallback(() => {
       if (route.params) {
-        setrebalanceRecodeList(
-          rebalanceRecodes.filter((rebalanceRecodes) => rebalanceRecodes.pfId === route.params.id)
+        setrebalanceRecordList(
+          rebalanceRecords.filter((rebalanceRecords) => rebalanceRecords.pfId === route.params.id)
         );
         const name = route.params.stocks.reduce((acc, item) => {
           acc[item.ticker] = item.companyName;
@@ -26,16 +26,16 @@ const RebalanceRecodeList = ({ route, navigation }) => {
         }, {});
         setTickerName(name);
       } else {
-        setrebalanceRecodeList(rebalanceRecodes);
+        setrebalanceRecordList(rebalanceRecords);
       }
-      setrebalanceRecodeList(
-        rebalanceRecodeList.sort((a, b) => new Date(b.date) - new Date(a.date))
+      setrebalanceRecordList(
+        rebalanceRecordList.sort((a, b) => new Date(b.date) - new Date(a.date))
       );
     setLoading(false);
     }, [])
   );
 useEffect(() =>{
-    //console.log("rblist: ", rebalanceRecodeList);
+    //console.log("rblist: ", rebalanceRecordList);
   }, [])
 
   if (loading) return <Loading />;
@@ -54,13 +54,13 @@ useEffect(() =>{
         <AppText style={{ fontSize: 30, fontWeight: "bold" }}>리밸런싱 내역</AppText>
       </View>
       <ScrollView style={styles.alertList}>
-        {rebalanceRecodeList.map((item, index) => {
+        {rebalanceRecordList.map((item, index) => {
           return (
             <View key={index}>
               <TouchableOpacity
                 style={styles.alertContainer}
                 onPress={async () => {
-                  navigation.navigate("ViewRebalanceRecode", {
+                  navigation.navigate("ViewRebalanceRecord", {
                     pfId: item.pfId,
                     date: item.date,
                     records: item.records,
@@ -138,4 +138,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default RebalanceRecodeList;
+export default RebalanceRecordList;
