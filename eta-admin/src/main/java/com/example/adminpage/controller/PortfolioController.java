@@ -32,7 +32,7 @@ public class PortfolioController {
     private PortfolioRecordRepository portfolioRecordRepository;
 
     @GetMapping
-    public String getUsers(Model model) {
+    public String getPortfolios(Model model) {
         model.addAttribute("portfolios", portfolioRepository.findAll());
         return "Portfolio";
     }
@@ -50,7 +50,8 @@ public class PortfolioController {
         return "portfolio";
     }
     @GetMapping("/{PfId}")
-    public String getUser(@PathVariable("PfId") int PfId, Model model) {
+    public String getPortfolioDetail(@PathVariable("PfId") int PfId, Model model) {
+        System.out.println("PortfolioController.getPortfolioDetail");
         model.addAttribute("portfolio", portfolioRepository.getReferenceById(PfId));
         model.addAttribute("records", portfolioRecordRepository.findAllByPfId(PfId));
         return "PortfolioDetail";
