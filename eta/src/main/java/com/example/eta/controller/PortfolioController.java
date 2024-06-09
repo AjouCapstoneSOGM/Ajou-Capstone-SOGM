@@ -102,7 +102,7 @@ public class PortfolioController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/{port_id}/desposit")
+    @PutMapping("/{port_id}/deposit")
     public ResponseEntity<Void> depositCash(@PathVariable("port_id") Integer pfId, @RequestBody Map<String, Float> requestBody) {
         portfolioService.depositCash(pfId, requestBody.get("cash"));
         return ResponseEntity.ok().build();
