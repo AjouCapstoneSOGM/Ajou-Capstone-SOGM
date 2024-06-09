@@ -50,7 +50,14 @@ public class PortfolioController {
         return "portfolio";
     }
     @GetMapping("/{PfId}")
-    public String getPortfolioDetail(@PathVariable("PfId") int PfId, Model model) {
+    public String getPortfolioDetail(@PathVariable("PfId") int PfId, Model model,RedirectAttributes redirectAttributes) {
+        Portfolio portfolio = portfolioRepository.getReferenceById(PfId);
+
+        if (!Boolean.TRUE.equals(portfolio.getIsAuto())) {
+            redirectAttributes.addFlashAttribute("errorMessage", "This portfolio is not accessible.");
+            return "redirect:/portfolio";
+        }
+
         model.addAttribute("portfolio", portfolioRepository.getReferenceById(PfId));
         model.addAttribute("records", portfolioRecordRepository.findAllByPfId(PfId));
         return "PortfolioDetail";

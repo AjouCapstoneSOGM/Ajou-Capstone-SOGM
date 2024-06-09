@@ -21,6 +21,13 @@
             background-color: #ffffff;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
+        tr.clickable {
+            cursor: pointer;
+        }
+        .dropdown:focus-within .dropdown-menu {
+            /* @apply block; */
+            display:block;
+        }
     </style>
 </head>
 <body class="min-h-screen bg-gray-100 dark:bg-gray-900">
@@ -36,13 +43,13 @@
                     </svg>
                     <span>ETA</span>
                 </a>
-<!--                <button id="toggle-notifications" class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground ml-auto h-8 w-8">-->
-<!--                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">-->
-<!--                        <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path>-->
-<!--                        <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path>-->
-<!--                    </svg>-->
-<!--                    <span class="sr-only">Toggle notifications</span>-->
-<!--                </button>-->
+                <!--                    <button id="toggle-notifications" class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground ml-auto h-8 w-8">-->
+                <!--                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">-->
+                <!--                            <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path>-->
+                <!--                            <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path>-->
+                <!--                        </svg>-->
+                <!--                        <span class="sr-only">Toggle notifications</span>-->
+                <!--                    </button>-->
             </div>
             <div class="flex-1 overflow-auto py-2">
                 <nav class="grid items-start px-4 text-sm font-medium">
@@ -53,7 +60,7 @@
                         </svg>
                         Dashboard
                     </a>
-                    <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50" href="users">
+                    <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50" href="/users">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
                             <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
                             <circle cx="9" cy="7" r="4"></circle>
@@ -62,7 +69,7 @@
                         </svg>
                         Users
                     </a>
-                    <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50" href="portfolio">
+                    <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50" href="/portfolio">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
                             <path d="m7.5 4.27 9 5.15"></path>
                             <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path>
@@ -71,14 +78,14 @@
                         </svg>
                         Portfolio
                     </a>
-                    <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50" href="ticker">
+                    <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50" href="/ticker">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
                             <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.51a2 2 0 0 1 1-1.73l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
                             <circle cx="12" cy="12" r="3"></circle>
                         </svg>
                         Ticker
                     </a>
-                    <a class="flex items-center gap-3 rounded-lg bg-gray-100 px-3 py-2 text-gray-900 transition-all hover:text-gray-900 dark:bg-gray-800 dark:text-gray-50 dark:hover:text-gray-50" href="sectors">
+                    <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50" href="/sectors">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
                             <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"></path>
                             <path d="M14 2v4a2 2 0 0 0 2 2h4"></path>
@@ -88,7 +95,7 @@
                         </svg>
                         Sector
                     </a>
-                    <a class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50" href="/questions">
+                    <a class="flex items-center gap-3 rounded-lg bg-gray-100 px-3 py-2 text-gray-900 transition-all hover:text-gray-900 dark:bg-gray-800 dark:text-gray-50 dark:hover:text-gray-50" href="/questions">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-question-square" viewBox="0 0 16 16">
                             <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z"/>
                             <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286m1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94"/>
@@ -100,34 +107,62 @@
         </div>
     </div>
 
-    <div>
-        <h2 class="text-xl font-semibold mb-4">Sector</h2>
+    <div class="flex-1 main-content">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold mb-4">Questions</h2>
+            <div class="inline-block text-left dropdown">
+                <span class="rounded-md shadow-sm">
+                    <button class="inline-flex justify-center w-full px-4 py-2 text-sm font-medium leading-5 text-gray-700 transition duration-150 ease-in-out bg-white border border-gray-300 rounded-md hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-50 active:text-gray-800"
+                         type="button" aria-haspopup="true" aria-expanded="true" aria-controls="headlessui-menu-items-117">
+                    <span th:text="${getOnlyUnanswered == true ? '답변되지 않은 질문' : '전체 질문'}"></span>
+                    <svg class="w-5 h-5 ml-2 -mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                    </button>
+                </span>
+                <div class="hidden dropdown-menu">
+                    <div class="absolute right-0 w-56 mt-2 origin-top-right bg-white border border-gray-200 divide-y divide-gray-100 rounded-md shadow-lg outline-none" aria-labelledby="headlessui-menu-button-1" id="headlessui-menu-items-117" role="menu">
+                        <a href="/questions" class="text-gray-700 flex justify-between w-full px-4 py-2 text-sm leading-5"  role="menuitem" >전체 질문</a>
+                        <a href="/questions/unanswered" class="text-gray-700 flex justify-between w-full px-4 py-2 text-sm leading-5" role="menuitem" >답변되지 않은 질문</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="alert" th:if="${message}">
+            <span th:text="${message}"></span>
+        </div>
         <table class="w-full bg-white rounded-md shadow-md overflow-hidden">
             <thead class="bg-gray-50">
             <tr>
-                <th class="px-4 py-2 text-left text-gray-500">SectorId</th>
-                <th class="px-4 py-2 text-left text-gray-500">name</th>
+                <th class="px-4 py-2 text-left text-gray-500">질문 번호</th>
+                <th class="px-4 py-2 text-left text-gray-500">질문 제목</th>
+                <th class="px-4 py-2 text-left text-gray-500">닉네임</th>
+                <th class="px-4 py-2 text-left text-gray-500">질문 일자</th>
+                <th class="px-4 py-2 text-left text-gray-500">답변 일자</th>
+                <th class="px-4 py-2 text-left text-gray-500"></th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="sector : ${sectors}">
-                <td class="border-t px-4 py-2" th:text="${sector.sectorId}"></td>
-                <td class="border-t px-4 py-2" th:text="${sector.sectorName}"></td>
+            <tr th:each="question : ${questions}" th:onclick="'javascript:goToDetail(\'' + ${question.questionId} + '\');'" class="clickable" >
+                <td class="border-t px-4 py-2" th:text="${question.questionId}"></td>
+                <td class="border-t px-4 py-2" th:text="${question.title}"></td>
+                <td class="border-t px-4 py-2" th:text="${question.user.name}"></td>
+                <td class="border-t px-4 py-2" th:text="${question.createdDate}"></td>
+                <td class="border-t px-4 py-2" th:text="${question.answeredDate == null ? '-' : question.answeredDate}"></td>
             </tr>
             </tbody>
         </table>
     </div>
 </div>
 <script>
-    document.getElementById('toggle-notifications').addEventListener('click', function () {
-        alert('Notifications toggled!');
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+            search();
+        }
     });
 
-    // Toggle the sidebar for small screens
-    document.querySelector('a.lg\\:hidden').addEventListener('click', function () {
-        const sidebar = document.querySelector('.lg\\:block');
-        sidebar.classList.toggle('hidden');
-    });
+    function goToDetail(questionId) {
+        window.location.href = '/questions/' + questionId;
+    }
+
 </script>
 </body>
 </html>
