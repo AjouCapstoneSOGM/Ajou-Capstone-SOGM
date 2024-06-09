@@ -101,4 +101,16 @@ public class PortfolioController {
         portfolioService.updatePortfolioName(pfId, requestBody.get("name"));
         return ResponseEntity.ok().build();
     }
+
+    @PutMapping("/{port_id}/desposit")
+    public ResponseEntity<Void> depositCash(@PathVariable("port_id") Integer pfId, @RequestBody Map<String, Float> requestBody) {
+        portfolioService.depositCash(pfId, requestBody.get("cash"));
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{port_id}/withdraw")
+    public ResponseEntity<Void> withdrawCash(@PathVariable("port_id") Integer pfId, @RequestBody Map<String, Float> requestBody) {
+        portfolioService.withdrawCash(pfId, requestBody.get("cash"));
+        return ResponseEntity.ok().build();
+    }
 }

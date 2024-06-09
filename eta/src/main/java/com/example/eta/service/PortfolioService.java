@@ -371,6 +371,23 @@ public class PortfolioService {
     }
 
     @Transactional
+    public void depositCash(Integer pfId, float cash) {
+        Portfolio portfolio = portfolioRepository.findById(pfId).get();
+        portfolio.updateCurrentCash(portfolio.getCurrentCash() + cash);
+        portfolioRepository.save(portfolio);
+    }
+
+    @Transactional
+    public void withdrawCash(Integer pfId, float cash) {
+        Portfolio portfolio = portfolioRepository.findById(pfId).get();
+        if (portfolio.getCurrentCash() < cash) {
+            throw new NotEnoughCashException();
+        }
+        portfolio.updateCurrentCash(portfolio.getCurrentCash() - cash);
+        portfolioRepository.save(portfolio);
+    }
+
+    @Transactional
     public void updatePortfolioName(Integer pfId, String newName) {
         Portfolio portfolio = portfolioRepository.findById(pfId).get();
         portfolio.setName(newName);
