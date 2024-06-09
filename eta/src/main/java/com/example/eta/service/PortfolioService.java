@@ -340,7 +340,6 @@ public class PortfolioService {
             float totalCost = sellRequestDto.getQuantity() * sellRequestDto.getPrice();
             float newCurrentCash = portfolio.getCurrentCash() + totalCost;
             portfolio.updateCurrentCash(newCurrentCash);
-            portfolio.updateCurrentCash(newCurrentCash);
         }
 
         portfolioRecordRepository.save(PortfolioRecord.builder()
