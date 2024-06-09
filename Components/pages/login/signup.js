@@ -40,8 +40,7 @@ const Signup = ({ navigation }) => {
           signupToken: signupToken,
         }),
       });
-      const data = await response.json();
-      return data.status;
+      return response.status;
     } catch (error) {
       console.error("Error:", error);
     }
@@ -121,13 +120,13 @@ const Signup = ({ navigation }) => {
   const handleSignUp = async () => {
     if (isValueValid()) {
       const response = await fetchSignupInfo();
-      if (response.status == 409) {
-        Alert.alert("이미 가입된 이메일입니다.")
-      } else if (response.status == 404) {
+      if (response == 409) {
+        Alert.alert("이미 가입된 이메일입니다.");
+      } else if (response == 404) {
         Alert.alert("이메일 인증을 진행해 주세요.");
-      } else if (response.status == 403) {
+      } else if (response == 403) {
         Alert.alert("인증번호가 잘못되었습니다.");
-      } else if (response.status == 200) {
+      } else if (response == 200) {
         Alert.alert("회원가입 완료", "회원가입이 완료되었습니다.", [
           {
             text: "확인",
