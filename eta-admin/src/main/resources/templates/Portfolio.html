@@ -26,6 +26,10 @@
     tr.clickable {
       cursor: pointer;
     }
+    tr.non-clickable {
+      cursor: not-allowed;
+      color: #999;
+    }
   </style>
 </head>
 <body class="min-h-screen bg-gray-100 dark:bg-gray-900">
@@ -126,7 +130,7 @@
         </tr>
       </thead>
       <tbody>
-          <tr th:each="portfolio : ${portfolios}" th:onclick="'javascript:goToDetail(\'' + ${portfolio.PfId} + '\');'" class="clickable" >
+          <tr th:each="portfolio : ${portfolios}" th:classappend="${portfolio.isAuto} ? 'clickable' : 'non-clickable'" th:onclick="${portfolio.isAuto} ? 'javascript:goToDetail(\'' + ${portfolio.PfId} + '\');' : ''">
             <td class="border-t px-4 py-2" th:text="${portfolio.PfId}"></td>
             <td class="border-t px-4 py-2" th:text="${portfolio.user.userId}"></td>
             <td class="border-t px-4 py-2" th:text="${portfolio.name}"></td>
