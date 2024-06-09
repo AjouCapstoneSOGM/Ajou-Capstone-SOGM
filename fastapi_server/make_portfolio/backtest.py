@@ -906,7 +906,7 @@ class backtest:
     ):
         asset_num = int_asset_num[:-num_safe]
         remaining_decimals = int_asset_num - np.floor(int_asset_num)
-        print(remaining_decimals)
+        int_asset_num = int_asset_num.astype(int)
 
         cash = (current_price * remaining_decimals).sum()
         int_asset_num_stock_all_old = int_asset_num[:-num_safe]
@@ -959,6 +959,7 @@ class backtest:
             new_asset_num, current_price, total_invest_money, initial_ratio, num_safe
         )
         change_asset_num = new_asset_num - current_asset_num
+
         for i in range(len(change_asset_num)):
             if change_asset_num[i] > 0:
                 average_price[i] = (
@@ -1088,7 +1089,7 @@ class backtest:
 
         port_return = (total_current_invest) / invest_money - 1
 
-        return re_cnt, invest_money, total_current_invest, port_return, no_re_return
+        return invest_money, total_current_invest, port_return, no_re_return
 
     def kos_return(self, buy_date, start_day):
         kos_data = web.get_data_yahoo(
@@ -1117,7 +1118,7 @@ class backtest:
             self.get_initial_data(port_list, results, start_day)
         )
 
-        re_cnt, invest_money, total_current_invest, port_return, no_re_return = (
+        invest_money, total_current_invest, port_return, no_re_return = (
             self.run_investment_strategy(
                 asset_adjClose,
                 initial_ratio,
