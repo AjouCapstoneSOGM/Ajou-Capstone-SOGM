@@ -58,6 +58,7 @@ public class UserService {
             throw new UnmodifiableSocialUserException();
 
         user.setName(name);
+        user.setModifiedDate(LocalDateTime.now());
     }
 
     @Transactional
@@ -69,6 +70,7 @@ public class UserService {
             throw new UnmodifiableSocialUserException();
 
         user.setPassword(passwordEncoder.encode(password));
+        user.setModifiedDate(LocalDateTime.now());
     }
 
     @Transactional

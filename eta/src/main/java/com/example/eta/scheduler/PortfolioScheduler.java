@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -36,6 +37,7 @@ public class PortfolioScheduler {
     @Transactional
     public void doProportionRebalancing() {
         updateStatistics();
+        disableUser();
 
         for (Portfolio portfolio : portfolioRepository.findAll()) {
             portfolioService.updatePortfolioProportion(portfolio, false);
@@ -232,5 +234,16 @@ public class PortfolioScheduler {
                 .totalUser(totalUser)
                 .totalPortfolio(totalPortfolio)
                 .build());
+    }
+
+    @Transactional
+    public void disableUser() {
+        List<User> users = userRepository.findAll();
+        for (User user : users) {
+            if ((user.getLastLoginDate() == null && user.getCreatedDate().isBefore(LocalDateTime.now().minusMonths(3)) && user.getToken() == null)
+                    || (user.getLastLoginDate() != null && user.getLastLoginDate().isBefore(LocalDateTime.now().minusMonths(3)) && user.getToken() == null)) {
+                user.setEnabled(false);
+            }
+        }
     }
 }
