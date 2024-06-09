@@ -6,7 +6,8 @@ import { LogBox, StatusBar } from "react-native";
 import Settings from "./pages/Settings.js";
 import Information from "./pages/Information.js";
 import MyPage from "./pages/MyPage.js";
-import QnA from "./pages/QnA.js";
+import QnA from "./pages/qna/QnA.js";
+import QnACreate from "./pages/qna/QnaCreate.js";
 import Login from "./pages/login/login";
 import SocialLogin from "./pages/login/sociallogin";
 import Signup from "./pages/login/signup";
@@ -41,6 +42,7 @@ function ScreenStack() {
     >
       <Stack.Screen name="MyPage" component={MyPage} />
       <Stack.Screen name="QnA" component={QnA} />
+      <Stack.Screen name="QnACreate" component={QnACreate} />
       <Stack.Screen name="Information" component={Information} />
       <Stack.Screen name="Settings" component={Settings} />
       <Stack.Screen name="Login" component={Login} />
@@ -54,8 +56,14 @@ function ScreenStack() {
       <Stack.Screen name="PortfolioDetails" component={PortfolioDetails} />
       <Stack.Screen name="AddStockInManual" component={AddStockInManual} />
       <Stack.Screen name="ManagementPage" component={ManagementPage} />
-      <Stack.Screen name="RebalanceRecodeList" component={RebalanceRecodeList} />
-      <Stack.Screen name="ViewRebalanceRecode" component={ViewRebalanceRecode} />
+      <Stack.Screen
+        name="RebalanceRecodeList"
+        component={RebalanceRecodeList}
+      />
+      <Stack.Screen
+        name="ViewRebalanceRecode"
+        component={ViewRebalanceRecode}
+      />
       <Stack.Screen name="ModifyPortfolio" component={ModifyPortfolio} />
       <Stack.Screen name="MakePortfolio" component={MakePortfolio} />
     </Stack.Navigator>

@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react";
 import { View, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Divider } from "@rneui/base";
-import { getUsertoken } from "../utils/localStorageUtils";
-import urls from "../utils/urls";
-import AppText from "../utils/AppText";
+import { getUsertoken } from "../../utils/localStorageUtils";
+import urls from "../../utils/urls";
+import AppText from "../../utils/AppText";
+import { timeAgo } from "../../utils/utils";
 
 const QnA = ({ navigation }) => {
   const [qnaList, setQnaList] = useState([]);
@@ -13,7 +14,8 @@ const QnA = ({ navigation }) => {
   const [selectedId, setSelectedId] = useState("");
 
   const handleSelectedId = (id) => {
-    setSelectedId(id);
+    if (selectedId !== id) setSelectedId(id);
+    else if (selectedId === id) setSelectedId("");
   };
 
   const fetchQnAList = async () => {
@@ -142,22 +144,7 @@ const QnA = ({ navigation }) => {
       const qnaIdList = qnaLists.map((qna) => qna.id);
       const qnaResults = await getQnaResults(qnaIdList);
 
-      //setQnaList(qnaList);
-      setQnaList([
-        {
-          id: 0,
-          title: 테스트제목1,
-          created_date: "2024-05-05",
-          answered: true,
-        },
-        {
-          id: 1,
-          title: 테스트제목2,
-          created_date: "2024-05-05",
-          answered: false,
-        },
-      ]);
-
+      setQnaList(qnaLists);
       setQnaResult(qnaResults);
       setLoading(false);
     };
@@ -179,7 +166,12 @@ const QnA = ({ navigation }) => {
         <AppText style={{ fontSize: 30, fontWeight: "bold" }}>문의하기</AppText>
       </View>
       <ScrollView style={styles.settingList}>
-        <TouchableOpacity style={styles.settingItem} onPress={() => {}}>
+        <TouchableOpacity
+          style={styles.settingItem}
+          onPress={() => {
+            navigation.navigate("QnACreate");
+          }}
+        >
           <AppText style={{ color: "#f0f0f0", fontSize: 18 }}>
             문의 보내기
           </AppText>
@@ -198,7 +190,7 @@ const QnA = ({ navigation }) => {
             </AppText>
           ) : (
             qnaList.map((qna, index) => {
-              const result = qnaResult.find((result) => result.id === qna);
+              const result = qnaResult.find((result) => result.id === qna.id);
               return (
                 <React.Fragment>
                   <TouchableOpacity
@@ -207,8 +199,12 @@ const QnA = ({ navigation }) => {
                     onPress={() => handleSelectedId(index)}
                   >
                     <View>
-                      <AppText>{qna.title}</AppText>
-                      <AppText>{qna.created_date}</AppText>
+                      <AppText style={{ color: "#f0f0f0", fontSize: 17 }}>
+                        {qna.title}
+                      </AppText>
+                      <AppText style={{ color: "#999", fontSize: 13 }}>
+                        {timeAgo(qna.createdDate)}
+                      </AppText>
                     </View>
                     <AppText
                       style={[
@@ -221,11 +217,38 @@ const QnA = ({ navigation }) => {
                   </TouchableOpacity>
                   <Divider />
                   {selectedId === index && (
-                    <View>
-                      <AppText>내용</AppText>
-                      <AppText>{result.content}</AppText>
-                      <AppText>답변</AppText>
-                      <AppText>{result.answer}</AppText>
+                    <View style={styles.qnaContent}>
+                      <View style={{ marginBottom: 10 }}>
+                        <AppText
+                          style={{
+                            color: "#999",
+                            fontSize: 25,
+                            marginBottom: 10,
+                          }}
+                        >
+                          내용
+                        </AppText>
+                        <AppText style={{ color: "#333" }}>
+                          {result?.content}
+                        </AppText>
+                      </View>
+                      {qna.answered && (
+                        <View style={{ marginBottom: 10 }}>
+                          <AppText
+                            style={{
+                              color: "#999",
+                              fontSize: 25,
+                              marginBottom: 10,
+                            }}
+                          >
+                            답변
+                          </AppText>
+                          <AppText style={{ color: "#333" }}>
+                            {result?.answer}
+                          </AppText>
+                        </View>
+                      )}
+                      <Divider />
                     </View>
                   )}
                 </React.Fragment>
@@ -330,7 +353,18 @@ const styles = StyleSheet.create({
   qnaList: {
     marginVertical: 20,
   },
-  qnaItem: {},
+  qnaItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginVertical: 10,
+  },
+  qnaContent: {
+    backgroundColor: "#f0f0f0",
+    marginVertical: 10,
+    borderRadius: 5,
+    paddingHorizontal: 5,
+  },
   text: {
     color: "#f0f0f0",
     fontSize: 15,
