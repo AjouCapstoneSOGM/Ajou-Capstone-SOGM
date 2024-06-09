@@ -10,6 +10,7 @@ export const PortfolioProvider = ({ children }) => {
   const [portfolios, setPortfolios] = useState([]);
   const [portLoading, setPortLoading] = useState(false);
   const [rebalances, setRebalances] = useState([]);
+  const [rebalanceRecodes, setrebalanceRecodes] = useState([]);
   const { isLoggedIn } = useAuth();
 
   const removePortfolios = () => {
@@ -36,6 +37,34 @@ export const PortfolioProvider = ({ children }) => {
             item.portfolioName = data.portfolioName;
           });
           return data.rebalancing.flat();
+        }
+        return [];
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchRebalanceRecodeList = async (pfId) => {
+    try {
+      const token = await getUsertoken();
+      const response = await fetch(
+        `${urls.springUrl}/api/portfolioRecord/${pfId}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (response.ok) {
+        const data = await response.json();
+        //console.log("Li ", data.length);
+        if (data.length > 0) {
+          data.forEach((item) => {
+            item.pfId = pfId;
+          });
+          return data.flat();
         }
         return [];
       }
@@ -79,6 +108,14 @@ export const PortfolioProvider = ({ children }) => {
     });
     const rebalancesList = await Promise.all(promises);
     return rebalancesList.flat();
+  };
+
+  const fetchAllRebalanceRecodes = async (portfolioIds) => {
+    const promises = portfolioIds.map((id) => {
+      return fetchRebalanceRecodeList(id);
+    });
+    const rebalanceRecodesList = await Promise.all(promises);
+    return rebalanceRecodesList.flat();
   };
 
   const fetchPortfolios = async () => {
@@ -262,7 +299,12 @@ export const PortfolioProvider = ({ children }) => {
     rebalancesList.sort(
       (a, b) => new Date(b.createdDate) - new Date(a.createdDate)
     );
+
+    const rebalanceRecodesList = await fetchAllRebalanceRecodes(portfolioIds);
+    console.log(rebalanceRecodesList)
+
     setRebalances(rebalancesList);
+    setrebalanceRecodes(rebalanceRecodesList);
     setPortfolios(portfolioList);
     setPortLoading(false);
   };
@@ -278,6 +320,7 @@ export const PortfolioProvider = ({ children }) => {
       value={{
         portfolios,
         rebalances,
+        rebalanceRecodes,
         fetchPortfolios,
         fetchDelete,
         getPortfolioById,
