@@ -19,10 +19,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.IntStream;
 
 @Component
 @RequiredArgsConstructor
@@ -41,7 +39,7 @@ public class PortfolioScheduler {
     @Transactional
     public void doProportionRebalancing() {
         for (Portfolio portfolio : portfolioRepository.findAll()) {
-            portfolioService.updateProportion(portfolio, false);
+            portfolioService.updatePortfolioProportion(portfolio, false);
             if (isProportionRebalancingNeeded(portfolio)) {
                 int rnId = createProportionRebalancing(portfolio);
                 try {

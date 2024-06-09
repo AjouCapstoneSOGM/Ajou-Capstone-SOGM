@@ -105,7 +105,7 @@ public class PortfolioSchedulerTest {
     @Transactional
     @DisplayName("스케줄러: 비중 조정 테스트")
     public void testUpdateProportion() {
-        portfolioService.updateProportion(portfolio, false);
+        portfolioService.updatePortfolioProportion(portfolio, false);
 
         Assertions.assertAll(
             () -> assertNotEquals(0.33f, portfolio.getPortfolioTickers().get(0).getCurrentProportion()),
@@ -117,7 +117,7 @@ public class PortfolioSchedulerTest {
     @Transactional
     @DisplayName("스케줄러: 비중 조정 후 리밸런싱 알림 생성 테스트")
     public void testDoProportionRebalancing() {
-        portfolioService.updateProportion(portfolio, false);
+        portfolioService.updatePortfolioProportion(portfolio, false);
         portfolioScheduler.createProportionRebalancing(portfolio);
 
         // then 리밸런싱 반영 시, 각 종목 비중이 초기 비중에서 오차 범위 20% 내로 들어오는지 확인
