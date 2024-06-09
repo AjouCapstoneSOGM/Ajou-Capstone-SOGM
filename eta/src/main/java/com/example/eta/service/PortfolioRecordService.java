@@ -5,8 +5,11 @@ import com.example.eta.entity.PortfolioRecord;
 import com.example.eta.repository.PortfolioRecordRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -18,15 +21,16 @@ public class PortfolioRecordService {
 
     private final PortfolioRecordRepository portfolioRecordRepository;
 
+    @Transactional
     public List<RecordDto.PortfolioRecordGroupedDto> getGroupedPortfolioRecords(Integer pfId) {
-        List<PortfolioRecord> records = portfolioRecordRepository.findAllByPortfolioPfId(pfId); // 해당 포트폴리오의 기록 조회
+        List<PortfolioRecord> records = portfolioRecordRepository.findAllByPortfolioPfId(pfId);
 
-        Map<LocalDate, List<PortfolioRecord>> groupedByDate = records.stream()
-                .collect(Collectors.groupingBy(record -> record.getRecordDate().toLocalDate()));
+        Map<LocalDateTime, List<PortfolioRecord>> groupedByDate = records.stream()
+                .collect(Collectors.groupingBy(PortfolioRecord::getRecordDate));
 
         List<RecordDto.PortfolioRecordGroupedDto> result = new ArrayList<>();
-        for (Map.Entry<LocalDate, List<PortfolioRecord>> entry : groupedByDate.entrySet()) {
-            LocalDate date = entry.getKey();
+        for (Map.Entry<LocalDateTime, List<PortfolioRecord>> entry : groupedByDate.entrySet()) {
+            LocalDateTime date = entry.getKey();
             List<RecordDto.PortfolioRecordDto> recordDtos = entry.getValue().stream()
                     .map(record -> new RecordDto.PortfolioRecordDto(
                             record.getTicker().getTicker(),
