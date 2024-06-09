@@ -11,9 +11,6 @@ import ManualPage2 from "../make/manual/ManualPage2";
 import ManualAddPage3 from "../make/manual/ManualAddPage3";
 import ListPage1 from "../make/manual/ListPage1";
 import ListPage2 from "../make/manual/ListPage2";
-import { Divider } from "@rneui/base";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { usePortfolio } from "../../utils/PortfolioContext";
 
 const AddStockInManual = ({ route, navigation }) => {
   const pfId = route.params.pfId;
