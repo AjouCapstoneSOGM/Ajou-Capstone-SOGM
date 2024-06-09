@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Divider } from "@rneui/base";
 import { getUsertoken } from "../../utils/localStorageUtils";
@@ -18,6 +24,28 @@ const QnA = ({ navigation }) => {
     else if (selectedId === id) setSelectedId("");
   };
 
+  const handleQnaDelete = async () => {
+    const result = await fetchQnADelete();
+    if (result === "success") {
+      Alert.alert("삭제 완료", "삭제가 완료되었습니다.", [
+        {
+          text: "확인",
+          onPress: async () => {
+            await loadQna();
+          },
+          style: "cancel",
+        },
+      ]);
+    } else if (result === "fail") {
+      Alert.alert("삭제 실패", "삭제에 실패했습니다.", [
+        {
+          text: "확인",
+          onPress: () => {},
+          style: "cancel",
+        },
+      ]);
+    }
+  };
   const fetchQnAList = async () => {
     try {
       const token = await getUsertoken();
@@ -36,31 +64,6 @@ const QnA = ({ navigation }) => {
     } catch (error) {
       console.log(error);
       return [];
-    }
-  };
-
-  const fetchQnACreate = async () => {
-    try {
-      const token = await getUsertoken();
-      const response = await fetch(`${urls.springUrl}/api/question/create`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          title: title,
-          content: content,
-        }),
-      });
-      if (response.ok) {
-        return { result: "success" };
-      } else {
-        throw new Error();
-      }
-    } catch (error) {
-      console.log(error);
-      return { result: "fail" };
     }
   };
 
@@ -99,13 +102,13 @@ const QnA = ({ navigation }) => {
         },
       });
       if (response.ok) {
-        return { result: "success" };
+        return "success";
       } else {
-        throw new Error();
+        throw new Error("qna delete error");
       }
     } catch (error) {
       console.log(error);
-      return { result: "fail" };
+      return "fail";
     }
   };
 
@@ -137,17 +140,16 @@ const QnA = ({ navigation }) => {
     });
     return await Promise.all(promises);
   };
+  const loadQna = async () => {
+    const qnaLists = await fetchQnAList();
+    const qnaIdList = qnaLists.map((qna) => qna.id);
+    const qnaResults = await getQnaResults(qnaIdList);
 
+    setQnaList(qnaLists);
+    setQnaResult(qnaResults);
+    setLoading(false);
+  };
   useEffect(() => {
-    const loadQna = async () => {
-      const qnaLists = await fetchQnAList();
-      const qnaIdList = qnaLists.map((qna) => qna.id);
-      const qnaResults = await getQnaResults(qnaIdList);
-
-      setQnaList(qnaLists);
-      setQnaResult(qnaResults);
-      setLoading(false);
-    };
     loadQna();
   }, []);
 
@@ -217,22 +219,8 @@ const QnA = ({ navigation }) => {
                   </TouchableOpacity>
                   <Divider />
                   {selectedId === index && (
-                    <View style={styles.qnaContent}>
-                      <View style={{ marginBottom: 10 }}>
-                        <AppText
-                          style={{
-                            color: "#999",
-                            fontSize: 25,
-                            marginBottom: 10,
-                          }}
-                        >
-                          내용
-                        </AppText>
-                        <AppText style={{ color: "#333" }}>
-                          {result?.content}
-                        </AppText>
-                      </View>
-                      {qna.answered && (
+                    <React.Fragment>
+                      <View style={styles.qnaContent}>
                         <View style={{ marginBottom: 10 }}>
                           <AppText
                             style={{
@@ -241,15 +229,39 @@ const QnA = ({ navigation }) => {
                               marginBottom: 10,
                             }}
                           >
-                            답변
+                            내용
                           </AppText>
                           <AppText style={{ color: "#333" }}>
-                            {result?.answer}
+                            {result?.content}
                           </AppText>
                         </View>
-                      )}
-                      <Divider />
-                    </View>
+                        {qna.answered && (
+                          <View style={{ marginBottom: 10 }}>
+                            <AppText
+                              style={{
+                                color: "#999",
+                                fontSize: 25,
+                                marginBottom: 10,
+                              }}
+                            >
+                              답변
+                            </AppText>
+                            <AppText style={{ color: "#333" }}>
+                              {result?.answer}
+                            </AppText>
+                          </View>
+                        )}
+                      </View>
+                      <Button
+                        title="삭제"
+                        type="clear"
+                        titleStyle={{ color: "#ff5858" }}
+                        containerStyle={{ alignSelf: "flex-end" }}
+                        onPress={() => {
+                          handleQnaDelete(qna.id);
+                        }}
+                      />
+                    </React.Fragment>
                   )}
                 </React.Fragment>
               );
@@ -257,70 +269,6 @@ const QnA = ({ navigation }) => {
           )}
         </View>
       </ScrollView>
-      {/* <ModalComponent
-        isVisible={pwModalVisible}
-        onToggle={togglePwModalVisible}
-      >
-        <View style={styles.textInputContainer}>
-          <AppText style={{ flex: 1, fontSize: 11, color: "#f0f0f0" }}>
-            새 비밀번호
-          </AppText>
-          <TextInput
-            secureTextEntry
-            style={styles.passwordInput}
-            onChangeText={setPassword}
-            value={password}
-          ></TextInput>
-        </View>
-        {password && password.length < 10 && (
-          <AppText style={{ fontSize: 12, color: "#ff5858" }}>
-            비밀번호는 10자리 이상이어야 합니다.
-          </AppText>
-        )}
-        <View style={styles.textInputContainer}>
-          <AppText style={{ flex: 1, fontSize: 11, color: "#f0f0f0" }}>
-            새 비밀번호 확인
-          </AppText>
-          <TextInput
-            secureTextEntry
-            style={styles.passwordInput}
-            onChangeText={setPwCheck}
-            value={pwCheck}
-          ></TextInput>
-        </View>
-        {pwCheck && pwCheck != password && (
-          <AppText style={{ fontSize: 12, color: "#ff5858" }}>
-            비밀번호를 정확히 입력해주세요.
-          </AppText>
-        )}
-        <Button
-          buttonStyle={styles.submitButton}
-          title="변경"
-          onPress={handleChangedPassword}
-          disabled={!pwValid}
-        />
-      </ModalComponent>
-      <ModalComponent
-        isVisible={nameModalVisible}
-        onToggle={toggleNameModalVisible}
-      >
-        <View style={styles.textInputContainer}>
-          <AppText style={{ flex: 1, fontSize: 11, color: "#f0f0f0" }}>
-            새 닉네임
-          </AppText>
-          <TextInput
-            style={styles.passwordInput}
-            onChangeText={setNewUserName}
-            value={newUserName}
-          ></TextInput>
-        </View>
-        <Button
-          buttonStyle={styles.submitButton}
-          title="변경"
-          onPress={handleChangedName}
-          disabled={newUserName.length == 0}
-        />
-      </ModalComponent> */}
     </SafeAreaView>
   );
 };
