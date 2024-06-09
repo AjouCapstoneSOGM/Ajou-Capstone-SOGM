@@ -23,6 +23,14 @@ const ManualPage3 = ({ stockList }) => {
     else setSelectedId(index);
   };
 
+  const getTotalPrice = () => {
+    const totalPrice = stockList.reduce(
+      (acc, cur) => acc + cur.currentPrice * cur.quantity,
+      0
+    );
+    return isNaN(totalPrice) ? 0 : totalPrice;
+  };
+
   const gotoDetailPage = async () => {
     await loadData();
     navigation.dispatch(
@@ -112,6 +120,7 @@ const ManualPage3 = ({ stockList }) => {
             selectedId={selectedId}
             size={0.6 * width}
             mode={"dark"}
+            type={"stock"}
           />
         </View>
         <View style={styles.column}>
@@ -127,48 +136,23 @@ const ManualPage3 = ({ stockList }) => {
             type="clear"
             containerStyle={styles.columnName}
             titleStyle={{ color: "#808080", fontSize: 12 }}
-            onPress={() => {
-              handleSort("name");
-            }}
-            icon={{
-              type: "antdesign",
-              name: "caretdown",
-              color: "#808080",
-              size: 11,
-            }}
-            iconPosition="right"
+            onPress={() => {}}
           />
           <Button
             title="수량"
             type="clear"
             containerStyle={styles.columnNumber}
             titleStyle={{ color: "#808080", fontSize: 12 }}
-            onPress={() => {
-              handleSort("quantity");
-            }}
-            icon={{
-              type: "antdesign",
-              name: "caretdown",
-              color: "#808080",
-              size: 11,
-            }}
-            iconPosition="right"
+            onPress={() => {}}
           />
           <Button
-            title="한 주당 금액"
+            title="금액"
             type="clear"
             containerStyle={styles.columnPrice}
             titleStyle={{ color: "#808080", fontSize: 12 }}
             onPress={() => {
               handleSort("price");
             }}
-            icon={{
-              type: "antdesign",
-              name: "caretdown",
-              color: "#808080",
-              size: 11,
-            }}
-            iconPosition="right"
           />
         </View>
         <ScrollView style={styles.labelContainer}>
@@ -197,6 +181,15 @@ const ManualPage3 = ({ stockList }) => {
               </TouchableOpacity>
             ))}
         </ScrollView>
+        <View style={styles.totalPriceContainer}>
+          <AppText style={{ color: "#ccc" }}>총 가격</AppText>
+          <AppText style={{ color: "#ccc" }}>
+            <AppText style={{ color: "#f0f0f0", fontSize: 20 }}>
+              {getTotalPrice().toLocaleString()}
+            </AppText>{" "}
+            원
+          </AppText>
+        </View>
       </View>
       <View style={styles.nextButtonContainer}>
         <Button
@@ -281,6 +274,14 @@ const styles = StyleSheet.create({
     color: "#f0f0f0",
     textAlign: "center",
     fontSize: 15,
+  },
+  totalPriceContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-end",
+    borderBottomColor: "#434343",
+    borderBottomWidth: 1,
+    paddingVertical: 10,
   },
   nextButton: {
     backgroundColor: "#6262e8",

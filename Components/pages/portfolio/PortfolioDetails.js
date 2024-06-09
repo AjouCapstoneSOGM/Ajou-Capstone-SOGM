@@ -18,11 +18,10 @@ import { width, height, filteringNumber, colorScale } from "../../utils/utils";
 import StockInfo from "./StockInfo";
 import Loading from "../../utils/Loading";
 import ModalComponent from "../../utils/Modal";
-import NotificationBubble from "../../utils/Notification";
 
 const PortfolioDetails = ({ route, navigation }) => {
   const stocksLength = 10;
-  const { getPortfolioById, portfolios, loadData } = usePortfolio();
+  const { getPortfolioById, portfolios, reloadPortfolio } = usePortfolio();
   const [portfolio, setPortfolio] = useState({
     id: null,
     name: "",
@@ -72,6 +71,7 @@ const PortfolioDetails = ({ route, navigation }) => {
         }
       );
       if (response.ok) {
+        return true;
       } else {
         console.error("Error occured");
       }
@@ -84,6 +84,15 @@ const PortfolioDetails = ({ route, navigation }) => {
     setModifyBuy(true);
     setModifyPrice(0);
     setModifyQuantity(0);
+  };
+
+  const handleModify = async () => {
+    setLoading(true);
+    await fetchModifyStockManual();
+    await reloadPortfolio(route.params.id);
+    resetModifyData();
+    toggleInfoModal();
+    setLoading(false);
   };
 
   const handleQuantityChange = (newQuantity) => {
@@ -290,10 +299,12 @@ const PortfolioDetails = ({ route, navigation }) => {
       <View style={styles.chartContainer}>
         <PortfolioPieChart
           data={portfolio}
-          cash={portfolio}
-          selectedId={selectedId}
+          selectedId={
+            selectedId !== null ? selectedId : portfolio?.stocks.length
+          }
           size={width * 0.6}
           mode={"light"}
+          type={"stock"}
         />
         {!portfolio.auto && (
           <TouchableOpacity
@@ -468,6 +479,7 @@ const PortfolioDetails = ({ route, navigation }) => {
                         onPress={() => {
                           navigation.navigate("NewsSummary", {
                             ticker: item.ticker,
+                            name: item.companyName,
                           });
                         }}
                       >
@@ -567,13 +579,10 @@ const PortfolioDetails = ({ route, navigation }) => {
             </View>
             <Button
               buttonStyle={styles.submitButton}
-              title="반영"
+              title="확인"
               disabled={modifyQuantity == 0}
-              onPress={async () => {
-                await fetchModifyStockManual();
-                resetModifyData();
-                await loadData();
-                toggleInfoModal();
+              onPress={() => {
+                handleModify();
               }}
             />
           </ModalComponent>

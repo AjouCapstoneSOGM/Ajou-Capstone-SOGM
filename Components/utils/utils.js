@@ -75,7 +75,6 @@ export const colorScale = [
   "hsl(300, 90%, 80%)", // 파스텔 시안-그린,
   "#00ac00",
   "#ffd700",
-  "#ccc",
 ];
 
 export const basicDimensions = {

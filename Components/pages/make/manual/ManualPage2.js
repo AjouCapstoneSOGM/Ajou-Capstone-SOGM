@@ -5,13 +5,20 @@ import { filteringNumber, height } from "../../../utils/utils";
 import GetCurrentPrice from "../../../utils/GetCurrentPrice";
 import { Button, Icon } from "@rneui/base";
 import Loading from "../../../utils/Loading";
+import ModalComponent from "../../../utils/Modal";
 
 const ManualPage2 = ({ step, setStep, stockList, setStockList }) => {
   const [loading, setLoading] = useState(true);
   const [disabled, setDisabled] = useState(true);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modifyIndex, setModifyIndex] = useState("");
 
   const handleNextStep = () => {
     setStep(step + 1);
+  };
+
+  const toggleModifyModal = () => {
+    setModalVisible(!modalVisible);
   };
 
   const getTotalPrice = () => {
@@ -161,11 +168,25 @@ const ManualPage2 = ({ step, setStep, stockList, setStockList }) => {
                   />
                 </View>
                 <View style={styles.priceContainer}>
-                  <TextInput
-                    value={String(item.currentPrice ? item.currentPrice : 0)}
-                    onChangeText={(value) => handlePriceChange(value, index)}
-                    style={styles.inputPrice}
-                    keyboardType="numeric"
+                  <AppText style={{ color: "#f0f0f0" }}>
+                    {Number(
+                      item.currentPrice ? item.currentPrice : 0
+                    ).toLocaleString()}
+                    원
+                  </AppText>
+                  <Button
+                    containerStyle={{ marginHorizontal: -5 }}
+                    type="clear"
+                    onPress={() => {
+                      setModifyIndex(index);
+                      setModalVisible(true);
+                    }}
+                    icon={{
+                      name: "pencil",
+                      type: "ionicon",
+                      color: "#999",
+                      size: 13,
+                    }}
                   />
                 </View>
               </View>
@@ -192,6 +213,43 @@ const ManualPage2 = ({ step, setStep, stockList, setStockList }) => {
           disabled={disabled}
         />
       </View>
+      <ModalComponent isVisible={modalVisible} onToggle={toggleModifyModal}>
+        <AppText
+          style={{
+            position: "absolute",
+            top: 0,
+            color: "#888",
+            fontSize: 20,
+            fontWeight: "bold",
+          }}
+        >
+          가격 수정
+        </AppText>
+        <View style={styles.content}>
+          <AppText
+            style={{ fontSize: 20, color: "#f0f0f0", marginVertical: 20 }}
+          >
+            {stockList[modifyIndex]?.name}
+          </AppText>
+          <TextInput
+            value={String(
+              stockList[modifyIndex]?.currentPrice
+                ? stockList[modifyIndex]?.currentPrice
+                : 0
+            )}
+            onChangeText={(value) => handlePriceChange(value, modifyIndex)}
+            style={styles.inputPrice}
+            keyboardType="numeric"
+          />
+          <Button
+            buttonStyle={styles.submitButton}
+            title="확인"
+            onPress={async () => {
+              toggleModifyModal();
+            }}
+          />
+        </View>
+      </ModalComponent>
     </View>
   );
 };
@@ -258,13 +316,13 @@ const styles = StyleSheet.create({
   priceContainer: {
     flex: 1,
     alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "flex-end",
   },
   inputPrice: {
     color: "#f0f0f0",
-    fontSize: 16,
+    borderBottomColor: "#434343",
     borderBottomWidth: 1,
-    borderBottomColor: "#888",
-    width: 70,
   },
   totalPriceContainer: {
     flexDirection: "row",
@@ -283,6 +341,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: height * 5,
     backgroundColor: "#333",
+  },
+  submitButton: {
+    backgroundColor: "#6262e8",
+    borderRadius: 10,
+    height: 40,
+    marginVertical: 10,
   },
 });
 

@@ -247,6 +247,19 @@ export const PortfolioProvider = ({ children }) => {
     return;
   };
 
+  const reloadPortfolio = async (id) => {
+    const oldPortfolios = [...portfolios];
+    const newPortfolioStocks = await fetchStocksByPortfolioId(id);
+    const newPortfolioWithCurrent = await fetchCurrentPrice(newPortfolioStocks);
+    const changedPortfolios = oldPortfolios.map((portfolio) => {
+      if (portfolio.id === id) {
+        return { ...portfolio, detail: newPortfolioWithCurrent };
+      }
+      return portfolio;
+    });
+    setPortfolios(changedPortfolios);
+  };
+
   const loadData = async () => {
     setPortLoading(true);
     const portData = await fetchPortfolios();
@@ -287,6 +300,7 @@ export const PortfolioProvider = ({ children }) => {
         fetchCurrentPrice,
         fetchRebalanceList,
         fetchChangePortName,
+        reloadPortfolio,
         loadData,
         portLoading,
       }}

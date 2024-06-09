@@ -39,31 +39,34 @@ const AutoPage3 = ({ step, setStep, sector, interest, setInterest }) => {
       </View>
       <View style={styles.sectorContainer}>
         <ScrollView persistentScrollbar={true}>
-          {Object.entries(sector).map(([code, name], index) => (
-            <TouchableOpacity
-              key={code}
-              style={styles.sectorContent}
-              onPress={() => setInterest(code)}
-            >
-              <Icon
-                name={icons[index][0]}
-                type={icons[index][1]}
-                color={interest === code ? "#97f697" : "#808080"}
-                style={{ marginRight: 20 }}
-              />
-              <AppText
-                style={[
-                  {
-                    fontSize: 27,
-                    fontWeight: "bold",
-                    color: interest === code ? "#97f697" : "#f0f0f0",
-                  },
-                ]}
-              >
-                {name}
-              </AppText>
-            </TouchableOpacity>
-          ))}
+          {Object.entries(sector).map(
+            ([code, name], index) =>
+              name != "기타" && (
+                <TouchableOpacity
+                  key={code}
+                  style={styles.sectorContent}
+                  onPress={() => setInterest(code)}
+                >
+                  <Icon
+                    name={icons[index][0]}
+                    type={icons[index][1]}
+                    color={interest === code ? "#97f697" : "#808080"}
+                    style={{ marginRight: 20 }}
+                  />
+                  <AppText
+                    style={[
+                      {
+                        fontSize: 27,
+                        fontWeight: "bold",
+                        color: interest === code ? "#97f697" : "#f0f0f0",
+                      },
+                    ]}
+                  >
+                    {name}
+                  </AppText>
+                </TouchableOpacity>
+              )
+          )}
         </ScrollView>
         <AppText style={styles.safeinfoText}>
           특정 분야와 수익률은 알려진 직접적인 관계가 없어요.
