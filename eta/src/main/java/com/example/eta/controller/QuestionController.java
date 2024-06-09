@@ -43,6 +43,7 @@ public class QuestionController {
         @Builder
         @Getter
         static class QuestionPreview {
+            int id;
             String title;
             LocalDateTime createdDate;
             boolean answered;
@@ -63,6 +64,7 @@ public class QuestionController {
         User user = userService.findByEmail(userPrincipal.getEmail());
         List<Dto.QuestionPreview> questions = questionService.findAllByUser(user).stream().map(question -> {
             return Dto.QuestionPreview.builder()
+                    .id(question.getQuestionId())
                     .title(question.getTitle())
                     .createdDate(question.getCreatedDate())
                     .answered(question.getAnsweredDate() != null)
