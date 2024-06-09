@@ -7,22 +7,22 @@ import { setRebalanceAlarm } from "./localStorageUtils";
 
 const PushNotificationContext = createContext(null);
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
-  }),
-});
-
 export const PushNotificationProvider = ({ children }) => {
   const [expoPushToken, setExpoPushToken] = useState("emptyExpoToken");
   const [notification, setNotification] = useState(false);
   const notificationListener = useRef();
   const responseListener = useRef();
-
+  
   useEffect(() => {
     setRebalanceAlarm('denied');
+
+    Notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: true,
+        shouldSetBadge: true,
+      }),
+    });
     
     registerForPushNotificationsAsync().then((token) =>
       setExpoPushToken(token)
@@ -67,7 +67,8 @@ async function registerForPushNotificationsAsync() {
     });
   }
 
-  if (Device.isDevice) {
+  //if (Device.isDevice) {
+  if (true) {
     const { status: existingStatus } =
       await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
@@ -86,7 +87,7 @@ async function registerForPushNotificationsAsync() {
       })
     ).data;
     console.log(token);
-  } else {
+  } else { 
     alert("Must use physical device for Push Notifications");
   }
 

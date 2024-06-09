@@ -1,8 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet } from "react-native";
+import { Divider } from "@rneui/base";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { usePortfolio } from "../../utils/PortfolioContext";
+import AppText from "../../utils/AppText";
+
+import ManualAddSelect from "../make/manual/ManualAddSelect";
 import ManualPage1 from "../make/manual/ManualPage1";
 import ManualPage2 from "../make/manual/ManualPage2";
 import ManualAddPage3 from "../make/manual/ManualAddPage3";
+import ListPage1 from "../make/manual/ListPage1";
+import ListPage2 from "../make/manual/ListPage2";
 import { Divider } from "@rneui/base";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { usePortfolio } from "../../utils/PortfolioContext";
@@ -10,7 +18,8 @@ import { usePortfolio } from "../../utils/PortfolioContext";
 const AddStockInManual = ({ route, navigation }) => {
   const pfId = route.params.pfId;
   const [stockList, setStockList] = useState([]);
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0);
+  const [interest, setInterest] = useState("");
   const [disabled, setDisabled] = useState(false);
   const { reloadPortfolio } = usePortfolio();
 
@@ -25,24 +34,26 @@ const AddStockInManual = ({ route, navigation }) => {
   };
 
   useEffect(() => {
-    if (step === 1) {
+    if (step === 1 || step === 3) {
       if (stockList.length === 0) setDisabled(true);
       else setDisabled(false);
     }
-    if (step === 2) {
+    if (step === 4) {
       const result = stockList.filter(
         (stock) => stock.currentPrice === 0 || stock.quantity === 0
       );
       if (result.length) setDisabled(true);
       else setDisabled(false);
     }
-    if (step === 4) {
+    if (step === 6) {
       handleMovePage();
     }
   }, [step, stockList]);
 
   const renderManualStep = () => {
     switch (step) {
+      case 0:
+        return <ManualAddSelect step={step} setStep={setStep} />;
       case 1:
         return (
           <ManualPage1
@@ -54,6 +65,25 @@ const AddStockInManual = ({ route, navigation }) => {
         );
       case 2:
         return (
+          <ListPage1
+            step={step}
+            setStep={setStep}
+            interest={interest}
+            setInterest={setInterest}
+          />
+        );
+      case 3:
+        return (
+          <ListPage2
+            step={step}
+            setStep={setStep}
+            interest={interest}
+            stockList={stockList}
+            setStockList={setStockList}
+          />
+        );
+      case 4:
+        return (
           <ManualPage2
             step={step}
             setStep={setStep}
@@ -61,7 +91,7 @@ const AddStockInManual = ({ route, navigation }) => {
             setStockList={setStockList}
           />
         );
-      case 3:
+      case 5:
         return <ManualAddPage3 stockList={stockList} pfId={pfId} />;
     }
   };
