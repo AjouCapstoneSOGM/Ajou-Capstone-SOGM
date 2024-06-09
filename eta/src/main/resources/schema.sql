@@ -185,3 +185,10 @@ CREATE TABLE `question` (
     PRIMARY KEY (`question_id`),
     FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE
 );
+
+CREATE TABLE `statistic` (
+     `date` datetime NOT NULL,
+     `total_user` int NOT NULL,
+     `total_portfolio` int NOT NULL,
+     PRIMARY KEY (`date`)
+);
