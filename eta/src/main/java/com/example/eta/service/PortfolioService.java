@@ -4,6 +4,9 @@ import com.example.eta.api.ApiClientFastApi;
 import com.example.eta.dto.PortfolioDto;
 import com.example.eta.dto.TickerDto;
 import com.example.eta.entity.*;
+import com.example.eta.exception.authorization.NotFoundException;
+import com.example.eta.exception.portfolio.CannotSellStockException;
+import com.example.eta.exception.portfolio.NotEnoughCashException;
 import com.example.eta.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -276,10 +279,13 @@ public class PortfolioService {
 
     @Transactional
     public void buyStock(Integer pfId, PortfolioDto.BuyRequestDto buyRequestDto) {
-        // TODO: 현재 현금으로 매수 가능 여부
         Portfolio portfolio = portfolioRepository.getReferenceById(pfId);
         List<PortfolioTicker> portfolioTickers = portfolio.getPortfolioTickers();
         Ticker ticker = tickerRepository.findById(buyRequestDto.getTicker()).get();
+
+        if (portfolio.getCurrentCash() < buyRequestDto.getPrice() * buyRequestDto.getQuantity()) {
+            throw new NotEnoughCashException();
+        }
 
         // 이미 보유한 종목일 시 보유 종목 정보 업데이트, 아닐 시 새로운 종목 추가
         portfolioTickers.stream().filter(pt -> pt.getTicker().equals(ticker)).findFirst().ifPresentOrElse(
@@ -309,9 +315,10 @@ public class PortfolioService {
                 .recordDate(LocalDateTime.now())
                 .build());
 
-        // 포트폴리오 초기 자산 업데이트
+        // 포트폴리오 초기 자산 업데이트, 현금 업데이트
         float asset = calculateAmount(portfolio, true, null);
         portfolio.setInitAsset(asset);
+        portfolio.updateCurrentCash(portfolio.getCurrentCash() - buyRequestDto.getPrice() * buyRequestDto.getQuantity());
 
         // 초기, 현재 비중 업데이트
         updateProportion(portfolio, true);
@@ -321,27 +328,20 @@ public class PortfolioService {
 
     @Transactional
     public void sellStock(Integer pfId, PortfolioDto.SellRequestDto sellRequestDto) {
-        PortfolioTicker portfolioTicker = findPortfolioTicker(pfId, sellRequestDto.getTicker());
-        Portfolio portfolio = portfolioTicker.getPortfolio();
+        Portfolio portfolio = portfolioRepository.findById(pfId).get();
+        Ticker ticker = tickerRepository.findById(sellRequestDto.getTicker()).get();
+        PortfolioTicker portfolioTicker = portfolioTickerRepository.findByPortfolioAndTicker(portfolio, ticker).orElseThrow(
+                () -> new CannotSellStockException());
 
-        // TODO: 매도 가능 여부(해당 티커 보유 중인지, 매도량 < 보유량인지)
         // 매도 가능 여부 확인
         int existingQuantity = portfolioTicker.getNumber();
         int sellQuantity = sellRequestDto.getQuantity();
         if (existingQuantity < sellQuantity) {
-            throw new IllegalArgumentException("매도량이 보유량보다 많습니다.");
+            throw new CannotSellStockException();
         }
 
         int newQuantity = existingQuantity - sellRequestDto.getQuantity();
         portfolioTicker.updateNumber(newQuantity);
-
-        // 수동일 경우 현금 보유량 계산하지 않음
-        if (portfolio.getIsAuto()) {
-            float totalCost = sellRequestDto.getQuantity() * sellRequestDto.getPrice();
-            float newCurrentCash = portfolio.getCurrentCash() + totalCost;
-            portfolio.updateCurrentCash(newCurrentCash);
-            portfolio.updateCurrentCash(newCurrentCash);
-        }
 
         portfolioRecordRepository.save(PortfolioRecord.builder()
                 .portfolio(portfolio)
@@ -359,24 +359,15 @@ public class PortfolioService {
             portfolioTickerRepository.save(portfolioTicker);
         }
 
-        // 포트폴리오 초기 자산 업데이트
+        // 포트폴리오 초기 자산, 현금 업데이트
         float asset = calculateAmount(portfolio, true, null);
         portfolio.setInitAsset(asset);
+        portfolio.updateCurrentCash(portfolio.getCurrentCash() + sellRequestDto.getPrice() * sellRequestDto.getQuantity());
 
         // 초기, 현재 비중 업데이트
         updateProportion(portfolio, true);
 
         portfolioRepository.save(portfolio);
-    }
-
-    public PortfolioTicker findPortfolioTicker(Integer portfolioId, String tickerId) {
-        Portfolio portfolio = portfolioRepository.findById(portfolioId)
-                .orElseThrow(() -> new IllegalArgumentException("Portfolio not found"));
-        Ticker ticker = tickerRepository.findById(tickerId)
-                .orElseThrow(() -> new IllegalArgumentException("Ticker not found"));
-
-        return portfolioTickerRepository.findByPortfolioAndTicker(portfolio, ticker)
-                .orElseThrow(() -> new IllegalArgumentException("PortfolioTicker not found"));
     }
 
     @Transactional
