@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 public class PortfolioRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "rec_id")
     private Integer id;
 
     @ManyToOne
