@@ -27,7 +27,14 @@ public class UserController {
 
     @GetMapping
     public String getUsers(Model model) {
+        long socialUserCount = userService.getSocialUserCount();
+        long regularUserCount = userService.getRegularUserCount();
+
         model.addAttribute("users", userRepository.findAll());
+        model.addAttribute("totalUsers", userRepository.count());
+        model.addAttribute("socialUserCount", socialUserCount);
+        model.addAttribute("regularUserCount", regularUserCount);
+
         return "Users";
     }
 

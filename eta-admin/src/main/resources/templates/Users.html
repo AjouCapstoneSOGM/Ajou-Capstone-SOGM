@@ -117,6 +117,20 @@
             <div class="alert" th:if="${message}">
                 <span th:text="${message}"></span>
             </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <div class="card">
+                    <h2 class="text-lg font-medium">Total Users</h2>
+                    <p class="text-2xl font-bold">[[${totalUsers}]]</p>
+                </div>
+                <div class="card">
+                    <h2 class="text-lg font-medium">일반 계정</h2>
+                    <p class="text-2xl font-bold">[[${regularUserCount}]] </p>
+                </div>
+                <div class="card">
+                    <h2 class="text-lg font-medium">소셜 계정</h2>
+                    <p class="text-2xl font-bold">[[${socialUserCount}]]</p>
+                </div>
+            </div>
             <table class="w-full bg-white rounded-md shadow-md overflow-hidden">
                 <thead class="bg-gray-50">
                 <tr>

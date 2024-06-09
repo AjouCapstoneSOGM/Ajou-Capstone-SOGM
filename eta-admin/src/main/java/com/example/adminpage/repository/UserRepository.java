@@ -24,6 +24,5 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     long countSocialUsers();
     @Query("SELECT COUNT(u) FROM User u WHERE u.socialType IS NULL")
     long countRegularUsers();
-
     long count();
 }
