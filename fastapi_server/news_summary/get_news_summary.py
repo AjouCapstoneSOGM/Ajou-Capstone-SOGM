@@ -9,7 +9,7 @@ from urllib.parse import urlparse, parse_qs
 class News:
     def __init__(self):
         self.today = datetime.today()
-        self.period = self.today - timedelta(days=1)
+        self.period = self.today - timedelta(days=30)
         self.start_date = self.period.strftime("%Y-%m-%d")  # Example start date
         self.end_date = self.today.strftime("%Y-%m-%d")  # Example end date
 
@@ -82,7 +82,7 @@ class News:
 
         return news_list
 
-    def get_news_title_from_page(self, page, start_date, end_date, ticker):
+    async def get_news_title_from_page(self, page, start_date, end_date, ticker):
         url = f"https://finance.naver.com/item/news.naver?code={ticker}&page={page}"
 
         response = rq.get(url)
@@ -157,7 +157,7 @@ class News:
                 hrefs[i] = "Invalid URL or missing parameters"
         return titles, infos, dates, hrefs
 
-    def get_company_news(self, ticker):
+    async def get_company_news(self, ticker):
         # Initialize lists to store unique titles and dates
         start_date = self.start_date
         end_date = self.end_date
@@ -172,7 +172,7 @@ class News:
         page = 1
         max_articles = 50  # 최대 기사 수 설정
         while len(unique_titles) < max_articles:
-            titles, infos, dates, hrefs = self.get_news_title_from_page(
+            titles, infos, dates, hrefs = await self.get_news_title_from_page(
                 page, start_date, end_date, ticker
             )
 
@@ -195,11 +195,12 @@ class News:
             }
         )
 
-        df.drop_duplicates(inplace=True)
-
+        df.drop_duplicates(subset=["title"], inplace=True)
+        df["title"] = df["title"].astype(str)
         word_to_delete = "코스피|코스닥"
-        mask = df["title"].str.contains(word_to_delete, case=False)
-        df = df[~mask]
+        if not df.isnull().values.any():
+            mask = df["title"].str.contains(word_to_delete, case=False)
+            df = df[~mask]
 
         df.reset_index(drop=True, inplace=True)
 
