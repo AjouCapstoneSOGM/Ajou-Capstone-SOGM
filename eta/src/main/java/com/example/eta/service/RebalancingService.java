@@ -122,11 +122,11 @@ public class RebalancingService {
 
         // 수동 포트폴리오일 경우 초기 비중을 현재 비중으로 업데이트함
         if (!portfolio.getIsAuto()) {
-            portfolioService.updateProportion(portfolio, true);
+            portfolioService.updatePortfolioProportion(portfolio, true);
         }
         // 초기화되지 않은 자동 포트폴리오의 날짜, 초기 현금 업데이트
         else if (portfolio.getCreatedDate() == null) {
-            portfolioService.setInitProportion(portfolio);
+            portfolioService.setPortfolioInitProportion(portfolio);
             portfolio.setInitCash(portfolio.getCurrentCash());
             portfolio.setCreatedDate(LocalDateTime.now());
         }
@@ -141,7 +141,7 @@ public class RebalancingService {
     public int executeRebalancingAndGetNotificationId(int pfId) {
         Portfolio portfolio = portfolioRepository.findById(pfId).get();
 
-        portfolioService.updateProportion(portfolio, false);
+        portfolioService.updatePortfolioProportion(portfolio, false);
         if (portfolioScheduler.isProportionRebalancingNeeded(portfolio)) {
             return portfolioScheduler.createProportionRebalancing(portfolio);
         } else return -1;

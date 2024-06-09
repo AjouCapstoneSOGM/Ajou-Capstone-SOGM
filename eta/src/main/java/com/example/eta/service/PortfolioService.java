@@ -4,6 +4,8 @@ import com.example.eta.api.ApiClientFastApi;
 import com.example.eta.dto.PortfolioDto;
 import com.example.eta.dto.TickerDto;
 import com.example.eta.entity.*;
+import com.example.eta.exception.portfolio.CannotSellStockException;
+import com.example.eta.exception.portfolio.NotEnoughCashException;
 import com.example.eta.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -55,9 +57,13 @@ public class PortfolioService {
      * 포트폴리오의 현재 비중을 업데이트힙니다. 종목의 종가를 기준으로 계산합니다.
      *
      * <p> {@code setInitProportion} 가 {@code true}이면 초기 비중을 현재 비중과 동일하게 설정합니다.
+     *
+     * <p> 종목의 종가를 기준으로 계산하는 이유는 기본적으로 현재 비중 정보는 비중 리밸런싱을 위해 필요하기 때문이며, 따라서 이 메서드는 비중 리밸런싱 시에 사용된다.
+     * 그러나 현재 코드상으로 수동 포트폴리오에서 초기 비중을 현재 비중으로 업데이트하기 위해 이 메서드를 사용해주고 있는데, 사실 이 경우는 전날 종가가 아닌 현재가를 기준으로 계산하는게 엄밀히 정확하다.
+     * 일단 치명적으로 잘못된 부분은 아니지만, 추후 수정이 필요할 수 있다.
      */
     @Transactional
-    public void updateProportion(Portfolio portfolio, boolean setInitProportion) {
+    public void updatePortfolioProportion(Portfolio portfolio, boolean setInitProportion) {
         Map<PortfolioTicker, Float> currentAmountForTicker = new HashMap<>();
         float totalAmount = calculateAmount(portfolio, false, currentAmountForTicker);
 
@@ -77,7 +83,7 @@ public class PortfolioService {
      * <p> 자동, 수동 포트폴리오 생성 시 최초 비중을 설정하기 위해 사용합니다.
      */
     @Transactional
-    public void setInitProportion(Portfolio portfolio) {
+    public void setPortfolioInitProportion(Portfolio portfolio) {
         Map<PortfolioTicker, Float> currentAmountForTicker = new HashMap<>();
         float totalAmount = calculateAmount(portfolio, true, currentAmountForTicker);
 
@@ -240,8 +246,8 @@ public class PortfolioService {
                 .country(request.getCountry())
                 .isAuto(false)
                 .initAsset(totalAsset)
-                .initCash(0)
-                .currentCash(0)
+                .initCash(request.getCash())
+                .currentCash(request.getCash())
                 .build();
         portfolioRepository.save(portfolio);
 
@@ -269,17 +275,20 @@ public class PortfolioService {
         }
 
         // 초기 비중, 현재 비중 업데이트
-        setInitProportion(portfolio);
+        setPortfolioInitProportion(portfolio);
 
         return portfolio.getPfId();
     }
 
     @Transactional
     public void buyStock(Integer pfId, PortfolioDto.BuyRequestDto buyRequestDto) {
-        // TODO: 현재 현금으로 매수 가능 여부
         Portfolio portfolio = portfolioRepository.getReferenceById(pfId);
         List<PortfolioTicker> portfolioTickers = portfolio.getPortfolioTickers();
         Ticker ticker = tickerRepository.findById(buyRequestDto.getTicker()).get();
+
+        if (portfolio.getCurrentCash() < buyRequestDto.getPrice() * buyRequestDto.getQuantity()) {
+            throw new NotEnoughCashException();
+        }
 
         // 이미 보유한 종목일 시 보유 종목 정보 업데이트, 아닐 시 새로운 종목 추가
         portfolioTickers.stream().filter(pt -> pt.getTicker().equals(ticker)).findFirst().ifPresentOrElse(
@@ -309,39 +318,33 @@ public class PortfolioService {
                 .recordDate(LocalDateTime.now())
                 .build());
 
-        // 포트폴리오 초기 자산 업데이트
+        // 포트폴리오 초기 자산 업데이트, 현금 업데이트
         float asset = calculateAmount(portfolio, true, null);
         portfolio.setInitAsset(asset);
+        portfolio.updateCurrentCash(portfolio.getCurrentCash() - buyRequestDto.getPrice() * buyRequestDto.getQuantity());
 
         // 초기, 현재 비중 업데이트
-        updateProportion(portfolio, true);
+        updatePortfolioProportion(portfolio, true);
 
         portfolioRepository.save(portfolio);
     }
 
     @Transactional
     public void sellStock(Integer pfId, PortfolioDto.SellRequestDto sellRequestDto) {
-        PortfolioTicker portfolioTicker = findPortfolioTicker(pfId, sellRequestDto.getTicker());
-        Portfolio portfolio = portfolioTicker.getPortfolio();
+        Portfolio portfolio = portfolioRepository.findById(pfId).get();
+        Ticker ticker = tickerRepository.findById(sellRequestDto.getTicker()).get();
+        PortfolioTicker portfolioTicker = portfolioTickerRepository.findByPortfolioAndTicker(portfolio, ticker).orElseThrow(
+                () -> new CannotSellStockException());
 
-        // TODO: 매도 가능 여부(해당 티커 보유 중인지, 매도량 < 보유량인지)
         // 매도 가능 여부 확인
         int existingQuantity = portfolioTicker.getNumber();
         int sellQuantity = sellRequestDto.getQuantity();
         if (existingQuantity < sellQuantity) {
-            throw new IllegalArgumentException("매도량이 보유량보다 많습니다.");
+            throw new CannotSellStockException();
         }
 
         int newQuantity = existingQuantity - sellRequestDto.getQuantity();
         portfolioTicker.updateNumber(newQuantity);
-
-        // 수동일 경우 현금 보유량 계산하지 않음
-        if (portfolio.getIsAuto()) {
-            float totalCost = sellRequestDto.getQuantity() * sellRequestDto.getPrice();
-            float newCurrentCash = portfolio.getCurrentCash() + totalCost;
-            portfolio.updateCurrentCash(newCurrentCash);
-            portfolio.updateCurrentCash(newCurrentCash);
-        }
 
         portfolioRecordRepository.save(PortfolioRecord.builder()
                 .portfolio(portfolio)
@@ -359,24 +362,40 @@ public class PortfolioService {
             portfolioTickerRepository.save(portfolioTicker);
         }
 
-        // 포트폴리오 초기 자산 업데이트
+        // 포트폴리오 초기 자산, 현금 업데이트
         float asset = calculateAmount(portfolio, true, null);
         portfolio.setInitAsset(asset);
+        portfolio.updateCurrentCash(portfolio.getCurrentCash() + sellRequestDto.getPrice() * sellRequestDto.getQuantity());
 
         // 초기, 현재 비중 업데이트
-        updateProportion(portfolio, true);
+        updatePortfolioProportion(portfolio, true);
 
         portfolioRepository.save(portfolio);
     }
 
-    public PortfolioTicker findPortfolioTicker(Integer portfolioId, String tickerId) {
-        Portfolio portfolio = portfolioRepository.findById(portfolioId)
-                .orElseThrow(() -> new IllegalArgumentException("Portfolio not found"));
-        Ticker ticker = tickerRepository.findById(tickerId)
-                .orElseThrow(() -> new IllegalArgumentException("Ticker not found"));
+    @Transactional
+    public void depositCash(Integer pfId, float cash) {
+        Portfolio portfolio = portfolioRepository.findById(pfId).get();
+        portfolio.updateCurrentCash(portfolio.getCurrentCash() + cash);
 
-        return portfolioTickerRepository.findByPortfolioAndTicker(portfolio, ticker)
-                .orElseThrow(() -> new IllegalArgumentException("PortfolioTicker not found"));
+        // 현재 비중 업데이트 (수동일 경우, 초기 비중도 업데이트)
+        updatePortfolioProportion(portfolio, !portfolio.getIsAuto());
+
+        portfolioRepository.save(portfolio);
+    }
+
+    @Transactional
+    public void withdrawCash(Integer pfId, float cash) {
+        Portfolio portfolio = portfolioRepository.findById(pfId).get();
+        if (portfolio.getCurrentCash() < cash) {
+            throw new NotEnoughCashException();
+        }
+        portfolio.updateCurrentCash(portfolio.getCurrentCash() - cash);
+
+        // 현재 비중 업데이트 (수동일 경우, 초기 비중도 업데이트)
+        updatePortfolioProportion(portfolio, !portfolio.getIsAuto());
+
+        portfolioRepository.save(portfolio);
     }
 
     @Transactional
