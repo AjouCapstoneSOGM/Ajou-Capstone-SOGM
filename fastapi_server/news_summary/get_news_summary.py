@@ -9,7 +9,7 @@ from urllib.parse import urlparse, parse_qs
 class News:
     def __init__(self):
         self.today = datetime.today()
-        self.period = self.today - timedelta(days=1)
+        self.period = self.today - timedelta(days=30)
         self.start_date = self.period.strftime("%Y-%m-%d")  # Example start date
         self.end_date = self.today.strftime("%Y-%m-%d")  # Example end date
 
@@ -79,11 +79,10 @@ class News:
         mask = news_list["title"].str.contains(word_to_delete, case=False)
         news_list = news_list[~mask]
         news_list.reset_index(drop=True, inplace=True)
-        
 
         return news_list
 
-    def get_news_title_from_page(self, page, start_date, end_date, ticker):
+    async def get_news_title_from_page(self, page, start_date, end_date, ticker):
         url = f"https://finance.naver.com/item/news.naver?code={ticker}&page={page}"
 
         response = rq.get(url)
@@ -100,47 +99,72 @@ class News:
         table = iframe_soup.find("table", {"class": "type5"})
         rows = table.find_all("tr")
 
-        # Initialize lists to store titles and dates
+        # Initialize lists to store titles, dates, infos, and hrefs
         titles = []
         dates = []
+        infos = []
+        hrefs = []
 
         for row in rows:
-            # Find the title and date within each row
-            title = row.find("td", {"class": "title"})
-            date = row.find("td", {"class": "date"})
+            # Find the title, info, and date within each row
+            title_td = row.find("td", {"class": "title"})
+            info_td = row.find("td", {"class": "info"})
+            date_td = row.find("td", {"class": "date"})
 
-            # If title or date is None, continue to the next row
-            if not title or not date:
-                continue
+            if title_td:
+                a_tag = title_td.find("a", class_="tit")
+                if a_tag:
+                    title_text = a_tag.text.strip()
+                    href = a_tag["href"]
+                    titles.append(title_text)
+                    hrefs.append(href)
 
-            # Extract text from title and date elements
-            title_text = title.text.strip()
-            date_text = date.text.strip()
-            # Convert date text to datetime object
-            try:
-                news_date = datetime.strptime(date_text, "%Y.%m.%d %H:%M")
-            except ValueError:
-                continue  # Skip this row if the date format is not as expected
+            if info_td:
+                infos.append(info_td.text.strip())
 
-            # Check if news date is within the specified date range
-            if (
-                start_date - timedelta(days=1)
-                <= news_date
-                <= end_date + timedelta(days=1)
-            ):
-                titles.append(title_text)
-                dates.append(date_text)
-            elif news_date < start_date:
-                # If the news date is before the start_date, stop processing further pages
-                return titles, dates  # Return the collected titles and dates
-        return titles, dates
+            if date_td:
+                date_text = date_td.text.strip()
+                try:
+                    news_date = datetime.strptime(date_text, "%Y.%m.%d %H:%M")
+                except ValueError:
+                    continue  # Skip this row if the date format is not as expected
+
+                # Check if the news date is within the specified date range
+                if (
+                    start_date - timedelta(days=1)
+                    <= news_date
+                    <= end_date + timedelta(days=1)
+                ):
+                    dates.append(date_text)
+                elif news_date < start_date:
+                    # If the news date is before the start_date, stop processing further pages
+                    return titles, infos, dates, hrefs
+
+        for i, href in enumerate(hrefs):
+            parsed_url = urlparse(href)
+            query_params = parse_qs(parsed_url.query)
+
+            # 필요한 정보 추출
+            article_id = query_params.get("article_id", [None])[0]
+            office_id = query_params.get("office_id", [None])[0]
+
+            # 첫 번째 링크 형식으로 재구성
+            if article_id and office_id:
+                hrefs[i] = (
+                    f"https://n.news.naver.com/mnews/article/{office_id}/{article_id}"
+                )
+            else:
+                hrefs[i] = "Invalid URL or missing parameters"
+        return titles, infos, dates, hrefs
 
     async def get_company_news(self, ticker):
         # Initialize lists to store unique titles and dates
         start_date = self.start_date
         end_date = self.end_date
         unique_titles = []
-        unique_dates = set()
+        unique_dates = []
+        unique_infos = []
+        unique_hrefs = []
         # Convert start_date and end_date to datetime objects if they are not already
         start_date = datetime.strptime(start_date, "%Y-%m-%d")
         end_date = datetime.strptime(end_date, "%Y-%m-%d")
@@ -148,31 +172,36 @@ class News:
         page = 1
         max_articles = 50  # 최대 기사 수 설정
         while len(unique_titles) < max_articles:
-            # Call the function for the current page
-            titles, dates = await self.get_news_title_from_page(
+            titles, infos, dates, hrefs = await self.get_news_title_from_page(
                 page, start_date, end_date, ticker
             )
-            # If there are no more articles or start_date has passed, stop iterating
+
             if not dates or datetime.strptime(dates[-1], "%Y.%m.%d %H:%M") < start_date:
                 break
 
-            # Add titles and dates to the lists
             unique_titles.extend(titles)
-            unique_dates.update(dates)
+            unique_dates.extend(dates)
+            unique_infos.extend(infos)
+            unique_hrefs.extend(hrefs)
 
-            # Move to the next page
             page += 1
-        # Create a DataFrame with the unique titles
-        df = pd.DataFrame(unique_titles, columns=["Title"])
 
-        # Remove duplicate titles
-        df.drop_duplicates(inplace=True)
-        # Delete contain 코스피 or 코스닥
+        df = pd.DataFrame(
+            {
+                "title": unique_titles,
+                "press": unique_infos,
+                "wdate": unique_dates,
+                "href": unique_hrefs,
+            }
+        )
+
+        df.drop_duplicates(subset=["title"], inplace=True)
+        df["title"] = df["title"].astype(str)
         word_to_delete = "코스피|코스닥"
-        mask = df["Title"].str.contains(word_to_delete, case=False)
-        df = df[~mask]
-        df.reset_index(drop=True, inplace=True)
-        df_value = df["Title"].to_list()
+        if not df.isnull().values.any():
+            mask = df["title"].str.contains(word_to_delete, case=False)
+            df = df[~mask]
 
-        # Return the DataFrame
-        return df_value
+        df.reset_index(drop=True, inplace=True)
+
+        return df
