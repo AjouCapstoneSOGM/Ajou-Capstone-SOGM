@@ -233,7 +233,7 @@ public class PortfolioService {
             name = user.getName() + "의 수동 포트폴리오 " + (user.getPortfolios().size() + 1);
         }
 
-        float totalAsset = 0;
+        float totalAsset = request.getCash();
         for (PortfolioDto.StockDetailDto stock : request.getStocks()) {
             totalAsset = totalAsset + (stock.getQuantity() * stock.getPrice());
         }
