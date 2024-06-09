@@ -42,7 +42,6 @@ public class PortfolioServiceTest {
         // given 유저 생성
         User user = userRepository.save(new User().builder()
                 .email("suprlux09@ajou.ac.kr")
-                .isVerified(false)
                 .password("password!")
                 .name("James")
                 .roleType(RoleType.ROLE_USER)
@@ -73,7 +72,6 @@ public class PortfolioServiceTest {
         // given 유저 생성
         User user = userRepository.save(new User().builder()
                 .email("suprlux09@ajou.ac.kr")
-                .isVerified(false)
                 .password("password!")
                 .name("James")
                 .roleType(RoleType.ROLE_USER)
@@ -114,7 +112,6 @@ public class PortfolioServiceTest {
 //        // given 유저 생성
 //        User user = userRepository.save(new User().builder()
 //                .email("suprlux09@ajou.ac.kr")
-//                .isVerified(false)
 //                .password("password!")
 //                .name("James")
 //                .roleType(RoleType.ROLE_USER)
@@ -161,7 +158,6 @@ public class PortfolioServiceTest {
 //        // given 유저 생성
 //        User user = userRepository.save(new User().builder()
 //                .email("suprlux09@ajou.ac.kr")
-//                .isVerified(false)
 //                .password("password!")
 //                .name("James")
 //                .roleType(RoleType.ROLE_USER)
@@ -207,7 +203,6 @@ public class PortfolioServiceTest {
     public void testInitializeAutoPortfolio() throws Exception {
         User user = userRepository.save(new User().builder()
                 .email("suprlux09@ajou.ac.kr")
-                .isVerified(false)
                 .password("password!")
                 .name("James")
                 .roleType(RoleType.ROLE_USER)
@@ -251,7 +246,6 @@ public class PortfolioServiceTest {
     void testSellStock_ManualPortfolio_CashNotUpdated() {
         User user = userRepository.save(new User().builder()
                 .email("suprlux09@ajou.ac.kr")
-                .isVerified(false)
                 .password("password!")
                 .name("James")
                 .roleType(RoleType.ROLE_USER)
@@ -301,7 +295,6 @@ public class PortfolioServiceTest {
     public void testUpdatePortfolioName() {
         User user = userRepository.save(new User().builder()
                 .email("suprlux09@ajou.ac.kr")
-                .isVerified(false)
                 .password("password!")
                 .name("James")
                 .roleType(RoleType.ROLE_USER)

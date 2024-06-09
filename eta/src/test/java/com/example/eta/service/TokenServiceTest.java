@@ -30,7 +30,6 @@ public class TokenServiceTest {
     public void testSaveFcmToken() {
         User user = userRepository.save(User.builder()
                 .email("suprlux09@ajou.ac.kr")
-                .isVerified(false)
                 .password("password!")
                 .name("James")
                 .roleType(RoleType.ROLE_USER)
@@ -50,7 +49,6 @@ public class TokenServiceTest {
     public void testDeleteFcmToken() {
         User user = userRepository.save(User.builder()
                 .email("suprlux09@ajou.ac.kr")
-                .isVerified(false)
                 .password("password!")
                 .name("James")
                 .roleType(RoleType.ROLE_USER)

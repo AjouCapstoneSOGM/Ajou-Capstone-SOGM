@@ -7,6 +7,7 @@ CREATE TABLE `user` (
     `role` varchar(30) NOT NULL,
     `created_date` datetime NOT NULL,
     `modified_date` datetime NULL,
+    `last_login_date` datetime NULL,
     `enabled` bool NOT NULL,
     PRIMARY KEY (`user_id`)
 );
