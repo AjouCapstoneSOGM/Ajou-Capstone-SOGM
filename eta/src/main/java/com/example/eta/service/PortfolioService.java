@@ -240,8 +240,8 @@ public class PortfolioService {
                 .country(request.getCountry())
                 .isAuto(false)
                 .initAsset(totalAsset)
-                .initCash(0)
-                .currentCash(0)
+                .initCash(request.getCash())
+                .currentCash(request.getCash())
                 .build();
         portfolioRepository.save(portfolio);
 
