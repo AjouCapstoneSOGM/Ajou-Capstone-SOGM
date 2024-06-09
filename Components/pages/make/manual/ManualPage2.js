@@ -11,7 +11,17 @@ const ManualPage2 = ({ step, setStep, stockList, setStockList }) => {
   const [loading, setLoading] = useState(true);
   const [disabled, setDisabled] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
+  const [cashModalVisible, setCashModalVisible] = useState(false);
   const [modifyIndex, setModifyIndex] = useState("");
+  const [cash, setCash] = useState(0);
+
+  const handleCash = (value) => {
+    setCash(Number(filteringNumber(value)));
+  };
+
+  const insertCash = () => {
+    setStockList({ stocks: stockList, cash: cash });
+  };
 
   const handleNextStep = () => {
     setStep(step + 1);
@@ -19,6 +29,10 @@ const ManualPage2 = ({ step, setStep, stockList, setStockList }) => {
 
   const toggleModifyModal = () => {
     setModalVisible(!modalVisible);
+  };
+
+  const toggleCashModal = () => {
+    setCashModalVisible(!cashModalVisible);
   };
 
   const getTotalPrice = () => {
@@ -191,12 +205,45 @@ const ManualPage2 = ({ step, setStep, stockList, setStockList }) => {
                 </View>
               </View>
             ))}
+          <View style={styles.contentsItem}>
+            <View style={{ flex: 1 }}>
+              <AppText
+                style={{
+                  color: "#f0f0f0",
+                  fontWeight: "bold",
+                  fontSize: 15,
+                  textAlign: "center",
+                }}
+              >
+                현금
+              </AppText>
+            </View>
+            <View style={{ flex: 1 }}></View>
+            <View style={styles.priceContainer}>
+              <AppText style={{ color: "#f0f0f0" }}>
+                {Number(cash).toLocaleString()}원
+              </AppText>
+              <Button
+                containerStyle={{ marginHorizontal: -5 }}
+                type="clear"
+                onPress={() => {
+                  setCashModalVisible(true);
+                }}
+                icon={{
+                  name: "pencil",
+                  type: "ionicon",
+                  color: "#999",
+                  size: 13,
+                }}
+              />
+            </View>
+          </View>
         </ScrollView>
         <View style={styles.totalPriceContainer}>
           <AppText style={{ color: "#ccc" }}>총 가격</AppText>
           <AppText style={{ color: "#ccc" }}>
             <AppText style={{ color: "#f0f0f0", fontSize: 20 }}>
-              {getTotalPrice().toLocaleString()}
+              {(getTotalPrice() + cash).toLocaleString()}
             </AppText>{" "}
             원
           </AppText>
@@ -209,7 +256,10 @@ const ManualPage2 = ({ step, setStep, stockList, setStockList }) => {
         <Button
           buttonStyle={styles.nextButton}
           title="다음"
-          onPress={handleNextStep}
+          onPress={() => {
+            insertCash();
+            handleNextStep();
+          }}
           disabled={disabled}
         />
       </View>
@@ -246,6 +296,39 @@ const ManualPage2 = ({ step, setStep, stockList, setStockList }) => {
             title="확인"
             onPress={async () => {
               toggleModifyModal();
+            }}
+          />
+        </View>
+      </ModalComponent>
+      <ModalComponent isVisible={cashModalVisible} onToggle={toggleCashModal}>
+        <AppText
+          style={{
+            position: "absolute",
+            top: 0,
+            color: "#888",
+            fontSize: 20,
+            fontWeight: "bold",
+          }}
+        >
+          현금 수정
+        </AppText>
+        <View style={styles.content}>
+          <AppText
+            style={{ fontSize: 20, color: "#f0f0f0", marginVertical: 20 }}
+          >
+            현금
+          </AppText>
+          <TextInput
+            value={String(cash ? cash : 0)}
+            onChangeText={(value) => handleCash(value)}
+            style={styles.inputPrice}
+            keyboardType="numeric"
+          />
+          <Button
+            buttonStyle={styles.submitButton}
+            title="확인"
+            onPress={async () => {
+              toggleCashModal();
             }}
           />
         </View>

@@ -62,7 +62,7 @@ const AutoPage3 = ({ step, setStep, sector, interest, setInterest }) => {
                       },
                     ]}
                   >
-                    {name}
+                    {name === "건강관리" ? "바이오" : name}
                   </AppText>
                 </TouchableOpacity>
               )
