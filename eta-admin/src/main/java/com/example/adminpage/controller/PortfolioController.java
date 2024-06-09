@@ -51,7 +51,6 @@ public class PortfolioController {
     }
     @GetMapping("/{PfId}")
     public String getPortfolioDetail(@PathVariable("PfId") int PfId, Model model) {
-        System.out.println("PortfolioController.getPortfolioDetail");
         model.addAttribute("portfolio", portfolioRepository.getReferenceById(PfId));
         model.addAttribute("records", portfolioRecordRepository.findAllByPfId(PfId));
         return "PortfolioDetail";

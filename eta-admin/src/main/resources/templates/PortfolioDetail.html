@@ -109,7 +109,7 @@
                     </div>
                     <div>
                         <label class="text-gray-500">포트폴리오 종류</label>
-                        <p class="text-gray-900 font-semibold" th:text="${portfolio.isAuto == null ? '자동' : '수동' + ''}"></p>
+                        <p class="text-gray-900 font-semibold" th:text="${portfolio.getIsAuto() ? '자동' : '수동'}"></p>
                     </div>
                     <div>
                         <label class="text-gray-500">생성일</label>
