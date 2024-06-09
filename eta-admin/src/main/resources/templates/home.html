@@ -145,15 +145,6 @@
                 <canvas id="riskReturnsChart"></canvas>
             </div>
         </div>
-        <div class="card mt-4">
-            <h2 class="text-lg font-medium mb-4">예금 대비 수익률 현황</h2>
-            <h3 class="text-lg font-small mb-4">*2024/06/07 12개월 만기 기준 무위험 수익률 3.49%</h3>
-            <canvas id="returnRateChart"></canvas>
-            <h2 class="text-lg font-medium mb-4">Summary</h2>
-            <p>Average Return Rate: <span th:text="${averageReturnRate}">0.0</span>%</p>
-            <p>Higher than Deposit Rate: <span id="higherCount">0</span></p>
-            <p>Lower than Deposit Rate: <span id="lowerCount">0</span></p>
-        </div>
     </div>
 </div>
 
@@ -179,11 +170,6 @@
             riskValues.push(parsedRiskData[risk]);
         }
     });
-
-    const comparisonResultsData = /*[[${comparisonResultsJson}]]*/ '{}';
-    const parsedComparisonResultsData = JSON.parse(comparisonResultsData);
-    document.getElementById('higherCount').innerText = parsedComparisonResultsData.higherCount;
-    document.getElementById('lowerCount').innerText = parsedComparisonResultsData.lowerCount;
 
     const sectorReturnsData = /*[[${sectorReturnRatesJson}]]*/ '{}';
     const sectorParsedReturnsData = JSON.parse(sectorReturnsData);
@@ -318,27 +304,7 @@
                 }
             }
         });
-        const ctxReturnRate = document.getElementById('returnRateChart').getContext('2d');
-        const returnRateChart = new Chart(ctxReturnRate, {
-            type: 'bar',
-            data: {
-                labels: ['Higher than Deposit Rate', 'Lower than Deposit Rate'],
-                datasets: [{
-                    label: 'Number of Portfolios',
-                    data: [parsedComparisonResultsData.higherCount, parsedComparisonResultsData.lowerCount],
-                    backgroundColor: ['rgba(75, 192, 192, 0.2)', 'rgba(255, 99, 132, 0.2)'],
-                    borderColor: ['rgba(75, 192, 192, 1)', 'rgba(255, 99, 132, 1)'],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
+
         const ctxSectorReturns = document.getElementById('sectorReturnsChart').getContext('2d');
         new Chart(ctxSectorReturns, {
             type: 'bar',
