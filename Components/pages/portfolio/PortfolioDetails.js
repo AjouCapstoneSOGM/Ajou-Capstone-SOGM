@@ -36,10 +36,16 @@ const PortfolioDetails = ({ route, navigation }) => {
   const [selectedId, setSelectedId] = useState(null);
   const [alertExist, setAlertExist] = useState(false);
   const [infoVisible, setInfoVisible] = useState(false);
+  const [cashVisible, setCashVisible] = useState(false);
   const [stockInfoVisible, setStockInfoVisible] = useState(false);
   const [modifyQuantity, setModifyQuantity] = useState(0);
   const [modifyPrice, setModifyPrice] = useState(0);
   const [modifyBuy, setModifyBuy] = useState(true);
+  const [modifyCash, setModifyCash] = useState(0);
+
+  const toggleCashModal = () => {
+    setCashVisible(!cashVisible);
+  };
 
   const toggleInfoModal = () => {
     setInfoVisible(!infoVisible);
@@ -95,6 +101,10 @@ const PortfolioDetails = ({ route, navigation }) => {
     setLoading(false);
   };
 
+  const handleCash = (value) => {
+    setModifyCash(Number(filteringNumber(value)));
+  };
+
   const handleQuantityChange = (newQuantity) => {
     const currentQuantity = portfolio.stocks[selectedId].quantity;
     if (!modifyBuy && Number(newQuantity) > Number(currentQuantity))
@@ -117,6 +127,75 @@ const PortfolioDetails = ({ route, navigation }) => {
       Number(modifyQuantity) > Number(portfolio.stocks[selectedId].quantity)
     )
       setModifyQuantity(portfolio.stocks[selectedId].quantity);
+  };
+
+  const handleCashIn = async () => {
+    const result = await fetchCashIn();
+    setModifyCash(0);
+    toggleCashModal();
+    await reloadPortfolio(route.params.id);
+  };
+
+  const handleCashOut = async () => {
+    const result = await fetchCashOut();
+    setModifyCash(0);
+    toggleCashModal();
+    await reloadPortfolio(route.params.id);
+  };
+
+  const fetchCashIn = async () => {
+    try {
+      const token = await getUsertoken();
+      const response = await fetch(
+        `${urls.springUrl}/api/portfolio/${portfolio.id}/deposit`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            cash: modifyCash,
+          }),
+        }
+      );
+      if (response.ok) {
+        console.log("success");
+        return "success";
+      } else {
+        throw new Error("cash in error");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      return "fail";
+    }
+  };
+
+  const fetchCashOut = async () => {
+    try {
+      const token = await getUsertoken();
+      const response = await fetch(
+        `${urls.springUrl}/api/portfolio/${portfolio.id}/withdraw`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            cash: modifyCash,
+          }),
+        }
+      );
+      if (response.ok) {
+        return { result: "success" };
+      } else {
+        throw new Error("cash out error");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      return { result: "fail" };
+    }
   };
 
   const getAlertExists = async (id) => {
@@ -286,13 +365,30 @@ const PortfolioDetails = ({ route, navigation }) => {
             </AppText>
             {getPortfolioROI()}
           </View>
-          <View style={styles.outlineDetailBox}>
-            <AppText style={{ fontWeight: "bold", color: "#f0f0f0" }}>
-              현금
-            </AppText>
-            <AppText style={{ color: "#f0f0f0" }}>
-              {portfolio.currentCash.toLocaleString()} 원
-            </AppText>
+          <View style={[styles.outlineDetailBox, { flexDirection: "row" }]}>
+            <View style={{ alignItems: "center" }}>
+              <AppText style={{ fontWeight: "bold", color: "#f0f0f0" }}>
+                현금
+              </AppText>
+              <AppText style={{ color: "#f0f0f0" }}>
+                {portfolio.currentCash.toLocaleString()} 원
+              </AppText>
+            </View>
+            {!portfolio.auto && (
+              <Button
+                containerStyle={{ marginHorizontal: -5 }}
+                type="clear"
+                onPress={() => {
+                  setCashVisible(true);
+                }}
+                icon={{
+                  name: "swap",
+                  type: "antdesign",
+                  color: "#f0f0f0",
+                  size: 17,
+                }}
+              />
+            )}
           </View>
         </View>
       </View>
@@ -586,6 +682,49 @@ const PortfolioDetails = ({ route, navigation }) => {
               }}
             />
           </ModalComponent>
+          <ModalComponent isVisible={cashVisible} onToggle={toggleCashModal}>
+            <AppText
+              style={{
+                position: "absolute",
+                top: 0,
+                color: "#888",
+                fontSize: 20,
+                fontWeight: "bold",
+              }}
+            >
+              현금 입출금
+            </AppText>
+            <View style={styles.content}>
+              <View style={styles.contentsItem}>
+                <TextInput
+                  value={String(modifyCash)}
+                  onChangeText={(value) => handleCash(value)}
+                  style={styles.inputQuantity}
+                  keyboardType="numeric"
+                />
+              </View>
+            </View>
+            <View style={{ flexDirection: "row" }}>
+              <Button
+                containerStyle={[{ flex: 1, marginHorizontal: 5 }]}
+                buttonStyle={styles.submitButton}
+                title="입금"
+                disabled={modifyCash == 0}
+                onPress={() => {
+                  handleCashIn();
+                }}
+              />
+              <Button
+                containerStyle={[{ flex: 1, marginHorizontal: 5 }]}
+                buttonStyle={styles.submitButton}
+                title="출금"
+                disabled={modifyCash == 0}
+                onPress={() => {
+                  handleCashOut();
+                }}
+              />
+            </View>
+          </ModalComponent>
         </React.Fragment>
       )}
     </SafeAreaView>
@@ -616,6 +755,7 @@ const styles = StyleSheet.create({
   },
   outlineDetailBox: {
     width: "50%",
+    justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
     paddingRight: 12,
@@ -720,8 +860,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     alignItems: "center",
     paddingBottom: 20,
-    borderBottomColor: "#434343",
-    borderBottomWidth: 1,
   },
   quantityContainer: {
     flex: 1.1,

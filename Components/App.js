@@ -6,6 +6,7 @@ import { LogBox, StatusBar } from "react-native";
 import Settings from "./pages/Settings.js";
 import Information from "./pages/Information.js";
 import MyPage from "./pages/MyPage.js";
+import QnA from "./pages/QnA.js";
 import Login from "./pages/login/login";
 import SocialLogin from "./pages/login/sociallogin";
 import Signup from "./pages/login/signup";
@@ -39,6 +40,7 @@ function ScreenStack() {
       initialRouteName="Home"
     >
       <Stack.Screen name="MyPage" component={MyPage} />
+      <Stack.Screen name="QnA" component={QnA} />
       <Stack.Screen name="Information" component={Information} />
       <Stack.Screen name="Settings" component={Settings} />
       <Stack.Screen name="Login" component={Login} />
