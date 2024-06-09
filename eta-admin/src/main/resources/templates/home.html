@@ -32,6 +32,9 @@
             background-color: #ffffff;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
+        .clickable {
+            cursor: pointer;
+        }
     </style>
 </head>
 <body class="min-h-screen bg-gray-100 dark:bg-gray-900">
@@ -108,17 +111,13 @@
             <h1 class="text-2xl font-semibold">Dashboard</h1>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <div class="card">
+            <div class="card clickable" th:attr="onclick='javascript:goToDetail(\'users\');'">
                 <h2 class="text-lg font-medium">Total Users</h2>
                 <p class="text-2xl font-bold">[[${totalUsers}]]</p>
             </div>
-            <div class="card">
-                <h2 class="text-lg font-medium">일반 계정</h2>
-                <p class="text-2xl font-bold">[[${regularUserCount}]] </p>
-            </div>
-            <div class="card">
-                <h2 class="text-lg font-medium">소셜 계정</h2>
-                <p class="text-2xl font-bold">[[${socialUserCount}]]</p>
+            <div class="card clickable" th:attr="onclick='javascript:goToDetail(\'portfolios\');'">
+                <h2 class="text-lg font-medium">Total Portfolios</h2>
+                <p class="text-2xl font-bold">[[${totalPortfolios}]] </p>
             </div>
             <div class="card">
                 <h2 class="text-lg font-medium">서비스 평균 수익률</h2>
@@ -172,9 +171,13 @@
     });
 
     const sectorReturnsData = /*[[${sectorReturnRatesJson}]]*/ '{}';
+    console.log(sectorReturnsData)
     const sectorParsedReturnsData = JSON.parse(sectorReturnsData);
+    console.log(sectorReturnsData)
     const sectorName = sectorParsedReturnsData.map(sector => sector.sectorName);
     const sectorRate = sectorParsedReturnsData.map(sector => sector.averageReturnRate);
+    console.log(sectorName)
+    console.log(sectorRate)
 
     const riskReturnsDataMapped = /*[[${riskReturnRatesJson}]]*/ '{}';
     const parsedRiskReturnsData = JSON.parse(riskReturnsDataMapped);
@@ -403,9 +406,14 @@
                     }
                 }
             }
-        });
     });
-
+});
 </script>
+<script type="text/javascript">
+    function goToDetail(object) {
+        window.location.href = '/statistics/' + object;
+    }
+</script>
+
 </body>
 </html>
