@@ -10,6 +10,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -56,6 +58,7 @@ public class UserService {
             throw new UnmodifiableSocialUserException();
 
         user.setName(name);
+        user.setModifiedDate(LocalDateTime.now());
     }
 
     @Transactional
@@ -67,10 +70,16 @@ public class UserService {
             throw new UnmodifiableSocialUserException();
 
         user.setPassword(passwordEncoder.encode(password));
+        user.setModifiedDate(LocalDateTime.now());
     }
 
     @Transactional
     public void deleteUser(User user) {
         userRepository.delete(user);
+    }
+
+    @Transactional
+    public void updateLastLoginDate(User user) {
+        user.setLastLoginDate(LocalDateTime.now());
     }
 }

@@ -44,7 +44,6 @@ public class UserServiceTest {
     public void testResetPassword() throws Exception{
         User user = userRepository.save(User.builder()
                 .email("suprlux09@ajou.ac.kr")
-                .isVerified(false)
                 .password("password!")
                 .name("James")
                 .roleType(RoleType.ROLE_USER)

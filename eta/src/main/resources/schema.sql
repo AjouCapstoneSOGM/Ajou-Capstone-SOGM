@@ -7,6 +7,7 @@ CREATE TABLE `user` (
     `role` varchar(30) NOT NULL,
     `created_date` datetime NOT NULL,
     `modified_date` datetime NULL,
+    `last_login_date` datetime NULL,
     `enabled` bool NOT NULL,
     PRIMARY KEY (`user_id`)
 );
@@ -184,4 +185,11 @@ CREATE TABLE `question` (
     `user_id`	int	NOT NULL,
     PRIMARY KEY (`question_id`),
     FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE
+);
+
+CREATE TABLE `statistic` (
+     `date` datetime NOT NULL,
+     `total_user` int NOT NULL,
+     `total_portfolio` int NOT NULL,
+     PRIMARY KEY (`date`)
 );

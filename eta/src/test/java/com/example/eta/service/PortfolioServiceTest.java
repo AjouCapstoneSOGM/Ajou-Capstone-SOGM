@@ -42,7 +42,6 @@ public class PortfolioServiceTest {
         // given 유저 생성
         User user = userRepository.save(new User().builder()
                 .email("suprlux09@ajou.ac.kr")
-                .isVerified(false)
                 .password("password!")
                 .name("James")
                 .roleType(RoleType.ROLE_USER)
@@ -73,7 +72,6 @@ public class PortfolioServiceTest {
         // given 유저 생성
         User user = userRepository.save(new User().builder()
                 .email("suprlux09@ajou.ac.kr")
-                .isVerified(false)
                 .password("password!")
                 .name("James")
                 .roleType(RoleType.ROLE_USER)
@@ -114,7 +112,6 @@ public class PortfolioServiceTest {
 //        // given 유저 생성
 //        User user = userRepository.save(new User().builder()
 //                .email("suprlux09@ajou.ac.kr")
-//                .isVerified(false)
 //                .password("password!")
 //                .name("James")
 //                .roleType(RoleType.ROLE_USER)
@@ -161,7 +158,6 @@ public class PortfolioServiceTest {
 //        // given 유저 생성
 //        User user = userRepository.save(new User().builder()
 //                .email("suprlux09@ajou.ac.kr")
-//                .isVerified(false)
 //                .password("password!")
 //                .name("James")
 //                .roleType(RoleType.ROLE_USER)
@@ -207,7 +203,6 @@ public class PortfolioServiceTest {
     public void testInitializeAutoPortfolio() throws Exception {
         User user = userRepository.save(new User().builder()
                 .email("suprlux09@ajou.ac.kr")
-                .isVerified(false)
                 .password("password!")
                 .name("James")
                 .roleType(RoleType.ROLE_USER)
@@ -246,6 +241,53 @@ public class PortfolioServiceTest {
             assertNotEquals(0, rt.getPrice());
         }
     }
+    @Test
+    @Transactional
+    void testSellStock_ManualPortfolio_CashNotUpdated() {
+        User user = userRepository.save(new User().builder()
+                .email("suprlux09@ajou.ac.kr")
+                .password("password!")
+                .name("James")
+                .roleType(RoleType.ROLE_USER)
+                .createdDate(LocalDateTime.now())
+                .enabled(true).build());
+
+        Portfolio portfolio = portfolioRepository.save(new Portfolio().builder()
+                .pfId(40)
+                .user(user)
+                .isAuto(false)
+                .country("KOR")
+                .currentCash(1000.0f)
+                .build()
+        );
+
+        Ticker tickerEntity = new Ticker();
+        tickerEntity.setName("삼성전자");
+        tickerEntity.setTicker("005390");
+
+        PortfolioTicker portfolioTicker = portfolioTickerRepository.save(new PortfolioTicker().builder()
+                .portfolio(portfolio)
+                .averagePrice(1000.f)
+                .ticker(tickerEntity)
+                .number(10)
+                .build()
+        );
+
+        int sellQuantity = 5;
+        float sellPrice = 150.0f;
+
+        PortfolioDto.SellRequestDto sellRequestDto = PortfolioDto.SellRequestDto.builder()
+                .ticker(tickerEntity.getTicker())
+                .quantity(sellQuantity)
+                .price(sellPrice)
+                .isBuy(false)
+                .build();
+
+        portfolioService.sellStock(portfolio.getPfId(), sellRequestDto);
+
+        Portfolio updatedPortfolio = portfolioRepository.findById(portfolio.getPfId()).orElseThrow();
+        assertEquals(1000.0f, updatedPortfolio.getCurrentCash(), 0.01);
+    }
 
     @Test
     @DisplayName("포트폴리오 이름 변경")
@@ -253,7 +295,6 @@ public class PortfolioServiceTest {
     public void testUpdatePortfolioName() {
         User user = userRepository.save(new User().builder()
                 .email("suprlux09@ajou.ac.kr")
-                .isVerified(false)
                 .password("password!")
                 .name("James")
                 .roleType(RoleType.ROLE_USER)

@@ -54,6 +54,7 @@ public class RebalancingController {
 
     @PutMapping("/{port_id}/execute")
     public ResponseEntity<?> executeRebalancing(@PathVariable("port_id") Integer pfId) {
+        portfolioScheduler.disableUser();
         int rnId = rebalancingService.executeRebalancingAndGetNotificationId(pfId);
         if (rnId > 0) {
             Portfolio portfolio = portfolioService.findOne(pfId);

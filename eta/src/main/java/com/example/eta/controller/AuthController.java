@@ -70,6 +70,9 @@ public class AuthController {
         // expo 토큰 저장
         tokenService.saveToken(user, loginDto.getExpoPushToken());
 
+        // 로그인 시간 갱신
+        userService.updateLastLoginDate(user);
+
         // 응답
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(header, prefix + jwt);
@@ -108,7 +111,6 @@ public class AuthController {
         user.setName(InfoDto.getName());
         user.setPassword(passwordEncoder.encode(InfoDto.getPassword()));
         user.setEmail(InfoDto.getEmail());
-        user.setIsVerified(false);
         user.setRoleType(RoleType.ROLE_USER);
         user.setCreatedDate(LocalDateTime.now());
         user.setEnabled(true);
@@ -151,6 +153,9 @@ public class AuthController {
 
             // expo 토큰 저장
             tokenService.saveToken(userService.findByEmail(kakaoId), requestBody.get("expoPushToken"));
+
+            // 로그인 시간 갱신
+            userService.updateLastLoginDate(user);
 
             // 응답
             HttpHeaders httpHeaders = new HttpHeaders();
