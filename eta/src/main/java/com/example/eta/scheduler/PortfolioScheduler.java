@@ -1,15 +1,9 @@
 package com.example.eta.scheduler;
 
 import com.example.eta.dto.PushMessageDto;
-import com.example.eta.entity.Portfolio;
-import com.example.eta.entity.PortfolioTicker;
-import com.example.eta.entity.Rebalancing;
-import com.example.eta.entity.RebalancingTicker;
+import com.example.eta.entity.*;
 import com.example.eta.exception.FailToSendPushNotificationException;
-import com.example.eta.repository.PortfolioRepository;
-import com.example.eta.repository.PriceRepository;
-import com.example.eta.repository.RebalancingRepository;
-import com.example.eta.repository.RebalancingTickerRepository;
+import com.example.eta.repository.*;
 import com.example.eta.service.PortfolioService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +12,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -32,12 +28,17 @@ public class PortfolioScheduler {
     private final PriceRepository priceRepository;
     private final RebalancingRepository rebalancingRepository;
     private final RebalancingTickerRepository rebalancingTickerRepository;
+    private final StatisticRepository statisticRepository;
+    private final UserRepository userRepository;
 
     private Logger logger = LoggerFactory.getLogger(PortfolioScheduler.class);
 
     @Scheduled(cron = "0 0 0 * * 1-5")
     @Transactional
     public void doProportionRebalancing() {
+        updateStatistics();
+        disableUser();
+
         for (Portfolio portfolio : portfolioRepository.findAll()) {
             portfolioService.updatePortfolioProportion(portfolio, false);
             if (isProportionRebalancingNeeded(portfolio)) {
@@ -215,5 +216,34 @@ public class PortfolioScheduler {
                 .build();
 
         pushNotificationService.triggerPushNotification(to, title, body, data);
+    }
+
+    @Transactional
+    public void updateStatistics() {
+        LocalDate localDate = LocalDate.now();
+
+        // 유저 수
+        int totalUser = userRepository.findAll().size();
+
+        // 포트폴리오 수
+        int totalPortfolio = portfolioRepository.findAll().size();
+
+        // 통계 업데이트
+        statisticRepository.save(Statistic.builder()
+                .date(localDate)
+                .totalUser(totalUser)
+                .totalPortfolio(totalPortfolio)
+                .build());
+    }
+
+    @Transactional
+    public void disableUser() {
+        List<User> users = userRepository.findAll();
+        for (User user : users) {
+            if ((user.getLastLoginDate() == null && user.getCreatedDate().isBefore(LocalDateTime.now().minusMonths(3)) && user.getToken() == null)
+                    || (user.getLastLoginDate() != null && user.getLastLoginDate().isBefore(LocalDateTime.now().minusMonths(3)) && user.getToken() == null)) {
+                user.setEnabled(false);
+            }
+        }
     }
 }

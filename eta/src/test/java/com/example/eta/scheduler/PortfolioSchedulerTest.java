@@ -58,7 +58,6 @@ public class PortfolioSchedulerTest {
     public void setup() {
         user = userRepository.save(User.builder()
                 .email("testtesttesttest@footest.bartest")
-                .isVerified(true)
                 .password("password!")
                 .name("test")
                 .roleType(RoleType.ROLE_USER)

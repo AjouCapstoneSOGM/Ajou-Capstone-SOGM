@@ -52,7 +52,6 @@ public class PortfolioControllerTest {
         // 다른 유저로 포트폴리오 생성
         User user = userRepository.save(new User().builder()
                 .email("suprlux09@gmail.com")
-                .isVerified(false)
                 .password("password!")
                 .name("James")
                 .roleType(RoleType.ROLE_USER)
