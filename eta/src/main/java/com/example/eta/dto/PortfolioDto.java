@@ -117,6 +117,7 @@ public class PortfolioDto {
     public static class CreateManualRequestDto {
         private String name;
         private String country;
+        private float cash;
         private List<StockDetailDto> stocks;
     }
 

@@ -43,8 +43,10 @@ public class QuestionController {
         @Builder
         @Getter
         static class QuestionPreview {
+            int id;
             String title;
             LocalDateTime createdDate;
+            boolean answered;
         }
 
         @Builder
@@ -62,8 +64,10 @@ public class QuestionController {
         User user = userService.findByEmail(userPrincipal.getEmail());
         List<Dto.QuestionPreview> questions = questionService.findAllByUser(user).stream().map(question -> {
             return Dto.QuestionPreview.builder()
+                    .id(question.getQuestionId())
                     .title(question.getTitle())
                     .createdDate(question.getCreatedDate())
+                    .answered(question.getAnsweredDate() != null)
                     .build();
         }).collect(Collectors.toList());
 
@@ -107,13 +111,13 @@ public class QuestionController {
     public ResponseEntity<Void> updateQuestion(@PathVariable int question_id, @RequestBody Dto.QuestionInfo questionInfo,
                                                @AuthenticationPrincipal UserPrincipal userPrincipal) {
         User user = userService.findByEmail(userPrincipal.getEmail());
-        Question questionEntity = questionService.findOne(question_id);
-        if (questionEntity == null || !questionEntity.getUser().equals(user)) {
+        Question question = questionService.findOne(question_id);
+        if (question == null || !question.getUser().equals(user)) {
             return ResponseEntity.notFound().build();
         }
-        questionEntity.setTitle(questionInfo.getTitle());
-        questionEntity.setContent(questionInfo.getContent());
-        questionService.save(questionEntity);
+        question.setTitle(questionInfo.getTitle());
+        question.setContent(questionInfo.getContent());
+        questionService.save(question);
         return ResponseEntity.ok().build();
     }
 

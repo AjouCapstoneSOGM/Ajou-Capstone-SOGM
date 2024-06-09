@@ -46,8 +46,7 @@ public class PortfolioController {
     public ResponseEntity<PortfolioDto.CreateManualResponseDto> createManualPortfolio(@RequestBody PortfolioDto.CreateManualRequestDto request,
                                                                                       @AuthenticationPrincipal UserPrincipal userPrincipal) {
         User user = userService.findByEmail(userPrincipal.getEmail());
-
-        int portfolioId = portfolioService.createManualPortfolio(user,request);
+        int portfolioId = portfolioService.createManualPortfolio(user, request);
         return ResponseEntity.ok(new PortfolioDto.CreateManualResponseDto(portfolioId));
     }
 
@@ -100,6 +99,18 @@ public class PortfolioController {
     @PutMapping("/{port_id}")
     public ResponseEntity<Void> updatePortfolioName(@PathVariable("port_id") Integer pfId, @RequestBody Map<String, String> requestBody) {
         portfolioService.updatePortfolioName(pfId, requestBody.get("name"));
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{port_id}/deposit")
+    public ResponseEntity<Void> depositCash(@PathVariable("port_id") Integer pfId, @RequestBody Map<String, Float> requestBody) {
+        portfolioService.depositCash(pfId, requestBody.get("cash"));
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{port_id}/withdraw")
+    public ResponseEntity<Void> withdrawCash(@PathVariable("port_id") Integer pfId, @RequestBody Map<String, Float> requestBody) {
+        portfolioService.withdrawCash(pfId, requestBody.get("cash"));
         return ResponseEntity.ok().build();
     }
 }
