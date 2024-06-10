@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="_csrf" content="${_csrf.token}">
-  <meta name="_csrf_header" content="${_csrf.headerName}">
+  <meta name="_csrf" th:content="${_csrf.token}" />
+  <meta name="_csrf_header" th:content="${_csrf.headerName}" />
   <title>ETA-ADMIN</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css">
   <style>
@@ -180,19 +180,23 @@
     const searchType = document.querySelector('input[name="searchType"]:checked').value;
 
     if (query) {
-      window.location.href = `/portfolio-list/search/${searchType}/${query}`;
+      window.location.href = `/portfolio/search/${searchType}/${query}`;
     } else {
-      window.location.href = '/portfolio-list';
+      window.location.href = '/portfolio';
     }
   }
 
   function deletePortfolio(PfId) {
+    const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
     if (confirm("Are you sure you want to delete this portfolio?")) {
 
-      fetch(`/portfolio-list/${PfId}`, {
+      fetch(`/portfolio/${PfId}`, {
         method: 'DELETE',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          [csrfHeader]: csrfToken
         }
       }).then(response => {
         if (response.ok) {
