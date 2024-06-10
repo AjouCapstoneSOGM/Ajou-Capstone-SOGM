@@ -15,18 +15,15 @@ import { Button, Divider, Icon } from "@rneui/base";
 import { width, height } from "../../../utils/utils";
 
 const ListPage2 = ({ step, setStep, interest, stockList, setStockList }) => {
-  const {
-    fetchStocksByPortfolioId,
-    fetchRebalanceList,
-    fetchDelete,
-  } = usePortfolio();
+  const { fetchStocksByPortfolioId, fetchRebalanceList, fetchDelete } =
+    usePortfolio();
   const [loading, setLoading] = useState(true);
   const [pfId, setPfId] = useState("");
   const [portfolio, setPortfolio] = useState([]);
   const [initRebalance, setInitRebalance] = useState([]);
 
   const handleNextStep = () => {
-    setStep(step + 1);
+    setStep(3);
   };
 
   const handleSelectedStocks = (stock) => {
@@ -53,14 +50,14 @@ const ListPage2 = ({ step, setStep, interest, stockList, setStockList }) => {
         setInitRebalance(rebalance[0].rebalancings);
         setLoading(false);
       };
-      const loadAndDelete = async () =>{
+      const loadAndDelete = async () => {
         await loadPortfolio();
         await fetchDelete(pfId);
-      }
+      };
       loadAndDelete();
     }
   }, [pfId]);
-  
+
   useEffect(() => {
     const fetchAutoInfo = async () => {
       try {
@@ -111,7 +108,7 @@ const ListPage2 = ({ step, setStep, interest, stockList, setStockList }) => {
         </View>
       </View>
     );
-    
+
   const result3 = () => {
     return (
       <View style={styles.pageContainer}>
@@ -135,9 +132,7 @@ const ListPage2 = ({ step, setStep, interest, stockList, setStockList }) => {
   return (
     <View style={styles.container}>
       <View style={styles.textContainer}>
-        <AppText style={styles.titleText}>
-          추가하실 종목을 선택해주세요
-        </AppText>
+        <AppText style={styles.titleText}>추가하실 종목을 선택해주세요</AppText>
       </View>
       <View style={styles.contentsContainer}>
         <View style={styles.selectedContainer}>
