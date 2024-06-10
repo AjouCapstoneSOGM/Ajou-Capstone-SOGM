@@ -66,7 +66,7 @@ async def get_News(ticker: Ticker):
             status_code=status.HTTP_204_NO_CONTENT, content={"detail": "no news"}
         )
 
-    summary = await chatbot.summary("".join(headlines), ticker.ticker)
+    summary = await chatbot.summary("".join(headlines["title"]), ticker.ticker)
     return {"summary": summary}
 
 
