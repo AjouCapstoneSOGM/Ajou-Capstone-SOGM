@@ -6,6 +6,8 @@ import { LogBox, StatusBar } from "react-native";
 import Settings from "./pages/Settings.js";
 import Information from "./pages/Information.js";
 import MyPage from "./pages/MyPage.js";
+import QnA from "./pages/qna/QnA.js";
+import QnACreate from "./pages/qna/QnaCreate.js";
 import Login from "./pages/login/login";
 import SocialLogin from "./pages/login/sociallogin";
 import Signup from "./pages/login/signup";
@@ -17,6 +19,8 @@ import ViewPortfolio from "./pages/portfolio/ViewPortfolio";
 import PortfolioDetails from "./pages/portfolio/PortfolioDetails";
 import AddStockInManual from "./pages/portfolio/AddStockInManual";
 import ManagementPage from "./pages/portfolio/ManagePortfolio";
+import RebalanceRecordList from "./pages/portfolio/RebalanceRecordList";
+import ViewRebalanceRecord from "./pages/portfolio/ViewRebalanceRecord";
 import MakePortfolio from "./pages/make/MakePortfolio";
 import ModifyPortfolio from "./pages/rebalance/ModifyPortfolio";
 import { AuthProvider } from "./utils/AuthContext";
@@ -37,6 +41,8 @@ function ScreenStack() {
       initialRouteName="Home"
     >
       <Stack.Screen name="MyPage" component={MyPage} />
+      <Stack.Screen name="QnA" component={QnA} />
+      <Stack.Screen name="QnACreate" component={QnACreate} />
       <Stack.Screen name="Information" component={Information} />
       <Stack.Screen name="Settings" component={Settings} />
       <Stack.Screen name="Login" component={Login} />
@@ -50,6 +56,8 @@ function ScreenStack() {
       <Stack.Screen name="PortfolioDetails" component={PortfolioDetails} />
       <Stack.Screen name="AddStockInManual" component={AddStockInManual} />
       <Stack.Screen name="ManagementPage" component={ManagementPage} />
+      <Stack.Screen name="RebalanceRecordList" component={RebalanceRecordList} />
+      <Stack.Screen name="ViewRebalanceRecord" component={ViewRebalanceRecord} />
       <Stack.Screen name="ModifyPortfolio" component={ModifyPortfolio} />
       <Stack.Screen name="MakePortfolio" component={MakePortfolio} />
     </Stack.Navigator>

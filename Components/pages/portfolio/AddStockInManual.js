@@ -15,13 +15,19 @@ import ListPage2 from "../make/manual/ListPage2";
 const AddStockInManual = ({ route, navigation }) => {
   const pfId = route.params.pfId;
   const [stockList, setStockList] = useState([]);
-  const [step, setStep] = useState(0);  
+  const [step, setStep] = useState(0);
   const [interest, setInterest] = useState("");
   const [disabled, setDisabled] = useState(false);
-  const { loadData } = usePortfolio();
+  const { reloadPortfolio } = usePortfolio();
 
   const handleNextStep = () => {
     setStep(step + 1);
+  };
+
+  const handleMovePage = async () => {
+    await reloadPortfolio(pfId);
+    navigation.popToTop();
+    navigation.navigate("ViewPortfolio");
   };
 
   useEffect(() => {
@@ -37,21 +43,14 @@ const AddStockInManual = ({ route, navigation }) => {
       else setDisabled(false);
     }
     if (step === 6) {
-      loadData();
-      navigation.popToTop();
-      navigation.navigate("ViewPortfolio");
+      handleMovePage();
     }
   }, [step, stockList]);
 
   const renderManualStep = () => {
     switch (step) {
       case 0:
-        return (
-          <ManualAddSelect
-            step={step}
-            setStep={setStep}
-          />
-        );
+        return <ManualAddSelect step={step} setStep={setStep} />;
       case 1:
         return (
           <ManualPage1
@@ -68,7 +67,7 @@ const AddStockInManual = ({ route, navigation }) => {
             setStep={setStep}
             interest={interest}
             setInterest={setInterest}
-          />       
+          />
         );
       case 3:
         return (

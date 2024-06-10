@@ -16,7 +16,7 @@ import ModalComponent from "../utils/Modal";
 import { TextInput } from "react-native-gesture-handler";
 import FooterComponent from "../utils/Footer";
 
-const Settings = ({ navigation }) => {
+const MyPage = ({ navigation }) => {
   const { logout } = useAuth();
   const [pwModalVisible, setPwModalVisible] = useState(false);
   const [nameModalVisible, setNameModalVisible] = useState(false);
@@ -323,6 +323,15 @@ const Settings = ({ navigation }) => {
           </React.Fragment>
         )}
         <Divider />
+        <TouchableOpacity
+          style={styles.settingItem}
+          onPress={() => {
+            navigation.navigate("QnA");
+          }}
+        >
+          <AppText style={{ color: "#f0f0f0", fontSize: 18 }}>문의하기</AppText>
+        </TouchableOpacity>
+        <Divider />
         <TouchableOpacity style={styles.settingItem} onPress={handleLogout}>
           <AppText style={{ color: "#f0f0f0", fontSize: 18 }}>로그아웃</AppText>
         </TouchableOpacity>
@@ -457,4 +466,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Settings;
+export default MyPage;

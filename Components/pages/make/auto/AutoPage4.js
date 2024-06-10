@@ -124,7 +124,6 @@ const AutoPage4 = ({ step, setStep, amount, riskLevel, interest }) => {
   const handleModify = async () => {
     const rebalanceData = updateKey([...initRebalance]);
     await fetchModify(rebalanceData, pfId, rnId);
-    await loadData();
   };
 
   useEffect(() => {
@@ -478,6 +477,7 @@ const AutoPage4 = ({ step, setStep, amount, riskLevel, interest }) => {
               {initRebalance[modifyIndex]?.name}
             </AppText>
             <TextInput
+              keyboardType="numeric"
               style={styles.modifyPrice}
               value={String(initRebalance[modifyIndex]?.price)}
               onChangeText={(value) => handleChangePrice(value)}
@@ -582,8 +582,8 @@ const AutoPage4 = ({ step, setStep, amount, riskLevel, interest }) => {
         <Button
           buttonStyle={styles.nextButton}
           title={"완료"}
-          onPress={() => {
-            handleModify();
+          onPress={async () => {
+            await handleModify();
             gotoDetailPage();
           }}
           disabled={checkList.length < 12 || getRemainCash() < 0}

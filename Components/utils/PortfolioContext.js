@@ -10,6 +10,7 @@ export const PortfolioProvider = ({ children }) => {
   const [portfolios, setPortfolios] = useState([]);
   const [portLoading, setPortLoading] = useState(false);
   const [rebalances, setRebalances] = useState([]);
+  const [rebalanceRecords, setrebalanceRecords] = useState([]);
   const { isLoggedIn } = useAuth();
 
   const removePortfolios = () => {
@@ -36,6 +37,33 @@ export const PortfolioProvider = ({ children }) => {
             item.portfolioName = data.portfolioName;
           });
           return data.rebalancing.flat();
+        }
+        return [];
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchRebalanceRecordList = async (pfId) => {
+    try {
+      const token = await getUsertoken();
+      const response = await fetch(
+        `${urls.springUrl}/api/portfolioRecord/${pfId}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (response.ok) {
+        const data = await response.json();
+        if (data.length > 0) {
+          data.forEach((item) => {
+            item.pfId = pfId;
+          });
+          return data.flat();
         }
         return [];
       }
@@ -79,6 +107,14 @@ export const PortfolioProvider = ({ children }) => {
     });
     const rebalancesList = await Promise.all(promises);
     return rebalancesList.flat();
+  };
+
+  const fetchAllRebalanceRecords = async (portfolioIds) => {
+    const promises = portfolioIds.map((id) => {
+      return fetchRebalanceRecordList(id);
+    });
+    const rebalanceRecordsList = await Promise.all(promises);
+    return rebalanceRecordsList.flat();
   };
 
   const fetchPortfolios = async () => {
@@ -247,6 +283,19 @@ export const PortfolioProvider = ({ children }) => {
     return;
   };
 
+  const reloadPortfolio = async (id) => {
+    const oldPortfolios = [...portfolios];
+    const newPortfolioStocks = await fetchStocksByPortfolioId(id);
+    const newPortfolioWithCurrent = await fetchCurrentPrice(newPortfolioStocks);
+    const changedPortfolios = oldPortfolios.map((portfolio) => {
+      if (portfolio.id === id) {
+        return { ...portfolio, detail: newPortfolioWithCurrent };
+      }
+      return portfolio;
+    });
+    setPortfolios(changedPortfolios);
+  };
+
   const loadData = async () => {
     setPortLoading(true);
     const portData = await fetchPortfolios();
@@ -262,7 +311,11 @@ export const PortfolioProvider = ({ children }) => {
     rebalancesList.sort(
       (a, b) => new Date(b.createdDate) - new Date(a.createdDate)
     );
+
+    const rebalanceRecordsList = await fetchAllRebalanceRecords(portfolioIds);
+
     setRebalances(rebalancesList);
+    setrebalanceRecords(rebalanceRecordsList);
     setPortfolios(portfolioList);
     setPortLoading(false);
   };
@@ -278,6 +331,7 @@ export const PortfolioProvider = ({ children }) => {
       value={{
         portfolios,
         rebalances,
+        rebalanceRecords,
         fetchPortfolios,
         fetchDelete,
         getPortfolioById,
@@ -287,6 +341,7 @@ export const PortfolioProvider = ({ children }) => {
         fetchCurrentPrice,
         fetchRebalanceList,
         fetchChangePortName,
+        reloadPortfolio,
         loadData,
         portLoading,
       }}

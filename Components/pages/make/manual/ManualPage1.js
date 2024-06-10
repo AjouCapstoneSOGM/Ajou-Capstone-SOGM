@@ -14,7 +14,7 @@ const ManualPage1 = ({ step, setStep, stockList, setStockList }) => {
   const [selectedIndex, setSelectedIndex] = useState(null);
 
   const handleNextStep = () => {
-    setStep(step + 3);
+    setStep(step + 1);
   };
 
   const toggleStockModal = () => {
@@ -48,9 +48,7 @@ const ManualPage1 = ({ step, setStep, stockList, setStockList }) => {
   return (
     <View style={styles.container}>
       <View style={styles.textContainer}>
-        <AppText style={styles.titleText}>
-          추가하실 종목을 선택해주세요
-        </AppText>
+        <AppText style={styles.titleText}>추가하실 종목을 선택해주세요</AppText>
       </View>
       <SearchBar
         placeholder="종목 이름, 티커로 검색"

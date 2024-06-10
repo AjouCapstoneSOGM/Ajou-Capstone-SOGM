@@ -43,7 +43,7 @@ const AutoPage2 = ({ step, setStep, riskLevel, setRiskLevel }) => {
     <View style={styles.container}>
       <View style={styles.textContainer}>
         <AppText style={styles.titleText}>
-          포트폴리오의 위험도를 선택해주세요.
+          선호하는 투자 스타일을 선택해주세요.
         </AppText>
       </View>
       <View style={styles.contentsContainer}>

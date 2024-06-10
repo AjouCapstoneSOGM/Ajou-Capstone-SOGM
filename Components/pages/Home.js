@@ -223,8 +223,8 @@ const Home = () => {
           </View>
           {newsLoading && <Loading />}
           {!newsLoading &&
-            currentNews.slice(0, 10).map((item) => (
-              <React.Fragment>
+            currentNews.slice(0, 10).map((item, index) => (
+              <React.Fragment key={index}>
                 <TouchableOpacity
                   onPress={() => OpenUrl(`${item.href}`)}
                   style={styles.newsItem}
