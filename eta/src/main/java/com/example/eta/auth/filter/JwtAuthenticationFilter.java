@@ -1,6 +1,7 @@
 package com.example.eta.auth.filter;
 
 import com.example.eta.auth.entity.UserPrincipal;
+import com.example.eta.entity.User;
 import com.example.eta.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -50,12 +51,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 .parseClaimsJws(jwt)
                 .getBody();
 
-        // 인증 성공 시 인증정보 SecurityContext에 저장
         String email = String.valueOf(claims.get("email"));
-        var auth = new UsernamePasswordAuthenticationToken(UserPrincipal.create(userRepository.findByEmail(email).get()), null, List.of(new SimpleGrantedAuthority(ROLE_USER.name())));
-        SecurityContextHolder.getContext().setAuthentication(auth);
+        User user = userRepository.findByEmail(email).get();
 
+        if (!user.getEnabled()) {
+            disabledUserHandler(response);
+        }
+        else {
+            // 인증 성공 시 인증정보 SecurityContext에 저장
+            var auth = new UsernamePasswordAuthenticationToken(UserPrincipal.create(user), null, List.of(new SimpleGrantedAuthority(ROLE_USER.name())));
+            SecurityContextHolder.getContext().setAuthentication(auth);
+        }
         filterChain.doFilter(request, response);
+    }
+
+    public void disabledUserHandler(HttpServletResponse response) {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
 
     // 로그인, 회원가입 API는 JWT 인증 필터 무시
