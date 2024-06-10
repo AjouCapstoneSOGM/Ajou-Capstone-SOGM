@@ -127,6 +127,10 @@
                         <p class="text-gray-900 font-semibold" th:text="${user.modifiedDate == null ? '-' : user.modifiedDate}"></p>
                     </div>
                     <div>
+                        <label class="text-gray-500">최근 로그인 일자</label>
+                        <p class="text-gray-900 font-semibold" th:text="${user.lastLoginDate == null ? '-' : user.lastLoginDate}"></p>
+                    </div>
+                    <div>
                         <label class="text-gray-500">계정 상태</label>
                         <p class="text-gray-900 font-semibold" th:text="${user.enabled ? '활성화' : '비활성화'}"></p>
                     </div>
