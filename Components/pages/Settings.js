@@ -22,7 +22,7 @@ const Settings = ({ navigation }) => {
   const [hasNotificationPermission, setHasNotificationPermission] =
     useState(false);
   const [pushTokenCheck, setPushTokenCheck] = useState(1);
-  const { expoPushToken } = usePushNotifications();
+  const { expoPushToken, setIsNotificationEnable } = usePushNotifications();
 
   useEffect(() => {
     getRebalanceAlarm().then((res) => {
@@ -33,6 +33,7 @@ const Settings = ({ navigation }) => {
   const handleNotificationPermission = async () => {
     if (hasNotificationPermission) {
       setHasNotificationPermission(false);
+      setIsNotificationEnable(false);
       setRebalanceAlarm("denied");
     } else {
       const notificationStatus = await Notifications.getPermissionsAsync();
@@ -40,6 +41,7 @@ const Settings = ({ navigation }) => {
       if (notificationStatus.granted) {
         setRebalanceAlarm("granted");
         setHasNotificationPermission(true);
+        setIsNotificationEnable(true);
       } else {
         Alert.alert("알림", "설정 > 앱 > 알림에서 권한을 허용해 주세요.");
       }
@@ -51,6 +53,7 @@ const Settings = ({ navigation }) => {
     if (pushTokenCheck > 5) {
       Alert.alert("Token", expoPushToken);
       console.log("Token", expoPushToken);
+      checkListener();
     }
   };
 
