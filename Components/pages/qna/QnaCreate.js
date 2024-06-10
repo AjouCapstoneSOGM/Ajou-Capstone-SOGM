@@ -20,7 +20,6 @@ const QnACreate = ({ navigation }) => {
 
   const handleQnaCreate = async () => {
     const result = await fetchQnACreate();
-    console.log(result);
     if (result === "success") {
       Alert.alert("문의 완료", "문의 요청이 완료되었습니다.", [
         {

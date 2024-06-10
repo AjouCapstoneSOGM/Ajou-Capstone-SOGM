@@ -24,8 +24,8 @@ const QnA = ({ navigation }) => {
     else if (selectedId === id) setSelectedId("");
   };
 
-  const handleQnaDelete = async () => {
-    const result = await fetchQnADelete();
+  const handleQnaDelete = async (id) => {
+    const result = await fetchQnADelete(id);
     if (result === "success") {
       Alert.alert("삭제 완료", "삭제가 완료되었습니다.", [
         {
