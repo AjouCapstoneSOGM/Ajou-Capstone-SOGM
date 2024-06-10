@@ -31,18 +31,18 @@ const AddStockInManual = ({ route, navigation }) => {
   };
 
   useEffect(() => {
-    if (step === 1 || step === 3) {
+    if (step === 1 || step === 11) {
       if (stockList.length === 0) setDisabled(true);
       else setDisabled(false);
     }
-    if (step === 4) {
+    if (step === 2) {
       const result = stockList.filter(
         (stock) => stock.currentPrice === 0 || stock.quantity === 0
       );
       if (result.length) setDisabled(true);
       else setDisabled(false);
     }
-    if (step === 6) {
+    if (step === 4) {
       handleMovePage();
     }
   }, [step, stockList]);

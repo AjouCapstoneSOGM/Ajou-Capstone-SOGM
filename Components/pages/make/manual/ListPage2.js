@@ -23,7 +23,7 @@ const ListPage2 = ({ step, setStep, interest, stockList, setStockList }) => {
   const [initRebalance, setInitRebalance] = useState([]);
 
   const handleNextStep = () => {
-    setStep(3);
+    setStep(2);
   };
 
   const handleSelectedStocks = (stock) => {
