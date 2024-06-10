@@ -47,7 +47,7 @@ public class PortfolioController {
                 break;
             default:
         }
-        return "portfolio";
+        return "Portfolio";
     }
     @GetMapping("/{PfId}")
     public String getPortfolioDetail(@PathVariable("PfId") int PfId, Model model,RedirectAttributes redirectAttributes) {
