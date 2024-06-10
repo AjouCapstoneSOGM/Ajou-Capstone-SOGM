@@ -146,6 +146,9 @@ public class AuthController {
             }
             else {
                 user = userService.findByEmail(kakaoId);
+                if (!user.getEnabled()) {
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+                }
             }
 
             // JWT 토큰 발급
