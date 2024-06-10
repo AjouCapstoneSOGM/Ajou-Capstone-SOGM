@@ -8,6 +8,34 @@ import AppText from "../../../utils/AppText";
 const ManualPage3 = ({ stockList, pfId }) => {
   const [loading, setLoading] = useState(true);
 
+  const fetchCashIn = async () => {
+    try {
+      const token = await getUsertoken();
+      const response = await fetch(
+        `${urls.springUrl}/api/portfolio/${pfId}/deposit`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            cash: stockList.cash,
+          }),
+        }
+      );
+      if (response.ok) {
+        console.log("success");
+        return "success";
+      } else {
+        throw new Error("cash in error");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      return "fail";
+    }
+  };
+
   const fetchAddManual = async (stock) => {
     try {
       const token = await getUsertoken();
@@ -37,13 +65,15 @@ const ManualPage3 = ({ stockList, pfId }) => {
   };
 
   const handleFetchAddManual = async () => {
-    const promises = stockList.map((stock) => {
+    const promises = stockList.stocks?.map((stock) => {
       return fetchAddManual(stock);
     });
     await Promise.all(promises);
   };
+
   useEffect(() => {
     const fetchData = async () => {
+      await fetchCashIn();
       await handleFetchAddManual();
       setLoading(false);
     };
