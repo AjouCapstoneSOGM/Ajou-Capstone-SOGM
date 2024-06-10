@@ -112,19 +112,38 @@ const ListPage2 = ({ step, setStep, interest, stockList, setStockList }) => {
   const result3 = () => {
     return (
       <View style={styles.pageContainer}>
-        <ScrollView>
-          {initRebalance.map((stock, index) => (
-            <TouchableOpacity
-              key={index}
-              style={styles.labelItemContent}
-              onPress={() => handleSelectedStocks(stock)}
-            >
-              <View style={styles.itemNameBox}>
-                <AppText style={styles.itemName}>{stock.name}</AppText>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
+        <TouchableOpacity onPress={console.log("init: ", initRebalance)} />
+        <View style={styles.itemContainer}>
+          <View style={styles.selectedContainer}>
+            <ScrollView>
+              {initRebalance.map((stock, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.suggestion}
+                  onPress={() => handleSelectedStocks(stock)}
+                >
+                  <View style={{ flexDirection: "row" }}>
+                    <AppText style={{ color: "#f0f0f0" }}>
+                      {stock.name}
+                      {"  "}
+                    </AppText>
+                    <AppText style={{ fontSize: 13, color: "#888" }}>
+                      {stock.ticker}
+                    </AppText>
+                  </View>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                    }}
+                  >
+                    <AppText style={{ fontSize: 13, color: "#fff" }}>{stock.price.toLocaleString()} 원</AppText>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        </View>
       </View>
     );
   };
@@ -142,7 +161,7 @@ const ListPage2 = ({ step, setStep, interest, stockList, setStockList }) => {
               style={styles.selectedItem}
               onPress={() => handleSelectedStocks(item)}
             >
-              <AppText>{item.name} </AppText>
+              <AppText>{item.name}</AppText>
               <Icon name="close" size={12} color="#222" />
             </TouchableOpacity>
           ))}
@@ -224,6 +243,10 @@ const styles = StyleSheet.create({
     paddingBottom: height * 5,
     backgroundColor: "#333",
   },
+  itemContainer: {
+    flex: 1,
+    backgroundColor: "#333",
+  },
   selectedContainer: {
     paddingVertical: 5,
     flexDirection: "row",
@@ -236,5 +259,14 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     padding: 7,
     margin: 5,
+  },
+  suggestion: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 10,
+    marginHorizontal: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#434343",
   },
 });
