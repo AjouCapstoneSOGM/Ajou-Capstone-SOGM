@@ -682,51 +682,51 @@ const PortfolioDetails = ({ route, navigation }) => {
               }}
             />
           </ModalComponent>
-          <ModalComponent isVisible={cashVisible} onToggle={toggleCashModal}>
-            <AppText
-              style={{
-                position: "absolute",
-                top: 0,
-                color: "#888",
-                fontSize: 20,
-                fontWeight: "bold",
-              }}
-            >
-              현금 입출금
-            </AppText>
-            <View style={styles.content}>
-              <View style={styles.contentsItem}>
-                <TextInput
-                  value={String(modifyCash)}
-                  onChangeText={(value) => handleCash(value)}
-                  style={styles.inputQuantity}
-                  keyboardType="numeric"
-                />
-              </View>
-            </View>
-            <View style={{ flexDirection: "row" }}>
-              <Button
-                containerStyle={[{ flex: 1, marginHorizontal: 5 }]}
-                buttonStyle={styles.submitButton}
-                title="입금"
-                disabled={modifyCash == 0}
-                onPress={() => {
-                  handleCashIn();
-                }}
-              />
-              <Button
-                containerStyle={[{ flex: 1, marginHorizontal: 5 }]}
-                buttonStyle={styles.submitButton}
-                title="출금"
-                disabled={modifyCash == 0}
-                onPress={() => {
-                  handleCashOut();
-                }}
-              />
-            </View>
-          </ModalComponent>
         </React.Fragment>
       )}
+      <ModalComponent isVisible={cashVisible} onToggle={toggleCashModal}>
+        <AppText
+          style={{
+            position: "absolute",
+            top: 0,
+            color: "#888",
+            fontSize: 20,
+            fontWeight: "bold",
+          }}
+        >
+          현금 입출금
+        </AppText>
+        <View style={styles.content}>
+          <View style={styles.contentsItem}>
+            <TextInput
+              value={String(modifyCash)}
+              onChangeText={(value) => handleCash(value)}
+              style={styles.inputQuantity}
+              keyboardType="numeric"
+            />
+          </View>
+        </View>
+        <View style={{ flexDirection: "row" }}>
+          <Button
+            containerStyle={[{ flex: 1, marginHorizontal: 5 }]}
+            buttonStyle={styles.submitButton}
+            title="입금"
+            disabled={modifyCash == 0}
+            onPress={() => {
+              handleCashIn();
+            }}
+          />
+          <Button
+            containerStyle={[{ flex: 1, marginHorizontal: 5 }]}
+            buttonStyle={styles.submitButton}
+            title="출금"
+            disabled={modifyCash == 0}
+            onPress={() => {
+              handleCashOut();
+            }}
+          />
+        </View>
+      </ModalComponent>
     </SafeAreaView>
   );
 };

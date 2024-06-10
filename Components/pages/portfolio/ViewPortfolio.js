@@ -171,7 +171,7 @@ const PortfolioList = ({ navigation }) => {
       {portfolioExist() && (
         <React.Fragment>
           <ButtonGroup
-            buttons={["자산별", "종목별", "수익률별"]}
+            buttons={["자산별", "종목별"]}
             selectedIndex={selectedChartType}
             onPress={(value) => {
               setSelectedChartType(value);
@@ -201,25 +201,19 @@ const PortfolioList = ({ navigation }) => {
               data={
                 selectedChartType == 0
                   ? portfolios //포트폴리오별
-                  : selectedChartType == 1
-                  ? allPortfolioData //종목별
-                  : getPortfolioRoiData() //수익률별
+                  : allPortfolioData //종목별
               }
               selectedId={selectedIndex}
               size={
                 selectedChartType == 0
                   ? width * 0.8 //포트폴리오별
-                  : selectedChartType == 1
-                  ? width * 0.6 //종목별
-                  : width * 0.6 //수익률별
+                  : width * 0.6 //종목별
               }
               mode={"light"}
               type={
                 selectedChartType == 0
                   ? "portfolio" //포트폴리오별
-                  : selectedChartType == 1
-                  ? "stock" //종목별
-                  : "rate" //수익률별
+                  : "stock" //종목별
               }
             />
             {selectedChartType === 0 && (

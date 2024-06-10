@@ -104,7 +104,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
         item.index = index;
         item.buyPrice = item.price;
         item.buyQuantity = item.quantity;
-        item.rateDiff = ((price * 100) / (totalPrice - price)).toFixed(2);
+        item.rateDiff = ((price * 100) / totalPrice).toFixed(2);
       });
       setRebalances(rebalancing);
       setLoading(false);
