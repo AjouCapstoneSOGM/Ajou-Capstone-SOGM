@@ -34,9 +34,6 @@ public class User {
     private String email;
 
     @Column
-    private Boolean isVerified;
-
-    @Column(nullable = false)
     private String password;
 
     @Column(nullable = false, length = 30)
@@ -55,6 +52,9 @@ public class User {
 
     @Column
     private LocalDateTime modifiedDate;
+
+    @Column
+    private LocalDateTime lastLoginDate;
 
     @Column(nullable = false)
     private Boolean enabled;

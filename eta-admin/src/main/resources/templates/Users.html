@@ -146,6 +146,7 @@
                     <th class="px-4 py-2 text-left text-gray-500">닉네임</th>
                     <th class="px-4 py-2 text-left text-gray-500">계정 생성일</th>
                     <th class="px-4 py-2 text-left text-gray-500">계정 수정일</th>
+                    <th class="px-4 py-2 text-left text-gray-500">최근 로그인 일자</th>
                     <th class="px-4 py-2 text-left text-gray-500">계정 종류</th>
                     <th class="px-4 py-2 text-left text-gray-500">계정 상태</th>
                     <th class="px-4 py-2 text-left text-gray-500"></th>
@@ -158,6 +159,7 @@
                     <td class="border-t px-4 py-2" th:text="${user.name}"></td>
                     <td class="border-t px-4 py-2" th:text="${user.createdDate}"></td>
                     <td class="border-t px-4 py-2" th:text="${user.modifiedDate == null ? '-' : user.modifiedDate}"></td>
+                    <td class="border-t px-4 py-2" th:text="${user.lastLoginDate == null ? '-' : user.lastLoginDate}"></td>
                     <td class="border-t px-4 py-2" th:text="${user.socialType == null ? '일반 계정' : '소셜 계정' + '(' + user.socialType + ')'}"></td>
                     <td class="border-t px-4 py-2" th:text="${user.enabled ? '활성화' : '비활성화'}"></td>
                     <td class="border-t px-4 py-2">
