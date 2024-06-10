@@ -19,8 +19,8 @@ import ViewPortfolio from "./pages/portfolio/ViewPortfolio";
 import PortfolioDetails from "./pages/portfolio/PortfolioDetails";
 import AddStockInManual from "./pages/portfolio/AddStockInManual";
 import ManagementPage from "./pages/portfolio/ManagePortfolio";
-import RebalanceRecodeList from "./pages/portfolio/RebalanceRecodeList";
-import ViewRebalanceRecode from "./pages/portfolio/ViewRebalanceRecode";
+import RebalanceRecordList from "./pages/portfolio/RebalanceRecordList";
+import ViewRebalanceRecord from "./pages/portfolio/ViewRebalanceRecord";
 import MakePortfolio from "./pages/make/MakePortfolio";
 import ModifyPortfolio from "./pages/rebalance/ModifyPortfolio";
 import { AuthProvider } from "./utils/AuthContext";
@@ -56,14 +56,8 @@ function ScreenStack() {
       <Stack.Screen name="PortfolioDetails" component={PortfolioDetails} />
       <Stack.Screen name="AddStockInManual" component={AddStockInManual} />
       <Stack.Screen name="ManagementPage" component={ManagementPage} />
-      <Stack.Screen
-        name="RebalanceRecodeList"
-        component={RebalanceRecodeList}
-      />
-      <Stack.Screen
-        name="ViewRebalanceRecode"
-        component={ViewRebalanceRecode}
-      />
+      <Stack.Screen name="RebalanceRecordList" component={RebalanceRecordList} />
+      <Stack.Screen name="ViewRebalanceRecord" component={ViewRebalanceRecord} />
       <Stack.Screen name="ModifyPortfolio" component={ModifyPortfolio} />
       <Stack.Screen name="MakePortfolio" component={MakePortfolio} />
     </Stack.Navigator>

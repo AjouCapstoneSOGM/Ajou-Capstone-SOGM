@@ -6,7 +6,7 @@ import { width, height, deepCopy, filteringNumber } from "../../utils/utils";
 import AppText from "../../utils/AppText";
 import Loading from "../../utils/Loading";
 
-const ViewRebalanceRecode = ({ route, navigation }) => {
+const ViewRebalanceRecord = ({ route, navigation }) => {
   const { pfId, date, records, tickerName} = route.params;
   const [rebalanceRecord, setrebalanceRecord] = useState(records)
   const [loading, setLoading] = useState(true);
@@ -146,7 +146,7 @@ const ViewRebalanceRecode = ({ route, navigation }) => {
               <TouchableOpacity style={styles.rebalanceItemContent}>
                 <View style={styles.itemNameBox}>
                   <AppText style={styles.itemName}>{item.name}</AppText>
-                  <AppText style={styles.itemOnePrice}>{item.price.toLocaleString()}</AppText>
+                  <AppText style={styles.itemOnePrice}>{item.price.toLocaleString()}원</AppText>
                 </View>
                 <AppText style={styles.itemNumber}>{item.number.toLocaleString()}</AppText>
                 <AppText style={styles.itemPrice}>{item.totalPrice.toLocaleString()} 원</AppText>
@@ -270,4 +270,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ViewRebalanceRecode;
+export default ViewRebalanceRecord;

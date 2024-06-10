@@ -63,7 +63,7 @@ const ManagementPage = ({ route, navigation }) => {
           <AppText style={{ fontSize: 30, fontWeight: "bold" }}>설정</AppText>
         </View>
         <ScrollView style={styles.settingList}>
-        <TouchableOpacity onPress={() => {navigation.navigate("RebalanceRecodeList", { id: portfolio.id, portfolio: portfolio, stocks: portfolio.stocks })}} style={styles.settingItem}>
+        <TouchableOpacity onPress={() => {navigation.navigate("RebalanceRecordList", { id: portfolio.id, portfolio: portfolio, stocks: portfolio.stocks })}} style={styles.settingItem}>
             <AppText style={{ color: "#ffffff", fontSize: 20 }}>
               지난 리밸런싱 내역 보기
             </AppText>

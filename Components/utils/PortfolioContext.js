@@ -10,7 +10,7 @@ export const PortfolioProvider = ({ children }) => {
   const [portfolios, setPortfolios] = useState([]);
   const [portLoading, setPortLoading] = useState(false);
   const [rebalances, setRebalances] = useState([]);
-  const [rebalanceRecodes, setrebalanceRecodes] = useState([]);
+  const [rebalanceRecords, setrebalanceRecords] = useState([]);
   const { isLoggedIn } = useAuth();
 
   const removePortfolios = () => {
@@ -45,7 +45,7 @@ export const PortfolioProvider = ({ children }) => {
     }
   };
 
-  const fetchRebalanceRecodeList = async (pfId) => {
+  const fetchRebalanceRecordList = async (pfId) => {
     try {
       const token = await getUsertoken();
       const response = await fetch(
@@ -59,7 +59,6 @@ export const PortfolioProvider = ({ children }) => {
       );
       if (response.ok) {
         const data = await response.json();
-        //console.log("Li ", data.length);
         if (data.length > 0) {
           data.forEach((item) => {
             item.pfId = pfId;
@@ -110,12 +109,12 @@ export const PortfolioProvider = ({ children }) => {
     return rebalancesList.flat();
   };
 
-  const fetchAllRebalanceRecodes = async (portfolioIds) => {
+  const fetchAllRebalanceRecords = async (portfolioIds) => {
     const promises = portfolioIds.map((id) => {
-      return fetchRebalanceRecodeList(id);
+      return fetchRebalanceRecordList(id);
     });
-    const rebalanceRecodesList = await Promise.all(promises);
-    return rebalanceRecodesList.flat();
+    const rebalanceRecordsList = await Promise.all(promises);
+    return rebalanceRecordsList.flat();
   };
 
   const fetchPortfolios = async () => {
@@ -313,11 +312,10 @@ export const PortfolioProvider = ({ children }) => {
       (a, b) => new Date(b.createdDate) - new Date(a.createdDate)
     );
 
-    const rebalanceRecodesList = await fetchAllRebalanceRecodes(portfolioIds);
-    console.log(rebalanceRecodesList)
+    const rebalanceRecordsList = await fetchAllRebalanceRecords(portfolioIds);
 
     setRebalances(rebalancesList);
-    setrebalanceRecodes(rebalanceRecodesList);
+    setrebalanceRecords(rebalanceRecordsList);
     setPortfolios(portfolioList);
     setPortLoading(false);
   };
@@ -333,7 +331,7 @@ export const PortfolioProvider = ({ children }) => {
       value={{
         portfolios,
         rebalances,
-        rebalanceRecodes,
+        rebalanceRecords,
         fetchPortfolios,
         fetchDelete,
         getPortfolioById,
