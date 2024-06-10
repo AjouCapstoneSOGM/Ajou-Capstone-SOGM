@@ -62,6 +62,17 @@ const AddStockInManual = ({ route, navigation }) => {
         );
       case 2:
         return (
+          <ManualPage2
+            step={step}
+            setStep={setStep}
+            stockList={stockList}
+            setStockList={setStockList}
+          />
+        );
+      case 3:
+        return <ManualAddPage3 stockList={stockList} pfId={pfId} />;
+      case 10:
+        return (
           <ListPage1
             step={step}
             setStep={setStep}
@@ -69,7 +80,7 @@ const AddStockInManual = ({ route, navigation }) => {
             setInterest={setInterest}
           />
         );
-      case 3:
+      case 11:
         return (
           <ListPage2
             step={step}
@@ -79,17 +90,6 @@ const AddStockInManual = ({ route, navigation }) => {
             setStockList={setStockList}
           />
         );
-      case 4:
-        return (
-          <ManualPage2
-            step={step}
-            setStep={setStep}
-            stockList={stockList}
-            setStockList={setStockList}
-          />
-        );
-      case 5:
-        return <ManualAddPage3 stockList={stockList} pfId={pfId} />;
     }
   };
 
