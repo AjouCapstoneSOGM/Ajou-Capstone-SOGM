@@ -5,7 +5,7 @@
     "version": "1.0.1",
     "platforms": ["ios", "android", "web"],
     "android": {
-      "package": "com.sogm.pushalarmtest",
+      "package": "com.sogm.eta",
       "googleServicesFile": "./google-services.json"
     },
     "plugins": [
