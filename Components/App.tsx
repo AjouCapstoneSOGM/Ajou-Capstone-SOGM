@@ -1,18 +1,21 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import * as Font from "expo-font";
-import { LogBox, StatusBar } from "react-native";
+import { LogBox } from "react-native";
+import { setCustomText } from "react-native-global-props";
+import React, { useEffect, useState } from "react";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
-import Settings from "./pages/Settings.js";
-import Information from "./pages/Information.js";
-import MyPage from "./pages/MyPage.js";
-import QnA from "./pages/qna/QnA.js";
-import QnACreate from "./pages/qna/QnaCreate.js";
+import Settings from "./pages/Settings";
+import Information from "./pages/Information";
+import MyPage from "./pages/MyPage";
+import QnA from "./pages/qna/QnA";
+import QnACreate from "./pages/qna/QnaCreate";
 import Login from "./pages/login/login";
 import SocialLogin from "./pages/login/sociallogin";
 import Signup from "./pages/login/signup";
 import ResetPW from "./pages/login/resetpw";
-import Home from "./pages/Home";
+import Home from "./pages/Home/Home";
 import NewsSummary from "./pages/NewsSummary";
 import AlertList from "./pages/rebalance/AlertList";
 import ViewPortfolio from "./pages/portfolio/ViewPortfolio";
@@ -25,11 +28,7 @@ import MakePortfolio from "./pages/make/MakePortfolio";
 import ModifyPortfolio from "./pages/rebalance/ModifyPortfolio";
 import { AuthProvider } from "./utils/AuthContext";
 import { PortfolioProvider } from "./utils/PortfolioContext";
-import { PushNotificationProvider } from "./utils/PushNotificationContext.js";
-
-import { setCustomText } from "react-native-global-props";
-import { useEffect, useState } from "react";
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import { PushNotificationProvider } from "./utils/PushNotificationContext";
 
 const Stack = createStackNavigator();
 function ScreenStack() {
@@ -56,8 +55,14 @@ function ScreenStack() {
       <Stack.Screen name="PortfolioDetails" component={PortfolioDetails} />
       <Stack.Screen name="AddStockInManual" component={AddStockInManual} />
       <Stack.Screen name="ManagementPage" component={ManagementPage} />
-      <Stack.Screen name="RebalanceRecordList" component={RebalanceRecordList} />
-      <Stack.Screen name="ViewRebalanceRecord" component={ViewRebalanceRecord} />
+      <Stack.Screen
+        name="RebalanceRecordList"
+        component={RebalanceRecordList}
+      />
+      <Stack.Screen
+        name="ViewRebalanceRecord"
+        component={ViewRebalanceRecord}
+      />
       <Stack.Screen name="ModifyPortfolio" component={ModifyPortfolio} />
       <Stack.Screen name="MakePortfolio" component={MakePortfolio} />
     </Stack.Navigator>
@@ -65,7 +70,7 @@ function ScreenStack() {
 }
 
 export default function App() {
-  const [fontsLoaded, setFontsLoaded] = useState(false);
+  const [fontsLoaded, setFontsLoaded] = useState<boolean>(false);
 
   useEffect(() => {
     async function loadFonts() {
@@ -95,7 +100,6 @@ export default function App() {
     <AuthProvider>
       <PortfolioProvider>
         <PushNotificationProvider>
-          <StatusBar style="light" />
           <SafeAreaProvider>
             <NavigationContainer>
               <ScreenStack />
