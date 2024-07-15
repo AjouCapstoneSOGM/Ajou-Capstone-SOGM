@@ -3,8 +3,8 @@ import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import { Button, Divider, Icon } from "@rneui/base";
 
 import { SafeAreaView } from "react-native-safe-area-context";
-import AppText from "../../utils/AppText.js";
-import { usePortfolio } from "../../utils/PortfolioContext.js";
+import AppText from "../../utils/AppText";
+import { usePortfolio } from "../../utils/PortfolioContext";
 import { useFocusEffect } from "@react-navigation/native";
 import { timeAgo } from "../../utils/utils.js";
 

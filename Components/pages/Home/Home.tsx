@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
-import AppText from "../../utils/AppText.js";
+import AppText from "../../utils/AppText";
 import { Button, Divider, Icon } from "@rneui/base";
 import HeaderComponent from "../../utils/Header.js";
 import FooterComponent from "../../utils/Footer.js";
@@ -14,7 +14,7 @@ import StockInfo from "../portfolio/StockInfo.js";
 import ModalComponent from "../../utils/Modal.js";
 import urls from "../../utils/urls.js";
 import Loading from "../../utils/Loading.js";
-import { usePortfolio } from "../../utils/PortfolioContext.js";
+import { usePortfolio } from "../../utils/PortfolioContext";
 import OpenUrl from "../../utils/OpenUrl.js";
 
 interface NewsItemData {
@@ -189,7 +189,7 @@ const Home: React.FC = () => {
               <AppText style={{ fontSize: 25, fontWeight: "bold" }}>
                 {FGI}{" "}
               </AppText>
-              <AppText style={{ fontSize: 12 }}>/ 100</AppText>
+              <AppText>/ 100</AppText>
             </AppText>
             <View style={styles.FGIBarContainer}>
               <View
