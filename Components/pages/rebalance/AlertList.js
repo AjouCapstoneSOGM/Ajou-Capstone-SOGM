@@ -6,7 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import AppText from "../../utils/AppText";
 import { usePortfolio } from "../../utils/PortfolioContext";
 import { useFocusEffect } from "@react-navigation/native";
-import { timeAgo } from "../../utils/utils.js";
+import { timeAgo } from "../../utils/utils";
 
 const AlertList = ({ route, navigation }) => {
   const { rebalances, getPortfolioById } = usePortfolio();

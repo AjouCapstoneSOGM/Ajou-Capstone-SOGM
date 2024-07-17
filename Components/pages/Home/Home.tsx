@@ -7,7 +7,7 @@ import FooterComponent from "../../utils/Footer.js";
 import { SearchBar } from "@rneui/themed";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { width, height } from "../../utils/utils.js";
+import { width, height } from "../../utils/utils";
 import { FlatList } from "react-native-gesture-handler";
 import { useSearch } from "../../utils/SearchStock";
 import StockInfo from "../portfolio/StockInfo.js";
