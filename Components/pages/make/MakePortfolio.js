@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, TouchableOpacity, StyleSheet } from "react-native";
 import AutoPortfolio from "./auto/AutoPortfolio.js";
 import ManualPortfolio from "./manual/ManualPortfolio.js";
-import AppText from "../../utils/AppText.js";
+import AppText from "../../utils/AppText";
 import { Button, Divider, Icon } from "@rneui/base";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { width, height } from "../../utils/utils";

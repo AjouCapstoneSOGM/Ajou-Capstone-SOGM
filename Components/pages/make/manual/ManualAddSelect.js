@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { View, TouchableOpacity, StyleSheet } from "react-native";
-import AppText from "../../../utils/AppText.js";
+import AppText from "../../../utils/AppText";
 import { Button, Divider, Icon } from "@rneui/base";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { height, width } from "../../../utils/utils";
-
 
 const ManualAddSelect = ({ step, setStep }) => {
   const [path, setPath] = useState("search");
@@ -12,7 +11,7 @@ const ManualAddSelect = ({ step, setStep }) => {
 
   const handleNextStep = () => {
     if (path === "search") setStep(step + 1);
-    else if (path === "select") setStep(step + 2);
+    else if (path === "select") setStep(10);
   };
 
   return (

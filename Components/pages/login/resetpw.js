@@ -29,7 +29,7 @@ const ResetPW = ({ navigation }) => {
         }
       );
       if (response.status == 200) {
-        Alert.alert("메일 발송", "초기화 비밀번호가 발송되었습니다.");
+        Alert.alert("메일 발송", "초기화를 위한 메일을 발송하였습니다.");
         navigation.goBack();
       } else {
         Alert.alert("잠시 후 다시 시도해 주세요.");

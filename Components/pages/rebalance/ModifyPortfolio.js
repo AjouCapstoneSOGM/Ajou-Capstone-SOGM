@@ -108,7 +108,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
       });
       setRebalances(rebalancing);
       setLoading(false);
-    }, [])
+    }, [portfolio])
   );
 
   const handleSelectedId = (ticker) => {
