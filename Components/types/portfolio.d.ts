@@ -50,7 +50,7 @@ declare global {
     isAuto: boolean;
     riskValue: number;
     createdDate: Date;
-    detail?: PortfolioDetail;
+    detail: PortfolioDetail;
   };
 
   type RebalancingStock = {
