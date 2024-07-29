@@ -1,30 +1,42 @@
 import React from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, ViewStyle } from "react-native";
 import { Button } from "@rneui/themed";
-import { useNavigation, useNavigationState } from "@react-navigation/native";
+import {
+  useNavigation,
+  useNavigationState,
+  NavigationProp,
+} from "@react-navigation/native";
 import { useAuth } from "./AuthContext";
 import { height, width } from "./utils";
 import { usePortfolio } from "./PortfolioContext";
+import { RootStackParamList } from "../types/Navigations";
+
+type NavigationProps = NavigationProp<RootStackParamList>;
 
 const FooterComponent = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProps>();
   const state = useNavigationState((state) => state);
   const currentRoute = state.routes[state.index];
   const { isLoggedIn } = useAuth();
   const { portfolios } = usePortfolio();
 
-  const isPortfolioExist = () => {
+  const isPortfolioExist = (): boolean => {
     if (portfolios?.length > 0) return true;
     else return false;
+  };
+
+  const getButtonStyle = (page: string): ViewStyle => {
+    const baseStyle = styles.buttonContainer;
+    if (currentRoute.name === page) {
+      return { ...baseStyle, backgroundColor: "#FOFOFO" };
+    }
+    return baseStyle;
   };
 
   return (
     <View style={styles.footer}>
       <Button
-        containerStyle={[
-          styles.buttonContainer,
-          currentRoute.name == "MyPage" ? { backgroundColor: "#f0f0f0" } : "",
-        ]}
+        containerStyle={getButtonStyle("MyPage")}
         buttonStyle={styles.footerButton}
         titleStyle={
           currentRoute.name == "MyPage"
@@ -45,10 +57,7 @@ const FooterComponent = () => {
         }}
       />
       <Button
-        containerStyle={[
-          styles.buttonContainer,
-          currentRoute.name == "Home" ? { backgroundColor: "#f0f0f0" } : "",
-        ]}
+        containerStyle={getButtonStyle("Home")}
         buttonStyle={styles.footerButton}
         titleStyle={
           currentRoute.name == "Home"
@@ -67,12 +76,7 @@ const FooterComponent = () => {
         }}
       />
       <Button
-        containerStyle={[
-          styles.buttonContainer,
-          currentRoute.name == "ViewPortfolio"
-            ? { backgroundColor: "#f0f0f0" }
-            : "",
-        ]}
+        containerStyle={getButtonStyle("ViewPortfolio")}
         buttonStyle={styles.footerButton}
         titleStyle={
           currentRoute.name == "ViewPortfolio"
