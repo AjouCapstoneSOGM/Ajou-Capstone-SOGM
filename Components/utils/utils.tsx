@@ -7,7 +7,7 @@ import {
 } from "date-fns";
 import { ko } from "date-fns/locale";
 
-export const deepCopy = (obj) => {
+export function deepCopy<T>(obj: T): T {
   if (obj === null || typeof obj !== "object") {
     return obj;
   }
@@ -17,11 +17,11 @@ export const deepCopy = (obj) => {
     for (let i = 0; i < obj.length; i++) {
       copy[i] = deepCopy(obj[i]);
     }
-    return copy;
+    return copy as T;
   }
 
   if (obj instanceof Object) {
-    const copy = {};
+    const copy = {} as T;
     for (const key in obj) {
       if (obj.hasOwnProperty(key)) {
         copy[key] = deepCopy(obj[key]);
@@ -31,9 +31,9 @@ export const deepCopy = (obj) => {
   }
 
   throw new Error("Unable to copy obj! Its type isn't supported.");
-};
+}
 
-export const arraysEqual = (arr1, arr2) => {
+export function arraysEqual(arr1: [], arr2: []): boolean {
   if (arr1.length !== arr2.length) return false; // 배열의 길이 비교
 
   for (let i = 0; i < arr1.length; i++) {
@@ -52,17 +52,17 @@ export const arraysEqual = (arr1, arr2) => {
   }
 
   return true; // 모든 요소가 같으면 true 반환
-};
+}
 
-export const filteringNumber = (value) => {
+export function filteringNumber(value: string): string {
   return value.replace(/[^0-9]/g, "");
-};
+}
 
-export const removeSpecialChars = (text) => {
+export const removeSpecialChars = (text: string): string => {
   return text.replace(/[^a-zA-Z0-9 가-힣ㄱ-ㅎㅏ-ㅣㆍ]/g, "");
 };
 
-export const colorScale = [
+export const colorScale: string[] = [
   "hsl(348, 100%, 80%)", // 파스텔 핑크,
   "hsl(207, 94%, 80%)", // 파스텔 블루,
   "hsl(48, 100%, 78%)", // 파스텔 옐로우,
@@ -77,19 +77,23 @@ export const colorScale = [
   "#ffd700",
 ];
 
-export const basicDimensions = {
+export const basicDimensions: { height: number; width: number } = {
   // 디자이너가 작업하고 있는 XD파일 스크린의 세로,가로
   height: 800,
   width: 360,
 };
 
-export const height = // 높이 변환 작업
-  (Dimensions.get("screen").height * (1 / basicDimensions.height)).toFixed(2);
+export const height: number = // 높이 변환 작업
+  Number(
+    (Dimensions.get("screen").height * (1 / basicDimensions.height)).toFixed(2)
+  );
 
-export const width = // 가로 변환 작업
-  (Dimensions.get("screen").width * (1 / basicDimensions.width)).toFixed(2);
+export const width: number = // 가로 변환 작업
+  Number(
+    (Dimensions.get("screen").width * (1 / basicDimensions.width)).toFixed(2)
+  );
 
-export const timeAgo = (date) => {
+export const timeAgo = (date: Date): string => {
   const now = new Date();
   // 7일 이내인지 확인
   if (isWithinInterval(date, { start: subDays(now, 7), end: now })) {

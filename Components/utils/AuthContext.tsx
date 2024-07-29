@@ -7,15 +7,15 @@ import {
 } from "./localStorageUtils";
 import urls from "./urls";
 
-const AuthContext = createContext(null);
+const AuthContext = createContext<AuthContextTypes | null>(null);
 
-export const AuthProvider = ({ children }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userName, setUserName] = useState("");
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [userName, setUserName] = useState<string>("");
 
   const login = () => setIsLoggedIn(true);
 
-  const fetchLogout = async () => {
+  const fetchLogout = async (): Promise<{ message: string }> => {
     try {
       const token = await getUsertoken();
       const response = await fetch(`${urls.springUrl}/api/auth/logout`, {
@@ -36,7 +36,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = async () => {
+  const logout = async (): Promise<void> => {
     const result = await fetchLogout();
     if (result.message == "success") {
       setIsLoggedIn(false);
@@ -46,7 +46,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    const checkLoginStatus = async () => {
+    const checkLoginStatus = async (): Promise<void> => {
       const token = await getUsertoken();
       if (token) {
         setIsLoggedIn(true);
@@ -57,7 +57,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    const loadData = async () => {
+    const loadData = async (): Promise<void> => {
       const username = await getUserName();
       setUserName(username);
     };
@@ -72,4 +72,10 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === null) {
+    throw new Error("useAuth must be used within a AuthProvider");
+  }
+  return context;
+};

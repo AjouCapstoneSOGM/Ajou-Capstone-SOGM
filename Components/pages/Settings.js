@@ -15,7 +15,7 @@ import AppText from "../utils/AppText";
 import {
   getRebalanceAlarm,
   setRebalanceAlarm,
-} from "../utils/localStorageUtils.js";
+} from "../utils/localStorageUtils";
 import { usePushNotifications } from "../utils/PushNotificationContext.js";
 
 const Settings = ({ navigation }) => {
@@ -37,7 +37,7 @@ const Settings = ({ navigation }) => {
       setRebalanceAlarm("denied");
     } else {
       const notificationStatus = await Notifications.getPermissionsAsync();
-      console.log(notificationStatus)
+      console.log(notificationStatus);
       if (notificationStatus.granted) {
         setRebalanceAlarm("granted");
         setHasNotificationPermission(true);
