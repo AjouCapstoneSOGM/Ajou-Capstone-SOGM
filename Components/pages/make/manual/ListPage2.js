@@ -15,18 +15,15 @@ import { Button, Divider, Icon } from "@rneui/base";
 import { width, height } from "../../../utils/utils";
 
 const ListPage2 = ({ step, setStep, interest, stockList, setStockList }) => {
-  const {
-    fetchStocksByPortfolioId,
-    fetchRebalanceList,
-    fetchDelete,
-  } = usePortfolio();
+  const { fetchStocksByPortfolioId, fetchRebalanceList, fetchDelete } =
+    usePortfolio();
   const [loading, setLoading] = useState(true);
   const [pfId, setPfId] = useState("");
   const [portfolio, setPortfolio] = useState([]);
   const [initRebalance, setInitRebalance] = useState([]);
 
   const handleNextStep = () => {
-    setStep(step + 1);
+    setStep(2);
   };
 
   const handleSelectedStocks = (stock) => {
@@ -53,14 +50,14 @@ const ListPage2 = ({ step, setStep, interest, stockList, setStockList }) => {
         setInitRebalance(rebalance[0].rebalancings);
         setLoading(false);
       };
-      const loadAndDelete = async () =>{
+      const loadAndDelete = async () => {
         await loadPortfolio();
         await fetchDelete(pfId);
-      }
+      };
       loadAndDelete();
     }
   }, [pfId]);
-  
+
   useEffect(() => {
     const fetchAutoInfo = async () => {
       try {
@@ -111,23 +108,42 @@ const ListPage2 = ({ step, setStep, interest, stockList, setStockList }) => {
         </View>
       </View>
     );
-    
+
   const result3 = () => {
     return (
       <View style={styles.pageContainer}>
-        <ScrollView>
-          {initRebalance.map((stock, index) => (
-            <TouchableOpacity
-              key={index}
-              style={styles.labelItemContent}
-              onPress={() => handleSelectedStocks(stock)}
-            >
-              <View style={styles.itemNameBox}>
-                <AppText style={styles.itemName}>{stock.name}</AppText>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
+        <TouchableOpacity onPress={console.log("init: ", initRebalance)} />
+        <View style={styles.itemContainer}>
+          <View style={styles.selectedContainer}>
+            <ScrollView>
+              {initRebalance.map((stock, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.suggestion}
+                  onPress={() => handleSelectedStocks(stock)}
+                >
+                  <View style={{ flexDirection: "row" }}>
+                    <AppText style={{ color: "#f0f0f0" }}>
+                      {stock.name}
+                      {"  "}
+                    </AppText>
+                    <AppText style={{ fontSize: 13, color: "#888" }}>
+                      {stock.ticker}
+                    </AppText>
+                  </View>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                    }}
+                  >
+                    <AppText style={{ fontSize: 13, color: "#fff" }}>{stock.price.toLocaleString()} 원</AppText>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        </View>
       </View>
     );
   };
@@ -135,9 +151,7 @@ const ListPage2 = ({ step, setStep, interest, stockList, setStockList }) => {
   return (
     <View style={styles.container}>
       <View style={styles.textContainer}>
-        <AppText style={styles.titleText}>
-          추가하실 종목을 선택해주세요
-        </AppText>
+        <AppText style={styles.titleText}>추가하실 종목을 선택해주세요</AppText>
       </View>
       <View style={styles.contentsContainer}>
         <View style={styles.selectedContainer}>
@@ -147,7 +161,7 @@ const ListPage2 = ({ step, setStep, interest, stockList, setStockList }) => {
               style={styles.selectedItem}
               onPress={() => handleSelectedStocks(item)}
             >
-              <AppText>{item.name} </AppText>
+              <AppText>{item.name}</AppText>
               <Icon name="close" size={12} color="#222" />
             </TouchableOpacity>
           ))}
@@ -229,6 +243,10 @@ const styles = StyleSheet.create({
     paddingBottom: height * 5,
     backgroundColor: "#333",
   },
+  itemContainer: {
+    flex: 1,
+    backgroundColor: "#333",
+  },
   selectedContainer: {
     paddingVertical: 5,
     flexDirection: "row",
@@ -241,5 +259,14 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     padding: 7,
     margin: 5,
+  },
+  suggestion: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 10,
+    marginHorizontal: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#434343",
   },
 });

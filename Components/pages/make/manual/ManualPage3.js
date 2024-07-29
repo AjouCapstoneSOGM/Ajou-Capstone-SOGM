@@ -14,13 +14,21 @@ import { usePortfolio } from "../../../utils/PortfolioContext";
 const ManualPage3 = ({ stockList }) => {
   const navigation = useNavigation();
   const { loadData } = usePortfolio();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [selectedId, setSelectedId] = useState();
   const [pfId, setPfId] = useState("");
 
   const handleSelectedId = (index) => {
     if (selectedId === index) setSelectedId(null);
     else setSelectedId(index);
+  };
+
+  const getTotalPrice = () => {
+    const totalPrice = stockList.stocks?.reduce(
+      (acc, cur) => acc + cur.currentPrice * cur.quantity,
+      0
+    );
+    return isNaN(totalPrice) ? 0 : totalPrice;
   };
 
   const gotoDetailPage = async () => {
@@ -50,7 +58,8 @@ const ManualPage3 = ({ stockList }) => {
           },
           body: JSON.stringify({
             country: "KOR",
-            stocks: stockList.map((stock) => ({
+            cash: stockList.cash,
+            stocks: stockList.stocks?.map((stock) => ({
               ticker: stock.ticker,
               isBuy: true,
               quantity: stock.quantity,
@@ -74,7 +83,7 @@ const ManualPage3 = ({ stockList }) => {
 
   useEffect(() => {
     fetchManualInfo();
-    stockList.sort(
+    stockList.stocks?.sort(
       (a, b) => b.currentPrice * b.quantity - a.currentPrice * a.quantity
     );
   }, [stockList]);
@@ -102,8 +111,8 @@ const ManualPage3 = ({ stockList }) => {
         <View style={styles.chartContainer}>
           <PortfolioPieChart
             data={{
-              currentCash: 0,
-              stocks: stockList.map((stock) => ({
+              currentCash: stockList.cash,
+              stocks: stockList.stocks?.map((stock) => ({
                 companyName: stock.name,
                 quantity: stock.quantity,
                 currentPrice: stock.currentPrice,
@@ -112,6 +121,7 @@ const ManualPage3 = ({ stockList }) => {
             selectedId={selectedId}
             size={0.6 * width}
             mode={"dark"}
+            type={"stock"}
           />
         </View>
         <View style={styles.column}>
@@ -127,53 +137,28 @@ const ManualPage3 = ({ stockList }) => {
             type="clear"
             containerStyle={styles.columnName}
             titleStyle={{ color: "#808080", fontSize: 12 }}
-            onPress={() => {
-              handleSort("name");
-            }}
-            icon={{
-              type: "antdesign",
-              name: "caretdown",
-              color: "#808080",
-              size: 11,
-            }}
-            iconPosition="right"
+            onPress={() => {}}
           />
           <Button
             title="수량"
             type="clear"
             containerStyle={styles.columnNumber}
             titleStyle={{ color: "#808080", fontSize: 12 }}
-            onPress={() => {
-              handleSort("quantity");
-            }}
-            icon={{
-              type: "antdesign",
-              name: "caretdown",
-              color: "#808080",
-              size: 11,
-            }}
-            iconPosition="right"
+            onPress={() => {}}
           />
           <Button
-            title="한 주당 금액"
+            title="금액"
             type="clear"
             containerStyle={styles.columnPrice}
             titleStyle={{ color: "#808080", fontSize: 12 }}
             onPress={() => {
               handleSort("price");
             }}
-            icon={{
-              type: "antdesign",
-              name: "caretdown",
-              color: "#808080",
-              size: 11,
-            }}
-            iconPosition="right"
           />
         </View>
         <ScrollView style={styles.labelContainer}>
           {stockList &&
-            stockList.map((stock, index) => (
+            stockList.stocks?.map((stock, index) => (
               <TouchableOpacity
                 key={index}
                 style={styles.labelItemContent}
@@ -196,7 +181,33 @@ const ManualPage3 = ({ stockList }) => {
                 </AppText>
               </TouchableOpacity>
             ))}
+          <TouchableOpacity
+            style={styles.labelItemContent}
+            onPress={() => handleSelectedId(stockList.stocks?.length)}
+          >
+            <Icon
+              name="checkcircle"
+              type="antdesign"
+              color="#ccc"
+              size={15}
+              style={{ marginRight: 5 }}
+            />
+            <AppText style={styles.itemName}>현금</AppText>
+            <AppText style={styles.itemNumber}></AppText>
+            <AppText style={styles.itemPrice}>
+              {Number(stockList.cash).toLocaleString()}원
+            </AppText>
+          </TouchableOpacity>
         </ScrollView>
+        <View style={styles.totalPriceContainer}>
+          <AppText style={{ color: "#ccc" }}>총 가격</AppText>
+          <AppText style={{ color: "#ccc" }}>
+            <AppText style={{ color: "#f0f0f0", fontSize: 20 }}>
+              {(getTotalPrice() + stockList.cash).toLocaleString()}
+            </AppText>{" "}
+            원
+          </AppText>
+        </View>
       </View>
       <View style={styles.nextButtonContainer}>
         <Button
@@ -281,6 +292,14 @@ const styles = StyleSheet.create({
     color: "#f0f0f0",
     textAlign: "center",
     fontSize: 15,
+  },
+  totalPriceContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-end",
+    borderBottomColor: "#434343",
+    borderBottomWidth: 1,
+    paddingVertical: 10,
   },
   nextButton: {
     backgroundColor: "#6262e8",

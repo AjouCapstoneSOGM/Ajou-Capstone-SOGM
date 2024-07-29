@@ -4,9 +4,56 @@ import { getUsertoken } from "../../../utils/localStorageUtils";
 import urls from "../../../utils/urls";
 import Loading from "../../../utils/Loading";
 import AppText from "../../../utils/AppText";
+import { Button } from "@rneui/base";
+import { usePortfolio } from "../../../utils/PortfolioContext";
+import { useNavigation, CommonActions } from "@react-navigation/native";
+import { height, width } from "../../../utils/utils";
 
 const ManualPage3 = ({ stockList, pfId }) => {
+  const navigation = useNavigation();
   const [loading, setLoading] = useState(true);
+  const { reloadPortfolio } = usePortfolio();
+
+  const gotoDetailPage = async () => {
+    await reloadPortfolio(pfId);
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 2,
+        routes: [
+          { name: "Home" },
+          { name: "ViewPortfolio" },
+          { name: "PortfolioDetails", params: { id: pfId } },
+        ],
+      })
+    );
+  };
+  const fetchCashIn = async () => {
+    try {
+      const token = await getUsertoken();
+      const response = await fetch(
+        `${urls.springUrl}/api/portfolio/${pfId}/deposit`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            cash: stockList.cash,
+          }),
+        }
+      );
+      if (response.ok) {
+        console.log("success");
+        return "success";
+      } else {
+        throw new Error("cash in error");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      return "fail";
+    }
+  };
 
   const fetchAddManual = async (stock) => {
     try {
@@ -37,13 +84,15 @@ const ManualPage3 = ({ stockList, pfId }) => {
   };
 
   const handleFetchAddManual = async () => {
-    const promises = stockList.map((stock) => {
+    const promises = stockList.stocks?.map((stock) => {
       return fetchAddManual(stock);
     });
     await Promise.all(promises);
   };
+
   useEffect(() => {
     const fetchData = async () => {
+      await fetchCashIn();
       await handleFetchAddManual();
       setLoading(false);
     };
@@ -71,6 +120,13 @@ const ManualPage3 = ({ stockList, pfId }) => {
           종목 추가가 완료되었어요!{"\n"}
         </AppText>
         <View style={styles.contentsContainer}></View>
+      </View>
+      <View style={styles.nextButtonContainer}>
+        <Button
+          buttonStyle={styles.nextButton}
+          title="상세 정보로 이동"
+          onPress={gotoDetailPage}
+        />
       </View>
     </View>
   );
@@ -127,5 +183,13 @@ const styles = StyleSheet.create({
     color: "#f0f0f0",
     textAlign: "center",
     fontSize: 15,
+  },nextButton: {
+    backgroundColor: "#6262e8",
+    borderRadius: 10,
+    height: height * 50,
+  },
+  nextButtonContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: height * 5,
   },
 });

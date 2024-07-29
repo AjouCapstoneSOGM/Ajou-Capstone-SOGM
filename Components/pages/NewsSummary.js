@@ -2,16 +2,16 @@ import React, { useEffect, useState } from "react";
 import { View, StyleSheet } from "react-native";
 import urls from "../utils/urls.js";
 import { ScrollView } from "react-native-gesture-handler";
-import AppText from "../utils/AppText.js";
+import AppText from "../utils/AppText";
 import Loading from "../utils/Loading.js";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button, Icon } from "@rneui/base";
-import { getUsertoken } from "../utils/localStorageUtils.js";
+import { Button, Icon, color } from "@rneui/base";
+import { getUsertoken } from "../utils/localStorageUtils";
 
 const NewsSummary = ({ route, navigation }) => {
   const [loading, setLoading] = useState(true);
   const [summary, setSummary] = useState([]);
-  const { ticker } = route.params;
+  const { ticker, name } = route.params;
   const fetchNewsSummary = async (ticker) => {
     try {
       const token = await getUsertoken();
@@ -41,7 +41,6 @@ const NewsSummary = ({ route, navigation }) => {
       throw error;
     }
   };
-
   const isNewsExist = () => {
     if (summary.length > 0) {
       return true;
@@ -89,6 +88,9 @@ const NewsSummary = ({ route, navigation }) => {
         <AppText style={{ fontSize: 30, fontWeight: "bold" }}>뉴스</AppText>
       </View>
       <View style={styles.newsContainer}>
+        <View style={styles.nameHeader}>
+          <AppText style={{ fontSize: 20, color: "#f0f0f0" }}>{name}</AppText>
+        </View>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <AppText style={{ color: "#888", fontWeight: "bold" }}>
             최근 한 달간의 뉴스가 ChatGPT를 통하여 요약되었습니다.{"  "}
@@ -136,6 +138,9 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 10,
     backgroundColor: "#333",
+  },
+  nameHeader: {
+    flexDirection: "row",
   },
   newsContent: {
     padding: 5,

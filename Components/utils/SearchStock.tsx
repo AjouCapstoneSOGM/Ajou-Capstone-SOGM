@@ -3,11 +3,23 @@ import debounce from "lodash.debounce";
 import { getUsertoken } from "./localStorageUtils";
 import urls from "./urls";
 
-export const useSearch = () => {
-  const [query, setQuery] = useState("");
-  const [suggestions, setSuggestions] = useState([]);
+interface SuggestionItem {
+  exchange: string;
+  name: string;
+  ticker: string;
+}
 
-  const fetchSuggestions = async (query) => {
+interface SearchHook {
+  query: string;
+  setQuery: React.Dispatch<React.SetStateAction<string>>;
+  suggestions: SuggestionItem[];
+}
+
+export const useSearch = (): SearchHook => {
+  const [query, setQuery] = useState<string>("");
+  const [suggestions, setSuggestions] = useState<SuggestionItem[]>([]);
+
+  const fetchSuggestions = async (query: string): Promise<void> => {
     if (query.length < 2) {
       setSuggestions([]);
       return;
@@ -35,7 +47,7 @@ export const useSearch = () => {
   };
 
   const debouncedFetchSuggestions = useRef(
-    debounce((query) => fetchSuggestions(query), 500)
+    debounce((query: string) => fetchSuggestions(query), 500)
   ).current;
 
   useEffect(() => {

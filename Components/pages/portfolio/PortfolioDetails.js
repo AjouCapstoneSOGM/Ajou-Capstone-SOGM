@@ -18,11 +18,10 @@ import { width, height, filteringNumber, colorScale } from "../../utils/utils";
 import StockInfo from "./StockInfo";
 import Loading from "../../utils/Loading";
 import ModalComponent from "../../utils/Modal";
-import NotificationBubble from "../../utils/Notification";
 
 const PortfolioDetails = ({ route, navigation }) => {
   const stocksLength = 10;
-  const { getPortfolioById, portfolios, loadData } = usePortfolio();
+  const { getPortfolioById, portfolios, reloadPortfolio } = usePortfolio();
   const [portfolio, setPortfolio] = useState({
     id: null,
     name: "",
@@ -37,10 +36,16 @@ const PortfolioDetails = ({ route, navigation }) => {
   const [selectedId, setSelectedId] = useState(null);
   const [alertExist, setAlertExist] = useState(false);
   const [infoVisible, setInfoVisible] = useState(false);
+  const [cashVisible, setCashVisible] = useState(false);
   const [stockInfoVisible, setStockInfoVisible] = useState(false);
   const [modifyQuantity, setModifyQuantity] = useState(0);
   const [modifyPrice, setModifyPrice] = useState(0);
   const [modifyBuy, setModifyBuy] = useState(true);
+  const [modifyCash, setModifyCash] = useState(0);
+
+  const toggleCashModal = () => {
+    setCashVisible(!cashVisible);
+  };
 
   const toggleInfoModal = () => {
     setInfoVisible(!infoVisible);
@@ -72,6 +77,7 @@ const PortfolioDetails = ({ route, navigation }) => {
         }
       );
       if (response.ok) {
+        return true;
       } else {
         console.error("Error occured");
       }
@@ -84,6 +90,19 @@ const PortfolioDetails = ({ route, navigation }) => {
     setModifyBuy(true);
     setModifyPrice(0);
     setModifyQuantity(0);
+  };
+
+  const handleModify = async () => {
+    setLoading(true);
+    await fetchModifyStockManual();
+    await reloadPortfolio(route.params.id);
+    resetModifyData();
+    toggleInfoModal();
+    setLoading(false);
+  };
+
+  const handleCash = (value) => {
+    setModifyCash(Number(filteringNumber(value)));
   };
 
   const handleQuantityChange = (newQuantity) => {
@@ -108,6 +127,75 @@ const PortfolioDetails = ({ route, navigation }) => {
       Number(modifyQuantity) > Number(portfolio.stocks[selectedId].quantity)
     )
       setModifyQuantity(portfolio.stocks[selectedId].quantity);
+  };
+
+  const handleCashIn = async () => {
+    const result = await fetchCashIn();
+    setModifyCash(0);
+    toggleCashModal();
+    await reloadPortfolio(route.params.id);
+  };
+
+  const handleCashOut = async () => {
+    const result = await fetchCashOut();
+    setModifyCash(0);
+    toggleCashModal();
+    await reloadPortfolio(route.params.id);
+  };
+
+  const fetchCashIn = async () => {
+    try {
+      const token = await getUsertoken();
+      const response = await fetch(
+        `${urls.springUrl}/api/portfolio/${portfolio.id}/deposit`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            cash: modifyCash,
+          }),
+        }
+      );
+      if (response.ok) {
+        console.log("success");
+        return "success";
+      } else {
+        throw new Error("cash in error");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      return "fail";
+    }
+  };
+
+  const fetchCashOut = async () => {
+    try {
+      const token = await getUsertoken();
+      const response = await fetch(
+        `${urls.springUrl}/api/portfolio/${portfolio.id}/withdraw`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            cash: modifyCash,
+          }),
+        }
+      );
+      if (response.ok) {
+        return { result: "success" };
+      } else {
+        throw new Error("cash out error");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      return { result: "fail" };
+    }
   };
 
   const getAlertExists = async (id) => {
@@ -277,23 +365,42 @@ const PortfolioDetails = ({ route, navigation }) => {
             </AppText>
             {getPortfolioROI()}
           </View>
-          <View style={styles.outlineDetailBox}>
-            <AppText style={{ fontWeight: "bold", color: "#f0f0f0" }}>
-              현금
-            </AppText>
-            <AppText style={{ color: "#f0f0f0" }}>
-              {portfolio.currentCash.toLocaleString()} 원
-            </AppText>
+          <View style={[styles.outlineDetailBox, { flexDirection: "row" }]}>
+            <View style={{ alignItems: "center" }}>
+              <AppText style={{ fontWeight: "bold", color: "#f0f0f0" }}>
+                현금
+              </AppText>
+              <AppText style={{ color: "#f0f0f0" }}>
+                {portfolio.currentCash.toLocaleString()} 원
+              </AppText>
+            </View>
+            {!portfolio.auto && (
+              <Button
+                containerStyle={{ marginHorizontal: -5 }}
+                type="clear"
+                onPress={() => {
+                  setCashVisible(true);
+                }}
+                icon={{
+                  name: "swap",
+                  type: "antdesign",
+                  color: "#f0f0f0",
+                  size: 17,
+                }}
+              />
+            )}
           </View>
         </View>
       </View>
       <View style={styles.chartContainer}>
         <PortfolioPieChart
           data={portfolio}
-          cash={portfolio}
-          selectedId={selectedId}
+          selectedId={
+            selectedId !== null ? selectedId : portfolio?.stocks.length
+          }
           size={width * 0.6}
           mode={"light"}
+          type={"stock"}
         />
         {!portfolio.auto && (
           <TouchableOpacity
@@ -468,6 +575,7 @@ const PortfolioDetails = ({ route, navigation }) => {
                         onPress={() => {
                           navigation.navigate("NewsSummary", {
                             ticker: item.ticker,
+                            name: item.companyName,
                           });
                         }}
                       >
@@ -567,18 +675,58 @@ const PortfolioDetails = ({ route, navigation }) => {
             </View>
             <Button
               buttonStyle={styles.submitButton}
-              title="반영"
+              title="확인"
               disabled={modifyQuantity == 0}
-              onPress={async () => {
-                await fetchModifyStockManual();
-                resetModifyData();
-                await loadData();
-                toggleInfoModal();
+              onPress={() => {
+                handleModify();
               }}
             />
           </ModalComponent>
         </React.Fragment>
       )}
+      <ModalComponent isVisible={cashVisible} onToggle={toggleCashModal}>
+        <AppText
+          style={{
+            position: "absolute",
+            top: 0,
+            color: "#888",
+            fontSize: 20,
+            fontWeight: "bold",
+          }}
+        >
+          현금 입출금
+        </AppText>
+        <View style={styles.content}>
+          <View style={styles.contentsItem}>
+            <TextInput
+              value={String(modifyCash)}
+              onChangeText={(value) => handleCash(value)}
+              style={styles.inputQuantity}
+              keyboardType="numeric"
+            />
+          </View>
+        </View>
+        <View style={{ flexDirection: "row" }}>
+          <Button
+            containerStyle={[{ flex: 1, marginHorizontal: 5 }]}
+            buttonStyle={styles.submitButton}
+            title="입금"
+            disabled={modifyCash == 0}
+            onPress={() => {
+              handleCashIn();
+            }}
+          />
+          <Button
+            containerStyle={[{ flex: 1, marginHorizontal: 5 }]}
+            buttonStyle={styles.submitButton}
+            title="출금"
+            disabled={modifyCash == 0}
+            onPress={() => {
+              handleCashOut();
+            }}
+          />
+        </View>
+      </ModalComponent>
     </SafeAreaView>
   );
 };
@@ -607,6 +755,7 @@ const styles = StyleSheet.create({
   },
   outlineDetailBox: {
     width: "50%",
+    justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
     paddingRight: 12,
@@ -711,8 +860,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     alignItems: "center",
     paddingBottom: 20,
-    borderBottomColor: "#434343",
-    borderBottomWidth: 1,
   },
   quantityContainer: {
     flex: 1.1,

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import { Button, Divider, Icon } from "@rneui/base";
 
@@ -6,29 +6,40 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import AppText from "../../utils/AppText";
 import { usePortfolio } from "../../utils/PortfolioContext";
 import { useFocusEffect } from "@react-navigation/native";
-import { timeAgo } from "../../utils/utils";
+import Loading from "../../utils/Loading";
 
-const AlertList = ({ route, navigation }) => {
-  const { rebalances, getPortfolioById } = usePortfolio();
-  const [rebalanceList, setRebalanceList] = useState([]);
-
-  const getIsBuyCount = (stocks) => {
-    const buyCount = stocks.filter((item) => item.isBuy === true).length;
-    const sellCount = stocks.length - buyCount;
-    return { buyCount, sellCount };
-  };
+const RebalanceRecordList = ({ route, navigation }) => {
+  const { rebalanceRecords } = usePortfolio();
+  const [loading, setLoading] = useState(true);
+  const [rebalanceRecordList, setrebalanceRecordList] = useState([]);
+  const [tickerName, setTickerName] = useState([]);
 
   useFocusEffect(
     useCallback(() => {
       if (route.params) {
-        setRebalanceList(
-          rebalances.filter((rebalance) => rebalance.pfId === route.params.pfId)
+        const list = rebalanceRecords.filter(
+          (rebalanceRecords) => rebalanceRecords.pfId === route.params.id
         );
+        setrebalanceRecordList(
+          list.sort((a, b) => new Date(b.date) - new Date(a.date))
+        );
+        const name = route.params.stocks.reduce((acc, item) => {
+          acc[item.ticker] = item.companyName;
+          return acc;
+        }, {});
+        setTickerName(name);
       } else {
-        setRebalanceList(rebalances);
+        setrebalanceRecordList(rebalanceRecords);
       }
+      setLoading(false);
+      //console.log("rblist: ", rebalanceRecordList);
     }, [])
   );
+  useEffect(() => {
+    //console.log("rblist: ", rebalanceRecordList);
+  }, []);
+
+  if (loading) return <Loading />;
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -41,44 +52,41 @@ const AlertList = ({ route, navigation }) => {
         />
       </View>
       <View style={styles.textContainer}>
-        <AppText style={{ fontSize: 30, fontWeight: "bold" }}>알림</AppText>
+        <AppText style={{ fontSize: 30, fontWeight: "bold" }}>
+          리밸런싱 내역
+        </AppText>
       </View>
       <ScrollView style={styles.alertList}>
-        {rebalanceList.map((item, index) => {
-          const { buyCount, sellCount } = getIsBuyCount(item.rebalancings);
+        {rebalanceRecordList.map((item, index) => {
           return (
             <View key={index}>
               <TouchableOpacity
                 style={styles.alertContainer}
                 onPress={async () => {
-                  navigation.navigate("ModifyPortfolio", {
+                  navigation.navigate("ViewRebalanceRecord", {
                     pfId: item.pfId,
-                    rnId: item.rnId,
-                    rebalancing: item.rebalancings,
-                    portfolio: await getPortfolioById(item.pfId),
+                    date: item.date,
+                    records: item.records,
+                    tickerName: tickerName,
                   });
                 }}
               >
                 <View style={styles.alertHeader}>
                   <AppText>
                     <Icon
-                      name="settings-sharp"
+                      name="book"
                       type="ionicon"
                       color="#f0f0f0"
                       size={16}
                     />
                     <AppText style={{ fontSize: 13, color: "#808080" }}>
                       {"  "}
-                      리밸런싱 알림
+                      리밸런싱 내역
                     </AppText>
-                  </AppText>
-                  <AppText style={{ fontSize: 13, color: "#808080" }}>
-                    {timeAgo(item.createdDate)}
                   </AppText>
                 </View>
                 <AppText style={styles.alertContent}>
-                  {item.portfolioName} 에서 {buyCount}개의 매수, {sellCount}
-                  개의 매도 알림이 생성되었어요
+                  {item.date.replace("T", " ")}에 진행한 리밸런싱 내역입니다.
                 </AppText>
                 <View style={styles.moveButton}>
                   <AppText style={{ color: "#999" }}>
@@ -132,4 +140,5 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
   },
 });
-export default AlertList;
+
+export default RebalanceRecordList;

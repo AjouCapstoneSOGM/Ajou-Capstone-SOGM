@@ -20,7 +20,6 @@ import ModalComponent from "../../utils/Modal";
 const ModifyPortfolio = ({ route, navigation }) => {
   const { pfId, rnId, rebalancing, portfolio } = route.params;
   const { fetchModify, loadData } = usePortfolio();
-  const [portfolioAfter, setPortfolioAfter] = useState([]);
   const [rebalances, setRebalances] = useState([]);
   const [selectedId, setSelectedId] = useState();
   const [loading, setLoading] = useState(true);
@@ -66,11 +65,13 @@ const ModifyPortfolio = ({ route, navigation }) => {
         if (stock.ticker == order.ticker) {
           stock.quantity += order.quantity * (order.isBuy ? 1 : -1);
           afterPortfolio.detail.currentCash +=
-            order.quantity * order.price * (order.isBuy ? -1 : 1);
+            order.quantity *
+            order.price *
+            (order.isBuy ? -1 : 1) *
+            (portfolio.auto ? 1 : 0);
         }
       });
     });
-
     return afterPortfolio;
   };
 
@@ -99,17 +100,15 @@ const ModifyPortfolio = ({ route, navigation }) => {
     useCallback(() => {
       const totalPrice = getTotalPrice(portfolio);
       rebalancing.forEach((item, index) => {
+        const price = item.buyPrice * item.buyQuantity * (item.isBuy ? 1 : -1);
         item.index = index;
         item.buyPrice = item.price;
         item.buyQuantity = item.quantity;
-        item.rateDiff = (
-          (item.buyPrice * item.buyQuantity * (item.isBuy ? 1 : -1) * 100) /
-          totalPrice
-        ).toFixed(2);
+        item.rateDiff = ((price * 100) / totalPrice).toFixed(2);
       });
       setRebalances(rebalancing);
       setLoading(false);
-    }, [])
+    }, [portfolio])
   );
 
   const handleSelectedId = (ticker) => {
@@ -148,8 +147,12 @@ const ModifyPortfolio = ({ route, navigation }) => {
 
   const handleModify = async () => {
     const rebalanceData = updateKey([...rebalances]);
+    const filteredRebalanceData = rebalanceData.filter((item, index) => {
+      return checkList.includes(index);
+    });
+
     setLoading(true);
-    await fetchModify(rebalanceData, pfId, rnId);
+    await fetchModify(filteredRebalanceData, pfId, rnId);
     await loadData();
     setLoading(false);
     Alert.alert("반영 완료", "반영이 완료되었습니다.", [
@@ -213,6 +216,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
               selectedId={selectedId}
               size={width * 0.6}
               mode={"light"}
+              type={"stock"}
               animate={false}
             />
           </View>
@@ -353,7 +357,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
                     onChangeText={(text) => handleChangeQuantity(index, text)}
                     placeholder={item.quantity.toString()}
                     placeholderTextColor="#777"
-                    keyboardType="number-pad"
+                    keyboardType="numeric"
                   />
                   <AppText
                     style={{
@@ -370,7 +374,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
                   onChangeText={(text) => handleChangePrices(index, text)}
                   placeholder={item.price.toString()}
                   placeholderTextColor="#777"
-                  keyboardType="number-pad"
+                  keyboardType="numeric"
                 />
                 <AppText
                   style={[
@@ -391,6 +395,7 @@ const ModifyPortfolio = ({ route, navigation }) => {
           buttonStyle={styles.nextButton}
           title="반영"
           onPress={() => handleModify()}
+          disabled={portfolio.auto && checkList?.length !== rebalances?.length}
         />
       </View>
       <ModalComponent isVisible={isVisible} onToggle={toggleModal}>

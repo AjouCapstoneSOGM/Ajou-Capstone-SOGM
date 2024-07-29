@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { usePortfolio } from "../../utils/PortfolioContext";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Icon, Button } from "@rneui/base";
+import { Icon, Button, ButtonGroup } from "@rneui/base";
 import PagerView from "react-native-pager-view";
 
 import AppText from "../../utils/AppText";
@@ -28,7 +28,45 @@ const PortfolioList = ({ navigation }) => {
   const [nameModalVisible, setNameModalVisible] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [changedName, setChangedName] = useState("");
+  const [selectedChartType, setSelectedChartType] = useState(0);
+  const [allPortfolioData, setAllPortfolioData] = useState({});
   const pagerRef = useRef(null);
+
+  const getPortfolioRoiData = () => {
+    const roiData = portfolios.map((portfolio) => {
+      return { name: portfolio.name, rate: getTotalROI(portfolio.detail) };
+    });
+
+    return roiData;
+  };
+  const consolidatePortfolios = () => {
+    const totalCash = portfolios.reduce(
+      (acc, portfolio) => acc + portfolio.detail.currentCash,
+      0
+    );
+    const stockList = portfolios
+      .map((portfolio) => portfolio.detail.stocks)
+      .flat();
+    const consolidated = stockList.reduce((acc, item) => {
+      const existing = acc.find((p) => p.ticker === item.ticker);
+      if (existing) {
+        existing.quantity += item.quantity;
+        existing.averageCost =
+          (existing.averageCost * (existing.quantity - item.quantity) +
+            item.averageCost * item.quantity) /
+          existing.quantity;
+      } else {
+        acc.push({ ...item });
+      }
+      return acc;
+    }, []);
+
+    consolidated.sort(
+      (a, b) => b.quantity * b.currentPrice - a.quantity * a.currentPrice
+    );
+    const result = { currentCash: totalCash, stocks: consolidated };
+    return result;
+  };
 
   const handleChangedName = (value) => {
     if (value.length < 20) setChangedName(removeSpecialChars(value));
@@ -109,6 +147,7 @@ const PortfolioList = ({ navigation }) => {
   };
 
   useEffect(() => {
+    setAllPortfolioData(consolidatePortfolios());
     if (portfolios[selectedIndex])
       setChangedName(portfolios[selectedIndex]?.name);
   }, [selectedIndex]);
@@ -130,43 +169,72 @@ const PortfolioList = ({ navigation }) => {
         </AppText>
       </View>
       {portfolioExist() && (
-        <View style={styles.chartContainer}>
-          <Button
-            containerStyle={{ zIndex: 1 }}
-            type="clear"
-            onPress={() => {
-              handlePagePrev();
+        <React.Fragment>
+          <ButtonGroup
+            buttons={["자산별", "종목별"]}
+            selectedIndex={selectedChartType}
+            onPress={(value) => {
+              setSelectedChartType(value);
             }}
-            icon={{
-              name: "caretleft",
-              type: "antdesign",
-              color: "#333",
-              size: 30,
-            }}
-            disabled={selectedIndex == 0}
-            disabledStyle={{ opacity: 0 }}
+            selectedButtonStyle={{ backgroundColor: "#333" }}
+            containerStyle={{ borderRadius: 5 }}
           />
-          {/* <PortfolioPieChart
-            data={portfolios[selectedIndex]?.detail}
-            size={width * 0.9}
-            mode={"light"}
-          /> */}
-          <Button
-            containerStyle={{ zIndex: 1 }}
-            type="clear"
-            onPress={() => {
-              handlePageNext();
-            }}
-            icon={{
-              name: "caretright",
-              type: "antdesign",
-              color: "#333",
-              size: 30,
-            }}
-            disabled={selectedIndex == portfolios?.length - 1}
-            disabledStyle={{ opacity: 0 }}
-          />
-        </View>
+          <View style={styles.chartContainer}>
+            {selectedChartType === 0 && (
+              <Button
+                containerStyle={{ zIndex: 1 }}
+                type="clear"
+                onPress={() => {
+                  handlePagePrev();
+                }}
+                icon={{
+                  name: "caretleft",
+                  type: "antdesign",
+                  color: "#333",
+                  size: 30,
+                }}
+                disabled={selectedIndex == 0}
+                disabledStyle={{ opacity: 0 }}
+              />
+            )}
+            <PortfolioPieChart
+              data={
+                selectedChartType == 0
+                  ? portfolios //포트폴리오별
+                  : allPortfolioData //종목별
+              }
+              selectedId={selectedIndex}
+              size={
+                selectedChartType == 0
+                  ? width * 0.8 //포트폴리오별
+                  : width * 0.6 //종목별
+              }
+              mode={"light"}
+              type={
+                selectedChartType == 0
+                  ? "portfolio" //포트폴리오별
+                  : "stock" //종목별
+              }
+            />
+            {selectedChartType === 0 && (
+              <Button
+                containerStyle={{ zIndex: 1 }}
+                type="clear"
+                onPress={() => {
+                  handlePageNext();
+                }}
+                icon={{
+                  name: "caretright",
+                  type: "antdesign",
+                  color: "#333",
+                  size: 30,
+                }}
+                disabled={selectedIndex == portfolios?.length}
+                disabledStyle={{ opacity: 0 }}
+              />
+            )}
+          </View>
+        </React.Fragment>
       )}
       {portfolioExist() && (
         <React.Fragment>
@@ -180,132 +248,139 @@ const PortfolioList = ({ navigation }) => {
               </AppText>
             ))}
           </View>
-          <PagerView
-            style={styles.listContainer}
-            initialPage={0}
-            onPageSelected={handlePageChange}
-            ref={pagerRef}
-          >
-            {portfolios.map((portfolio, index) => {
-              const roi = getTotalROI(portfolio.detail);
-              const roiFormatted = roi > 0 ? `+${roi}` : `${roi}`;
-              const currentCash = portfolio.detail.currentCash;
-              return (
-                <View key={index}>
-                  <TouchableOpacity
-                    style={styles.portfolio}
-                    onPress={() => {
-                      navigation.navigate("PortfolioDetails", {
-                        id: portfolio.id,
-                      });
-                    }}
-                  >
-                    <View style={styles.portfolioHeader}>
-                      <View
-                        style={{ flexDirection: "row", alignItems: "center" }}
-                      >
-                        <AppText style={{ color: "#f0f0f0" }}>
-                          {portfolio.name}
-                        </AppText>
-                        <Button
-                          type="clear"
-                          onPress={() => {
-                            setNameModalVisible(true);
-                          }}
-                          icon={{
-                            name: "pencil",
-                            type: "ionicon",
-                            color: "#f0f0f0",
-                            size: 15,
-                          }}
-                        />
-                      </View>
-                      <AppText style={{ color: "#f0f0f0" }}>
-                        <AppText>
-                          {portfolio.auto ? "자동" : "수동"}
-                          {"  "}
-                        </AppText>
-                        <AppText>{portfolio.country}</AppText>
-                      </AppText>
-                    </View>
-                    <View style={styles.portfolioContent}>
-                      <AppText
-                        style={{
-                          fontSize: 30,
-                          color: "#f0f0f0",
-                        }}
-                      >
-                        <AppText style={{ fontWeight: "bold" }}>
-                          {(
-                            getTotalPrice(portfolio.detail.stocks) + currentCash
-                          ).toLocaleString()}{" "}
-                        </AppText>
-                        <AppText style={{ fontSize: 20 }}>원</AppText>
-                      </AppText>
-                      <AppText
-                        style={[
-                          { fontSize: 17, fontWeight: "bold", marginBottom: 5 },
-                          roi > 0
-                            ? { color: "#ff5858" }
-                            : roi < 0
-                            ? { color: "#5888ff" }
-                            : { color: "#666" },
-                        ]}
-                      >
-                        {roiFormatted}%
-                      </AppText>
-                      <AppText
-                        style={
-                          portfolio.riskValue === 1
-                            ? { color: "#91ff91" }
-                            : portfolio.riskValue === 2
-                            ? { color: "#ffbf44" }
-                            : { color: "#ff5858" }
-                        }
-                      >
-                        {portfolio.riskValue === 1
-                          ? "안정투자형"
-                          : portfolio.riskValue === 2
-                          ? "위험중립형"
-                          : portfolio.riskValue === 3
-                          ? "적극투자형"
-                          : ""}
-                      </AppText>
-                    </View>
-                  </TouchableOpacity>
-                </View>
-              );
-            })}
+          <View style={{ flex: 1 }}>
             <TouchableOpacity
-              style={[
-                styles.portfolio,
-                { alignItems: "center", justifyContent: "center" },
-              ]}
+              style={styles.floatingButton}
               onPress={() => {
                 navigation.navigate("MakePortfolio");
               }}
             >
-              <Icon name="plus" type="antdesign" color="#f0f0f0" size={40} />
+              <Icon name="plus" type="antdesign" color="#f0f0f0" />
             </TouchableOpacity>
-          </PagerView>
+            <TouchableOpacity
+              style={styles.reloadButton}
+              onPress={() => {
+                reloadData();
+              }}
+            >
+              <Icon name="reload1" type="antdesign" color="#f0f0f0" />
+            </TouchableOpacity>
+            <PagerView
+              style={styles.listContainer}
+              initialPage={0}
+              onPageSelected={handlePageChange}
+              ref={pagerRef}
+            >
+              {portfolios.map((portfolio, index) => {
+                const roi = getTotalROI(portfolio.detail);
+                const roiFormatted = roi > 0 ? `+${roi}` : `${roi}`;
+                const currentCash = portfolio.detail.currentCash;
+                return (
+                  <View key={index}>
+                    <TouchableOpacity
+                      style={styles.portfolio}
+                      onPress={() => {
+                        navigation.navigate("PortfolioDetails", {
+                          id: portfolio.id,
+                        });
+                      }}
+                    >
+                      <View style={styles.portfolioHeader}>
+                        <View
+                          style={{ flexDirection: "row", alignItems: "center" }}
+                        >
+                          <AppText style={{ color: "#f0f0f0" }}>
+                            {portfolio.name}
+                          </AppText>
+                          <Button
+                            type="clear"
+                            onPress={() => {
+                              setNameModalVisible(true);
+                            }}
+                            icon={{
+                              name: "pencil",
+                              type: "ionicon",
+                              color: "#f0f0f0",
+                              size: 15,
+                            }}
+                          />
+                        </View>
+                        <AppText style={{ color: "#f0f0f0" }}>
+                          <AppText>
+                            {portfolio.auto ? "자동" : "수동"}
+                            {"  "}
+                          </AppText>
+                          <AppText>{portfolio.country}</AppText>
+                        </AppText>
+                      </View>
+                      <View style={styles.portfolioContent}>
+                        <AppText
+                          style={{
+                            fontSize: 30,
+                            color: "#f0f0f0",
+                          }}
+                        >
+                          <AppText style={{ fontWeight: "bold" }}>
+                            {(
+                              getTotalPrice(portfolio.detail.stocks) +
+                              currentCash
+                            ).toLocaleString()}{" "}
+                          </AppText>
+                          <AppText style={{ fontSize: 20 }}>원</AppText>
+                        </AppText>
+                        <AppText
+                          style={[
+                            {
+                              fontSize: 17,
+                              fontWeight: "bold",
+                              marginBottom: 5,
+                            },
+                            roi > 0
+                              ? { color: "#ff5858" }
+                              : roi < 0
+                              ? { color: "#5888ff" }
+                              : { color: "#666" },
+                          ]}
+                        >
+                          {roiFormatted}%
+                        </AppText>
+                        <AppText
+                          style={
+                            portfolio.riskValue === 1
+                              ? { color: "#91ff91" }
+                              : portfolio.riskValue === 2
+                              ? { color: "#ffbf44" }
+                              : { color: "#ff5858" }
+                          }
+                        >
+                          {portfolio.riskValue === 1
+                            ? "안정투자형"
+                            : portfolio.riskValue === 2
+                            ? "위험중립형"
+                            : portfolio.riskValue === 3
+                            ? "적극투자형"
+                            : ""}
+                        </AppText>
+                      </View>
+                    </TouchableOpacity>
+                  </View>
+                );
+              })}
+              <TouchableOpacity
+                style={[
+                  styles.portfolio,
+                  { alignItems: "center", justifyContent: "center" },
+                ]}
+                onPress={() => {
+                  navigation.navigate("MakePortfolio");
+                }}
+              >
+                <Icon name="plus" type="antdesign" color="#f0f0f0" size={40} />
+              </TouchableOpacity>
+            </PagerView>
+          </View>
         </React.Fragment>
       )}
-      <TouchableOpacity
-        style={styles.floatingButton}
-        onPress={() => {
-          navigation.navigate("MakePortfolio");
-        }}
-      >
-        <Icon name="plus" type="antdesign" color="#f0f0f0" />
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.reloadButton}
-        onPress={() => {
-          reloadData();
-        }}
-      >
-        <Icon name="reload1" type="antdesign" color="#f0f0f0" />
-      </TouchableOpacity>
       {portfolios[selectedIndex] && (
         <ModalComponent
           isVisible={nameModalVisible}
@@ -360,9 +435,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   portfolio: {
-    height: height * 170,
+    height: height * 160,
     backgroundColor: "#333",
-    borderRadius: 30,
+    borderRadius: 10,
     paddingVertical: height * 15,
     paddingHorizontal: width * 25,
     marginHorizontal: width * 15,
@@ -378,16 +453,15 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
   },
   chartContainer: {
+    flex: 1,
     flexDirection: "row",
-    position: "absolute",
     alignItems: "center",
     alignSelf: "center",
-    bottom: height * 110,
   },
   floatingButton: {
     position: "absolute",
-    bottom: height * 90,
-    right: width * 15,
+    top: height * -60,
+    right: width * 10,
     width: width * 60,
     height: width * 60,
     borderRadius: 50,
@@ -402,8 +476,8 @@ const styles = StyleSheet.create({
   },
   reloadButton: {
     position: "absolute",
-    bottom: height * 90,
-    left: width * 15,
+    top: height * -60,
+    left: width * 10,
     width: width * 60,
     height: width * 60,
     borderRadius: 50,
