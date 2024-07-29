@@ -3,7 +3,7 @@ import { View } from "react-native";
 import urls from "../../utils/urls";
 import { WebView } from "react-native-webview";
 
-import { setUserName, setUsertoken } from "../../utils/localStorageUtils.js";
+import { setUserName, setUsertoken } from "../../utils/localStorageUtils";
 import { usePushNotifications } from "../../utils/PushNotificationContext.js";
 import Loading from "../../utils/Loading.js";
 

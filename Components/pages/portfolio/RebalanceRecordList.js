@@ -3,8 +3,8 @@ import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import { Button, Divider, Icon } from "@rneui/base";
 
 import { SafeAreaView } from "react-native-safe-area-context";
-import AppText from "../../utils/AppText.js";
-import { usePortfolio } from "../../utils/PortfolioContext.js";
+import AppText from "../../utils/AppText";
+import { usePortfolio } from "../../utils/PortfolioContext";
 import { useFocusEffect } from "@react-navigation/native";
 import Loading from "../../utils/Loading";
 
@@ -17,7 +17,9 @@ const RebalanceRecordList = ({ route, navigation }) => {
   useFocusEffect(
     useCallback(() => {
       if (route.params) {
-        const list = rebalanceRecords.filter((rebalanceRecords) => rebalanceRecords.pfId === route.params.id)
+        const list = rebalanceRecords.filter(
+          (rebalanceRecords) => rebalanceRecords.pfId === route.params.id
+        );
         setrebalanceRecordList(
           list.sort((a, b) => new Date(b.date) - new Date(a.date))
         );
@@ -33,9 +35,9 @@ const RebalanceRecordList = ({ route, navigation }) => {
       //console.log("rblist: ", rebalanceRecordList);
     }, [])
   );
-useEffect(() =>{
+  useEffect(() => {
     //console.log("rblist: ", rebalanceRecordList);
-  }, [])
+  }, []);
 
   if (loading) return <Loading />;
   return (
@@ -50,7 +52,9 @@ useEffect(() =>{
         />
       </View>
       <View style={styles.textContainer}>
-        <AppText style={{ fontSize: 30, fontWeight: "bold" }}>리밸런싱 내역</AppText>
+        <AppText style={{ fontSize: 30, fontWeight: "bold" }}>
+          리밸런싱 내역
+        </AppText>
       </View>
       <ScrollView style={styles.alertList}>
         {rebalanceRecordList.map((item, index) => {
@@ -63,7 +67,7 @@ useEffect(() =>{
                     pfId: item.pfId,
                     date: item.date,
                     records: item.records,
-                    tickerName: tickerName
+                    tickerName: tickerName,
                   });
                 }}
               >

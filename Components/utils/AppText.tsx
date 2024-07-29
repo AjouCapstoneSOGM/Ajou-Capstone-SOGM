@@ -1,7 +1,12 @@
-import React from "react";
-import { Text, StyleSheet } from "react-native";
+import React, { ReactNode } from "react";
+import { Text, StyleSheet, TextProps, TextStyle } from "react-native";
 
-const AppText = ({ children, style, ...rest }) => {
+interface AppTextProps extends TextProps {
+  children: ReactNode;
+  style?: TextStyle | TextStyle[];
+}
+
+const AppText: React.FC<AppTextProps> = ({ children, style, ...rest }) => {
   // 스타일을 평면화하고 기본값을 빈 객체로 설정하여 안전하게 처리
   const flattenedStyle = StyleSheet.flatten(style) || {};
 

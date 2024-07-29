@@ -1,16 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { View, StyleSheet } from "react-native";
 import { Button } from "@rneui/base";
 import AppText from "./AppText";
 import { useAuth } from "./AuthContext";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { height, width } from "./utils";
 import { usePortfolio } from "./PortfolioContext";
+import { RootStackParamList } from "../types/Navigations";
 
-const HeaderComponent = () => {
+type NavigationProps = NavigationProp<RootStackParamList>;
+
+const HeaderComponent: React.FC = () => {
   const { isLoggedIn, userName } = useAuth();
   const { rebalances } = usePortfolio();
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProps>();
 
   return (
     <View style={styles.header}>

@@ -1,7 +1,12 @@
 import { Buffer } from "buffer";
-global.Buffer = Buffer;
 
-const GetCurrentPrice = async (ticker) => {
+type CurrentPrice = {
+  ticker: string;
+  currentPrice?: number;
+  error?: string;
+};
+
+const GetCurrentPrice = async (ticker: string): Promise<CurrentPrice> => {
   const iconv = require("iconv-lite");
   const url = `https://finance.naver.com/item/main.naver?code=${ticker}`;
   try {
@@ -18,7 +23,7 @@ const GetCurrentPrice = async (ticker) => {
       throw new Error("Unable to fetch the price");
     }
   } catch (error) {
-    return { ticker, error: error.message };
+    return { ticker, error: "currentPrice Error" };
   }
 };
 export default GetCurrentPrice;

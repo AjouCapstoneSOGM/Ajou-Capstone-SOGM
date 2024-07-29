@@ -12,18 +12,33 @@ export const PushNotificationProvider = ({ children }) => {
   const [notification, setNotification] = useState(false);
   const notificationListener = useRef();
   const responseListener = useRef();
-  
+  const [isNotificationEnable, setIsNotificationEnable] = useState(false)
+
+  useEffect(() => {
+    console.log(isNotificationEnable)
+    if (isNotificationEnable) {
+      Notifications.setNotificationHandler({
+        handleNotification: async () => ({
+          shouldShowAlert: true,
+          shouldPlaySound: true,
+          shouldSetBadge: true,
+        }),
+      });
+    }
+    else {
+      Notifications.setNotificationHandler({
+        handleNotification: async () => ({
+          shouldShowAlert: false,
+          shouldPlaySound: false,
+          shouldSetBadge: false,
+        }),
+      });
+    }
+  }, [isNotificationEnable])
+
   useEffect(() => {
     setRebalanceAlarm('denied');
 
-    Notifications.setNotificationHandler({
-      handleNotification: async () => ({
-        shouldShowAlert: true,
-        shouldPlaySound: true,
-        shouldSetBadge: true,
-      }),
-    });
-    
     registerForPushNotificationsAsync().then((token) =>
       setExpoPushToken(token)
     );
@@ -47,7 +62,7 @@ export const PushNotificationProvider = ({ children }) => {
   }, []);
 
   return (
-    <PushNotificationContext.Provider value={{ expoPushToken, notification }}>
+    <PushNotificationContext.Provider value={{ expoPushToken, notification, setIsNotificationEnable }}>
       {children}
     </PushNotificationContext.Provider>
   );
@@ -86,8 +101,9 @@ async function registerForPushNotificationsAsync() {
         projectId: "f3f90f52-c78a-4e7e-a7b0-ac053ff5dd0c",
       })
     ).data;
+    setIsNotificationEnable(true);
     console.log(token);
-  } else { 
+  } else {
     alert("Must use physical device for Push Notifications");
   }
 

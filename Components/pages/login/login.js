@@ -10,10 +10,10 @@ import {
 import { Divider } from "react-native-elements";
 
 import urls from "../../utils/urls";
-import { setUserName, setUsertoken } from "../../utils/localStorageUtils.js";
-import { useAuth } from "../../utils/AuthContext.js";
-import AppText from "../../utils/AppText.js";
-import { usePortfolio } from "../../utils/PortfolioContext.js";
+import { setUserName, setUsertoken } from "../../utils/localStorageUtils";
+import { useAuth } from "../../utils/AuthContext";
+import AppText from "../../utils/AppText";
+import { usePortfolio } from "../../utils/PortfolioContext";
 import Loading from "../../utils/Loading.js";
 import { usePushNotifications } from "../../utils/PushNotificationContext.js";
 import { width, height } from "../../utils/utils";

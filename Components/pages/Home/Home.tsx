@@ -1,48 +1,57 @@
 import React, { useEffect, useState } from "react";
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Touchable,
-} from "react-native";
-import AppText from "../utils/AppText.js";
+import { View, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
+import AppText from "../../utils/AppText";
 import { Button, Divider, Icon } from "@rneui/base";
-import HeaderComponent from "../utils/Header.js";
-import FooterComponent from "../utils/Footer.js";
+import HeaderComponent from "../../utils/Header";
+import FooterComponent from "../../utils/Footer";
 import { SearchBar } from "@rneui/themed";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { width, height } from "../utils/utils";
+import { width, height } from "../../utils/utils";
 import { FlatList } from "react-native-gesture-handler";
-import { useSearch } from "../utils/SearchStock.js";
-import StockInfo from "./portfolio/StockInfo.js";
-import ModalComponent from "../utils/Modal.js";
-import urls from "../utils/urls.js";
-import Loading from "../utils/Loading.js";
-import { usePortfolio } from "../utils/PortfolioContext.js";
-import OpenUrl from "../utils/OpenUrl.js";
+import { useSearch } from "../../utils/SearchStock";
+import StockInfo from "../portfolio/StockInfo.js";
+import ModalComponent from "../../utils/Modal.js";
+import urls from "../../utils/urls.js";
+import Loading from "../../utils/Loading.js";
+import { usePortfolio } from "../../utils/PortfolioContext";
+import OpenUrl from "../../utils/OpenUrl.js";
 
-const Home = () => {
+interface NewsItemData {
+  title: string;
+  press: string;
+  wdate: string;
+  href: string;
+}
+
+type NewsApiResponse = {
+  [K in keyof NewsItemData]: { [key: string]: string };
+};
+
+interface NewsItem extends NewsItemData {
+  id: string;
+}
+
+const Home: React.FC = () => {
   const { query, setQuery, suggestions } = useSearch();
   const { portLoading } = usePortfolio();
-  const [FGI, setFGI] = useState(50);
-  const [isVisible, setIsVisible] = useState(false);
-  const [stockInfoVisible, setStockInfoVisible] = useState(false);
-  const [selectedIndex, setSelectedIndex] = useState(null);
-  const [currentNews, setCurrentNews] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [newsLoading, setNewsLoading] = useState(false);
+  const [FGI, setFGI] = useState<number>(50);
+  const [isVisible, setIsVisible] = useState<boolean>(false);
+  const [stockInfoVisible, setStockInfoVisible] = useState<boolean>(false);
+  const [selectedIndex, setSelectedIndex] = useState<number>(0);
+  const [currentNews, setCurrentNews] = useState<NewsItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [newsLoading, setNewsLoading] = useState<boolean>(false);
 
-  const toggleStockModal = () => {
+  const toggleStockModal = (): void => {
     setStockInfoVisible(!stockInfoVisible);
   };
 
-  const handleSelectedIndex = (index) => {
+  const handleSelectedIndex = (index: number): void => {
     setSelectedIndex(index);
   };
 
-  const fetchFGI = async () => {
+  const fetchFGI = async (): Promise<number> => {
     try {
       const response = await fetch(`${urls.fastapiUrl}/fearGreed`, {
         method: "GET",
@@ -53,50 +62,51 @@ const Home = () => {
       }
     } catch (error) {
       console.log(error);
-      return 0;
     }
+    return 0;
   };
 
-  const fetchNews = async () => {
+  const fetchNews = async (): Promise<NewsItem[]> => {
     const response = await fetch(`${urls.fastapiUrl}/currentNews`, {
       method: "GET",
     });
     if (response.ok) {
-      const data = await response.json();
-      return data;
+      const data: NewsApiResponse = await response.json();
+      return Object.keys(data.title).map((key) => ({
+        id: key,
+        title: data.title[key],
+        press: data.press[key],
+        wdate: data.wdate[key],
+        href: data.href[key],
+      }));
     }
+    throw new Error("Failed to fetch news");
   };
 
-  const handleFetchNews = async () => {
+  const handleFetchNews = async (): Promise<void> => {
     try {
       setNewsLoading(true);
-      const currentNews = await fetchNews();
-      const listData = Object.keys(currentNews.title).map((key) => ({
-        id: key,
-        title: currentNews.title[key],
-        press: currentNews.press[key],
-        date: currentNews.wdate[key],
-        href: currentNews.href[key],
-      }));
-      setCurrentNews(listData);
-      setNewsLoading(false);
+      const newsItems = await fetchNews();
+      setCurrentNews(newsItems);
     } catch (error) {
-      setCurrentNews(false);
+      setCurrentNews([]);
       console.error(error);
+    } finally {
+      setNewsLoading(false);
     }
   };
 
-  const handleFetchFGI = async () => {
+  const handleFetchFGI = async (): Promise<void> => {
     const fgi = await fetchFGI();
     setFGI(fgi);
   };
 
-  const toggleModal = () => {
+  const toggleModal = (): void => {
     setIsVisible(!isVisible);
   };
 
   useEffect(() => {
-    const loadHomeData = async () => {
+    const loadHomeData = async (): Promise<void> => {
       setLoading(true);
       await handleFetchFGI();
       await handleFetchNews();
@@ -215,7 +225,6 @@ const Home = () => {
           <View style={styles.newsHeaderContainr}>
             <AppText style={styles.newsHeader}>실시간 뉴스</AppText>
             <Button
-              style={styles.newsReload}
               type="clear"
               icon={{ type: "antdesign", name: "reload1", color: "#f0f0f0" }}
               onPress={handleFetchNews}
@@ -237,7 +246,7 @@ const Home = () => {
                     }}
                   >
                     <AppText style={styles.newsDetail}>{item.press} </AppText>
-                    <AppText style={styles.newsDetail}>{item.date}</AppText>
+                    <AppText style={styles.newsDetail}>{item.wdate}</AppText>
                   </View>
                 </TouchableOpacity>
                 <Divider />
@@ -245,7 +254,7 @@ const Home = () => {
             ))}
         </View>
       </ScrollView>
-      <View style={{ height: height * 60 }} />
+      <View style={{ height: Number(height) * 60 }} />
       {/* footer 높이 만큼 증가 */}
       <FooterComponent />
       <ModalComponent isVisible={isVisible} onToggle={toggleModal}>
