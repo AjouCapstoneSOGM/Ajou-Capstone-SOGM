@@ -7,7 +7,7 @@ import {
   Switch,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Button, Divider } from "@rneui/base";
+import { Button } from "@rneui/base";
 import { width, height } from "../../utils/utils";
 import * as Notifications from "expo-notifications";
 

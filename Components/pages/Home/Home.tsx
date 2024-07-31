@@ -115,7 +115,7 @@ const Home: React.FC = () => {
     loadHomeData();
   }, []);
 
-  if (loading || portLoading) return <Loading size={"small"} color={""} />;
+  if (loading || portLoading) return <Loading />;
   return (
     <SafeAreaView style={styles.container}>
       <HeaderComponent />
@@ -230,7 +230,7 @@ const Home: React.FC = () => {
               onPress={handleFetchNews}
             />
           </View>
-          {newsLoading && <Loading size={"small"} color={""} />}
+          {newsLoading && <Loading />}
           {!newsLoading &&
             currentNews.slice(0, 10).map((item, index) => (
               <React.Fragment key={index}>

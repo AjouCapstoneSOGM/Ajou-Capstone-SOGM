@@ -2,8 +2,8 @@ import React from "react";
 import { View, ActivityIndicator, Modal, StyleSheet } from "react-native";
 
 type LoadingType = {
-  size: "small" | "large";
-  color: string;
+  size?: "small" | "large";
+  color?: string;
 };
 
 const Loading: React.FC<LoadingType> = ({ size = "large", color = "#aaa" }) => {

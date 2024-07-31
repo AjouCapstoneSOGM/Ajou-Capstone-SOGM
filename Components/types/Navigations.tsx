@@ -38,7 +38,7 @@ export type RootStackParamList = {
   AlertList: undefined;
   ViewPortfolio: undefined;
   NewsSummary: undefined;
-  PortfolioDetails: undefined;
+  PortfolioDetails: { id: number };
   AddStockInManual: undefined;
   ManagementPage: undefined;
   RebalanceRecordList: undefined;

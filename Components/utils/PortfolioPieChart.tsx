@@ -6,12 +6,17 @@ import { StyleSheet, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 
 type PieChart = {
-  data: Portfolio[] | PortfolioDetail;
+  data:
+    | Portfolio[]
+    | {
+        currentCash: number;
+        stocks: Stock[];
+      };
   selectedId: number;
   size: number;
   mode: "dark" | "light";
   type: "portfolio" | "stock";
-  animate: boolean;
+  animate?: boolean;
 };
 
 type ChartData = {

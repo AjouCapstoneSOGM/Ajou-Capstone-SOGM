@@ -20,26 +20,41 @@ import { useAuth } from "../../utils/AuthContext";
 import { width, height } from "../../utils/utils";
 import ModalComponent from "../../utils/Modal";
 import { removeSpecialChars } from "../../utils/utils";
+import { useNavigation } from "@react-navigation/native";
+import { RootStackParamList } from "../../types/Navigations";
+import { StackNavigationProp } from "@react-navigation/stack";
 
-const PortfolioList = ({ navigation }) => {
+const PortfolioList = () => {
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const { portfolios, loadData, portLoading, fetchChangePortName } =
     usePortfolio();
   const { userName } = useAuth();
-  const [nameModalVisible, setNameModalVisible] = useState(false);
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const [changedName, setChangedName] = useState("");
-  const [selectedChartType, setSelectedChartType] = useState(0);
-  const [allPortfolioData, setAllPortfolioData] = useState({});
-  const pagerRef = useRef(null);
+  const [nameModalVisible, setNameModalVisible] = useState<boolean>(false);
+  const [selectedIndex, setSelectedIndex] = useState<number>(0);
+  const [changedName, setChangedName] = useState<string>("");
+  const [selectedChartType, setSelectedChartType] = useState<number>(0);
+  const [allPortfolioData, setAllPortfolioData] = useState<{
+    currentCash: number;
+    stocks: Stock[];
+  }>({
+    currentCash: 0,
+    stocks: [],
+  });
+  const pagerRef = useRef<PagerView>(null);
 
-  const getPortfolioRoiData = () => {
-    const roiData = portfolios.map((portfolio) => {
-      return { name: portfolio.name, rate: getTotalROI(portfolio.detail) };
-    });
+  const getPortfolioRoiData = (): { name: string; rate: number }[] => {
+    const roiData = portfolios.map((portfolio) => ({
+      name: portfolio.name,
+      rate: getTotalROI(portfolio.detail),
+    }));
 
     return roiData;
   };
-  const consolidatePortfolios = () => {
+
+  const consolidatePortfolios = (): {
+    currentCash: number;
+    stocks: Stock[];
+  } => {
     const totalCash = portfolios.reduce(
       (acc, portfolio) => acc + portfolio.detail.currentCash,
       0
@@ -47,7 +62,7 @@ const PortfolioList = ({ navigation }) => {
     const stockList = portfolios
       .map((portfolio) => portfolio.detail.stocks)
       .flat();
-    const consolidated = stockList.reduce((acc, item) => {
+    const consolidated = stockList.reduce<Stock[]>((acc, item) => {
       const existing = acc.find((p) => p.ticker === item.ticker);
       if (existing) {
         existing.quantity += item.quantity;
@@ -68,11 +83,11 @@ const PortfolioList = ({ navigation }) => {
     return result;
   };
 
-  const handleChangedName = (value) => {
+  const handleChangedName = (value: string): void => {
     if (value.length < 20) setChangedName(removeSpecialChars(value));
   };
 
-  const handleFetchChangedName = async () => {
+  const handleFetchChangedName = async (): Promise<void> => {
     const result = await fetchChangePortName(
       portfolios[selectedIndex].id,
       changedName
@@ -97,13 +112,13 @@ const PortfolioList = ({ navigation }) => {
       setNameModalVisible(false);
     }
   };
-  const portfolioExist = () => {
+  const portfolioExist = (): boolean => {
     if (portLoading) return false;
     if (portfolios.length > 0) return true;
     return false;
   };
 
-  const getTotalPrice = (stocks) => {
+  const getTotalPrice = (stocks: Stock[]): number => {
     const totalPrice = stocks.reduce(
       (acc, cur) => acc + cur.currentPrice * cur.quantity,
       0
@@ -112,14 +127,14 @@ const PortfolioList = ({ navigation }) => {
   };
 
   // 포트폴리오의 총 수익률 계산 후 반환
-  const getTotalROI = (detail) => {
+  const getTotalROI = (detail: PortfolioDetail): number => {
     const benefit =
       getTotalPrice(detail.stocks) + detail.currentCash - detail.initialAsset;
     const totalROI = ((benefit / detail.initialAsset) * 100).toFixed(2);
-    return totalROI;
+    return Number(totalROI);
   };
 
-  const sumAllPrices = () => {
+  const sumAllPrices = (): number => {
     if (portfolioExist()) {
       return portfolios.reduce((total, portfolio) => {
         const stockTotal = getTotalPrice(portfolio.detail.stocks);
@@ -129,20 +144,21 @@ const PortfolioList = ({ navigation }) => {
     return 0;
   };
 
-  const handlePageChange = (e) => {
+  const handlePageChange = (e: any): void => {
     setSelectedIndex(e.nativeEvent.position);
   };
 
-  const handlePageNext = () => {
+  const handlePageNext = (): void => {
     setSelectedIndex(selectedIndex + 1);
     pagerRef.current?.setPage(selectedIndex + 1);
   };
-  const handlePagePrev = () => {
+
+  const handlePagePrev = (): void => {
     setSelectedIndex(selectedIndex - 1);
     pagerRef.current?.setPage(selectedIndex - 1);
   };
 
-  const reloadData = async () => {
+  const reloadData = async (): Promise<void> => {
     await loadData();
   };
 
