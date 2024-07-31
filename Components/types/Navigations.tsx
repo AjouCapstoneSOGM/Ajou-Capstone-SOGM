@@ -3,9 +3,9 @@ import {
   StackScreenProps,
 } from "@react-navigation/stack";
 
-import Settings from "../pages/Settings";
-import Information from "../pages/Information";
-import MyPage from "../pages/MyPage";
+import Settings from "../pages/Home/Settings";
+import Information from "../pages/Home/Information";
+import MyPage from "../pages/Home/MyPage";
 import QnA from "../pages/qna/QnA";
 import QnACreate from "../pages/qna/QnaCreate";
 import Login from "../pages/login/login";

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Divider, Icon } from "@rneui/base";
-import AppText from "../utils/AppText";
+import AppText from "../../utils/AppText";
 
 const Information = ({ navigation }) => {
   const [index, setIndex] = useState("");

@@ -8,15 +8,15 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Divider } from "@rneui/base";
-import { width, height } from "../utils/utils";
+import { width, height } from "../../utils/utils";
 import * as Notifications from "expo-notifications";
 
-import AppText from "../utils/AppText";
+import AppText from "../../utils/AppText";
 import {
   getRebalanceAlarm,
   setRebalanceAlarm,
-} from "../utils/localStorageUtils";
-import { usePushNotifications } from "../utils/PushNotificationContext.js";
+} from "../../utils/localStorageUtils";
+import { usePushNotifications } from "../../utils/PushNotificationContext.js";
 
 const Settings = ({ navigation }) => {
   const [hasNotificationPermission, setHasNotificationPermission] =
