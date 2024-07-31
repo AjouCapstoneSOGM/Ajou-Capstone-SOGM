@@ -15,7 +15,7 @@ import ModalComponent from "../../utils/Modal.js";
 import urls from "../../utils/urls.js";
 import Loading from "../../utils/Loading.js";
 import { usePortfolio } from "../../utils/PortfolioContext";
-import OpenUrl from "../../utils/OpenUrl.js";
+import OpenUrl from "../../utils/OpenUrl";
 
 interface NewsItemData {
   title: string;

@@ -1,11 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  VictoryAxis,
-  VictoryBar,
-  VictoryChart,
-  VictoryLegend,
-  VictoryPie,
-} from "victory-native";
+import { VictoryLegend, VictoryPie } from "victory-native";
 import { colorScale, height, width } from "./utils";
 import AppText from "./AppText";
 import { StyleSheet, View } from "react-native";
