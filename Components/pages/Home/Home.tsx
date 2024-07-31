@@ -11,9 +11,9 @@ import { width, height } from "../../utils/utils";
 import { FlatList } from "react-native-gesture-handler";
 import { useSearch } from "../../utils/SearchStock";
 import StockInfo from "../portfolio/StockInfo.js";
-import ModalComponent from "../../utils/Modal.js";
+import ModalComponent from "../../utils/Modal";
 import urls from "../../utils/urls.js";
-import Loading from "../../utils/Loading.js";
+import Loading from "../../utils/Loading";
 import { usePortfolio } from "../../utils/PortfolioContext";
 import OpenUrl from "../../utils/OpenUrl";
 
@@ -115,7 +115,7 @@ const Home: React.FC = () => {
     loadHomeData();
   }, []);
 
-  if (loading || portLoading) return <Loading />;
+  if (loading || portLoading) return <Loading size={"small"} color={""} />;
   return (
     <SafeAreaView style={styles.container}>
       <HeaderComponent />
@@ -230,7 +230,7 @@ const Home: React.FC = () => {
               onPress={handleFetchNews}
             />
           </View>
-          {newsLoading && <Loading />}
+          {newsLoading && <Loading size={"small"} color={""} />}
           {!newsLoading &&
             currentNews.slice(0, 10).map((item, index) => (
               <React.Fragment key={index}>

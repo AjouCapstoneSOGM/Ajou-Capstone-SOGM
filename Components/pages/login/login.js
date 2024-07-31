@@ -14,7 +14,7 @@ import { setUserName, setUsertoken } from "../../utils/localStorageUtils";
 import { useAuth } from "../../utils/AuthContext";
 import AppText from "../../utils/AppText";
 import { usePortfolio } from "../../utils/PortfolioContext";
-import Loading from "../../utils/Loading.js";
+import Loading from "../../utils/Loading";
 import { usePushNotifications } from "../../utils/PushNotificationContext.js";
 import { width, height } from "../../utils/utils";
 
