@@ -13,7 +13,7 @@ import SocialLogin from "../pages/login/sociallogin";
 import Signup from "../pages/login/signup";
 import ResetPW from "../pages/login/resetpw";
 import Home from "../pages/Home/Home";
-import NewsSummary from "../pages/NewsSummary";
+import NewsSummary from "../pages/portfolio/NewsSummary";
 import AlertList from "../pages/rebalance/AlertList";
 import ViewPortfolio from "../pages/portfolio/ViewPortfolio";
 import PortfolioDetails from "../pages/portfolio/PortfolioDetails";
@@ -35,12 +35,12 @@ export type RootStackParamList = {
   SocialLogin: undefined;
   Signup: undefined;
   ResetPW: undefined;
-  AlertList: undefined;
+  AlertList: { id: number };
   ViewPortfolio: undefined;
-  NewsSummary: undefined;
+  NewsSummary: { ticker: string; name: string };
   PortfolioDetails: { id: number };
-  AddStockInManual: undefined;
-  ManagementPage: undefined;
+  AddStockInManual: { id: number };
+  ManagementPage: { id: number };
   RebalanceRecordList: undefined;
   ViewRebalanceRecord: undefined;
   ModifyPortfolio: undefined;
@@ -50,6 +50,10 @@ export type RootStackParamList = {
 export type ViewPortfolioProps = StackScreenProps<
   RootStackParamList,
   "ViewPortfolio"
+>;
+export type PortfolioDetailsProps = StackScreenProps<
+  RootStackParamList,
+  "PortfolioDetails"
 >;
 
 const Stack = createStackNavigator<RootStackParamList>();

@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { View, StyleSheet } from "react-native";
-import urls from "../utils/urls.js";
+import urls from "../../utils/urls.js";
 import { ScrollView } from "react-native-gesture-handler";
-import AppText from "../utils/AppText";
-import Loading from "../utils/Loading";
+import AppText from "../../utils/AppText";
+import Loading from "../../utils/Loading";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Icon, color } from "@rneui/base";
-import { getUsertoken } from "../utils/localStorageUtils";
+import { getUsertoken } from "../../utils/localStorageUtils";
 
 const NewsSummary = ({ route, navigation }) => {
   const [loading, setLoading] = useState(true);

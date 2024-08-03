@@ -20,12 +20,9 @@ import { useAuth } from "../../utils/AuthContext";
 import { width, height } from "../../utils/utils";
 import ModalComponent from "../../utils/Modal";
 import { removeSpecialChars } from "../../utils/utils";
-import { useNavigation } from "@react-navigation/native";
-import { RootStackParamList } from "../../types/Navigations";
-import { StackNavigationProp } from "@react-navigation/stack";
+import { ViewPortfolioProps } from "../../types/Navigations";
 
-const PortfolioList = () => {
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+const PortfolioList: React.FC<ViewPortfolioProps> = ({ navigation }) => {
   const { portfolios, loadData, portLoading, fetchChangePortName } =
     usePortfolio();
   const { userName } = useAuth();
