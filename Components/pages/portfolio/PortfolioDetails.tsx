@@ -18,30 +18,35 @@ import { width, height, filteringNumber, colorScale } from "../../utils/utils";
 import StockInfo from "./StockInfo";
 import Loading from "../../utils/Loading";
 import ModalComponent from "../../utils/Modal";
+import { PortfolioDetailsProps } from "../../types/Navigations";
 
-const PortfolioDetails = ({ route, navigation }) => {
+const PortfolioDetails: React.FC<PortfolioDetailsProps> = ({
+  route,
+  navigation,
+}) => {
   const stocksLength = 10;
   const { getPortfolioById, portfolios, reloadPortfolio } = usePortfolio();
-  const [portfolio, setPortfolio] = useState({
-    id: null,
-    name: "",
+  const portfolioId = route.params.id;
+  const [details, setDetails] = useState<PortfolioDetail>({
     stocks: [],
     currentCash: 0,
-    totalPrice: 0,
     initialAsset: 0,
-    riskValue: 0,
-    auto: true,
   });
-  const [loading, setLoading] = useState(true);
-  const [selectedId, setSelectedId] = useState(null);
-  const [alertExist, setAlertExist] = useState(false);
-  const [infoVisible, setInfoVisible] = useState(false);
-  const [cashVisible, setCashVisible] = useState(false);
-  const [stockInfoVisible, setStockInfoVisible] = useState(false);
-  const [modifyQuantity, setModifyQuantity] = useState(0);
-  const [modifyPrice, setModifyPrice] = useState(0);
-  const [modifyBuy, setModifyBuy] = useState(true);
-  const [modifyCash, setModifyCash] = useState(0);
+  const [portfolioName, setPortfolioName] = useState<string>("");
+  const [totalPrice, setTotalPrice] = useState<number>(0);
+  const [riskValue, setRiskValue] = useState<number>(1);
+  const [auto, setAuto] = useState<boolean>(true);
+
+  const [loading, setLoading] = useState<boolean>(true);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [alertExist, setAlertExist] = useState<boolean>(false);
+  const [infoVisible, setInfoVisible] = useState<boolean>(false);
+  const [cashVisible, setCashVisible] = useState<boolean>(false);
+  const [stockInfoVisible, setStockInfoVisible] = useState<boolean>(false);
+  const [modifyQuantity, setModifyQuantity] = useState<number>(0);
+  const [modifyPrice, setModifyPrice] = useState<number>(0);
+  const [modifyBuy, setModifyBuy] = useState<boolean>(true);
+  const [modifyCash, setModifyCash] = useState<number>(0);
 
   const toggleCashModal = () => {
     setCashVisible(!cashVisible);
@@ -59,7 +64,7 @@ const PortfolioDetails = ({ route, navigation }) => {
     try {
       const token = await getUsertoken();
       const response = await fetch(
-        `${urls.springUrl}/api/portfolio/${portfolio.id}/${
+        `${urls.springUrl}/api/portfolio/${portfolioId}/${
           modifyBuy ? "buy" : "sell"
         }`,
         {
@@ -69,7 +74,7 @@ const PortfolioDetails = ({ route, navigation }) => {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            ticker: portfolio.stocks[selectedId].ticker,
+            ticker: details.stocks[selectedId as number].ticker,
             isBuy: modifyBuy,
             quantity: modifyQuantity,
             price: modifyPrice,
@@ -95,59 +100,60 @@ const PortfolioDetails = ({ route, navigation }) => {
   const handleModify = async () => {
     setLoading(true);
     await fetchModifyStockManual();
-    await reloadPortfolio(route.params.id);
+    await reloadPortfolio(portfolioId);
     resetModifyData();
     toggleInfoModal();
     setLoading(false);
   };
 
-  const handleCash = (value) => {
+  const handleCash = (value: string) => {
     setModifyCash(Number(filteringNumber(value)));
   };
 
-  const handleQuantityChange = (newQuantity) => {
-    const currentQuantity = portfolio.stocks[selectedId].quantity;
+  const handleQuantityChange = (newQuantity: string) => {
+    const currentQuantity = details.stocks[selectedId as number].quantity;
     if (!modifyBuy && Number(newQuantity) > Number(currentQuantity))
       newQuantity = String(currentQuantity);
     if (Number(newQuantity) < 0) newQuantity = "0";
     if (Number(newQuantity) > 9999) newQuantity = "9999";
-    setModifyQuantity(filteringNumber(newQuantity));
+    setModifyQuantity(Number(filteringNumber(newQuantity)));
   };
 
-  const handlePriceChange = (newPrice) => {
+  const handlePriceChange = (newPrice: string) => {
     if (Number(newPrice) < 0) newPrice = "0";
     if (Number(newPrice) > 9999999) newPrice = "9999999";
     setModifyPrice(Number(filteringNumber(newPrice)));
   };
 
-  const handleBuyChange = (isBuy) => {
+  const handleBuyChange = (isBuy: boolean) => {
     setModifyBuy(!isBuy);
     if (
       isBuy &&
-      Number(modifyQuantity) > Number(portfolio.stocks[selectedId].quantity)
+      Number(modifyQuantity) >
+        Number(details.stocks[selectedId as number].quantity)
     )
-      setModifyQuantity(portfolio.stocks[selectedId].quantity);
+      setModifyQuantity(details.stocks[selectedId as number].quantity);
   };
 
   const handleCashIn = async () => {
     const result = await fetchCashIn();
     setModifyCash(0);
     toggleCashModal();
-    await reloadPortfolio(route.params.id);
+    await reloadPortfolio(portfolioId);
   };
 
   const handleCashOut = async () => {
     const result = await fetchCashOut();
     setModifyCash(0);
     toggleCashModal();
-    await reloadPortfolio(route.params.id);
+    await reloadPortfolio(portfolioId);
   };
 
   const fetchCashIn = async () => {
     try {
       const token = await getUsertoken();
       const response = await fetch(
-        `${urls.springUrl}/api/portfolio/${portfolio.id}/deposit`,
+        `${urls.springUrl}/api/portfolio/${portfolioId}/deposit`,
         {
           method: "PUT",
           headers: {
@@ -175,7 +181,7 @@ const PortfolioDetails = ({ route, navigation }) => {
     try {
       const token = await getUsertoken();
       const response = await fetch(
-        `${urls.springUrl}/api/portfolio/${portfolio.id}/withdraw`,
+        `${urls.springUrl}/api/portfolio/${portfolioId}/withdraw`,
         {
           method: "PUT",
           headers: {
@@ -198,7 +204,7 @@ const PortfolioDetails = ({ route, navigation }) => {
     }
   };
 
-  const getAlertExists = async (id) => {
+  const getAlertExists = async (id: number) => {
     try {
       const token = await getUsertoken();
       const response = await fetch(
@@ -220,40 +226,40 @@ const PortfolioDetails = ({ route, navigation }) => {
     }
   };
 
-  const handleSelectedId = (index) => {
+  const handleSelectedId = (index: number) => {
     if (selectedId === index) setSelectedId(null);
     else setSelectedId(index);
   };
 
-  const getStockROI = (id) => {
-    const current = portfolio.stocks[id].currentPrice;
-    const average = portfolio.stocks[id].averageCost;
+  const getStockROI = (id: number): number => {
+    const current = details.stocks[id].currentPrice;
+    const average = details.stocks[id].averageCost;
 
     if (current === 0 || average === 0) return 0;
-    const totalROI = (((current - average) / average) * 100).toFixed(2);
+    const totalROI = Number((((current - average) / average) * 100).toFixed(2));
 
     return totalROI;
   };
 
-  const getStockRate = (id) => {
+  const getStockRate = (id: number) => {
     const stockRate =
-      (portfolio.stocks[id].quantity * portfolio.stocks[id].currentPrice) /
-      getTotalPrice();
+      (details.stocks[id].quantity * details.stocks[id].currentPrice) /
+      totalPrice;
 
     return stockRate;
   };
 
   const getTotalPrice = () => {
-    const totalPrice = portfolio.stocks.reduce(
+    const totalPrice = details.stocks.reduce(
       (acc, cur) => acc + cur.currentPrice * cur.quantity,
       0
     );
-    return totalPrice + portfolio.currentCash;
+    return totalPrice + details.currentCash;
   };
 
   const getPortfolioROI = () => {
-    const benefit = getTotalPrice() - portfolio.initialAsset;
-    const roi = ((benefit / portfolio.initialAsset) * 100).toFixed(2);
+    const benefit = totalPrice - details.initialAsset;
+    const roi = Number(((benefit / details.initialAsset) * 100).toFixed(2));
     const roiFormatted = roi > 0 ? `+${roi}` : `${roi}`;
     const color = roi > 0 ? "#ff5858" : roi < 0 ? "#5878ff" : "#666";
     return (
@@ -270,20 +276,24 @@ const PortfolioDetails = ({ route, navigation }) => {
   useEffect(() => {
     const loadPortfolio = async () => {
       try {
-        const currentPortfolio = getPortfolioById(route.params.id);
-        if (currentPortfolio) {
-          await getAlertExists(currentPortfolio.id);
-          setPortfolio({
-            id: currentPortfolio.id,
-            name: currentPortfolio.name,
+        const currentPortfolio = getPortfolioById(portfolioId);
+        if (currentPortfolio !== undefined) {
+          setPortfolioName(currentPortfolio.name);
+          setRiskValue(currentPortfolio.riskValue);
+          setAuto(currentPortfolio.auto);
+          setDetails({
             stocks: currentPortfolio.detail.stocks,
             currentCash: currentPortfolio.detail.currentCash,
             initialAsset: currentPortfolio.detail.initialAsset,
-            riskValue: currentPortfolio.riskValue,
-            auto: currentPortfolio.auto,
           });
+          setTotalPrice(getTotalPrice());
+          await getAlertExists(portfolioId);
           setLoading(false);
-        } else setLoading(false);
+        } else {
+          // 포트폴리오가 존재하지 않을 경우
+
+          setLoading(false);
+        }
       } catch (error) {
         console.log("Detail loadData error: ", error);
         setLoading(false);
@@ -314,7 +324,7 @@ const PortfolioDetails = ({ route, navigation }) => {
               <Button
                 type="clear"
                 onPress={() => {
-                  navigation.navigate("AlertList", { pfId: portfolio.id });
+                  navigation.navigate("AlertList", { id: portfolioId });
                 }}
                 icon={{
                   name: "bell-fill",
@@ -327,7 +337,7 @@ const PortfolioDetails = ({ route, navigation }) => {
             <Button
               type="clear"
               onPress={() => {
-                navigation.navigate("ManagementPage", { portfolio });
+                navigation.navigate("ManagementPage", { id: portfolioId });
               }}
               icon={{
                 name: "settings-sharp",
@@ -339,22 +349,22 @@ const PortfolioDetails = ({ route, navigation }) => {
         </View>
         <AppText style={{ fontSize: 17, color: "#f0f0f0" }}>총 자산</AppText>
         <AppText style={{ fontSize: 25, color: "#f0f0f0", fontWeight: "bold" }}>
-          {getTotalPrice().toLocaleString()} 원
+          {totalPrice.toLocaleString()} 원
         </AppText>
         <AppText
           style={
-            portfolio.riskValue === 1
+            riskValue === 1
               ? { color: "#91ff91" }
-              : portfolio.riskValue === 2
+              : riskValue === 2
               ? { color: "#ffbf44" }
               : { color: "#ff5858" }
           }
         >
-          {portfolio.riskValue === 1
+          {riskValue === 1
             ? "안정투자형"
-            : portfolio.riskValue === 2
+            : riskValue === 2
             ? "위험중립형"
-            : portfolio.riskValue === 3
+            : riskValue === 3
             ? "위험중립형"
             : ""}
         </AppText>
@@ -371,10 +381,10 @@ const PortfolioDetails = ({ route, navigation }) => {
                 현금
               </AppText>
               <AppText style={{ color: "#f0f0f0" }}>
-                {portfolio.currentCash.toLocaleString()} 원
+                {details.currentCash.toLocaleString()} 원
               </AppText>
             </View>
-            {!portfolio.auto && (
+            {!auto && (
               <Button
                 containerStyle={{ marginHorizontal: -5 }}
                 type="clear"
@@ -394,19 +404,20 @@ const PortfolioDetails = ({ route, navigation }) => {
       </View>
       <View style={styles.chartContainer}>
         <PortfolioPieChart
-          data={portfolio}
-          selectedId={
-            selectedId !== null ? selectedId : portfolio?.stocks.length
-          }
+          data={{
+            currentCash: details.currentCash,
+            stocks: details.stocks,
+          }}
+          selectedId={selectedId !== null ? selectedId : details.stocks.length}
           size={width * 0.6}
           mode={"light"}
           type={"stock"}
         />
-        {!portfolio.auto && (
+        {!auto && (
           <TouchableOpacity
             style={styles.floatingButton}
             onPress={() => {
-              navigation.navigate("AddStockInManual", { pfId: portfolio.id });
+              navigation.navigate("AddStockInManual", { id: portfolioId });
             }}
           >
             <Icon name="plus" type="antdesign" color="#f0f0f0" />
@@ -431,7 +442,7 @@ const PortfolioDetails = ({ route, navigation }) => {
           >
             주식
           </AppText>
-          {portfolio.stocks.map((item, index) => {
+          {details.stocks.map((item, index) => {
             const roi = getStockROI(index);
             const roiFormatted = roi > 0 ? `+${roi}` : `${roi}`;
             return (
@@ -452,7 +463,7 @@ const PortfolioDetails = ({ route, navigation }) => {
                 <TouchableOpacity
                   style={[
                     styles.item,
-                    selectedId === index ? styles.selectedItem : {},
+                    // selectedId === index ? styles.selectedItem : {},
                   ]}
                   onPress={() => handleSelectedId(index)}
                 >
@@ -476,7 +487,7 @@ const PortfolioDetails = ({ route, navigation }) => {
                         >
                           {item.companyName}
                         </AppText>
-                        {!portfolio.auto && (
+                        {!auto && (
                           <Button
                             type="clear"
                             onPress={() => {
@@ -596,7 +607,7 @@ const PortfolioDetails = ({ route, navigation }) => {
           <StockInfo
             isVisible={stockInfoVisible}
             onToggle={toggleStockModal}
-            ticker={portfolio.stocks[selectedId].ticker}
+            ticker={details.stocks[selectedId].ticker}
           />
           <ModalComponent isVisible={infoVisible} onToggle={toggleInfoModal}>
             <AppText
@@ -619,7 +630,7 @@ const PortfolioDetails = ({ route, navigation }) => {
                   marginBottom: 20,
                 }}
               >
-                {portfolio.stocks[selectedId].companyName}
+                {details.stocks[selectedId].companyName}
               </AppText>
               <View style={styles.contentsItem}>
                 <View style={styles.quantityContainer}>
@@ -735,7 +746,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "stretch",
-    backgroundColor: "#f5f5f5",
     backgroundColor: "#333",
   },
   outline: {

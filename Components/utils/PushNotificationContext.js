@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useEffect, useRef, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { Platform } from "react-native";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
@@ -12,10 +18,10 @@ export const PushNotificationProvider = ({ children }) => {
   const [notification, setNotification] = useState(false);
   const notificationListener = useRef();
   const responseListener = useRef();
-  const [isNotificationEnable, setIsNotificationEnable] = useState(false)
+  const [isNotificationEnable, setIsNotificationEnable] = useState(false);
 
   useEffect(() => {
-    console.log(isNotificationEnable)
+    console.log(isNotificationEnable);
     if (isNotificationEnable) {
       Notifications.setNotificationHandler({
         handleNotification: async () => ({
@@ -24,8 +30,7 @@ export const PushNotificationProvider = ({ children }) => {
           shouldSetBadge: true,
         }),
       });
-    }
-    else {
+    } else {
       Notifications.setNotificationHandler({
         handleNotification: async () => ({
           shouldShowAlert: false,
@@ -34,10 +39,10 @@ export const PushNotificationProvider = ({ children }) => {
         }),
       });
     }
-  }, [isNotificationEnable])
+  }, [isNotificationEnable]);
 
   useEffect(() => {
-    setRebalanceAlarm('denied');
+    setRebalanceAlarm("denied");
 
     registerForPushNotificationsAsync().then((token) =>
       setExpoPushToken(token)
@@ -62,7 +67,9 @@ export const PushNotificationProvider = ({ children }) => {
   }, []);
 
   return (
-    <PushNotificationContext.Provider value={{ expoPushToken, notification, setIsNotificationEnable }}>
+    <PushNotificationContext.Provider
+      value={{ expoPushToken, notification, setIsNotificationEnable }}
+    >
       {children}
     </PushNotificationContext.Provider>
   );

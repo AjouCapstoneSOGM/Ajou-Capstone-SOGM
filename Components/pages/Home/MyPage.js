@@ -8,13 +8,13 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Divider, color } from "@rneui/base";
-import AppText from "../utils/AppText";
-import urls from "../utils/urls";
-import { getUsertoken } from "../utils/localStorageUtils";
-import { useAuth } from "../utils/AuthContext";
-import ModalComponent from "../utils/Modal";
+import AppText from "../../utils/AppText";
+import urls from "../../utils/urls";
+import { getUsertoken } from "../../utils/localStorageUtils";
+import { useAuth } from "../../utils/AuthContext";
+import ModalComponent from "../../utils/Modal";
 import { TextInput } from "react-native-gesture-handler";
-import FooterComponent from "../utils/Footer";
+import FooterComponent from "../../utils/Footer";
 
 const MyPage = ({ navigation }) => {
   const { logout } = useAuth();

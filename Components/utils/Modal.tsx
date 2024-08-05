@@ -2,7 +2,17 @@ import { Button, Overlay } from "@rneui/base";
 import React from "react";
 import { StyleSheet, View } from "react-native";
 
-const ModalComponent = ({ isVisible, onToggle, children }) => {
+type ModalComponentType = {
+  isVisible: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+};
+
+const ModalComponent: React.FC<ModalComponentType> = ({
+  isVisible,
+  onToggle,
+  children,
+}) => {
   return (
     <Overlay
       isVisible={isVisible}
