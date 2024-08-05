@@ -28,7 +28,7 @@ const FooterComponent = () => {
   const getButtonStyle = (page: string): ViewStyle => {
     const baseStyle = styles.buttonContainer;
     if (currentRoute.name === page) {
-      return { ...baseStyle, backgroundColor: "#FOFOFO" };
+      return { ...baseStyle, backgroundColor: "#F0F0F0" };
     }
     return baseStyle;
   };

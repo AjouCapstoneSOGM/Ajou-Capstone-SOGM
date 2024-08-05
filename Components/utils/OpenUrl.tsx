@@ -1,6 +1,6 @@
 import { Linking } from "react-native";
 
-const OpenUrl = async (url) => {
+const OpenUrl = async (url: string): Promise<void> => {
   const supported = await Linking.canOpenURL(url);
   if (supported) {
     await Linking.openURL(url);

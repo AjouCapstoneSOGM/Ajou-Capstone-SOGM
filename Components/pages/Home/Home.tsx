@@ -11,11 +11,11 @@ import { width, height } from "../../utils/utils";
 import { FlatList } from "react-native-gesture-handler";
 import { useSearch } from "../../utils/SearchStock";
 import StockInfo from "../portfolio/StockInfo.js";
-import ModalComponent from "../../utils/Modal.js";
+import ModalComponent from "../../utils/Modal";
 import urls from "../../utils/urls.js";
-import Loading from "../../utils/Loading.js";
+import Loading from "../../utils/Loading";
 import { usePortfolio } from "../../utils/PortfolioContext";
-import OpenUrl from "../../utils/OpenUrl.js";
+import OpenUrl from "../../utils/OpenUrl";
 
 interface NewsItemData {
   title: string;

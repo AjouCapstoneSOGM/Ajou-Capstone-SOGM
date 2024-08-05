@@ -5,7 +5,7 @@ import { WebView } from "react-native-webview";
 
 import { setUserName, setUsertoken } from "../../utils/localStorageUtils";
 import { usePushNotifications } from "../../utils/PushNotificationContext.js";
-import Loading from "../../utils/Loading.js";
+import Loading from "../../utils/Loading";
 
 const REST_API_KEY = "fb89b59e48d1926cb3653c68bc05de5e";
 const REDIRECT_URI = "https://sogm.ajou.ac.kr/oauth";
