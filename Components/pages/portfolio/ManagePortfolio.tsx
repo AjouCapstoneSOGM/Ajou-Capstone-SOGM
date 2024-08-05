@@ -10,10 +10,14 @@ import { usePortfolio } from "../../utils/PortfolioContext";
 import AppText from "../../utils/AppText";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Button, Divider } from "@rneui/base";
+import { ManagePortfolioProps } from "../../types/Navigations";
 
-const ManagementPage = ({ route, navigation }) => {
+const ManagePortfolio: React.FC<ManagePortfolioProps> = ({
+  route,
+  navigation,
+}) => {
   const { fetchDelete } = usePortfolio();
-  const { portfolio } = route.params;
+  const portfolioId = route.params.id;
 
   const alertDelete = () => {
     Alert.alert("삭제 확인", "정말로 삭제하시겠습니까?", [
@@ -33,7 +37,7 @@ const ManagementPage = ({ route, navigation }) => {
   };
 
   const handleDelete = async () => {
-    const result = await fetchDelete(portfolio.id);
+    const result = await fetchDelete(portfolioId);
     if (result) {
       navigation.popToTop();
       navigation.navigate("ViewPortfolio");
@@ -47,38 +51,41 @@ const ManagementPage = ({ route, navigation }) => {
       ]);
   };
 
-  if (portfolio) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <Button
-            type="clear"
-            onPress={() => {
-              navigation.goBack();
-            }}
-            icon={{ name: "left", type: "antdesign", color: "#333" }}
-          />
-        </View>
-        <View style={styles.textContainer}>
-          <AppText style={{ fontSize: 30, fontWeight: "bold" }}>설정</AppText>
-        </View>
-        <ScrollView style={styles.settingList}>
-        <TouchableOpacity onPress={() => {navigation.navigate("RebalanceRecordList", { id: portfolio.id, portfolio: portfolio, stocks: portfolio.stocks })}} style={styles.settingItem}>
-            <AppText style={{ color: "#ffffff", fontSize: 20 }}>
-              지난 리밸런싱 내역 보기
-            </AppText>
-          </TouchableOpacity>
-          <Divider />
-          <TouchableOpacity onPress={alertDelete} style={styles.settingItem}>
-            <AppText style={{ color: "#ff5858", fontSize: 20 }}>
-              포트폴리오 삭제
-            </AppText>
-          </TouchableOpacity>
-          <Divider />
-        </ScrollView>
-      </SafeAreaView>
-    );
-  }
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <Button
+          type="clear"
+          onPress={() => {
+            navigation.goBack();
+          }}
+          icon={{ name: "left", type: "antdesign", color: "#333" }}
+        />
+      </View>
+      <View style={styles.textContainer}>
+        <AppText style={{ fontSize: 30, fontWeight: "bold" }}>설정</AppText>
+      </View>
+      <ScrollView style={styles.settingList}>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate("RebalanceRecordList", { id: portfolioId });
+          }}
+          style={styles.settingItem}
+        >
+          <AppText style={{ color: "#f0f0f0", fontSize: 20 }}>
+            지난 리밸런싱 내역 보기
+          </AppText>
+        </TouchableOpacity>
+        <Divider />
+        <TouchableOpacity onPress={alertDelete} style={styles.settingItem}>
+          <AppText style={{ color: "#ff5858", fontSize: 20 }}>
+            포트폴리오 삭제
+          </AppText>
+        </TouchableOpacity>
+        <Divider />
+      </ScrollView>
+    </SafeAreaView>
+  );
 };
 
 const styles = StyleSheet.create({
@@ -105,4 +112,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ManagementPage;
+export default ManagePortfolio;

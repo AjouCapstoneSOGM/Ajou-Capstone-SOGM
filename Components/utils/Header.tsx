@@ -48,7 +48,7 @@ const HeaderComponent: React.FC = () => {
             <Button
               type="clear"
               onPress={() => {
-                navigation.navigate("AlertList");
+                navigation.navigate("AlertList", {});
               }}
               icon={{
                 name: "bell-fill",

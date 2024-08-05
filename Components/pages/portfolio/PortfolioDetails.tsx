@@ -286,7 +286,6 @@ const PortfolioDetails: React.FC<PortfolioDetailsProps> = ({
             currentCash: currentPortfolio.detail.currentCash,
             initialAsset: currentPortfolio.detail.initialAsset,
           });
-          setTotalPrice(getTotalPrice());
           await getAlertExists(portfolioId);
           setLoading(false);
         } else {
@@ -302,6 +301,10 @@ const PortfolioDetails: React.FC<PortfolioDetailsProps> = ({
 
     loadPortfolio();
   }, [portfolios]);
+
+  useEffect(() => {
+    setTotalPrice(getTotalPrice());
+  }, [details]);
 
   if (loading) {
     return <Loading />;
@@ -337,7 +340,7 @@ const PortfolioDetails: React.FC<PortfolioDetailsProps> = ({
             <Button
               type="clear"
               onPress={() => {
-                navigation.navigate("ManagementPage", { id: portfolioId });
+                navigation.navigate("ManagePortfolio", { id: portfolioId });
               }}
               icon={{
                 name: "settings-sharp",

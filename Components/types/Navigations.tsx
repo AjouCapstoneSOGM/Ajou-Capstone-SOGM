@@ -18,7 +18,7 @@ import AlertList from "../pages/rebalance/AlertList";
 import ViewPortfolio from "../pages/portfolio/ViewPortfolio";
 import PortfolioDetails from "../pages/portfolio/PortfolioDetails";
 import AddStockInManual from "../pages/portfolio/AddStockInManual";
-import ManagementPage from "../pages/portfolio/ManagePortfolio";
+import ManagePortfolio from "../pages/portfolio/ManagePortfolio";
 import RebalanceRecordList from "../pages/portfolio/RebalanceRecordList";
 import ViewRebalanceRecord from "../pages/portfolio/ViewRebalanceRecord";
 import MakePortfolio from "../pages/make/MakePortfolio";
@@ -35,13 +35,13 @@ export type RootStackParamList = {
   SocialLogin: undefined;
   Signup: undefined;
   ResetPW: undefined;
-  AlertList: { id: number };
+  AlertList: { id?: number };
   ViewPortfolio: undefined;
   NewsSummary: { ticker: string; name: string };
   PortfolioDetails: { id: number };
   AddStockInManual: { id: number };
-  ManagementPage: { id: number };
-  RebalanceRecordList: undefined;
+  ManagePortfolio: { id: number };
+  RebalanceRecordList: { id: number };
   ViewRebalanceRecord: undefined;
   ModifyPortfolio: undefined;
   MakePortfolio: undefined;
@@ -54,6 +54,10 @@ export type ViewPortfolioProps = StackScreenProps<
 export type PortfolioDetailsProps = StackScreenProps<
   RootStackParamList,
   "PortfolioDetails"
+>;
+export type ManagePortfolioProps = StackScreenProps<
+  RootStackParamList,
+  "ManagePortfolio"
 >;
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -80,7 +84,7 @@ export const ScreenStack = () => {
       <Stack.Screen name="NewsSummary" component={NewsSummary} />
       <Stack.Screen name="PortfolioDetails" component={PortfolioDetails} />
       <Stack.Screen name="AddStockInManual" component={AddStockInManual} />
-      <Stack.Screen name="ManagementPage" component={ManagementPage} />
+      <Stack.Screen name="ManagePortfolio" component={ManagePortfolio} />
       <Stack.Screen
         name="RebalanceRecordList"
         component={RebalanceRecordList}

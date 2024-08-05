@@ -13,9 +13,9 @@ import ListPage1 from "../make/manual/ListPage1";
 import ListPage2 from "../make/manual/ListPage2";
 
 const AddStockInManual = ({ route, navigation }) => {
-  const pfId = route.params.pfId;
+  const id = route.params.id;
   const [stockList, setStockList] = useState([]);
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(1);
   const [interest, setInterest] = useState("");
   const [disabled, setDisabled] = useState(false);
   const { reloadPortfolio } = usePortfolio();
@@ -25,7 +25,7 @@ const AddStockInManual = ({ route, navigation }) => {
   };
 
   const handleMovePage = async () => {
-    await reloadPortfolio(pfId);
+    await reloadPortfolio(id);
     navigation.popToTop();
     navigation.navigate("ViewPortfolio");
   };
@@ -49,8 +49,6 @@ const AddStockInManual = ({ route, navigation }) => {
 
   const renderManualStep = () => {
     switch (step) {
-      case 0:
-        return <ManualAddSelect step={step} setStep={setStep} />;
       case 1:
         return (
           <ManualPage1

@@ -11,6 +11,7 @@ import { timeAgo } from "../../utils/utils";
 const AlertList = ({ route, navigation }) => {
   const { rebalances, getPortfolioById } = usePortfolio();
   const [rebalanceList, setRebalanceList] = useState([]);
+  const id = route.params?.id;
 
   const getIsBuyCount = (stocks) => {
     const buyCount = stocks.filter((item) => item.isBuy === true).length;
@@ -20,9 +21,9 @@ const AlertList = ({ route, navigation }) => {
 
   useFocusEffect(
     useCallback(() => {
-      if (route.params) {
+      if (id) {
         setRebalanceList(
-          rebalances.filter((rebalance) => rebalance.pfId === route.params.pfId)
+          rebalances.filter((rebalance) => rebalance.pfId === id)
         );
       } else {
         setRebalanceList(rebalances);
@@ -55,7 +56,7 @@ const AlertList = ({ route, navigation }) => {
                     pfId: item.pfId,
                     rnId: item.rnId,
                     rebalancing: item.rebalancings,
-                    portfolio: await getPortfolioById(item.pfId),
+                    portfolio: getPortfolioById(item.pfId),
                   });
                 }}
               >
