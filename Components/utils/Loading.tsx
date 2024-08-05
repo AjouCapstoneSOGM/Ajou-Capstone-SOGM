@@ -1,7 +1,12 @@
 import React from "react";
 import { View, ActivityIndicator, Modal, StyleSheet } from "react-native";
 
-const Loading = ({ size = "large", color = "#aaa" }) => {
+type LoadingType = {
+  size?: "small" | "large";
+  color?: string;
+};
+
+const Loading: React.FC<LoadingType> = ({ size = "large", color = "#aaa" }) => {
   return (
     <Modal
       transparent={true} // 배경을 투명하게 설정

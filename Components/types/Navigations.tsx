@@ -3,9 +3,9 @@ import {
   StackScreenProps,
 } from "@react-navigation/stack";
 
-import Settings from "../pages/Settings";
-import Information from "../pages/Information";
-import MyPage from "../pages/MyPage";
+import Settings from "../pages/Home/Settings";
+import Information from "../pages/Home/Information";
+import MyPage from "../pages/Home/MyPage";
 import QnA from "../pages/qna/QnA";
 import QnACreate from "../pages/qna/QnaCreate";
 import Login from "../pages/login/login";
@@ -13,7 +13,7 @@ import SocialLogin from "../pages/login/sociallogin";
 import Signup from "../pages/login/signup";
 import ResetPW from "../pages/login/resetpw";
 import Home from "../pages/Home/Home";
-import NewsSummary from "../pages/NewsSummary";
+import NewsSummary from "../pages/portfolio/NewsSummary";
 import AlertList from "../pages/rebalance/AlertList";
 import ViewPortfolio from "../pages/portfolio/ViewPortfolio";
 import PortfolioDetails from "../pages/portfolio/PortfolioDetails";
@@ -35,12 +35,12 @@ export type RootStackParamList = {
   SocialLogin: undefined;
   Signup: undefined;
   ResetPW: undefined;
-  AlertList: undefined;
+  AlertList: { id: number };
   ViewPortfolio: undefined;
-  NewsSummary: undefined;
-  PortfolioDetails: undefined;
-  AddStockInManual: undefined;
-  ManagementPage: undefined;
+  NewsSummary: { ticker: string; name: string };
+  PortfolioDetails: { id: number };
+  AddStockInManual: { id: number };
+  ManagementPage: { id: number };
   RebalanceRecordList: undefined;
   ViewRebalanceRecord: undefined;
   ModifyPortfolio: undefined;
@@ -50,6 +50,10 @@ export type RootStackParamList = {
 export type ViewPortfolioProps = StackScreenProps<
   RootStackParamList,
   "ViewPortfolio"
+>;
+export type PortfolioDetailsProps = StackScreenProps<
+  RootStackParamList,
+  "PortfolioDetails"
 >;
 
 const Stack = createStackNavigator<RootStackParamList>();

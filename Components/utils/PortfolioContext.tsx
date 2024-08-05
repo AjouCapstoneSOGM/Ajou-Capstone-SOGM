@@ -15,16 +15,7 @@ const PortfolioContext = createContext<PortfolioContextType | null>(null);
 export const PortfolioProvider: React.FC<PortfolioProviderProps> = ({
   children,
 }) => {
-  const [portfolios, setPortfolios] = useState<Portfolio[]>([
-    {
-      id: 0,
-      name: "",
-      country: "",
-      isAuto: true,
-      riskValue: 1,
-      createdDate: new Date("2000-01-01"),
-    },
-  ]);
+  const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
   const [portLoading, setPortLoading] = useState<boolean>(false);
   const [rebalances, setRebalances] = useState<RebalancingList[]>([
     {

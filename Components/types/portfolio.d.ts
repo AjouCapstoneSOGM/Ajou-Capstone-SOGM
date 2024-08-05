@@ -47,10 +47,10 @@ declare global {
     id: number;
     name: string;
     country: string;
-    isAuto: boolean;
+    auto: boolean;
     riskValue: number;
     createdDate: Date;
-    detail?: PortfolioDetail;
+    detail: PortfolioDetail;
   };
 
   type RebalancingStock = {
